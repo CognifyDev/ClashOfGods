@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
+        <Title>COG</Title>
+        <Description>A mod for Among Us</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.6.13" />
+      <PackageReference Include="BepInEx.IL2CPP" Version="6.0.0-be.577" />
+      <PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.0.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.649" />
+      <PackageReference Include="Costura.Fody" Version="5.7.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="GitInfo" Version="2.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Modules\" />
+    </ItemGroup>
+
+</Project>
