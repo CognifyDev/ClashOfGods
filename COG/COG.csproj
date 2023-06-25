@@ -9,6 +9,20 @@
         <Description>A mod for Among Us</Description>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <WarningLevel>4</WarningLevel>
+      <WarningsAsErrors>;NU1605</WarningsAsErrors>
+      <DefineConstants>TRACE;</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <DefineConstants>TRACE;</DefineConstants>
+      <WarningLevel>4</WarningLevel>
+      <WarningsAsErrors>;NU1605</WarningsAsErrors>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.6.13" />
       <PackageReference Include="BepInEx.IL2CPP" Version="6.0.0-be.577" />

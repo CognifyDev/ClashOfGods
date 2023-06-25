@@ -22,6 +22,7 @@ public class Main : BasePlugin
     /// </summary>
     public override void Load()
     {
+        Logger.LogInfo("Loading...");
         Logger = BepInEx.Logging.Logger.CreateLogSource("ClashOfGods");
         harmony.PatchAll();
         
