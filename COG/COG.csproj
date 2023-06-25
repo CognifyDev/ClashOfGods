@@ -22,6 +22,11 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="GitInfo" Version="2.3.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  
+	  <Reference Include="$(AmongUs)\BepInEx\core\*.dll" />
+	  <Reference Include="$(AmongUs)\BepInEx\unhollowed\*.dll" />
+	  <EmbeddedResource Include=".\Resources\InDLL\*.*" />
     </ItemGroup>
 
     <ItemGroup>

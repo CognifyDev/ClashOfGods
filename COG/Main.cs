@@ -1,5 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.IL2CPP;
+using COG.Listener;
+using COG.Listener.Impl;
 using HarmonyLib;
 
 namespace COG;
@@ -9,8 +11,8 @@ namespace COG;
 public class Main : BasePlugin
 {
     
-    public const string PluginName = "Cash of God";
-    public const string PluginGuid = "top.cog.cashofgod";
+    public const string PluginName = "Clash of Gods";
+    public const string PluginGuid = "top.cog.clashofgods";
     public const string PluginVersion = "1.0.0";
     public Harmony harmony { get; } = new(PluginGuid);
     
@@ -21,5 +23,7 @@ public class Main : BasePlugin
     public override void Load()
     {
         harmony.PatchAll();
+        
+        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener() });
     }
 }
