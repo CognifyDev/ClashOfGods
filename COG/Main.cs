@@ -1,11 +1,7 @@
-﻿using System.Reflection;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.IL2CPP;
 using HarmonyLib;
 
-[assembly: AssemblyFileVersion(COG.Main.PluginVersion)]
-[assembly: AssemblyInformationalVersion(COG.Main.PluginVersion)]
-[assembly: AssemblyVersion(COG.Main.PluginVersion)]
 namespace COG;
 
 [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
