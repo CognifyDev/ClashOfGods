@@ -10,11 +10,11 @@ namespace COG;
 [BepInProcess("Among Us.exe")]
 public class Main : BasePlugin
 {
-    
     public const string PluginName = "Clash of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string PluginVersion = "1.0.0";
     public Harmony harmony { get; } = new(PluginGuid);
+    public static BepInEx.Logging.ManualLogSource Logger;
     
     
     /// <summary>
@@ -22,6 +22,7 @@ public class Main : BasePlugin
     /// </summary>
     public override void Load()
     {
+        Logger = BepInEx.Logging.Logger.CreateLogSource("ClashOfGods");
         harmony.PatchAll();
         
         ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener() });
