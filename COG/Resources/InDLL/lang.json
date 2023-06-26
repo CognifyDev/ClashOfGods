@@ -1,3 +1,9 @@
 {
+  "English": {
+    "MakePublic": "The room is not allowed to make public"
+  },
   
+  "SimplifiedChinese": {
+    "MakePublic": "房间不允许被设置为公开"
+  }
 }

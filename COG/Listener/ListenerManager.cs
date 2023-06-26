@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace COG.Listener;
 
 public class ListenerManager

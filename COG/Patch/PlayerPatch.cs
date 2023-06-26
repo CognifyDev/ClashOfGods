@@ -46,5 +46,17 @@ class PlayerMurderPatch
 
         return true;
     }
+}
 
+[HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
+internal class ChatUpdatePatch
+{
+    public static void Postfix(ChatController __instance)
+    {
+        if (!AmongUsClient.Instance.AmHost) return;
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnChatUpdate(__instance);
+        }
+    }
 }

@@ -1,21 +1,28 @@
-﻿using System.Reflection;
-using BepInEx;
-using BepInEx.IL2CPP;
+﻿using BepInEx;
+using BepInEx.Unity.IL2CPP;
 using COG.Listener;
 using COG.Listener.Impl;
+using COG.Utils;
 using HarmonyLib;
 
 namespace COG;
 
-[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+[BepInAutoPlugin(PluginGuid, PluginName)]
+[BepInIncompatibility("com.emptybottle.townofhost")]
+[BepInIncompatibility("me.eisbison.theotherroles")]
+[BepInIncompatibility("me.yukieiji.extremeroles")]
+[BepInIncompatibility("jp.ykundesu.supernewroles")]
+[BepInIncompatibility("com.tugaru.TownOfPlus")]
 [BepInProcess("Among Us.exe")]
-public class Main : BasePlugin
+public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string PluginVersion = "1.0.0";
     public Harmony harmony { get; } = new(PluginGuid);
     public static BepInEx.Logging.ManualLogSource Logger;
+
+    public static Main Instance;
     
     
     /// <summary>
@@ -23,11 +30,15 @@ public class Main : BasePlugin
     /// </summary>
     public override void Load()
     {
+        Instance = this;
+        
         Logger = BepInEx.Logging.Logger.CreateLogSource("ClashOfGods");
         Logger.LogInfo("Loading...");
         
-        harmony.PatchAll();
+        ConfigManager.Init();
         
-        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener() });
+        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener(), new ChatListener(), new GameListener() });
+        
+        harmony.PatchAll();
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace COG.Utils;
 
 public class TaskManager

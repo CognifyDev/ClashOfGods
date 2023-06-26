@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace COG.Command;
 
 public class CommandManager

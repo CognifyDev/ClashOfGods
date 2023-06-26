@@ -1,3 +1,5 @@
+using Il2CppSystem;
+
 namespace COG.Utils;
 
 public class SystemUtils

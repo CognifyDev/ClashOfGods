@@ -1,22 +1,22 @@
 namespace COG.Utils;
 
-public class Task
+public abstract class Task
 {
     public string Name { get; }
-    public Action Action { get; }
 
-    public Task(Action action, string name = "Unknown")
+    public Task(string name = "Unknown")
     {
         Name = name;
-        Action = action;
     }
+
+    public abstract void Run();
 }
 
-public class LateTask : Task
+public abstract class LateTask : Task
 {
     public float Time { get; }
 
-    public LateTask(Action action, float time, string name = "Unknown") : base(action, name)
+    public LateTask(float time, string name = "Unknown") : base(name)
     {
         Time = SystemUtils.GetTimeStamp() + time;
     }

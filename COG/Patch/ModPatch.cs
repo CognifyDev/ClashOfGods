@@ -17,7 +17,7 @@ internal class ModManagerLateUpdatePatch
             {
                 if (lateTask.Time < timestamp)
                 {
-                    task.Action();
+                    task.Run();
                 }
             }
         }
