@@ -26,13 +26,6 @@
         <AssemblyName>ClashOfGods</AssemblyName>
     </PropertyGroup>
 
-
-    <ItemGroup>
-      <None Remove="Resources\Images\COG-BG.png" />
-      <None Remove="Resources\InDLL\lang.json" />
-    </ItemGroup>
-
-
     <ItemGroup>
       <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
       <EmbeddedResource Include="Resources\InDLL\lang.json" />
