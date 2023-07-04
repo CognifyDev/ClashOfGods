@@ -34,7 +34,7 @@
 
 
     <ItemGroup>
-      <EmbeddedResource Include="Resources\Images\COG-BG.png" />
+      <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
       <EmbeddedResource Include="Resources\InDLL\lang.json" />
     </ItemGroup>
 

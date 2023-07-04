@@ -1,5 +1,8 @@
 namespace COG.Utils;
 
+// not finished!
+// DO NOT USE
+
 public abstract class Task
 {
     public string Name { get; }

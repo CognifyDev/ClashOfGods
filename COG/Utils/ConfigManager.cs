@@ -29,8 +29,5 @@ public class ConfigManager
         return null;
     }
 
-    public static string GetDataDirectoryName()
-    {
-        return Main.PluginName + "_DATA";
-    }
+    public static string GetDataDirectoryName() => Main.DisplayName + "_DATA";
 }

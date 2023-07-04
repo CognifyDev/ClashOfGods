@@ -41,7 +41,7 @@ public static class TitleLogo
         var CustomBG = new GameObject("CustomBG");
         CustomBG.transform.position = new Vector3(2, 0f, 0);
         var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
-        bgRenderer.sprite = LoadSprite("COG.Resources.Images.COG-BG.png", 280f);
+        bgRenderer.sprite = LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 280f);
     }
 }
 

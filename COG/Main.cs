@@ -20,6 +20,8 @@ public partial class Main : BasePlugin
     public const string PluginGuid = "top.cog.clashofgods";
     public const string PluginVersion = "1.0.0";
     public Harmony harmony { get; } = new(PluginGuid);
+    public const string DisplayName = "ClashOfGods";
+
     public static BepInEx.Logging.ManualLogSource Logger;
 
     public static Main Instance;
