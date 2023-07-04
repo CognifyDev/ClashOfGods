@@ -58,4 +58,6 @@ public interface IListener
     /// <param name="manager"></param>
     /// <returns></returns>
     bool OnMakePublic(GameStartManager manager) { return true; }
+
+    void OnPingTrackerUpdate(PingTracker tracker) { }
 }

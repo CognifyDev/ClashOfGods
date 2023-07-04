@@ -15,4 +15,6 @@ public class SystemUtils
         var timeStamp = isMillisecond ? Convert.ToInt64(ts.TotalMilliseconds) : Convert.ToInt64(ts.TotalSeconds); 
         return timeStamp; 
     }
+
+    public static int GetLanguageAsLCID() => System.Globalization.CultureInfo.CurrentCulture.LCID;
 }

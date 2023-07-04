@@ -1,3 +1,4 @@
+using System;
 using Il2CppSystem.IO;
 using Il2CppSystem.Text.Json;
 
@@ -48,6 +49,21 @@ public class Language
         return null;
     }
 
+    public static SupportedLanguage GetSupportedLanguageByLcid(int lcid)
+    {
+        try
+        {
+            var toReturn = Enum.Parse<SupportedLanguage>(Enum.GetName(typeof(SupportedLanguage), lcid) ?? string.Empty);
+            return toReturn;
+        }
+        catch (ArgumentException)
+        {
+            return SupportedLanguage.EnUs;
+        }
+    }
+
+    public static SupportedLanguage GetCorrectSupportedLanguage() => GetSupportedLanguageByLcid(SystemUtils.GetLanguageAsLCID());
+
 }
 
 /// <summary>
@@ -55,5 +71,6 @@ public class Language
 /// </summary>
 public enum SupportedLanguage
 {
-    SimplifiedChinese, English
+    ZhCn = 2052,
+    EnUs = 1033
 }

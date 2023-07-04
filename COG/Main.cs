@@ -16,7 +16,7 @@ namespace COG;
 [BepInProcess("Among Us.exe")]
 public partial class Main : BasePlugin
 {
-    public const string PluginName = "Clash of Gods";
+    public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string PluginVersion = "1.0.0";
     public Harmony harmony { get; } = new(PluginGuid);
@@ -37,7 +37,7 @@ public partial class Main : BasePlugin
         
         ConfigManager.Init();
         
-        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener(), new ChatListener(), new GameListener() });
+        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener(), new ChatListener(), new GameListener(), new VersionShowerListener() });
         
         harmony.PatchAll();
     }

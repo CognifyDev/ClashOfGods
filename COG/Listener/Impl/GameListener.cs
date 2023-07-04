@@ -1,4 +1,5 @@
 using COG.States;
+using COG.Utils;
 
 namespace COG.Listener.Impl;
 
@@ -23,6 +24,7 @@ public class GameListener : IListener
 
     public bool OnMakePublic(GameStartManager manager)
     {
+        GameUtils.SendGameMessage(Language.GetLang("MakePublic", Language.GetCorrectSupportedLanguage()));
         // 禁止设置为公开
         return false;
     }
