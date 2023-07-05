@@ -24,9 +24,9 @@ public partial class Main : BasePlugin
 
     public static BepInEx.Logging.ManualLogSource Logger;
 
-    public static Main Instance;
-    
-    
+    public static Main Instance { get; private set; }
+
+
     /// <summary>
     /// 插件的启动方法
     /// </summary>
