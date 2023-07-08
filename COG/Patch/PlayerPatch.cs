@@ -1,5 +1,6 @@
 using COG.Listener;
 using HarmonyLib;
+using UnityEngine;
 
 namespace COG.Patch;
 
@@ -59,4 +60,33 @@ internal class ChatUpdatePatch
             listener.OnChatUpdate(__instance);
         }
     }
+}
+[HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Update))]
+class HostSartPatch
+{
+    private static float timer = 600;
+    private static string currentText = "";
+    private static bool update = false;
+    public static void Prefix(GameStartManager __instance)
+    {
+        // showtime
+        if (!AmongUsClient.Instance.AmHost || !GameData.Instance || AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return;
+        update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
+        // start with no limit
+        GameStartManager.Instance.MinPlayers = 1;
+    }
+    public static void Postfix(GameStartManager __instance)
+    {
+        // showtime
+        if (update) currentText = __instance.PlayerCounter.text;
+        if (!AmongUsClient.Instance.AmHost) return;
+        timer = Mathf.Max(0f, timer -= Time.deltaTime);
+        int minutes = (int)timer / 60;
+        int seconds = (int)timer % 60;
+
+        string suffix = $"({minutes:00}:{seconds:00})";
+        __instance.PlayerCounter.text = currentText + suffix;
+        __instance.PlayerCounter.autoSizeTextContainer = true;
+    }
+
 }
