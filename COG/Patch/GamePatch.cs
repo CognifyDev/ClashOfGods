@@ -32,6 +32,8 @@ class GameStartManagerStartPatch
 {
     public static void Postfix(GameStartManager __instance)
     {
+        HostSartPatch.timer = 600f;
+
         foreach (var listener in ListenerManager.GetManager().GetListeners())
         {
             listener.OnGameStart(__instance);

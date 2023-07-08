@@ -64,7 +64,7 @@ internal class ChatUpdatePatch
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Update))]
 class HostSartPatch
 {
-    private static float timer = 600;
+    public static float timer = 600;
     private static string currentText = "";
     private static bool update = false;
     public static void Prefix(GameStartManager __instance)
