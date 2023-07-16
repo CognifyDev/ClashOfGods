@@ -25,4 +25,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: COG Artifact
-        path: COG/bin/Debug/net6.0/ClashOfGods.dll
+        path: COG/bin
+    - name: Upload Objects
+      uses: actions/upload-artifact@v2
+      with:
+        name: Objects
+        path: COG/obj
