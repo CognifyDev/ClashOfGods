@@ -38,7 +38,7 @@ public partial class Main : BasePlugin
         
         Logger = BepInEx.Logging.Logger.CreateLogSource("ClashOfGods");
         Logger.LogInfo("Loading...");
-        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener(), new GameListener(), new VersionShowerListener() });
+        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener(), new GameListener(), new VersionShowerListener(), new PlayerListener() });
         
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
         {

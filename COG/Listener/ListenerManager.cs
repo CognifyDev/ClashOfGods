@@ -22,6 +22,11 @@ public class ListenerManager
     {
         _listeners.AddRange(listeners);
     }
+
+    public void UnregisterListener(IListener listener)
+    {
+        _listeners.Remove(listener);
+    }
     
     public List<IListener> GetListeners() => _listeners;
 

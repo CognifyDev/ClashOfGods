@@ -1,6 +1,6 @@
 ﻿namespace COG.Role;
 
-public enum Camp
+public enum CampType
 {
     Crewmate, Impostor, Neutral, Unknown
 }

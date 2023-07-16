@@ -1,4 +1,5 @@
-﻿using COG.Listener;
+﻿using AmongUs.GameOptions;
+using COG.Listener;
 using UnityEngine;
 
 namespace COG.Role;
@@ -30,13 +31,19 @@ public abstract class Role
     /// <summary>
     /// 角色阵营
     /// </summary>
-    public Camp Camp { get; protected set; }
+    public CampType CampType { get; protected set; }
+    
+    /// <summary>
+    /// 原版角色蓝本
+    /// </summary>
+    public RoleTypes BaseRoleType { get; protected set; }
 
     protected Role(int id)
     {
         ID = id;
         Color = Color.white;
-        Camp = Camp.Crewmate;
+        CampType = CampType.Crewmate;
+        BaseRoleType = RoleTypes.Crewmate;
     }
 
     public abstract IListener GetListener(PlayerControl player);

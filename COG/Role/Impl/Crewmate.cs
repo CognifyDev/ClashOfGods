@@ -10,7 +10,7 @@ public class Crewmate : Role, IListener
         Name = "Crewmate";
         Description = "Finish your tasks!";
         Color = Color.white;
-        Camp = Camp.Crewmate;
+        CampType = CampType.Crewmate;
     }
 
     public override IListener GetListener(PlayerControl player)
