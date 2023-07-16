@@ -17,6 +17,7 @@ public class GameListener : IListener
 
     public void OnSelectRoles()
     {
+        RegisteredListeners.Clear();
         GameUtils.Data.Clear();
         var players = PlayerUtils.GetAllPlayers().Disarrange();
         var maxImpostors = GameUtils.GetGameOptions().NumImpostors;
