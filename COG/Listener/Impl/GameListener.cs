@@ -1,4 +1,3 @@
-using COG.Role;
 using COG.States;
 using COG.Utils;
 
@@ -9,15 +8,8 @@ public class GameListener : IListener
     public void OnCoBegin()
     {
         GameStates.InGame = true;
-        var players = PlayerUtils.GetAllPlayers();
-        var impostorNum = GameUtils.GetGameOptions().NumImpostors;
-        for (var i = 0; i < players.Count; i++)
-        {
-            var roles = Role.RoleManager.GetManager().GetRoles();
-            var role = roles.Count - 1 > i ? roles[i] : Role.RoleManager.GetManager().GetDefaultRole(impostorNum <= 0 ? Camp.Crewmate : Camp.Impostor);
-            if (role.Camp == Camp.Impostor) impostorNum --;
-            GameUtils.Data.Add(players[i], role);
-        }
+        
+        // 施工中
     }
 
     public void OnGameEnd(AmongUsClient client, EndGameResult endGameResult)
@@ -42,6 +34,6 @@ public class GameListener : IListener
     public void OnSetUpRoleText(IntroCutscene intro)
     {
         // 游戏开始的时候显示角色信息
-        
+        // 施工中
     }
 }
