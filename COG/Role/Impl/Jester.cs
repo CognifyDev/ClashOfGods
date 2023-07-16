@@ -13,7 +13,7 @@ public class Jester : Role, IListener
         Name = "Jester";
         Description = "You'll win when you get exiled.";
         Color = Color.magenta;
-        Camp = Camp.Neutral;
+        CampType = CampType.Neutral;
     }
 
     private bool CheckNull()
@@ -26,6 +26,7 @@ public class Jester : Role, IListener
         if (CheckNull()) return;
         if (!controller.exiled.IsSamePlayer(_player!.Data)) return;
         
+        GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, true);
     }
 
     public void OnAirshipPlayerExile(AirshipExileController controller)

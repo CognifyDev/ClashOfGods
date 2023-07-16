@@ -73,5 +73,11 @@ public interface IListener
 
     void OnAirshipPlayerExile(AirshipExileController controller) { }
 
-    // void OnPlayerLeave(AmongUsClient client, ClientData data, DisconnectReasons reason) { }
+    void OnPlayerLeft(AmongUsClient client, ClientData data, DisconnectReasons reason) { }
+
+    void OnSelectRoles() { }
+    
+    void OnPlayerJoined(AmongUsClient amongUsClient) {}
+    
+    void OnGameEndSetEverythingUp(EndGameManager manager) {}
 }

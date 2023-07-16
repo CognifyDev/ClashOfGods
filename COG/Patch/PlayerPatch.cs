@@ -1,5 +1,6 @@
 using COG.Listener;
 using HarmonyLib;
+using InnerNet;
 using UnityEngine;
 
 namespace COG.Patch;
@@ -110,6 +111,31 @@ class AirshipExileControllerPatch
         foreach (var listener in ListenerManager.GetManager().GetListeners())
         {
             listener.OnAirshipPlayerExile(__instance);
+        }
+    }
+}
+
+[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameJoined))]
+class OnGameJoinedPatch
+{
+    public static void Postfix(AmongUsClient __instance)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnPlayerJoined(__instance);
+        }
+    }
+}
+
+[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerLeft))]
+class OnPlayerLeftPatch
+{
+    public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data,
+        [HarmonyArgument(1)] DisconnectReasons reason)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnPlayerLeft(__instance, data, reason);
         }
     }
 }

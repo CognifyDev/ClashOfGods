@@ -1,4 +1,5 @@
 using COG.Listener;
+using COG.Listener.Impl;
 using HarmonyLib;
 
 namespace COG.Patch;
@@ -58,5 +59,29 @@ internal class MakePublicPatch
         if (returnAble) return false;
 
         return true;
+    }
+}
+
+[HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SelectRoles))]
+class SelectRolesPatch
+{
+    public static void Prefix()
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnSelectRoles();
+        }
+    }
+}
+
+[HarmonyPatch(typeof(EndGameManager), nameof(EndGameManager.SetEverythingUp))]
+class SetEverythingUpPatch
+{
+    public static void Postfix(EndGameManager __instance)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnGameEndSetEverythingUp(__instance);
+        }
     }
 }
