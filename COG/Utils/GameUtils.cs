@@ -1,7 +1,12 @@
+using System.Collections.Generic;
+using AmongUs.GameOptions;
+
 namespace COG.Utils;
 
 public class GameUtils
 {
+    public static readonly Dictionary<PlayerControl, Role.Role> Data = new();
+
     /// <summary>
     /// 向游戏里面发送一条信息
     /// </summary>
@@ -11,4 +16,6 @@ public class GameUtils
         if (DestroyableSingleton<HudManager>._instance) 
             DestroyableSingleton<HudManager>.Instance.Notifier.AddItem(text);
     }
+
+    public static NormalGameOptionsV07 GetGameOptions() => GameOptionsManager.Instance.currentNormalGameOptions;
 }

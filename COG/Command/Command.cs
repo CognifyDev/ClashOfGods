@@ -1,3 +1,5 @@
+using System;
+
 namespace COG.Command;
 
 public abstract class Command
@@ -30,7 +32,7 @@ public abstract class Command
     /// <summary>
     /// 命令其他形式
     /// </summary>
-    public string[] Aliases { get; set; }
+    public string[] Aliases { get; set; } = Array.Empty<string>();
 
     /// <summary>
     /// 玩家运行命令执行逻辑

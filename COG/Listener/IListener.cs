@@ -1,3 +1,5 @@
+using InnerNet;
+
 namespace COG.Listener;
 
 /// <summary>
@@ -5,6 +7,10 @@ namespace COG.Listener;
 /// </summary>
 public interface IListener
 {
+    private class EmptyListener : IListener { }
+
+    public static readonly IListener Empty = new EmptyListener();
+    
     /// <summary>
     /// 当一个玩家被击杀的时候，触发该监听器
     /// </summary>
@@ -60,4 +66,12 @@ public interface IListener
     bool OnMakePublic(GameStartManager manager) { return true; }
 
     void OnPingTrackerUpdate(PingTracker tracker) { }
+
+    void OnSetUpRoleText(IntroCutscene intro) { }
+
+    void OnPlayerExile(ExileController controller) { }
+
+    void OnAirshipPlayerExile(AirshipExileController controller) { }
+
+    // void OnPlayerLeave(AmongUsClient client, ClientData data, DisconnectReasons reason) { }
 }

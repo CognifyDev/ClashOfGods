@@ -88,5 +88,28 @@ class HostSartPatch
         __instance.PlayerCounter.text = currentText + suffix;
         __instance.PlayerCounter.autoSizeTextContainer = true;
     }
+}
 
+[HarmonyPatch(typeof(ExileController), nameof(ExileController.WrapUp))]
+class ExileControllerPatch
+{
+    public static void Postfix(ExileController __instance)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnPlayerExile(__instance);
+        }
+    }
+}
+
+[HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.WrapUpAndSpawn))]
+class AirshipExileControllerPatch
+{
+    public static void Postfix(AirshipExileController __instance)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnAirshipPlayerExile(__instance);
+        }
+    }
 }

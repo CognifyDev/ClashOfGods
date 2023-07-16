@@ -2,8 +2,9 @@
 using BepInEx.Unity.IL2CPP;
 using COG.Listener;
 using COG.Listener.Impl;
-using COG.Utils;
+using COG.Role.Impl;
 using HarmonyLib;
+using Reactor;
 
 namespace COG;
 
@@ -13,6 +14,7 @@ namespace COG;
 [BepInIncompatibility("me.yukieiji.extremeroles")]
 [BepInIncompatibility("jp.ykundesu.supernewroles")]
 [BepInIncompatibility("com.tugaru.TownOfPlus")]
+[BepInDependency(ReactorPlugin.Id)]
 [BepInProcess("Among Us.exe")]
 public partial class Main : BasePlugin
 {
@@ -36,10 +38,14 @@ public partial class Main : BasePlugin
         
         Logger = BepInEx.Logging.Logger.CreateLogSource("ClashOfGods");
         Logger.LogInfo("Loading...");
+        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener(), new GameListener(), new VersionShowerListener() });
         
-        ConfigManager.Init();
-        
-        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener(), new ChatListener(), new GameListener(), new VersionShowerListener() });
+        Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
+        {
+            new Crewmate(),
+            new Impostor(),
+            new Jester()
+        });
         
         harmony.PatchAll();
     }
