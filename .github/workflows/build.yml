@@ -1,0 +1,28 @@
+name: build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore --source https://api.nuget.org/v3/index.json --source https://nuget.bepinex.dev/v3/index.json
+    - name: Build
+      run: dotnet build
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: COG Artifact
+        path: COG/bin/Debug/net6.0/ClashOfGods.dll
