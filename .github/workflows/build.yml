@@ -22,12 +22,12 @@ jobs:
     - name: Build
       run: dotnet build
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: COG Artifact
         path: COG/bin
     - name: Upload Objects
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Objects
         path: COG/obj
