@@ -10,7 +10,7 @@ class HostChatPatch
 {
     public static bool Prefix(ChatController __instance)
     {
-        if (__instance.TextArea.text == "") return false;
+        if (__instance.freeChatField.textArea.text == "") return false;
 
         bool returnAble = false;
         foreach (var listener in ListenerManager.GetManager().GetListeners())

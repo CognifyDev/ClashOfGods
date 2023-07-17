@@ -7,7 +7,7 @@ public class CommandListener : IListener
 {
     public bool OnHostChat(ChatController controller)
     {
-        var text = controller.TextArea.text;
+        var text = controller.freeChatField.textArea.text;
         if (!text.ToLower().StartsWith("/")) return true;
         
         bool cancellable = false;
