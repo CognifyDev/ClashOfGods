@@ -1,9 +1,10 @@
-﻿using BepInEx;
+﻿global using Hazel;
+global using HarmonyLib;
+using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Role.Impl;
-using HarmonyLib;
 using Reactor;
 
 namespace COG;
