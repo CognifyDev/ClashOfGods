@@ -80,4 +80,10 @@ public interface IListener
     void OnPlayerJoined(AmongUsClient amongUsClient) {}
     
     void OnGameEndSetEverythingUp(EndGameManager manager) {}
+
+    void OnIGameOptionsExtensionsDisplay(ref string result) { }
+
+    void OnKeyboardJoystickUpdate(KeyboardJoystick keyboardJoystick) {}
+
+    void OnRPCReceived(byte callId, MessageReader reader) { }
 }

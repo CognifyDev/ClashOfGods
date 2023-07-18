@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using COG.Listener;
 
 namespace COG.Modules
 {
@@ -18,6 +18,11 @@ namespace COG.Modules
                     RPCProcedure.HandleShareOptions(reader.ReadByte(), reader);
                     break;
             }
+            
+            foreach (var listener in ListenerManager.GetManager().GetListeners())
+            {
+                listener.OnRPCReceived(callId, reader);
+            }
         }
     }
     class RPCProcedure
@@ -30,8 +35,8 @@ namespace COG.Modules
                 {
                     uint optionId = reader.ReadPackedUInt32();
                     uint selection = reader.ReadPackedUInt32();
-                    CustomOption option = CustomOption.options.First(option => option.id == (int)optionId);
-                    option.updateSelection((int)selection);
+                    // CustomOption? option = CustomOption.Options.First(option => option.ID == (int)optionId);
+                    // option.UpdateSelection((int)selection);
                 }
             }
             catch (System.Exception e)
