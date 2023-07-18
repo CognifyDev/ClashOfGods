@@ -2,6 +2,8 @@
 global using HarmonyLib;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
+using COG.Config;
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Role.Impl;
@@ -62,7 +64,7 @@ public partial class Main : BasePlugin
             new Impostor(),
             new Jester()
         });
-        
+
         harmony.PatchAll();
     }
 }

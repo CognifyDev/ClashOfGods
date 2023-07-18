@@ -13,8 +13,3 @@ ClashOfGods是一个Among Us模组<br />
 
 # 开发进度
 该模组仍在开发中，如果您有能力可以参与进来。
-
-# 贡献者(排名不分前后)
-1. [commandf1](https://github.com/commandf1)
-2. [hinhinarrrrrr](https://github.com/hinhinarrrrrr)
-3. [AmongUsDev](https://github.com/AmongUsDev)
