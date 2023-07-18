@@ -1,4 +1,6 @@
-﻿using COG.Listener;
+﻿using COG.Config.Impl;
+using COG.Listener;
+using COG.Modules;
 using COG.Utils;
 using UnityEngine;
 
@@ -8,12 +10,25 @@ public class Jester : Role, IListener
 {
     private PlayerControl? _player;
     
-    public Jester() : base(3)
+    public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, true, CampType.Neutral)
     {
-        Name = "Jester";
-        Description = "You'll win when you get exiled.";
-        Color = Color.magenta;
-        CampType = CampType.Neutral;
+        Description = LanguageConfig.Instance.JesterDescription;
+        var parentOption = RoleOptions[0];
+        RoleOptions.Add(CustomOption.Create(
+            parentOption.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true, parentOption)
+        );
+    }
+
+    public bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)
+    {
+        var allowReportDeadBodyOption = RoleOptions[1];
+        var result = allowReportDeadBodyOption.GetBool();
+        if (!result && playerControl.FriendCode.Equals(_player!.FriendCode) && target == null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private bool CheckNull()

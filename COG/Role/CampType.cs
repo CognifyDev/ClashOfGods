@@ -2,5 +2,8 @@
 
 public enum CampType
 {
-    Crewmate, Impostor, Neutral, Unknown
+    Unknown = 0,
+    Impostor = 1,
+    Neutral = 2,
+    Crewmate = 3
 }

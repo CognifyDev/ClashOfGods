@@ -5,12 +5,9 @@ namespace COG.Role.Impl;
 
 public class Crewmate : Role, IListener
 {
-    public Crewmate() : base(1)
+    public Crewmate() : base("Crewmate", Color.white, false, CampType.Crewmate)
     {
-        Name = "Crewmate";
         Description = "Finish your tasks!";
-        Color = Color.white;
-        CampType = CampType.Crewmate;
     }
 
     public override IListener GetListener(PlayerControl player)

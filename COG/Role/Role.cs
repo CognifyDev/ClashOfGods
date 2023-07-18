@@ -1,5 +1,9 @@
-﻿using AmongUs.GameOptions;
+﻿using System.Collections.Generic;
+using AmongUs.GameOptions;
+using COG.Config.Impl;
 using COG.Listener;
+using COG.Modules;
+using COG.Utils;
 using UnityEngine;
 
 namespace COG.Role;
@@ -10,18 +14,14 @@ namespace COG.Role;
 public abstract class Role
 {
     /// <summary>
-    /// 角色ID
-    /// </summary>
-    public int ID { get; }
-    /// <summary>
     /// 角色颜色
     /// </summary>
-    public Color Color { get; protected set; }
+    public Color Color { get; }
 
     /// <summary>
     /// 角色名称
     /// </summary>
-    public string Name { get; protected set; }
+    public string Name { get; }
     
     /// <summary>
     /// 角色介绍
@@ -31,19 +31,44 @@ public abstract class Role
     /// <summary>
     /// 角色阵营
     /// </summary>
-    public CampType CampType { get; protected set; }
+    public CampType CampType { get; }
     
     /// <summary>
     /// 原版角色蓝本
     /// </summary>
     public RoleTypes BaseRoleType { get; protected set; }
+    
+    /// <summary>
+    /// 角色设置
+    /// </summary>
+    public List<CustomOption> RoleOptions { get; }
+    
+    /// <summary>
+    /// 是否在设置中显示该职业
+    /// </summary>
+    public bool DisplayInOption { get; }
 
-    protected Role(int id)
+    protected Role(string name, Color color, bool displayInOption, CampType campType)
     {
-        ID = id;
-        Color = Color.white;
-        CampType = CampType.Crewmate;
+        DisplayInOption = displayInOption;
+        Name = name;
+        Description = "";
+        Color = color;
+        CampType = campType;
         BaseRoleType = RoleTypes.Crewmate;
+        RoleOptions = new();
+
+        if (DisplayInOption)
+        {
+            var option = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
+                ColorUtils.ToAmongUsColorString(Color, Name), false, null, true);
+            RoleOptions.Add(option);
+        }
+    }
+
+    public static CustomOption.CustomOptionType ToCustomOption(Role role)
+    {
+        return (CustomOption.CustomOptionType) role.CampType;
     }
 
     public abstract IListener GetListener(PlayerControl player);
