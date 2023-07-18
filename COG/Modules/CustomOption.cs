@@ -13,6 +13,8 @@ namespace COG.Modules;
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
 public class CustomOption
 {
+    internal static bool FirstOpen = true;  
+  
     public enum CustomOptionType
     {
         General = 0,
@@ -28,7 +30,7 @@ public class CustomOption
     public readonly string Name;
     public readonly System.Object[] Selections;
 
-    public int DefaultSelection;
+    public readonly int DefaultSelection;
     public int Selection;
     public OptionBehaviour OptionBehaviour;
     public readonly CustomOption? Parent;
@@ -148,7 +150,7 @@ public class CustomOption
         private static void CreateClassicTabs(GameOptionsMenu __instance)
         {
             bool isReturn = SetNames(
-                new Dictionary<string, string>()
+                new Dictionary<string, string>
                 {
                     ["COGSettings"] = LanguageConfig.Instance.GeneralSetting,
                     ["ImpostorSettings"] = LanguageConfig.Instance.ImpostorRolesSetting,
@@ -262,15 +264,24 @@ public class CustomOption
                     {
                         StringOption stringOption = UnityEngine.Object.Instantiate(template, menus[(int)option.Type]);
                         optionBehaviours[(int)option.Type].Add(stringOption);
-                        stringOption.OnValueChanged = new Action<OptionBehaviour>((o) => { });
+                        stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
                         stringOption.TitleText.text = option.Name;
-                        stringOption.Value = stringOption.oldValue = option.Selection;
+                        if (FirstOpen)
+                        {
+                            FirstOpen = false;
+                            stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
+                        }
+                        else
+                        {
+                            stringOption.Value = stringOption.oldValue = option.Selection;
+                        }
+
                         stringOption.ValueText.text = option.Selections[option.Selection].ToString();
 
                         option.OptionBehaviour = stringOption;
                     }
                 }
-                option.OptionBehaviour.gameObject.SetActive(true);
+                option?.OptionBehaviour.gameObject.SetActive(true);
             }
 
             SetOptions(
@@ -377,9 +388,19 @@ public class StringOptionEnablePatch
         CustomOption? option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
         if (option == null) return true;
 
-        __instance.OnValueChanged = new Action<OptionBehaviour>((o) => { });
+        __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
         __instance.TitleText.text = option.Name;
-        __instance.Value = __instance.oldValue = option.Selection;
+        
+        if (FirstOpen)
+        {
+            FirstOpen = false;
+            __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
+        }
+        else
+        {
+            __instance.Value = __instance.oldValue = option.Selection;
+        }
+        
         __instance.ValueText.text = option.Selections[option.Selection].ToString();
 
         return false;
