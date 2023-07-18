@@ -86,4 +86,6 @@ public interface IListener
     void OnKeyboardJoystickUpdate(KeyboardJoystick keyboardJoystick) {}
 
     void OnRPCReceived(byte callId, MessageReader reader) { }
+
+    bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target) { return true; }
 }

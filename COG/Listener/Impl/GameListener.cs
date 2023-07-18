@@ -46,8 +46,9 @@ public class GameListener : IListener
                 RegisteredListeners.Add(impostorRole.GetListener(player));
                 continue;
             }
-
-            Role.Role role = getter.GetNext();
+            setRoles:
+            var role = getter.GetNext() ?? Role.RoleManager.GetManager().GetDefaultRole(CampType.Crewmate);
+            if (role!.CampType == CampType.Impostor) goto setRoles; 
             RoleManager.Instance.SetRole(player, role.BaseRoleType);
             GameUtils.Data.Add(player, role);
             RegisteredListeners.Add(role.GetListener(player));

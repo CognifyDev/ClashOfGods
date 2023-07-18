@@ -5,11 +5,9 @@ namespace COG.Role.Impl;
 
 public class Impostor : Role
 {
-    public Impostor() : base(2)
+    public Impostor() : base("Impostor", Color.red, false, CampType.Impostor)
     {
-        Name = "Impostor";
         Description = "Kill the crewmates";
-        Color = Color.red;
     }
 
     public override IListener GetListener(PlayerControl player)
