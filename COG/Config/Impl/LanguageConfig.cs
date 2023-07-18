@@ -1,4 +1,4 @@
-﻿using COG.Utils;
+using COG.Utils;
 
 namespace COG.Config.Impl;
 
@@ -7,7 +7,7 @@ public class LanguageConfig : Config
     public static LanguageConfig Instance { get; }
     public string MessageForNextPage { get; private set; }
     public string MakePublicMessage { get; private set; }
-    
+   
     public LanguageConfig() : base(
         "Language", 
         DataDirectoryName + "/language.yml",
@@ -20,6 +20,7 @@ public class LanguageConfig : Config
 
     static LanguageConfig()
     {
+
         Instance = new LanguageConfig();
     }
 }
