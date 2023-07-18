@@ -5,6 +5,7 @@ using COG.Config.Impl;
 using static COG.Modules.CustomOption;
 using UnityEngine;
 using COG.Listener;
+using COG.Utils;
 
 namespace COG.Modules;
 
@@ -39,7 +40,7 @@ public class CustomOption
     public CustomOption(int id, CustomOptionType type, string name, System.Object[] selections, System.Object defaultValue, CustomOption? parent, bool isHeader)
     {
         ID = id;
-        Name = parent == null ? name : "- " + name;
+        Name = parent == null ? name : ColorUtils.ToAmongUsColorString(Color.gray, "→ ") + name;
         Selections = selections;
         int index = Array.IndexOf(selections, defaultValue);
         DefaultSelection = index >= 0 ? index : 0;
@@ -85,7 +86,7 @@ public class CustomOption
         while (optionsList.Any())
         {
             byte amount = (byte)Math.Min(optionsList.Count, 200); // takes less than 3 bytes per option on average
-            var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
+            var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable);
             writer.Write(amount);
             for (int i = 0; i < amount; i++)
             {
@@ -235,11 +236,11 @@ public class CustomOption
             }
 
             DestroyOptions(new List<List<OptionBehaviour>>{
-                torMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                impostorMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                neutralMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                crewmateMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                modifierMenu.GetComponentsInChildren<OptionBehaviour>().ToList()
+                Enumerable.ToList(torMenu.GetComponentsInChildren<OptionBehaviour>()),
+                Enumerable.ToList(impostorMenu.GetComponentsInChildren<OptionBehaviour>()),
+                Enumerable.ToList(neutralMenu.GetComponentsInChildren<OptionBehaviour>()),
+                Enumerable.ToList(crewmateMenu.GetComponentsInChildren<OptionBehaviour>()),
+                Enumerable.ToList(modifierMenu.GetComponentsInChildren<OptionBehaviour>())
             });
 
             List<OptionBehaviour> torOptions = new List<OptionBehaviour>();

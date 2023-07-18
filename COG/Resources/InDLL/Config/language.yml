@@ -3,7 +3,7 @@ lobby:
   make-public-message: '禁止设置为公开'
 role:
   global:
-    allow-start-meeting: "允许启动会议"
+    allow-start-meeting: "<color=#CEC7C7>允许启动会议</color>"
   jester:
     name: "小丑"
     description: "你会在被驱逐后获胜"
