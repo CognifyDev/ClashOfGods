@@ -183,19 +183,19 @@ public class CustomOption
             var gameTab = GameObject.Find("GameTab");
 
             var cogTab = UnityEngine.Object.Instantiate(roleTab, roleTab.transform.parent);
-            var cogTabHighlight = GetTabHighlight(cogTab, "TheOtherRolesTab", "TheOtherRoles.Resources.TabIcon.png");
+            var cogTabHighlight = GetTabHighlight(cogTab, "COGTab", "COG.Resources.InDLL.Images.COGw-BG.png");
 
             var impostorTab = UnityEngine.Object.Instantiate(roleTab, cogTab.transform);
-            var impostorTabHighlight = GetTabHighlight(impostorTab, "ImpostorTab", "TheOtherRoles.Resources.TabIconImpostor.png");
+            var impostorTabHighlight = GetTabHighlight(impostorTab, "ImpostorTab", "COG.Resources.InDLL.Images.Setting.Imposter.png");
 
             var neutralTab = UnityEngine.Object.Instantiate(roleTab, impostorTab.transform);
-            var neutralTabHighlight = GetTabHighlight(neutralTab, "NeutralTab", "TheOtherRoles.Resources.TabIconNeutral.png");
+            var neutralTabHighlight = GetTabHighlight(neutralTab, "NeutralTab", "COG.Resources.InDLL.Images.Setting.Neutral.png");
 
             var crewmateTab = UnityEngine.Object.Instantiate(roleTab, neutralTab.transform);
-            var crewmateTabHighlight = GetTabHighlight(crewmateTab, "CrewmateTab", "TheOtherRoles.Resources.TabIconCrewmate.png");
+            var crewmateTabHighlight = GetTabHighlight(crewmateTab, "CrewmateTab", "COG.Resources.InDLL.Images.Setting.Crewmate.png");
 
             var modifierTab = UnityEngine.Object.Instantiate(roleTab, crewmateTab.transform);
-            var modifierTabHighlight = GetTabHighlight(modifierTab, "ModifierTab", "TheOtherRoles.Resources.TabIconModifier.png");
+            var modifierTabHighlight = GetTabHighlight(modifierTab, "ModifierTab", "COG.Resources.InDLL.Images.Setting..png");
 
             // Position of Tab Icons
             gameTab.transform.position += Vector3.left * 3f;
