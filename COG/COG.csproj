@@ -29,6 +29,10 @@
     <ItemGroup>
       <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
     </ItemGroup>
+        
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\InDLL\Config\*.*" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Reactor" Version="2.1.0" />
@@ -46,6 +50,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="BepInEx.AutoPlugin" Version="1.0.1" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Resources\InDLL\Depends\" />
     </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">

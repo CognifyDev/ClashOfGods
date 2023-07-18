@@ -24,7 +24,7 @@ public class Config
     {
         Name = name;
         Path = path;
-        Text = resourceFile.GetResourcesTxt();
+        Text = resourceFile.GetResourcesText();
         LoadConfig();
     }
 

@@ -29,7 +29,7 @@ public class OptionListener : IListener
             text += sidebarObject + Environment.NewLine;
         }
         
-        text += LanguageConfig.MessageForNextPage.Replace("%correctpage%", _typePage + "").Replace("%pagecount%", pages + "");
+        text += LanguageConfig.Instance.MessageForNextPage.Replace("%correctpage%", _typePage + "").Replace("%pagecount%", pages + "");
         result = text;
     }
 
