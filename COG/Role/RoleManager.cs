@@ -54,52 +54,43 @@ public class RoleManager
         return null;
     }
 
-    public IGetter<Role> NewGetter()
+    public IGetter<Role?> NewGetter()
     {
         return new RoleGetter();
     }
 
-    public class RoleGetter : IGetter<Role>
+    public class RoleGetter : IGetter<Role?>
     {
-        private readonly List<Role> Roles = new(GetManager().GetRoles());
+        private readonly List<Role> _roles = new(GetManager().GetRoles());
 
         public RoleGetter()
         {
-            Roles = Roles.Disarrange();
+            _roles = _roles.Disarrange();
         }
 
-        public Role GetNext()
+        public Role? GetNext()
         {
-            try
+            var role = _roles[0];
+            _roles.RemoveAt(0);
+            if (!role.RoleOptions[0].GetBool())
             {
-                var role = Roles[0];
-                Roles.RemoveAt(0);
-                return role;
+                return HasNext() ? GetNext() : null;
             }
-            catch (System.Exception)
-            {
-                throw new GetterCanNotGetException("找不到指定Role");
-            }
+            return role;
         }
 
         public bool HasNext()
         {
-            return Roles.Count != 0;
+            return _roles.Count != 0;
         }
 
-        public Role GetNextTypeCampRole(CampType campType)
+        public Role? GetNextTypeCampRole(CampType campType)
         {
-            for (var i = 0; i < Roles.Count; i++)
-            {
-                if (Roles[i].CampType == campType)
-                {
-                    var toReturn = Roles[i];
-                    Roles.RemoveAt(i);
-                    return toReturn;
-                }
-            }
-
-            throw new GetterCanNotGetException("找不到指定Role");
+            start:
+            var role = GetNext();
+            if (role == null) return null;
+            if (role.CampType != campType) goto start;
+            return role;
         }
     }
 

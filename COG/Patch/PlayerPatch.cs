@@ -139,3 +139,23 @@ class OnPlayerLeftPatch
         }
     }
 }
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ReportDeadBody))]
+class ReportDeadBodyPatch
+{
+    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo target)
+    {
+        bool returnAble = false;
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            if (!listener.OnPlayerReportDeadBody(__instance, target))
+            {
+                returnAble = true;
+            }
+        }
+
+        if (returnAble) return false;
+
+        return true;
+    }
+}

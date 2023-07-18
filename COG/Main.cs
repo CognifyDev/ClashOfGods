@@ -1,5 +1,7 @@
 ﻿global using Hazel;
 global using HarmonyLib;
+using System.IO;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Config;
@@ -9,7 +11,9 @@ using COG.Listener.Impl;
 using COG.Role.Impl;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
+using COG.Utils;
 using Reactor;
+using Reactor.Utilities.Extensions;
 
 namespace COG;
 
@@ -40,9 +44,18 @@ public partial class Main : BasePlugin
     public override void Load()
     {
         Instance = this;
-        
+
         Logger = BepInEx.Logging.Logger.CreateLogSource("ClashOfGods");
         Logger.LogInfo("Loading...");
+        
+        // 添加依赖
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/YamlDotNet.dll", 
+            "COG.Resources.InDLL.Depends.YamlDotNet.dll");
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/YamlDotNet.xml", 
+            "COG.Resources.InDLL.Depends.YamlDotNet.xml");
+        
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(), 

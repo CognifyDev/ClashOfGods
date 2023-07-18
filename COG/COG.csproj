@@ -1,4 +1,4 @@
-﻿    <Project Sdk="Microsoft.NET.Sdk">
+    <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latest</LangVersion>
@@ -34,9 +34,12 @@
 
     <ItemGroup>
       <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
-      <EmbeddedResource Include="Resources\InDLL\Images\Setting\Crewmate.png" />
-      <EmbeddedResource Include="Resources\InDLL\Images\Setting\Imposter.png" />
-      <EmbeddedResource Include="Resources\InDLL\Images\Setting\Neutral.png" />
+      <EmbeddedResource Include="Resources\InDLL\Images\Setting\*.*" />
+    </ItemGroup>
+        
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\InDLL\Config\*.*" />
+      <EmbeddedResource Include="Resources\InDLL\Depends\*.*" />
     </ItemGroup>
 
     <ItemGroup>

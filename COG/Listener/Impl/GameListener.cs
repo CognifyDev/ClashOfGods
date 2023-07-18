@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using COG.Config.Impl;
 using COG.Exception;
 using COG.Role;
 using COG.States;
@@ -45,8 +46,9 @@ public class GameListener : IListener
                 RegisteredListeners.Add(impostorRole.GetListener(player));
                 continue;
             }
-
-            Role.Role role = getter.GetNext();
+            setRoles:
+            var role = getter.GetNext() ?? Role.RoleManager.GetManager().GetDefaultRole(CampType.Crewmate);
+            if (role!.CampType == CampType.Impostor) goto setRoles; 
             RoleManager.Instance.SetRole(player, role.BaseRoleType);
             GameUtils.Data.Add(player, role);
             RegisteredListeners.Add(role.GetListener(player));
@@ -73,7 +75,7 @@ public class GameListener : IListener
 
     public bool OnMakePublic(GameStartManager manager)
     {
-        GameUtils.SendGameMessage("禁止设置为公开");
+        GameUtils.SendGameMessage(LanguageConfig.Instance.MakePublicMessage);
         // 禁止设置为公开
         return false;
     }

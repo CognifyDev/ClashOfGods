@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using COG.Utils;
 
@@ -24,15 +24,19 @@ public class Config
     {
         Name = name;
         Path = path;
-        Text = resourceFile.GetResourcesTxt();
+        Text = resourceFile.GetResourcesText();
         LoadConfig();
     }
 
-    private void LoadConfig()
+    protected void LoadConfig(bool replace = false)
     {
         if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
-        if (!File.Exists(Path))
+        if (!File.Exists(Path) || replace)
         {
+            if (replace && File.Exists(Path))
+            {
+                File.Delete(Path);
+            }
             File.WriteAllText(Path, Text, Encoding.Unicode);
         }
 
