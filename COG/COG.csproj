@@ -34,9 +34,7 @@
 
     <ItemGroup>
       <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
-      <EmbeddedResource Include="Resources\InDLL\Images\Setting\Crewmate.png" />
-      <EmbeddedResource Include="Resources\InDLL\Images\Setting\Imposter.png" />
-      <EmbeddedResource Include="Resources\InDLL\Images\Setting\Neutral.png" />
+      <EmbeddedResource Include="Resources\InDLL\Images\Setting\*.*" />
     </ItemGroup>
         
     <ItemGroup>
