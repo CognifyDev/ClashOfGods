@@ -1,4 +1,3 @@
-﻿using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -14,10 +13,9 @@ public class ResourceFile
         Path = path;
     }
     
-    public string GetResourcesTxt()
+    public string GetResourcesText()
     {
         var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(Path);
-        Debug.Assert(stream != null, nameof(stream) + " != null");
         stream.Position = 0;
         using StreamReader reader = new(stream, Encoding.UTF8);
         return reader.ReadToEnd();

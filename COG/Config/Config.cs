@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using COG.Utils;
 
@@ -24,7 +24,7 @@ public class Config
     {
         Name = name;
         Path = path;
-        Text = resourceFile.GetResourcesTxt();
+        Text = resourceFile.GetResourcesText();
         LoadConfig();
     }
 
