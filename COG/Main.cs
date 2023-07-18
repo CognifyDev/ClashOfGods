@@ -5,6 +5,8 @@ using BepInEx.Unity.IL2CPP;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Role.Impl;
+using COG.UI.SidebarText;
+using COG.UI.SidebarText.Impl;
 using Reactor;
 
 namespace COG;
@@ -39,7 +41,20 @@ public partial class Main : BasePlugin
         
         Logger = BepInEx.Logging.Logger.CreateLogSource("ClashOfGods");
         Logger.LogInfo("Loading...");
-        ListenerManager.GetManager().RegisterListeners(new IListener[] { new CommandListener(), new GameListener(), new VersionShowerListener(), new PlayerListener() });
+        ListenerManager.GetManager().RegisterListeners(new IListener[]
+        {
+            new CommandListener(), 
+            new GameListener(), 
+            new VersionShowerListener(), 
+            new PlayerListener(),
+            new OptionListener()
+        });
+        
+        SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
+        {
+            new OriginalSettings(),
+            new ModSettings()
+        });
         
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
         {
