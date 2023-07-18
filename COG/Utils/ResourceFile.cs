@@ -16,7 +16,7 @@ public class ResourceFile
     public string GetResourcesText()
     {
         var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(Path);
-        stream.Position = 0;
+        stream!.Position = 0;
         using StreamReader reader = new(stream, Encoding.UTF8);
         return reader.ReadToEnd();
     }
