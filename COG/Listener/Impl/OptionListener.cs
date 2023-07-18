@@ -17,6 +17,9 @@ public class OptionListener : IListener
         
         var sidebars = SidebarTextManager.GetManager().GetSidebarTexts();
         if (_typePage > sidebars.Count || _typePage == 0) _typePage = 1;
+        
+        if (sidebars.Count <= 0) return;
+        
         var sidebar = sidebars[_typePage - 1];
         var text = sidebar.Title + Environment.NewLine;
         
