@@ -17,15 +17,16 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore --source https://api.nuget.org/v3/index.json --source https://nuget.bepinex.dev/v3/index.json
+  
     - name: Build
       run: dotnet build
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: COG Artifact
         path: COG/bin
+
     - name: Upload Objects
       uses: actions/upload-artifact@v3
       with:
