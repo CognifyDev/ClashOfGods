@@ -49,26 +49,26 @@ public partial class Main : BasePlugin
 
         Logger = BepInEx.Logging.Logger.CreateLogSource(DisplayName + "   ");
         Logger.LogInfo("Loading...");
-        
+
         // Add depends to core directory
         ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/YamlDotNet.dll", 
+            "BepInEx/core/YamlDotNet.dll",
             "COG.Resources.InDLL.Depends.YamlDotNet.dll");
         ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/YamlDotNet.xml", 
+            "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
-        
+
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
-            new CommandListener(), 
-            new GameListener(), 
-            new VersionShowerListener(), 
+            new CommandListener(),
+            new GameListener(),
+            new VersionShowerListener(),
             new PlayerListener(),
             new OptionListener(),
             new ModOptionListener()
         });
-        
+
         // Register sidebar texts
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
         {
@@ -79,7 +79,7 @@ public partial class Main : BasePlugin
             new ImpostorSettings(),
             new CrewmateSettings()
         });
-        
+
         // Register roles
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
         {
@@ -87,16 +87,18 @@ public partial class Main : BasePlugin
             new Impostor(),
             new Jester()
         });
-        
-        // Register mod option
-        var modOption = new ModOption(LanguageConfig.Instance.ReloadConfigs,
-            () =>
-            {
-                LanguageConfig.LoadLanguageConfig();
-                return false;
-            }, false);
-        modOption.Register();
 
+        // Register mod options
+        ModOptionManager.GetManager().RegisterModOptions(new ModOption[]
+        {
+            new(LanguageConfig.Instance.ReloadConfigs,
+                () =>
+                {
+                    LanguageConfig.LoadLanguageConfig(); 
+                    Environment.Exit(0);
+                    return false;
+                }, false)
+        });
         harmony.PatchAll();
     }
 }
