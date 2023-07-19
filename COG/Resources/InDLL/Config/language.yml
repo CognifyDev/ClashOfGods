@@ -1,27 +1,31 @@
 lobby:
   message-for-next-page: "按 TAB 切换下一页... %correctpage%/%pagecount%"
   make-public-message: "禁止设置为公开"
+
 role:
   global:
     max-num: "<color=#808080>最大职业数量</color>"
     allow-start-meeting: "<color=#CEC7C7>允许启动会议</color>"
     allow-report-body: "<color=#CEC7C7>允许报告尸体</color>"
+
   jester:
     name: "小丑"
     description: "你会在被驱逐后获胜"
+
 menu:
   general: "COG设置"
   impostor: "内鬼职业设置"
   neutral: "中立职业设置"
   crewmate: "船员职业设置"
   modifier: "高级设置"
+
 option:
   main:
     cog-options: "COG选项"
     reload-configs: "替换且重新加载语言文件且重启游戏"
     github: "Github"
-    QQ: "QQ"
-    Discord: "Discord"
+    qq: "QQ"
+    discord: "Discord"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
   

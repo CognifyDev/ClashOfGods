@@ -64,8 +64,8 @@ public class LanguageConfig : Config
             CogOptions = YamlReader.GetString("option.main.cog-options")!;
             ReloadConfigs = YamlReader.GetString("option.main.reload-configs")!;
             Github = YamlReader.GetString("option.main.github")!;
-            QQ = YamlReader.GetString("option.main.QQ")!;
-            Discord = YamlReader.GetString("option.main.Discord")!;
+            QQ = YamlReader.GetString("option.main.qq")!;
+            Discord = YamlReader.GetString("option.main.discord")!;
 
             MaxNumMessage = YamlReader.GetString("role.global.max-num")!;
             AllowStartMeeting = YamlReader.GetString("role.global.allow-start-meeting")!;
