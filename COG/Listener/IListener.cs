@@ -68,6 +68,7 @@ public interface IListener
     void OnPingTrackerUpdate(PingTracker tracker) { }
 
     void OnSetUpRoleText(IntroCutscene intro) { }
+    void OnSetUpTeamText(IntroCutscene intro) {}
 
     void OnPlayerExile(ExileController controller) { }
 
