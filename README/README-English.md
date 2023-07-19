@@ -13,3 +13,5 @@ This module adds many interesting professions to the original game.
 
 # Development
 The MOD is still under development, and if you have the ability, you can participate.
+
+# [Discord](https://discord.gg/uWZGh4Chde)
