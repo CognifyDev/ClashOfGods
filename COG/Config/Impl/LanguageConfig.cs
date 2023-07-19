@@ -5,7 +5,7 @@ namespace COG.Config.Impl;
 
 public class LanguageConfig : Config
 {
-    public static LanguageConfig Instance { get; private set; }
+    public static LanguageConfig Instance { get; private set; } = null!;
     public string MessageForNextPage { get; private set; }
     public string MakePublicMessage { get; private set; }
 
@@ -20,6 +20,9 @@ public class LanguageConfig : Config
 
     public string Enable { get; private set; }
     public string Disable { get; private set; }
+    public string CogOptions { get; private set; }
+    public string ReloadConfigs { get; private set; }
+    public string Github { get; private set; }
 
     public string MaxNumMessage { get; private set; }
     public string AllowStartMeeting { get; private set; }
@@ -55,6 +58,9 @@ public class LanguageConfig : Config
 
             Enable = YamlReader.GetString("option.enable")!;
             Disable = YamlReader.GetString("option.disable")!;
+            CogOptions = YamlReader.GetString("option.main.cog-options")!;
+            ReloadConfigs = YamlReader.GetString("option.main.reload-configs")!;
+            Github = YamlReader.GetString("option.main.github")!;
 
             MaxNumMessage = YamlReader.GetString("role.global.max-num")!;
             AllowStartMeeting = YamlReader.GetString("role.global.allow-start-meeting")!;
@@ -77,6 +83,11 @@ public class LanguageConfig : Config
     }
 
     static LanguageConfig()
+    {
+        LoadLanguageConfig();
+    }
+
+    internal static void LoadLanguageConfig()
     {
         Instance = new LanguageConfig();
     }

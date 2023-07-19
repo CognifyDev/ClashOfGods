@@ -16,12 +16,16 @@ menu:
   crewmate: "船员职业设置"
   modifier: "高级设置"
 option:
+  main:
+    cog-options: "COG选项"
+    reload-configs: "替换且重新加载语言文件且重启游戏"
+    github: "Github"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 sidebar-text:
-  original: "原版设置"
-  neutral: "中立设置"
-  mod: "模组设置"
-  modifier: "高级设置"
-  impostor: "伪装者设置"
-  crewmate: "船员设置"
+  original: "<color=#FF0000>原版设置</color>"
+  neutral: "<color=#FF0000>中立设置</color>"
+  mod: "<color=#FF0000>模组设置</color>"
+  modifier: "<color=#FF0000>高级设置</color>"
+  impostor: "<color=#FF0000>伪装者设置</color>"
+  crewmate: "<color=#FF0000>船员设置</color>"

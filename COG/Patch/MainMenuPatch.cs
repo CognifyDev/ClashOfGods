@@ -1,11 +1,10 @@
-﻿using HarmonyLib;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System;
+using COG.Config.Impl;
+using COG.UI.ModOption;
 using UnityEngine;
 
-namespace COG;
+namespace COG.Patch;
 
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuPatch
@@ -21,7 +20,7 @@ public static class MainMenuPatch
         var template = __instance.creditsButton;
         
         if (!template) return;
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), "GitHub", () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); });
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), LanguageConfig.Instance.Github, () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); });
     }
 
     /// <summary>
@@ -49,14 +48,18 @@ public static class MainMenuPatch
         button.OnClick.AddListener(action);
 
         Buttons.Add(button);
-
-        return;
     }
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]
     [HarmonyPostfix]
     static void LoadImage()
     {
+        ModOption.Buttons.Clear();
+        foreach (var modOption in ModOptionManager.GetManager().GetOptions())
+        {
+            modOption.Register();
+        }
+        
         CustomBG = new GameObject("CustomBG");
         CustomBG.transform.position = new Vector3(2f, 0f, 0f);
         var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
@@ -69,15 +72,19 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     static void Hide()
     {
-        CustomBG?.SetActive(false);
+        if (CustomBG != null) CustomBG.SetActive(false);
         foreach (var btn in Buttons) btn.gameObject.SetActive(false);
     }
     [HarmonyPatch(nameof(MainMenuManager.ResetScreen))]
     [HarmonyPostfix]
     static void Show()
     {
-        CustomBG?.SetActive(true);
-        foreach (var btn in Buttons) btn.gameObject.SetActive(true);
+        if (CustomBG != null) CustomBG.SetActive(true);
+        foreach (var btn in Buttons)
+        {
+            if (btn == null || btn.gameObject == null) continue;
+            btn.gameObject.SetActive(true);
+        }
     }
 }
 

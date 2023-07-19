@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using COG.Utils;
@@ -6,6 +7,8 @@ namespace COG.Config;
 
 public class Config
 {
+    public static List<Config> Configs { get; } = new();
+
     public static readonly string DataDirectoryName = $"{Main.DisplayName}_DATA";
     public string Name { get; }
     public string Path { get; }
@@ -17,6 +20,7 @@ public class Config
         Name = name;
         Path = path;
         Text = text;
+        Configs.Add(this);
         LoadConfig();
     }
 
@@ -28,7 +32,7 @@ public class Config
         LoadConfig();
     }
 
-    protected void LoadConfig(bool replace = false)
+    public void LoadConfig(bool replace = false)
     {
         if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
         if (!File.Exists(Path) || replace)
