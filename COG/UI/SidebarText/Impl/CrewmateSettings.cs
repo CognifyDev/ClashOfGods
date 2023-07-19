@@ -3,9 +3,9 @@ using COG.Modules;
 
 namespace COG.UI.SidebarText.Impl;
 
-public class ModSettings : SidebarText
+public class CrewmateSettings : SidebarText
 {
-    public ModSettings() : base(LanguageConfig.Instance.SidebarTextMod)
+    public CrewmateSettings() : base(LanguageConfig.Instance.SidebarTextCrewmate)
     {
     }
     
@@ -14,7 +14,7 @@ public class ModSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new []
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOptionType.General)
+            HudStringPatch.GetOptByType(CustomOption.CustomOptionType.Crewmate)
         });
     }
 }

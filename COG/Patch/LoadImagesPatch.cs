@@ -1,22 +1,24 @@
-﻿using HarmonyLib;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace COG;
+namespace COG.Patch;
+
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class TitleLogo
 {
-    static GameObject? CustomBG = null;
+    private static GameObject? _customBg;
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]
     [HarmonyPostfix]
     static void LoadImage()
     {
-        CustomBG = new GameObject("CustomBG");
-        CustomBG.transform.position = new Vector3(2, 0f, 0);
-        var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
+        _customBg = new GameObject("CustomBG")
+        {
+            transform =
+            {
+                position = new Vector3(2, 0f, 0)
+            }
+        };
+        var bgRenderer = _customBg.AddComponent<SpriteRenderer>();
         bgRenderer.sprite = Utils.ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 280f);
     }
     [HarmonyPatch(nameof(MainMenuManager.OpenAccountMenu))]
@@ -25,14 +27,14 @@ public static class TitleLogo
     [HarmonyPostfix]
     static void HideImage()
     {
-        CustomBG?.SetActive(false);
+        if (_customBg != null)
+            _customBg.SetActive(false);
     }
     [HarmonyPatch(nameof(MainMenuManager.ResetScreen))]
     [HarmonyPostfix]
     static void ShowImage()
     {
-        CustomBG?.SetActive(true);
+        if (_customBg != null) 
+            _customBg.SetActive(true);
     }
 }
-
-

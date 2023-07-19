@@ -68,7 +68,11 @@ public partial class Main : BasePlugin
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
         {
             new OriginalSettings(),
-            new ModSettings()
+            new NeutralSettings(),
+            new ModSettings(),
+            new ModifierSettings(),
+            new ImpostorSettings(),
+            new CrewmateSettings()
         });
         
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
