@@ -47,6 +47,11 @@ public abstract class Role
     /// 是否在设置中显示该职业
     /// </summary>
     public bool DisplayInOption { get; }
+    
+    /// <summary>
+    /// 是否为副职业
+    /// </summary>
+    public bool SubRole { get; protected set; }
 
     protected Role(string name, Color color, bool displayInOption, CampType campType)
     {
@@ -57,6 +62,7 @@ public abstract class Role
         CampType = campType;
         BaseRoleType = RoleTypes.Crewmate;
         RoleOptions = new();
+        SubRole = false;
 
         if (DisplayInOption)
         {
@@ -70,6 +76,7 @@ public abstract class Role
 
     public static CustomOption.CustomOptionType ToCustomOption(Role role)
     {
+        if (role.CampType == CampType.Unknown) return CustomOption.CustomOptionType.Modifier;
         return (CustomOption.CustomOptionType) role.CampType;
     }
 
