@@ -1,14 +1,17 @@
 lobby:
   message-for-next-page: "按 TAB 切换下一页... %correctpage%/%pagecount%"
   make-public-message: "禁止设置为公开"
+
 role:
   global:
     max-num: "<color=#808080>最大职业数量</color>"
     allow-start-meeting: "<color=#CEC7C7>允许启动会议</color>"
     allow-report-body: "<color=#CEC7C7>允许报告尸体</color>"
+
   jester:
     name: "小丑"
     description: "你会在被驱逐后获胜"
+
 menu:
   general: "COG设置"
   impostor: "内鬼职业设置"
