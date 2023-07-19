@@ -5,6 +5,7 @@ using COG.Config.Impl;
 using static COG.Modules.CustomOption;
 using UnityEngine;
 using COG.Listener;
+using COG.Utils;
 
 namespace COG.Modules;
 
@@ -12,6 +13,8 @@ namespace COG.Modules;
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
 public class CustomOption
 {
+    internal static bool FirstOpen = true;  
+  
     public enum CustomOptionType
     {
         General = 0,
@@ -27,7 +30,7 @@ public class CustomOption
     public readonly string Name;
     public readonly System.Object[] Selections;
 
-    public int DefaultSelection;
+    public readonly int DefaultSelection;
     public int Selection;
     public OptionBehaviour OptionBehaviour;
     public readonly CustomOption? Parent;
@@ -39,7 +42,7 @@ public class CustomOption
     public CustomOption(int id, CustomOptionType type, string name, System.Object[] selections, System.Object defaultValue, CustomOption? parent, bool isHeader)
     {
         ID = id;
-        Name = parent == null ? name : "- " + name;
+        Name = parent == null ? name : ColorUtils.ToAmongUsColorString(Color.gray, "→ ") + name;
         Selections = selections;
         int index = Array.IndexOf(selections, defaultValue);
         DefaultSelection = index >= 0 ? index : 0;
@@ -85,7 +88,7 @@ public class CustomOption
         while (optionsList.Any())
         {
             byte amount = (byte)Math.Min(optionsList.Count, 200); // takes less than 3 bytes per option on average
-            var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
+            var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable);
             writer.Write(amount);
             for (int i = 0; i < amount; i++)
             {
@@ -133,9 +136,7 @@ public class CustomOption
             ShareOptionChange((uint)ID);
         }
     }
-
-
-
+    
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
     class GameOptionsMenuStartPatch
     {
@@ -147,7 +148,7 @@ public class CustomOption
         private static void CreateClassicTabs(GameOptionsMenu __instance)
         {
             bool isReturn = SetNames(
-                new Dictionary<string, string>()
+                new Dictionary<string, string>
                 {
                     ["COGSettings"] = LanguageConfig.Instance.GeneralSetting,
                     ["ImpostorSettings"] = LanguageConfig.Instance.ImpostorRolesSetting,
@@ -235,11 +236,11 @@ public class CustomOption
             }
 
             DestroyOptions(new List<List<OptionBehaviour>>{
-                torMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                impostorMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                neutralMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                crewmateMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                modifierMenu.GetComponentsInChildren<OptionBehaviour>().ToList()
+                Enumerable.ToList(torMenu.GetComponentsInChildren<OptionBehaviour>()),
+                Enumerable.ToList(impostorMenu.GetComponentsInChildren<OptionBehaviour>()),
+                Enumerable.ToList(neutralMenu.GetComponentsInChildren<OptionBehaviour>()),
+                Enumerable.ToList(crewmateMenu.GetComponentsInChildren<OptionBehaviour>()),
+                Enumerable.ToList(modifierMenu.GetComponentsInChildren<OptionBehaviour>())
             });
 
             List<OptionBehaviour> torOptions = new List<OptionBehaviour>();
@@ -261,15 +262,23 @@ public class CustomOption
                     {
                         StringOption stringOption = UnityEngine.Object.Instantiate(template, menus[(int)option.Type]);
                         optionBehaviours[(int)option.Type].Add(stringOption);
-                        stringOption.OnValueChanged = new Action<OptionBehaviour>((o) => { });
+                        stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
                         stringOption.TitleText.text = option.Name;
-                        stringOption.Value = stringOption.oldValue = option.Selection;
+                        if (FirstOpen)
+                        {
+                            stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
+                        }
+                        else
+                        {
+                            stringOption.Value = stringOption.oldValue = option.Selection;
+                        }
+
                         stringOption.ValueText.text = option.Selections[option.Selection].ToString();
 
                         option.OptionBehaviour = stringOption;
                     }
                 }
-                option.OptionBehaviour.gameObject.SetActive(true);
+                option?.OptionBehaviour.gameObject.SetActive(true);
             }
 
             SetOptions(
@@ -376,9 +385,18 @@ public class StringOptionEnablePatch
         CustomOption? option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
         if (option == null) return true;
 
-        __instance.OnValueChanged = new Action<OptionBehaviour>((o) => { });
+        __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
         __instance.TitleText.text = option.Name;
-        __instance.Value = __instance.oldValue = option.Selection;
+        
+        if (FirstOpen)
+        {
+            __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
+        }
+        else
+        {
+            __instance.Value = __instance.oldValue = option.Selection;
+        }
+        
         __instance.ValueText.text = option.Selections[option.Selection].ToString();
 
         return false;
@@ -448,6 +466,7 @@ public abstract class SyncSettingPatch
 class GameOptionsMenuUpdatePatch
 {
     private static float timer = 1f;
+    private static float timerForBugFix = 1f;
     public static void Postfix(GameOptionsMenu __instance)
     {
         // Return Menu Update if in normal among us settings 
@@ -456,8 +475,12 @@ class GameOptionsMenuUpdatePatch
 
         __instance.GetComponentInParent<Scroller>().ContentYBounds.max = -0.5F + __instance.Children.Length * 0.55F;
         timer += Time.deltaTime;
+        timer += Time.deltaTime;
         if (timer < 0.1f) return;
+
         timer = 0f;
+
+        if (timerForBugFix < 3.0f) FirstOpen = false;
 
         float offset = 2.75f;
         foreach (CustomOption? option in Options)

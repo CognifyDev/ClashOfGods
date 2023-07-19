@@ -45,7 +45,7 @@ public partial class Main : BasePlugin
     {
         Instance = this;
 
-        Logger = BepInEx.Logging.Logger.CreateLogSource("ClashOfGods");
+        Logger = BepInEx.Logging.Logger.CreateLogSource(DisplayName + "   ");
         Logger.LogInfo("Loading...");
         
         // 添加依赖
