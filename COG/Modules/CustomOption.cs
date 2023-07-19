@@ -136,9 +136,7 @@ public class CustomOption
             ShareOptionChange((uint)ID);
         }
     }
-
-
-
+    
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
     class GameOptionsMenuStartPatch
     {
@@ -268,7 +266,6 @@ public class CustomOption
                         stringOption.TitleText.text = option.Name;
                         if (FirstOpen)
                         {
-                            FirstOpen = false;
                             stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
                         }
                         else
@@ -393,7 +390,6 @@ public class StringOptionEnablePatch
         
         if (FirstOpen)
         {
-            FirstOpen = false;
             __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
         }
         else
@@ -470,6 +466,7 @@ public abstract class SyncSettingPatch
 class GameOptionsMenuUpdatePatch
 {
     private static float timer = 1f;
+    private static float timerForBugFix = 1f;
     public static void Postfix(GameOptionsMenu __instance)
     {
         // Return Menu Update if in normal among us settings 
@@ -478,8 +475,12 @@ class GameOptionsMenuUpdatePatch
 
         __instance.GetComponentInParent<Scroller>().ContentYBounds.max = -0.5F + __instance.Children.Length * 0.55F;
         timer += Time.deltaTime;
+        timer += Time.deltaTime;
         if (timer < 0.1f) return;
+
         timer = 0f;
+
+        if (timerForBugFix < 3.0f) FirstOpen = false;
 
         float offset = 2.75f;
         foreach (CustomOption? option in Options)
