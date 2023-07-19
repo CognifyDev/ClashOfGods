@@ -6,13 +6,14 @@ using BepInEx.Unity.IL2CPP;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
-using COG.Role.Impl;
 using COG.Role.Impl.Neutral;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
 using COG.Utils;
 using Reactor;
+using Reactor.Networking;
+using Reactor.Networking.Attributes;
 
 namespace COG;
 
@@ -24,6 +25,7 @@ namespace COG;
 [BepInIncompatibility("com.tugaru.TownOfPlus")]
 [BepInDependency(ReactorPlugin.Id)]
 [BepInProcess("Among Us.exe")]
+[ReactorModFlags(ModFlags.RequireOnAllClients)]
 public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
