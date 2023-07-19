@@ -62,7 +62,8 @@ public partial class Main : BasePlugin
             new GameListener(), 
             new VersionShowerListener(), 
             new PlayerListener(),
-            new OptionListener()
+            new OptionListener(),
+            new ModOptionListener()
         });
         
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
