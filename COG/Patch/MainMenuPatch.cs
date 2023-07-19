@@ -9,8 +9,8 @@ namespace COG.Patch;
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuPatch
 {
-    static GameObject? CustomBG = null;
-    static List<PassiveButton> Buttons = new();
+    private static GameObject? _customBg;
+    private static readonly List<PassiveButton> Buttons = new();
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]
     [HarmonyPrefix]
@@ -21,8 +21,8 @@ public static class MainMenuPatch
         
         if (!template) return;
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), LanguageConfig.Instance.Github, () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); },Color.blue);
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.25f), LanguageConfig.Instance.QQ, () => { Application.OpenURL("http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=Dxv3e_wSrRjHF45soWU1ACqbNy5g4Kik&authKey=RoioUO2lEd4uPmdan9d%2B6nyid43cBgegqKkkA13ybNsXBjTyz4%2F8kVTftoaSLkwL&noverify=0&group_code=322174333\r\n");},Color.cyan);
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.7f, 0.15f), LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/gJCFag6Hyc"); }, Color.gray);
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.25f), LanguageConfig.Instance.QQ, () => { Application.OpenURL("https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R63D8foTESsZ9TmGFbkaSPix0q9WGwtq&authKey=1rfvioSJhdni%2BpFvBqS5rFXkZKXNDeeFO50ZKGPzwtlLKwmJqftlDcolx%2FkJ3jLC&noverify=0&group_code=607761127");},Color.cyan);
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.7f, 0.15f), LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); }, Color.gray);
     }
 
     /// <summary>
@@ -63,9 +63,9 @@ public static class MainMenuPatch
             modOption.Register();
         }
         
-        CustomBG = new GameObject("CustomBG");
-        CustomBG.transform.position = new Vector3(2f, 0f, 0f);
-        var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
+        _customBg = new GameObject("CustomBG");
+        _customBg.transform.position = new Vector3(2f, 0f, 0f);
+        var bgRenderer = _customBg.AddComponent<SpriteRenderer>();
         bgRenderer.sprite = Utils.ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 280f);
     }
 
@@ -75,14 +75,14 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     static void Hide()
     {
-        if (CustomBG != null) CustomBG.SetActive(false);
+        if (_customBg != null) _customBg.SetActive(false);
         foreach (var btn in Buttons) btn.gameObject.SetActive(false);
     }
     [HarmonyPatch(nameof(MainMenuManager.ResetScreen))]
     [HarmonyPostfix]
     static void Show()
     {
-        if (CustomBG != null) CustomBG.SetActive(true);
+        if (_customBg != null) _customBg.SetActive(true);
         foreach (var btn in Buttons)
         {
             if (btn == null || btn.gameObject == null) continue;
@@ -90,5 +90,3 @@ public static class MainMenuPatch
         }
     }
 }
-
-

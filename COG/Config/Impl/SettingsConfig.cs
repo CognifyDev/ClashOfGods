@@ -2,6 +2,9 @@
 
 namespace COG.Config.Impl;
 
+/*
+ * 暂时不用
+ */
 public class SettingsConfig : Config
 {
     public SettingsConfig() : base(
