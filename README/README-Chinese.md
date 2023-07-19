@@ -1,7 +1,7 @@
 # ClashOfGods
 #### 一个我们之中模组
 
-> [English](README-English.md) | 中文
+> [English](README-English.md) | 简体中文
 
 ClashOfGods是一个Among Us模组<br />
 
@@ -13,3 +13,6 @@ ClashOfGods是一个Among Us模组<br />
 
 # 开发进度
 该模组仍在开发中，如果您有能力可以参与进来。
+# [QQ群]([https://github.com/music-discussion/TownOfHost-TheOtherRoles](https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R63D8foTESsZ9TmGFbkaSPix0q9WGwtq&authKey=1rfvioSJhdni%2BpFvBqS5rFXkZKXNDeeFO50ZKGPzwtlLKwmJqftlDcolx%2FkJ3jLC&noverify=0&group_code=607761127)https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R63D8foTESsZ9TmGFbkaSPix0q9WGwtq&authKey=1rfvioSJhdni%2BpFvBqS5rFXkZKXNDeeFO50ZKGPzwtlLKwmJqftlDcolx%2FkJ3jLC&noverify=0&group_code=607761127)
+607761127
+
