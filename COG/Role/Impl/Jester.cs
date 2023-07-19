@@ -17,18 +17,23 @@ public class Jester : Role, IListener
         RoleOptions.Add(CustomOption.Create(
             parentOption.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true, parentOption)
         );
+        RoleOptions.Add(CustomOption.Create(
+            parentOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true, parentOption)
+        );
     }
 
     public bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)
     {
-        var allowReportDeadBodyOption = RoleOptions[1];
-        var result = allowReportDeadBodyOption.GetBool();
-        if (!result && playerControl.FriendCode.Equals(_player!.FriendCode) && target == null)
+        var allowStartMeetingOption = RoleOptions[2];
+        var allowReportDeadBodyOption = RoleOptions[3];
+        var result1 = allowStartMeetingOption.GetBool();
+        var result2 = allowReportDeadBodyOption.GetBool();
+        if (!result1 && playerControl.FriendCode.Equals(_player!.FriendCode) && target == null)
         {
             return false;
         }
 
-        return true;
+        return result2 || !playerControl.FriendCode.Equals(_player!.FriendCode) || target == null;
     }
 
     private bool CheckNull()

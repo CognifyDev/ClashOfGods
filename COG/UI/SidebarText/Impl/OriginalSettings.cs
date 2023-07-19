@@ -1,8 +1,10 @@
-﻿namespace COG.UI.SidebarText.Impl;
+﻿using COG.Config.Impl;
+
+namespace COG.UI.SidebarText.Impl;
 
 public class OriginalSettings : SidebarText
 {
-    public OriginalSettings() : base("原版设置")
+    public OriginalSettings() : base(LanguageConfig.Instance.SidebarTextOriginal)
     {
     }
 

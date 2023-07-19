@@ -61,10 +61,19 @@ public class RoleManager
 
     public class RoleGetter : IGetter<Role?>
     {
-        private readonly List<Role> _roles = new(GetManager().GetRoles());
+        private readonly List<Role> _roles = new();
 
         public RoleGetter()
         {
+            var roles = GetManager().GetRoles();
+            foreach (var role in roles)
+            {
+                var num = (int)role.RoleOptions[1].GetFloat();
+                for (var i = 0; i < num; i++)
+                {
+                    _roles.Add(role);
+                }
+            }
             _roles = _roles.Disarrange();
         }
 

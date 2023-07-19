@@ -62,13 +62,18 @@ public partial class Main : BasePlugin
             new GameListener(), 
             new VersionShowerListener(), 
             new PlayerListener(),
-            new OptionListener()
+            new OptionListener(),
+            new ModOptionListener()
         });
         
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
         {
             new OriginalSettings(),
-            new ModSettings()
+            new NeutralSettings(),
+            new ModSettings(),
+            new ModifierSettings(),
+            new ImpostorSettings(),
+            new CrewmateSettings()
         });
         
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]

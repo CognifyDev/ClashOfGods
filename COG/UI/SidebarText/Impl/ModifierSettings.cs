@@ -3,9 +3,9 @@ using COG.Modules;
 
 namespace COG.UI.SidebarText.Impl;
 
-public class ModSettings : SidebarText
+public class ModifierSettings : SidebarText
 {
-    public ModSettings() : base(LanguageConfig.Instance.SidebarTextMod)
+    public ModifierSettings() : base(LanguageConfig.Instance.SidebarTextModifier)
     {
     }
     
@@ -14,7 +14,7 @@ public class ModSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new []
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOptionType.General)
+            HudStringPatch.GetOptByType(CustomOption.CustomOptionType.Modifier)
         });
     }
 }

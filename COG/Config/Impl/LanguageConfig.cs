@@ -21,7 +21,17 @@ public class LanguageConfig : Config
     public string Enable { get; private set; }
     public string Disable { get; private set; }
 
+    public string MaxNumMessage { get; private set; }
     public string AllowStartMeeting { get; private set; }
+    public string AllowReportDeadBody { get; private set; }
+
+    public string SidebarTextOriginal { get; private set; }
+    public string SidebarTextNeutral { get; private set; }
+    public string SidebarTextMod { get; private set; }
+    public string SidebarTextModifier { get; private set; }
+    public string SidebarTextImpostor { get; private set; }
+    public string SidebarTextCrewmate { get; private set; }
+
 
     public LanguageConfig() : base(
         "Language",
@@ -46,7 +56,16 @@ public class LanguageConfig : Config
             Enable = YamlReader.GetString("option.enable")!;
             Disable = YamlReader.GetString("option.disable")!;
 
+            MaxNumMessage = YamlReader.GetString("role.global.max-num")!;
             AllowStartMeeting = YamlReader.GetString("role.global.allow-start-meeting")!;
+            AllowReportDeadBody = YamlReader.GetString("role.global.allow-report-body")!;
+
+            SidebarTextOriginal = YamlReader.GetString("sidebar-text.original")!;
+            SidebarTextNeutral = YamlReader.GetString("sidebar-text.neutral")!;
+            SidebarTextMod = YamlReader.GetString("sidebar-text.mod")!;
+            SidebarTextModifier = YamlReader.GetString("sidebar-text.modifier")!;
+            SidebarTextImpostor = YamlReader.GetString("sidebar-text.impostor")!;
+            SidebarTextCrewmate = YamlReader.GetString("sidebar-text.crewmate")!;
         }
         catch (NullReferenceException)
         {
