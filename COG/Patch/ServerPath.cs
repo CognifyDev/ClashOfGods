@@ -11,7 +11,8 @@ public static class ServerPath
             CreateRegionInfo("au-sh.pafyx.top", "梦服上海(新)", 22000),
             CreateRegionInfo("au-as.duikbo.at", "Modded Asia (MAS)", 443, true),
             CreateRegionInfo("www.aumods.xyz", "Modded NA (MNA)", 443, true),
-            CreateRegionInfo("au-eu.duikbo.at", "Modded EU (MEU)", 443, true)
+            CreateRegionInfo("au-eu.duikbo.at", "Modded EU (MEU)", 443, true),
+            CreateRegionInfo("server.among-us.top", "Commandf1's Server", 443, true)
         };
         
         regionInfos.Do(__instance.AddOrUpdateRegion);
