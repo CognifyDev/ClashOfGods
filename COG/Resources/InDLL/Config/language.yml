@@ -20,8 +20,11 @@ option:
     cog-options: "COG选项"
     reload-configs: "替换且重新加载语言文件且重启游戏"
     github: "Github"
+    QQ: "QQ"
+    Discord: "Discord"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
+  
 sidebar-text:
   original: "<color=#FF0000>原版设置</color>"
   neutral: "<color=#FF0000>中立设置</color>"

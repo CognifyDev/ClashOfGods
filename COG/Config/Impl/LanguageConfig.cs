@@ -34,6 +34,9 @@ public class LanguageConfig : Config
     public string SidebarTextModifier { get; private set; }
     public string SidebarTextImpostor { get; private set; }
     public string SidebarTextCrewmate { get; private set; }
+    public string QQ { get; private set; }
+    public string Discord { get; private set; }
+
 
 
     public LanguageConfig() : base(
@@ -61,6 +64,8 @@ public class LanguageConfig : Config
             CogOptions = YamlReader.GetString("option.main.cog-options")!;
             ReloadConfigs = YamlReader.GetString("option.main.reload-configs")!;
             Github = YamlReader.GetString("option.main.github")!;
+            QQ = YamlReader.GetString("option.main.QQ")!;
+            Discord = YamlReader.GetString("option.main.Discord")!;
 
             MaxNumMessage = YamlReader.GetString("role.global.max-num")!;
             AllowStartMeeting = YamlReader.GetString("role.global.allow-start-meeting")!;

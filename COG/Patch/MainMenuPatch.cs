@@ -20,7 +20,9 @@ public static class MainMenuPatch
         var template = __instance.creditsButton;
         
         if (!template) return;
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), LanguageConfig.Instance.Github, () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); });
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), LanguageConfig.Instance.Github, () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); },Color.blue);
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.25f), LanguageConfig.Instance.QQ, () => { Application.OpenURL("http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=Dxv3e_wSrRjHF45soWU1ACqbNy5g4Kik&authKey=RoioUO2lEd4uPmdan9d%2B6nyid43cBgegqKkkA13ybNsXBjTyz4%2F8kVTftoaSLkwL&noverify=0&group_code=322174333\r\n");},Color.cyan);
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.7f, 0.15f), LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/gJCFag6Hyc"); }, Color.gray);
     }
 
     /// <summary>
@@ -33,13 +35,14 @@ public static class MainMenuPatch
     /// <param name="text">按钮文本</param>
     /// <param name="action">点击按钮的动作</param>
     /// <returns>返回这个按钮</returns>
-    static void CreateButton(MainMenuManager __instance, PassiveButton template, Transform? parent, Vector2 anchorPoint, string text, Action action)
+    static void CreateButton(MainMenuManager __instance, PassiveButton template, Transform? parent, Vector2 anchorPoint, string text, Action action,Color color)
     {
         if (!parent) return;
 
         var button = UnityEngine.Object.Instantiate(template, parent);
         button.GetComponent<AspectPosition>().anchorPoint = anchorPoint;
-
+        SpriteRenderer buttonSprite = button.transform.FindChild("Inactive").GetComponent<SpriteRenderer>();
+        buttonSprite.color = color;
         __instance.StartCoroutine(Effects.Lerp(0.5f, new Action<float>((p) => {
             button.GetComponentInChildren<TMPro.TMP_Text>().SetText(text);
         })));
