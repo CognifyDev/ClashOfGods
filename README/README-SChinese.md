@@ -1,7 +1,7 @@
 # ClashOfGods
 #### 一个我们之中模组
 
-> [English](README-English.md) | 简体中文
+> [English](README-English.md) | 简体中文 | [繁體中文](README-TChinese.md)
 
 ClashOfGods是一个Among Us模组<br />
 
