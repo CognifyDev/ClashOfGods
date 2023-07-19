@@ -1,11 +1,9 @@
-﻿using HarmonyLib;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System;
+using COG.Config.Impl;
 using UnityEngine;
 
-namespace COG;
+namespace COG.Patch;
 
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuPatch
@@ -21,7 +19,7 @@ public static class MainMenuPatch
         var template = __instance.creditsButton;
         
         if (!template) return;
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), "GitHub", () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); });
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), LanguageConfig.Instance.Github, () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); });
     }
 
     /// <summary>

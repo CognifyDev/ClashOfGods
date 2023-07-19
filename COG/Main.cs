@@ -1,5 +1,6 @@
 ﻿global using Hazel;
 global using HarmonyLib;
+using System;
 using System.IO;
 using System.Reflection;
 using BepInEx;
@@ -9,6 +10,7 @@ using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Role.Impl;
+using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
 using COG.Utils;
@@ -48,7 +50,7 @@ public partial class Main : BasePlugin
         Logger = BepInEx.Logging.Logger.CreateLogSource(DisplayName + "   ");
         Logger.LogInfo("Loading...");
         
-        // 添加依赖
+        // Add depends to core directory
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/YamlDotNet.dll", 
             "COG.Resources.InDLL.Depends.YamlDotNet.dll");
@@ -56,6 +58,7 @@ public partial class Main : BasePlugin
             "BepInEx/core/YamlDotNet.xml", 
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
         
+        // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(), 
@@ -66,6 +69,7 @@ public partial class Main : BasePlugin
             new ModOptionListener()
         });
         
+        // Register sidebar texts
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
         {
             new OriginalSettings(),
@@ -76,12 +80,22 @@ public partial class Main : BasePlugin
             new CrewmateSettings()
         });
         
+        // Register roles
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
         {
             new Crewmate(),
             new Impostor(),
             new Jester()
         });
+        
+        // Register mod option
+        var modOption = new ModOption(LanguageConfig.Instance.ReloadConfigs,
+            () =>
+            {
+                LanguageConfig.LoadLanguageConfig();
+                return false;
+            }, false);
+        modOption.Register();
 
         harmony.PatchAll();
     }

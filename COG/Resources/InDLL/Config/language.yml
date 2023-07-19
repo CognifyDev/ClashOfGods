@@ -16,6 +16,10 @@ menu:
   crewmate: "船员职业设置"
   modifier: "高级设置"
 option:
+  main:
+    cog-options: "COG选项"
+    reload-configs: "替换且重新加载语言文件"
+    github: "Github"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 sidebar-text:
