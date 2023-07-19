@@ -6,37 +6,36 @@ namespace COG.Config.Impl;
 public class LanguageConfig : Config
 {
     public static LanguageConfig Instance { get; private set; } = null!;
-    public string MessageForNextPage { get; private set; }
-    public string MakePublicMessage { get; private set; }
+    public string MessageForNextPage { get; private set; } = null!;
+    public string MakePublicMessage { get; private set; } = null!;
 
-    public string GeneralSetting { get; private set; }
-    public string ImpostorRolesSetting { get; private set; }
-    public string NeutralRolesSetting { get; private set; }
-    public string CrewmateRolesSetting { get; private set; }
-    public string ModifierSetting { get; private set; }
+    public string GeneralSetting { get; private set; } = null!;
+    public string ImpostorRolesSetting { get; private set; } = null!;
+    public string NeutralRolesSetting { get; private set; } = null!;
+    public string CrewmateRolesSetting { get; private set; } = null!;
+    public string ModifierSetting { get; private set; } = null!;
 
-    public string JesterName { get; private set; }
-    public string JesterDescription { get; private set; }
+    public string JesterName { get; private set; } = null!;
+    public string JesterDescription { get; private set; } = null!;
 
-    public string Enable { get; private set; }
-    public string Disable { get; private set; }
-    public string CogOptions { get; private set; }
-    public string ReloadConfigs { get; private set; }
-    public string Github { get; private set; }
+    public string Enable { get; private set; } = null!;
+    public string Disable { get; private set; } = null!;
+    public string CogOptions { get; private set; } = null!;
+    public string ReloadConfigs { get; private set; } = null!;
+    public string Github { get; private set; } = null!;
 
-    public string MaxNumMessage { get; private set; }
-    public string AllowStartMeeting { get; private set; }
-    public string AllowReportDeadBody { get; private set; }
+    public string MaxNumMessage { get; private set; } = null!;
+    public string AllowStartMeeting { get; private set; } = null!;
+    public string AllowReportDeadBody { get; private set; } = null!;
 
-    public string SidebarTextOriginal { get; private set; }
-    public string SidebarTextNeutral { get; private set; }
-    public string SidebarTextMod { get; private set; }
-    public string SidebarTextModifier { get; private set; }
-    public string SidebarTextImpostor { get; private set; }
-    public string SidebarTextCrewmate { get; private set; }
-    public string QQ { get; private set; }
-    public string Discord { get; private set; }
-
+    public string SidebarTextOriginal { get; private set; } = null!;
+    public string SidebarTextNeutral { get; private set; } = null!;
+    public string SidebarTextMod { get; private set; } = null!;
+    public string SidebarTextModifier { get; private set; } = null!;
+    public string SidebarTextImpostor { get; private set; } = null!;
+    public string SidebarTextCrewmate { get; private set; } = null!;
+    public string QQ { get; private set; } = null!;
+    public string Discord { get; private set; } = null!;
 
 
     public LanguageConfig() : base(
