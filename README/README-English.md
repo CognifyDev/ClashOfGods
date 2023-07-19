@@ -1,7 +1,7 @@
 # ClashOfGods
 #### A mod for Among Us
 
-> English | [中文](README-Chinese.md)
+> English | [简体中文](README-SChinese.md) | [繁體中文](README-TChinese.md)
 
 ClashOfGods is a Among Us mod.<br />
 
