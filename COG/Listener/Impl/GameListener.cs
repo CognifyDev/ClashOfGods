@@ -35,19 +35,21 @@ public class GameListener : IListener
                 Role.Role? impostorRole;
                 try
                 {
-                    impostorRole = ((Role.RoleManager.RoleGetter) getter).GetNextTypeCampRole(CampType.Impostor);
+                    impostorRole = ((Role.RoleManager.RoleGetter)getter).GetNextTypeCampRole(CampType.Impostor);
                 }
                 catch (GetterCanNotGetException)
                 {
-                    impostorRole = Role.RoleManager.GetManager().GetDefaultRole(CampType.Impostor);
+                    impostorRole = Role.RoleManager.GetManager().GetTypeCampRoles(CampType.Impostor)[0];
                 }
+                
+                // 如果没有内鬼职业会出BUG
                 RoleManager.Instance.SetRole(player, impostorRole!.BaseRoleType);
                 GameUtils.Data.Add(player, impostorRole);
                 RegisteredListeners.Add(impostorRole.GetListener(player));
                 continue;
             }
             setRoles:
-            var role = getter.GetNext() ?? Role.RoleManager.GetManager().GetDefaultRole(CampType.Crewmate);
+            var role = getter.GetNext() ?? Role.RoleManager.GetManager().GetTypeCampRoles(CampType.Crewmate)[0];
             if (role!.CampType == CampType.Impostor) goto setRoles; 
             RoleManager.Instance.SetRole(player, role.BaseRoleType);
             GameUtils.Data.Add(player, role);

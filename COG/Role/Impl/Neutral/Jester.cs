@@ -4,13 +4,13 @@ using COG.Modules;
 using COG.Utils;
 using UnityEngine;
 
-namespace COG.Role.Impl;
+namespace COG.Role.Impl.Neutral;
 
 public class Jester : Role, IListener
 {
     private PlayerControl? _player;
     
-    public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, true, CampType.Neutral)
+    public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral)
     {
         Description = LanguageConfig.Instance.JesterDescription;
         var parentOption = RoleOptions[0];

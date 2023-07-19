@@ -7,6 +7,7 @@ using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Role.Impl;
+using COG.Role.Impl.Neutral;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -78,8 +79,6 @@ public partial class Main : BasePlugin
         // Register roles
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
         {
-            new Crewmate(),
-            new Impostor(),
             new Jester()
         });
 

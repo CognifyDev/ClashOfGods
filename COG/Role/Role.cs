@@ -42,20 +42,14 @@ public abstract class Role
     /// 角色设置
     /// </summary>
     public List<CustomOption> RoleOptions { get; }
-    
-    /// <summary>
-    /// 是否在设置中显示该职业
-    /// </summary>
-    public bool DisplayInOption { get; }
-    
+
     /// <summary>
     /// 是否为副职业
     /// </summary>
     public bool SubRole { get; protected set; }
 
-    protected Role(string name, Color color, bool displayInOption, CampType campType)
+    protected Role(string name, Color color, CampType campType)
     {
-        DisplayInOption = displayInOption;
         Name = name;
         Description = "";
         Color = color;
@@ -64,14 +58,11 @@ public abstract class Role
         RoleOptions = new();
         SubRole = false;
 
-        if (DisplayInOption)
-        {
-            var option = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
-                ColorUtils.ToAmongUsColorString(Color, Name), false, null, true);
-            RoleOptions.Add(option);
-            RoleOptions.Add(CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
-                LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, option));
-        }
+        var option = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
+            ColorUtils.ToAmongUsColorString(Color, Name), false, null, true);
+        RoleOptions.Add(option);
+        RoleOptions.Add(CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
+            LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, option));
     }
 
     public static CustomOption.CustomOptionType ToCustomOption(Role role)

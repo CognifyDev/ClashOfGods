@@ -197,7 +197,7 @@ public class CustomOption
             var crewmateTabHighlight = GetTabHighlight(crewmateTab, "CrewmateTab", "COG.Resources.InDLL.Images.Setting.Crewmate.png");
 
             var modifierTab = UnityEngine.Object.Instantiate(roleTab, crewmateTab.transform);
-            var modifierTabHighlight = GetTabHighlight(modifierTab, "ModifierTab", "COG.Resources.InDLL.Images.Setting..png");
+            var modifierTabHighlight = GetTabHighlight(modifierTab, "ModifierTab", "COG.Resources.InDLL.Images.Setting.SubRole.png");
 
             // Position of Tab Icons
             gameTab.transform.position += Vector3.left * 3f;
