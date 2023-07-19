@@ -1,11 +1,8 @@
 ﻿global using Hazel;
 global using HarmonyLib;
 using System;
-using System.IO;
-using System.Reflection;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
-using COG.Config;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
@@ -15,7 +12,6 @@ using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
 using COG.Utils;
 using Reactor;
-using Reactor.Utilities.Extensions;
 
 namespace COG;
 
@@ -32,14 +28,13 @@ public partial class Main : BasePlugin
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string PluginVersion = "1.0.0";
-    public Harmony harmony { get; } = new(PluginGuid);
+    public Harmony Harmony { get; } = new(PluginGuid);
     public const string DisplayName = "ClashOfGods";
 
-    public static BepInEx.Logging.ManualLogSource Logger;
+    public static BepInEx.Logging.ManualLogSource Logger = null!;
 
-    public static Main Instance { get; private set; }
-
-
+    public static Main Instance { get; private set; } = null!;
+    
     /// <summary>
     /// 插件的启动方法
     /// </summary>
@@ -99,6 +94,6 @@ public partial class Main : BasePlugin
                     return false;
                 }, false)
         });
-        harmony.PatchAll();
+        Harmony.PatchAll();
     }
 }

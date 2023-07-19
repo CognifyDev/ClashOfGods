@@ -18,8 +18,15 @@ public static class MainMenuPatch
     {
         Buttons.Clear();
         var template = __instance.creditsButton;
-        
+
         if (!template) return;
+        
+        ModOption.Buttons.Clear();
+        foreach (var modOption in ModOptionManager.GetManager().GetOptions())
+        {
+            modOption.Register();
+        }
+        
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), LanguageConfig.Instance.Github, () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); },Color.blue);
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.25f), LanguageConfig.Instance.QQ, () => { Application.OpenURL("https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R63D8foTESsZ9TmGFbkaSPix0q9WGwtq&authKey=1rfvioSJhdni%2BpFvBqS5rFXkZKXNDeeFO50ZKGPzwtlLKwmJqftlDcolx%2FkJ3jLC&noverify=0&group_code=607761127");},Color.cyan);
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.7f, 0.15f), LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); }, Color.gray);
@@ -57,12 +64,6 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     static void LoadImage()
     {
-        ModOption.Buttons.Clear();
-        foreach (var modOption in ModOptionManager.GetManager().GetOptions())
-        {
-            modOption.Register();
-        }
-        
         _customBg = new GameObject("CustomBG");
         _customBg.transform.position = new Vector3(2f, 0f, 0f);
         var bgRenderer = _customBg.AddComponent<SpriteRenderer>();
