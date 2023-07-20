@@ -28,7 +28,7 @@ public class OptionListener : IListener
         {
             text += sidebarObject + Environment.NewLine;
         }
-        text += LanguageConfig.Instance.MessageForNextPage.Replace("%correctpage%", _typePage + "").Replace("%pagecount%", pages + "");
+        text += LanguageConfig.Instance.MessageForNextPage.Replace("%currentpage%", _typePage + "").Replace("%pagecount%", pages + "");
         result = text;
     }
 
