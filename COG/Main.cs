@@ -91,12 +91,13 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.ReloadConfigs,
                 () =>
                 {
-                    LanguageConfig.LoadLanguageConfig(); 
-                    Environment.Exit(0);
+                    LanguageConfig.LoadLanguageConfig();
+                    UnityEngine.Application.Quit();
                     return false;
                 }, false)
         });
-        
+        Main.Logger.LogInfo("option regged");
+
         Harmony.PatchAll();
     }
 }

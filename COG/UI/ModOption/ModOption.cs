@@ -7,7 +7,7 @@ public class ModOption
     public readonly string Text;
     public readonly System.Func<bool> OnClick;
     public readonly bool DefaultValue;
-    public bool Init { get; set; }
+
     public ToggleButtonBehaviour? ToggleButton;
 
     public static readonly List<ModOption> Buttons = new();
