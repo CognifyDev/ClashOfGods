@@ -35,7 +35,6 @@ class OnTabGroupOpen
 {
     static void Postfix(TabGroup __instance)
     {
-        if (__instance.name == "GeneralButton") return;
         foreach (var btn in ModOption.Buttons)
             if (btn.ToggleButton != null)
                 btn.ToggleButton.gameObject.SetActive(false);

@@ -1,5 +1,5 @@
 lobby:
-  message-for-next-page: "按 TAB 切换下一页... %correctpage%/%pagecount%"
+  message-for-next-page: "按 TAB 切换下一页... %currentpage%/%pagecount%"
   make-public-message: "禁止设置为公开"
 
 role:

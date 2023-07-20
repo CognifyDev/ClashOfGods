@@ -96,7 +96,6 @@ public partial class Main : BasePlugin
                     return false;
                 }, false)
         });
-        Main.Logger.LogInfo("option regged");
 
         Harmony.PatchAll();
     }
