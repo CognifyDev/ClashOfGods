@@ -9,7 +9,6 @@ namespace COG.Listener.Impl;
 class ModOptionListener : IListener
 {
     private static List<Transform> Vanilla = new();
-    public bool Inited = false;
     
     private static CustomOption _saveGameConfigsOptions = CustomOption.Create(0,
         CustomOption.CustomOptionType.General, 
@@ -19,6 +18,7 @@ class ModOptionListener : IListener
     
     public void OnSettingInit(OptionsMenuBehaviour menu)
     {
+        Main.Logger.LogInfo("Setting init");
         var transform1 = menu.CensorChatButton.transform;
         Vector3? position = transform1.localPosition;
         var button = menu.EnableFriendInvitesButton;
@@ -44,12 +44,11 @@ class ModOptionListener : IListener
         modOptions.Text.transform.localScale = new Vector3(1 / 0.66f, 1, 1);
         modOptions.Background.color = Palette.EnabledColor;
 
-        LoadButtons(menu);
-        
         var modOptionsButton = modOptions.GetComponent<PassiveButton>();
         modOptionsButton.OnClick = new();
         modOptionsButton.OnClick.AddListener((System.Action)(() =>
         {
+            LoadButtons(menu);
             HideVanillaButtons(menu);
             foreach (var btn in ModOption.Buttons)
                 if (btn.ToggleButton != null)
@@ -77,13 +76,14 @@ class ModOptionListener : IListener
 
     public void LoadButtons(OptionsMenuBehaviour menu)
     {
+        ModOption.Buttons.Clear();
+        foreach (var modOption in ModOptionManager.GetManager().GetOptions()) modOption.Register();
         var a = 0;
         foreach(var btn in ModOption.Buttons)
         {
             CreateButton(menu, a, btn);
             a++;
         }
-        Inited = true;
     }
     
     /// <summary>
@@ -94,7 +94,6 @@ class ModOptionListener : IListener
     /// <param name="option">对应的 ModOption</param>
     public void CreateButton(OptionsMenuBehaviour menu, int idx, ModOption option)
     {
-        if (option.Init) return;
         var template = menu.CensorChatButton;
         var button = Object.Instantiate(template, menu.transform);
         Vector3 pos = new(idx % 2 == 0 ? -1.17f : 1.17f, 1.7f - idx / 2 * 0.8f, -0.5f);
@@ -122,6 +121,5 @@ class ModOptionListener : IListener
         option.ToggleButton = button;
 
         button.gameObject.SetActive(false);
-        option.Init = true;
     }
 }
