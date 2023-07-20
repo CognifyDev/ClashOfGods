@@ -13,11 +13,17 @@ role:
     description: "你会在被驱逐后获胜"
 
 menu:
-  general: "COG设置"
-  impostor: "内鬼职业设置"
-  neutral: "中立职业设置"
-  crewmate: "船员职业设置"
-  modifier: "副职业设置"
+  general:
+    name: "COG设置"
+    save-game-configs: "保存游戏设置"
+  impostor:
+    name: "内鬼职业设置"
+  neutral:
+    name: "中立职业设置"
+  crewmate:
+    name: "船员职业设置"
+  modifier:
+    name: "副职业设置"
 option:
   main:
     cog-options: "COG选项"

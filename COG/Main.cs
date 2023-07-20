@@ -6,6 +6,7 @@ using BepInEx.Unity.IL2CPP;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
+using COG.Modules;
 using COG.Role.Impl.Neutral;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
@@ -95,6 +96,7 @@ public partial class Main : BasePlugin
                     return false;
                 }, false)
         });
+        
         Harmony.PatchAll();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using COG.Config.Impl;
+using COG.Modules;
 using COG.UI.ModOption;
 using UnityEngine;
 
@@ -9,6 +10,13 @@ class ModOptionListener : IListener
 {
     private static List<Transform> Vanilla = new();
     public bool Inited = false;
+    
+    private static CustomOption _saveGameConfigsOptions = CustomOption.Create(0,
+        CustomOption.CustomOptionType.General, 
+        LanguageConfig.Instance.SaveGameConfigs,
+        false, null, true
+    );
+    
     public void OnSettingInit(OptionsMenuBehaviour menu)
     {
         var transform1 = menu.CensorChatButton.transform;
