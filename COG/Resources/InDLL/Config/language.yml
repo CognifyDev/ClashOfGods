@@ -11,6 +11,8 @@ role:
   jester:
     name: "小丑"
     description: "你会在被驱逐后获胜"
+  ditto:
+    name:
 
 menu:
   general:

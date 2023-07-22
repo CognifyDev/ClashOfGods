@@ -67,10 +67,6 @@ class SelectRolesPatch
 {
     public static void Prefix()
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
-            listener.OnSelectRoles();
-        }
     }
 }
 

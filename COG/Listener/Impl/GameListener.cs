@@ -30,7 +30,7 @@ public class GameListener : IListener
 
             if (maxImpostors > 0)
             {
-                maxImpostors --;
+                maxImpostors--;
 
                 Role.Role? impostorRole;
                 try
@@ -41,11 +41,18 @@ public class GameListener : IListener
                 {
                     impostorRole = Role.RoleManager.GetManager().GetTypeCampRoles(CampType.Impostor)[0];
                 }
-                
+
                 // 如果没有内鬼职业会出BUG
-                RoleManager.Instance.SetRole(player, impostorRole!.BaseRoleType);
-                GameUtils.Data.Add(player, impostorRole);
-                RegisteredListeners.Add(impostorRole.GetListener(player));
+                try
+                {
+                    RoleManager.Instance.SetRole(player, impostorRole!.BaseRoleType);
+                    GameUtils.Data.Add(player, impostorRole);
+                    RegisteredListeners.Add(impostorRole.GetListener(player));
+                }
+                catch
+                {
+                    RoleManager.Instance.SetRole(player, AmongUs.GameOptions.RoleTypes.Impostor);
+                }
                 continue;
             }
             setRoles:
