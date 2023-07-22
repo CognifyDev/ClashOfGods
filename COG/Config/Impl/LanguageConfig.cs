@@ -33,7 +33,7 @@ public class LanguageConfig : Config
     public string SidebarTextOriginal { get; private set; } = null!;
     public string SidebarTextNeutral { get; private set; } = null!;
     public string SidebarTextMod { get; private set; } = null!;
-    public string SidebarTextModifier { get; private set; } = null!;
+    public string SidebarTextAddons { get; private set; } = null!;
     public string SidebarTextImpostor { get; private set; } = null!;
     public string SidebarTextCrewmate { get; private set; } = null!;
     public string QQ { get; private set; } = null!;
@@ -55,7 +55,7 @@ public class LanguageConfig : Config
             ImpostorRolesSetting = GetString("menu.impostor.name");
             NeutralRolesSetting = GetString("menu.neutral.name");
             CrewmateRolesSetting = GetString("menu.crewmate.name");
-            AddonsSetting = GetString("menu.modifier.name");
+            AddonsSetting = GetString("menu.addons.name");
 
             SaveGameConfigs = GetString("menu.general.save-game-configs");
 
@@ -77,7 +77,7 @@ public class LanguageConfig : Config
             SidebarTextOriginal = GetString("sidebar-text.original");
             SidebarTextNeutral = GetString("sidebar-text.neutral");
             SidebarTextMod = GetString("sidebar-text.mod");
-            SidebarTextModifier = GetString("sidebar-text.modifier");
+            SidebarTextAddons = GetString("sidebar-text.addons");
             SidebarTextImpostor = GetString("sidebar-text.impostor");
             SidebarTextCrewmate = GetString("sidebar-text.crewmate");
         }

@@ -5,7 +5,7 @@ namespace COG.UI.SidebarText.Impl;
 
 public class AddonsSettings : SidebarText
 {
-    public AddonsSettings() : base(LanguageConfig.Instance.SidebarTextModifier)
+    public AddonsSettings() : base(LanguageConfig.Instance.SidebarTextAddons)
     {
     }
     

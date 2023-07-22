@@ -14,12 +14,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Resources\InDLL\Images\Setting\Crewmate.png" />
-      <None Remove="Resources\InDLL\Images\Setting\Imposter.png" />
-      <None Remove="Resources\InDLL\Images\Setting\Neutral.png" />
-    </ItemGroup>
-
-    <ItemGroup>
       <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
       <EmbeddedResource Include="Resources\InDLL\Images\Setting\*.*" />
     </ItemGroup>
