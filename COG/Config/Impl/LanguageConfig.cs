@@ -13,7 +13,7 @@ public class LanguageConfig : Config
     public string ImpostorRolesSetting { get; private set; } = null!;
     public string NeutralRolesSetting { get; private set; } = null!;
     public string CrewmateRolesSetting { get; private set; } = null!;
-    public string ModifierSetting { get; private set; } = null!;
+    public string AddonsSetting { get; private set; } = null!;
 
     public string SaveGameConfigs { get; private set; } = null!;
 
@@ -55,7 +55,7 @@ public class LanguageConfig : Config
             ImpostorRolesSetting = GetString("menu.impostor.name");
             NeutralRolesSetting = GetString("menu.neutral.name");
             CrewmateRolesSetting = GetString("menu.crewmate.name");
-            ModifierSetting = GetString("menu.modifier.name");
+            AddonsSetting = GetString("menu.modifier.name");
 
             SaveGameConfigs = GetString("menu.general.save-game-configs");
 

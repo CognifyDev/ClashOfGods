@@ -21,7 +21,7 @@ public class CustomOption
         Impostor = 1,
         Neutral = 2,
         Crewmate = 3,
-        Modifier = 4
+        Addons = 4
     }
 
     public static readonly List<CustomOption?> Options = new();
@@ -154,7 +154,7 @@ public class CustomOption
                     ["ImpostorSettings"] = LanguageConfig.Instance.ImpostorRolesSetting,
                     ["NeutralSettings"] = LanguageConfig.Instance.NeutralRolesSetting,
                     ["CrewmateSettings"] = LanguageConfig.Instance.CrewmateRolesSetting,
-                    ["ModifierSettings"] = LanguageConfig.Instance.ModifierSetting
+                    ["AddonsSettings"] = LanguageConfig.Instance.AddonsSetting
                 });
 
             if (isReturn) return;
@@ -178,8 +178,8 @@ public class CustomOption
             var crewmateSettings = UnityEngine.Object.Instantiate(gameSettings, parent);
             var crewmateMenu = GetMenu(crewmateSettings, "CrewmateSettings");
 
-            var modifierSettings = UnityEngine.Object.Instantiate(gameSettings, parent);
-            var modifierMenu = GetMenu(modifierSettings, "ModifierSettings");
+            var addonsSettings = UnityEngine.Object.Instantiate(gameSettings, parent);
+            var modifierMenu = GetMenu(addonsSettings, "AddonsSettings");
 
             var roleTab = GameObject.Find("RoleTab");
             var gameTab = GameObject.Find("GameTab");
@@ -219,7 +219,7 @@ public class CustomOption
                     [impostorSettings.gameObject] = impostorTabHighlight,
                     [neutralSettings.gameObject] = neutralTabHighlight,
                     [crewmateSettings.gameObject] = crewmateTabHighlight,
-                    [modifierSettings.gameObject] = modifierTabHighlight
+                    [addonsSettings.gameObject] = modifierTabHighlight
                 };
                 for (int i = 0; i < tabs.Length; i++)
                 {
@@ -284,7 +284,7 @@ public class CustomOption
             SetOptions(
                 new List<GameOptionsMenu> { torMenu, impostorMenu, neutralMenu, crewmateMenu, modifierMenu },
                 new List<List<OptionBehaviour>> { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions },
-                new List<GameObject> { torSettings, impostorSettings, neutralSettings, crewmateSettings, modifierSettings }
+                new List<GameObject> { torSettings, impostorSettings, neutralSettings, crewmateSettings, addonsSettings }
             );
 
             AdaptTaskCount(__instance);
@@ -493,7 +493,7 @@ class GameOptionsMenuUpdatePatch
                 continue;
             if (GameObject.Find("CrewmateSettings") && option.Type != CustomOptionType.Crewmate)
                 continue;
-            if (GameObject.Find("ModifierSettings") && option.Type != CustomOptionType.Modifier)
+            if (GameObject.Find("AddonsSettings") && option.Type != CustomOptionType.Addons)
                 continue;
             if (option?.OptionBehaviour != null && option.OptionBehaviour.gameObject != null)
             {

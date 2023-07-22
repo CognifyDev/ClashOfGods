@@ -67,7 +67,7 @@ public abstract class Role
 
     public static CustomOption.CustomOptionType ToCustomOption(Role role)
     {
-        if (role.CampType == CampType.Unknown) return CustomOption.CustomOptionType.Modifier;
+        if (role.CampType == CampType.Unknown) return CustomOption.CustomOptionType.Addons;
         return (CustomOption.CustomOptionType) role.CampType;
     }
 
