@@ -11,6 +11,8 @@ role:
   jester:
     name: "小丑"
     description: "你会在被驱逐后获胜"
+  ditto:
+    name:
 
 menu:
   general:
@@ -22,7 +24,7 @@ menu:
     name: "中立职业设置"
   crewmate:
     name: "船员职业设置"
-  modifier:
+  addons:
     name: "副职业设置"
 option:
   main:
@@ -38,6 +40,6 @@ sidebar-text:
   original: "<color=#FF0000>原版设置</color>"
   neutral: "<color=#FF0000>中立设置</color>"
   mod: "<color=#FF0000>模组设置</color>"
-  modifier: "<color=#FF0000>副职业设置</color>"
+  addons: "<color=#FF0000>副职业设置</color>"
   impostor: "<color=#FF0000>伪装者设置</color>"
   crewmate: "<color=#FF0000>船员设置</color>"

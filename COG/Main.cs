@@ -74,7 +74,7 @@ public partial class Main : BasePlugin
             new OriginalSettings(),
             new NeutralSettings(),
             new ModSettings(),
-            new ModifierSettings(),
+            new AddonsSettings(),
             new ImpostorSettings(),
             new CrewmateSettings()
         });
