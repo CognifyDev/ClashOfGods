@@ -18,6 +18,7 @@ public class GameListener : IListener
 
     public void OnSelectRoles()
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         RegisteredListeners.Clear();
         GameUtils.Data.Clear();
         var players = PlayerUtils.GetAllPlayers().Disarrange();
