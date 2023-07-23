@@ -117,32 +117,7 @@ public class GameListener : IListener
         intro.RoleBlurbText.text = role.Description;
         */
     }
-    
-    public void OnSetUpTeamText(IntroCutscene intro)
-    {
-        PlayerControl? player = null;
-        Role.Role? role = null;
 
-        foreach (var keyValuePair in GameUtils.Data)
-        {
-            var target = keyValuePair.Key;
-            if (intro.PlayerPrefab.name.Equals(target.name))
-            {
-                player = target;
-                role = keyValuePair.Value;
-            }
-        }
-        
-        if (role == null || player == null) return;
-        
-        // 游戏开始的时候显示陣營信息
-        intro.TeamTitle.color = role.Color;
-        if (role.CampType is CampType.Crewmate or CampType.Impostor) return;
-        /*
-         *  其他陣營文本預留
-         */
-    }
-    
     public void OnSetUpTeamText(IntroCutscene intro)
     {
         PlayerControl? player = null;
