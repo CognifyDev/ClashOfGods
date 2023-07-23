@@ -1,12 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace COG.Utils;
 
 public class Yaml
 {
-    public string Text { get; }
+    /// <summary>
+    /// Yaml内容
+    /// </summary>
+    public string Text { get; private set; }
+    /// <summary>
+    /// Yaml Stream
+    /// </summary>
     public YamlStream YamlStream { get; }
 
     private Yaml(string text)
@@ -20,6 +28,11 @@ public class Yaml
         YamlStream = yamlStream;
     }
 
+    /// <summary>
+    /// 获取Int值
+    /// </summary>
+    /// <param name="location">路径，例如: GetInt("abab.sb"),"."表示下级</param>
+    /// <returns>Int值</returns>
     public int? GetInt(string location)
     {
         var str = GetString(location);
@@ -32,7 +45,7 @@ public class Yaml
         return null;
     }
     
-    public List<string> GetStringList(string location)
+    public List<string>? GetStringList(string location)
     {
         var locations = location.Contains('.') ? location.Split(".") : new[] { location };
         var rootNode = (YamlMappingNode)YamlStream.Documents[0].RootNode;
@@ -55,11 +68,11 @@ public class Yaml
                 }
 
                 // 如果找不到对应的键或节点不是一个映射节点，则返回空列表
-                return new List<string>();
+                return null;
             }
             catch (KeyNotFoundException)
             {
-                return new List<string>();
+                return null;
             }
         }
 
@@ -123,7 +136,38 @@ public class Yaml
         
         return $"{valueNode}";
     }
+    
+    public void Set(string location, dynamic obj)
+    {
+        var deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
 
+        var serializer = new SerializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
+
+        var yamlObject = deserializer.Deserialize<dynamic>(Text);
+        SetValue(yamlObject, location, obj);
+
+        Text = serializer.Serialize(yamlObject);
+    }
+
+    private static void SetValue(dynamic yamlObject, string location, object value)
+    {
+        var parts = location.Split('.');
+
+        for (int i = 0; i < parts.Length - 1; i++)
+        {
+            if (!yamlObject.ContainsKey(parts[i]))
+                yamlObject[parts[i]] = new Dictionary<string, object>();
+
+            yamlObject = yamlObject[parts[i]];
+        }
+
+        yamlObject[parts[^1]] = value;
+    }
+    
     public static Yaml LoadFromString(string text)
     {
         return new Yaml(text);
@@ -132,5 +176,10 @@ public class Yaml
     public static Yaml LoadFromFile(string path)
     {
         return LoadFromString(File.ReadAllText(path));
+    }
+
+    public static Yaml NewEmptyYaml()
+    {
+        return LoadFromString("");
     }
 }
