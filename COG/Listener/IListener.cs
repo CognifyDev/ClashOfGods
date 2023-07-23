@@ -68,7 +68,8 @@ public interface IListener
     void OnPingTrackerUpdate(PingTracker tracker) { }
 
     void OnSetUpRoleText(IntroCutscene intro) { }
-    void OnSetUpTeamText(IntroCutscene intro) {}
+    
+    void OnSetUpTeamText(IntroCutscene intro) { }
 
     void OnPlayerExile(ExileController controller) { }
 
@@ -78,13 +79,13 @@ public interface IListener
 
     void OnSelectRoles() { }
     
-    void OnPlayerJoined(AmongUsClient amongUsClient) {}
+    void OnPlayerJoined(AmongUsClient amongUsClient) { }
     
-    void OnGameEndSetEverythingUp(EndGameManager manager) {}
+    void OnGameEndSetEverythingUp(EndGameManager manager) { }
 
     void OnIGameOptionsExtensionsDisplay(ref string result) { }
 
-    void OnKeyboardJoystickUpdate(KeyboardJoystick keyboardJoystick) {}
+    void OnKeyboardJoystickUpdate(KeyboardJoystick keyboardJoystick) { }
 
     void OnRPCReceived(byte callId, MessageReader reader) { }
 

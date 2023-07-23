@@ -14,13 +14,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Resources\InDLL\Images\Setting\Crewmate.png" />
-      <None Remove="Resources\InDLL\Images\Setting\Imposter.png" />
-      <None Remove="Resources\InDLL\Images\Setting\Neutral.png" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
       <EmbeddedResource Include="Resources\InDLL\Images\Setting\*.*" />
     </ItemGroup>
         
@@ -28,10 +21,10 @@
       <EmbeddedResource Include="Resources\InDLL\Config\*.*" />
       <EmbeddedResource Include="Resources\InDLL\Depends\*.*" />
     </ItemGroup>
-
+        
     <ItemGroup>
-        <PackageReference Include="Reactor" Version="2.1.0" />
-        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.663" Private="false" ExcludeAssets="runtime;native" />
+        <PackageReference Include="Reactor" Version="2.2.0" />
+        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.671" Private="false" ExcludeAssets="runtime;native" />
         <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.7.11" PrivateAssets="all" />
 
         <PackageReference Include="BepInEx.AutoPlugin" Version="1.1.0" PrivateAssets="all" />
@@ -41,7 +34,6 @@
 
     <ItemGroup>
         <PackageReference Include="GitInfo" Version="2.3.0" />
-        <PackageReference Include="BepInEx.AutoPlugin" Version="1.0.1" PrivateAssets="all" />
     </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">

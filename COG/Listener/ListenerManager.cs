@@ -29,5 +29,4 @@ public class ListenerManager
     }
     
     public List<IListener> GetListeners() => _listeners;
-
 }

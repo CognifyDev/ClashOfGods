@@ -20,16 +20,12 @@ public static class MainMenuPatch
         var template = __instance.creditsButton;
 
         if (!template) return;
+
         
-        ModOption.Buttons.Clear();
-        foreach (var modOption in ModOptionManager.GetManager().GetOptions())
-        {
-            modOption.Register();
-        }
         
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.15f), LanguageConfig.Instance.Github, () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); },Color.blue);
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.25f, 0.25f), LanguageConfig.Instance.QQ, () => { Application.OpenURL("https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R63D8foTESsZ9TmGFbkaSPix0q9WGwtq&authKey=1rfvioSJhdni%2BpFvBqS5rFXkZKXNDeeFO50ZKGPzwtlLKwmJqftlDcolx%2FkJ3jLC&noverify=0&group_code=607761127");},Color.cyan);
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.7f, 0.15f), LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); }, Color.gray);
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.2f, 0.38f), LanguageConfig.Instance.Github, () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); },Color.blue);
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.7f, 0.38f), LanguageConfig.Instance.QQ, () => { Application.OpenURL("https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R63D8foTESsZ9TmGFbkaSPix0q9WGwtq&authKey=1rfvioSJhdni%2BpFvBqS5rFXkZKXNDeeFO50ZKGPzwtlLKwmJqftlDcolx%2FkJ3jLC&noverify=0&group_code=607761127");},Color.cyan);
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new(0.45f, 0.38f), LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); }, Color.gray);
     }
 
     /// <summary>
@@ -65,9 +61,9 @@ public static class MainMenuPatch
     static void LoadImage()
     {
         _customBg = new GameObject("CustomBG");
-        _customBg.transform.position = new Vector3(2f, 0f, 0f);
+        _customBg.transform.position = new Vector3(1.8f, 0.2f, 0f);
         var bgRenderer = _customBg.AddComponent<SpriteRenderer>();
-        bgRenderer.sprite = Utils.ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 280f);
+        bgRenderer.sprite = Utils.ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 295f);
     }
 
     [HarmonyPatch(nameof(MainMenuManager.OpenAccountMenu))]

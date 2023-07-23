@@ -18,6 +18,7 @@ public class GameListener : IListener
 
     public void OnSelectRoles()
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         RegisteredListeners.Clear();
         GameUtils.Data.Clear();
         var players = PlayerUtils.GetAllPlayers().Disarrange();
@@ -30,24 +31,33 @@ public class GameListener : IListener
 
             if (maxImpostors > 0)
             {
-                maxImpostors --;
+                maxImpostors--;
 
                 Role.Role? impostorRole;
                 try
                 {
-                    impostorRole = ((Role.RoleManager.RoleGetter) getter).GetNextTypeCampRole(CampType.Impostor);
+                    impostorRole = ((Role.RoleManager.RoleGetter)getter).GetNextTypeCampRole(CampType.Impostor);
                 }
                 catch (GetterCanNotGetException)
                 {
-                    impostorRole = Role.RoleManager.GetManager().GetDefaultRole(CampType.Impostor);
+                    impostorRole = Role.RoleManager.GetManager().GetTypeCampRoles(CampType.Impostor)[0];
                 }
-                RoleManager.Instance.SetRole(player, impostorRole!.BaseRoleType);
-                GameUtils.Data.Add(player, impostorRole);
-                RegisteredListeners.Add(impostorRole.GetListener(player));
+
+                // 如果没有内鬼职业会出BUG
+                try
+                {
+                    RoleManager.Instance.SetRole(player, impostorRole!.BaseRoleType);
+                    GameUtils.Data.Add(player, impostorRole);
+                    RegisteredListeners.Add(impostorRole.GetListener(player));
+                }
+                catch
+                {
+                    RoleManager.Instance.SetRole(player, AmongUs.GameOptions.RoleTypes.Impostor);
+                }
                 continue;
             }
             setRoles:
-            var role = getter.GetNext() ?? Role.RoleManager.GetManager().GetDefaultRole(CampType.Crewmate);
+            var role = getter.GetNext() ?? Role.RoleManager.GetManager().GetTypeCampRoles(CampType.Crewmate)[0];
             if (role!.CampType == CampType.Impostor) goto setRoles; 
             RoleManager.Instance.SetRole(player, role.BaseRoleType);
             GameUtils.Data.Add(player, role);
@@ -82,6 +92,34 @@ public class GameListener : IListener
 
     public void OnSetUpRoleText(IntroCutscene intro)
     {
+        var player = PlayerControl.LocalPlayer;
+
+        Role.Role? role = null;
+        
+        foreach (var keyValuePair in GameUtils.Data)
+        {
+            if (keyValuePair.Key.FriendCode.Equals(player.FriendCode))
+            {
+                role = keyValuePair.Value;
+            }
+        }
+        
+        if (role == null) return;
+        
+        // 游戏开始的时候显示角色信息
+        
+        Main.Logger.LogInfo(intro.YouAreText.text + " " + intro.RoleText.text + " " + intro.RoleBlurbText.text);
+        /*
+        intro.YouAreText.color = role.Color;
+        intro.RoleText.text = role.Name;
+        intro.RoleText.color = role.Color;
+        intro.RoleBlurbText.color = role.Color;
+        intro.RoleBlurbText.text = role.Description;
+        */
+    }
+    
+    public void OnSetUpTeamText(IntroCutscene intro)
+    {
         PlayerControl? player = null;
         Role.Role? role = null;
 
@@ -97,12 +135,12 @@ public class GameListener : IListener
         
         if (role == null || player == null) return;
         
-        // 游戏开始的时候显示角色信息
-        intro.YouAreText.color = role.Color;
-        intro.RoleText.text = role.Name;
-        intro.RoleText.color = role.Color;
-        intro.RoleBlurbText.color = role.Color;
-        intro.RoleBlurbText.text = role.Description;
+        // 游戏开始的时候显示陣營信息
+        intro.TeamTitle.color = role.Color;
+        if (role.CampType is CampType.Crewmate or CampType.Impostor) return;
+        /*
+         *  其他陣營文本預留
+         */
     }
     
     public void OnSetUpTeamText(IntroCutscene intro)

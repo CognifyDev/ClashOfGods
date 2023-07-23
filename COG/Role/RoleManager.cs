@@ -15,26 +15,11 @@ public class RoleManager
         var list = new List<Role>();
         foreach (var role in _roles)
         {
-            if (role.CampType == campType)
+            if (role.CampType == campType && role.RoleOptions[0].GetBool())
                 list.Add(role);
         }
 
         return list.ToArray();
-    }
-
-    public Role? GetDefaultRole(CampType campType)
-    {
-        switch (campType)
-        {
-            case CampType.Crewmate:
-            case CampType.Unknown:
-            case CampType.Neutral:
-                return GetTypeRoleInstance<Crewmate>();
-            case CampType.Impostor:
-                return GetTypeRoleInstance<Impostor>();
-            default:
-                return GetTypeRoleInstance<Crewmate>();
-        }
     }
 
     private readonly List<Role> _roles = new();
@@ -68,7 +53,7 @@ public class RoleManager
             var roles = GetManager().GetRoles();
             foreach (var role in roles)
             {
-                var num = (int)role.RoleOptions[1].GetFloat();
+                var num = role.RoleOptions[1].GetFloat();
                 for (var i = 0; i < num; i++)
                 {
                     _roles.Add(role);

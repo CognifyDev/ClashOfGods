@@ -1,17 +1,20 @@
 ﻿global using Hazel;
 global using HarmonyLib;
-using System;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
-using COG.Role.Impl;
+using COG.Role.Impl.Crewmate;
+using COG.Role.Impl.Impostor;
+using COG.Role.Impl.Neutral;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
 using COG.Utils;
 using Reactor;
+using Reactor.Networking;
+using Reactor.Networking.Attributes;
 
 namespace COG;
 
@@ -23,6 +26,7 @@ namespace COG;
 [BepInIncompatibility("com.tugaru.TownOfPlus")]
 [BepInDependency(ReactorPlugin.Id)]
 [BepInProcess("Among Us.exe")]
+[ReactorModFlags(ModFlags.RequireOnAllClients)]
 public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
@@ -42,7 +46,7 @@ public partial class Main : BasePlugin
     {
         Instance = this;
 
-        Logger = BepInEx.Logging.Logger.CreateLogSource(DisplayName + "   ");
+        Logger = BepInEx.Logging.Logger.CreateLogSource($"   {DisplayName}");
         Logger.LogInfo("Loading...");
 
         // Add depends to core directory
@@ -70,7 +74,7 @@ public partial class Main : BasePlugin
             new OriginalSettings(),
             new NeutralSettings(),
             new ModSettings(),
-            new ModifierSettings(),
+            new AddonsSettings(),
             new ImpostorSettings(),
             new CrewmateSettings()
         });
@@ -89,11 +93,12 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.ReloadConfigs,
                 () =>
                 {
-                    LanguageConfig.LoadLanguageConfig(); 
-                    Environment.Exit(0);
+                    LanguageConfig.LoadLanguageConfig();
+                    UnityEngine.Application.Quit();
                     return false;
                 }, false)
         });
+
         Harmony.PatchAll();
     }
 }

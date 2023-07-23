@@ -5,7 +5,7 @@ namespace COG.Config.Impl;
 
 public class LanguageConfig : Config
 {
-    public static LanguageConfig Instance { get; private set; } = null!;
+    public static LanguageConfig Instance { get; private set; }
     public string MessageForNextPage { get; private set; } = null!;
     public string MakePublicMessage { get; private set; } = null!;
 
@@ -13,8 +13,19 @@ public class LanguageConfig : Config
     public string ImpostorRolesSetting { get; private set; } = null!;
     public string NeutralRolesSetting { get; private set; } = null!;
     public string CrewmateRolesSetting { get; private set; } = null!;
-    public string ModifierSetting { get; private set; } = null!;
+    public string AddonsSetting { get; private set; } = null!;
 
+    public string SaveGameConfigs { get; private set; } = null!;
+    
+    // Crewmate
+    public string CrewmateName { get; private set; } = null!;
+    public string CrewmateDescription { get; private set; } = null!;
+
+    // Impostor
+    public string ImpostorName { get; private set; } = null!;
+    public string ImpostorDescription { get; private set; } = null!;
+    
+    // Neutral
     public string JesterName { get; private set; } = null!;
     public string JesterDescription { get; private set; } = null!;
 
@@ -31,7 +42,7 @@ public class LanguageConfig : Config
     public string SidebarTextOriginal { get; private set; } = null!;
     public string SidebarTextNeutral { get; private set; } = null!;
     public string SidebarTextMod { get; private set; } = null!;
-    public string SidebarTextModifier { get; private set; } = null!;
+    public string SidebarTextAddons { get; private set; } = null!;
     public string SidebarTextImpostor { get; private set; } = null!;
     public string SidebarTextCrewmate { get; private set; } = null!;
     public string QQ { get; private set; } = null!;
@@ -46,36 +57,47 @@ public class LanguageConfig : Config
     {
         try
         {
-            MessageForNextPage = YamlReader.GetString("lobby.message-for-next-page")!;
-            MakePublicMessage = YamlReader.GetString("lobby.make-public-message")!;
+            MessageForNextPage = GetString("lobby.message-for-next-page");
+            MakePublicMessage = GetString("lobby.make-public-message");
 
-            GeneralSetting = YamlReader.GetString("menu.general")!;
-            ImpostorRolesSetting = YamlReader.GetString("menu.impostor")!;
-            NeutralRolesSetting = YamlReader.GetString("menu.neutral")!;
-            CrewmateRolesSetting = YamlReader.GetString("menu.crewmate")!;
-            ModifierSetting = YamlReader.GetString("menu.modifier")!;
+            GeneralSetting = GetString("menu.general.name");
+            ImpostorRolesSetting = GetString("menu.impostor.name");
+            NeutralRolesSetting = GetString("menu.neutral.name");
+            CrewmateRolesSetting = GetString("menu.crewmate.name");
+            AddonsSetting = GetString("menu.addons.name");
 
-            JesterName = YamlReader.GetString("role.jester.name")!;
-            JesterDescription = YamlReader.GetString("role.jester.description")!;
+            SaveGameConfigs = GetString("menu.general.save-game-configs");
 
-            Enable = YamlReader.GetString("option.enable")!;
-            Disable = YamlReader.GetString("option.disable")!;
-            CogOptions = YamlReader.GetString("option.main.cog-options")!;
-            ReloadConfigs = YamlReader.GetString("option.main.reload-configs")!;
-            Github = YamlReader.GetString("option.main.github")!;
-            QQ = YamlReader.GetString("option.main.qq")!;
-            Discord = YamlReader.GetString("option.main.discord")!;
+            // Crewmate
+            CrewmateName = GetString("role.crewmate.crewmate.name");
+            CrewmateDescription = GetString("role.crewmate.crewmate.description");
+            
+            // Impostor
+            ImpostorName = GetString("role.impostor.impostor.name");
+            ImpostorDescription = GetString("role.impostor.impostor.description");
+            
+            // Neutral
+            JesterName = GetString("role.neutral.jester.name");
+            JesterDescription = GetString("role.neutral.jester.description");
 
-            MaxNumMessage = YamlReader.GetString("role.global.max-num")!;
-            AllowStartMeeting = YamlReader.GetString("role.global.allow-start-meeting")!;
-            AllowReportDeadBody = YamlReader.GetString("role.global.allow-report-body")!;
+            Enable = GetString("option.enable");
+            Disable = GetString("option.disable");
+            CogOptions = GetString("option.main.cog-options");
+            ReloadConfigs = GetString("option.main.reload-configs");
+            Github = GetString("option.main.github");
+            QQ = GetString("option.main.qq");
+            Discord = GetString("option.main.discord");
 
-            SidebarTextOriginal = YamlReader.GetString("sidebar-text.original")!;
-            SidebarTextNeutral = YamlReader.GetString("sidebar-text.neutral")!;
-            SidebarTextMod = YamlReader.GetString("sidebar-text.mod")!;
-            SidebarTextModifier = YamlReader.GetString("sidebar-text.modifier")!;
-            SidebarTextImpostor = YamlReader.GetString("sidebar-text.impostor")!;
-            SidebarTextCrewmate = YamlReader.GetString("sidebar-text.crewmate")!;
+            MaxNumMessage = GetString("role.global.max-num");
+            AllowStartMeeting = GetString("role.global.allow-start-meeting");
+            AllowReportDeadBody = GetString("role.global.allow-report-body");
+
+            SidebarTextOriginal = GetString("sidebar-text.original");
+            SidebarTextNeutral = GetString("sidebar-text.neutral");
+            SidebarTextMod = GetString("sidebar-text.mod");
+            SidebarTextAddons = GetString("sidebar-text.addons");
+            SidebarTextImpostor = GetString("sidebar-text.impostor");
+            SidebarTextCrewmate = GetString("sidebar-text.crewmate");
         }
         catch (NullReferenceException)
         {
@@ -86,13 +108,26 @@ public class LanguageConfig : Config
         }
     }
 
+    private string GetString(string location)
+    {
+        var toReturn = YamlReader.GetString(location);
+        if (toReturn is null or "" or " ")
+        {
+            throw new NullReferenceException();
+        }
+
+        return toReturn;
+    }
+
     static LanguageConfig()
     {
+        Instance = new LanguageConfig();
         LoadLanguageConfig();
     }
 
     internal static void LoadLanguageConfig()
     {
+        Instance.LoadConfig(true);
         Instance = new LanguageConfig();
     }
 }
