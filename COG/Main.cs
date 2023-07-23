@@ -15,6 +15,7 @@ using COG.Utils;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
+using COG.UI.CustomButtons;
 
 namespace COG;
 

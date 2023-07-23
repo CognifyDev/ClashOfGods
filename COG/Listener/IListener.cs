@@ -41,7 +41,7 @@ public interface IListener
     void OnChatUpdate(ChatController controller) { }
 
     /// <summary>
-    /// 游戏CO开始的时候触发
+    /// 游戏开始显示身份的时候触发
     /// </summary>
     void OnCoBegin() { }
 
@@ -68,6 +68,7 @@ public interface IListener
     void OnPingTrackerUpdate(PingTracker tracker) { }
 
     void OnSetUpRoleText(IntroCutscene intro) { }
+
     void OnSetUpTeamText(IntroCutscene intro) {}
 
     void OnPlayerExile(ExileController controller) { }
@@ -91,4 +92,8 @@ public interface IListener
     bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target) { return true; }
 
     void OnSettingInit(OptionsMenuBehaviour menu) { }
+
+    void OnHudStart(HudManager hud) { }
+
+    void OnHudUpdate() { }
 }
