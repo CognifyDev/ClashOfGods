@@ -117,7 +117,7 @@ public class GameListener : IListener
         intro.RoleBlurbText.text = role.Description;
         */
     }
-    
+
     public void OnSetUpTeamText(IntroCutscene intro)
     {
         PlayerControl? player = null;

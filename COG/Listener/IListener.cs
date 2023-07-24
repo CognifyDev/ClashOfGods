@@ -90,6 +90,7 @@ public interface IListener
     void OnRPCReceived(byte callId, MessageReader reader) { }
 
     bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target) { return true; }
+    void OnMurderPlayer(PlayerControl killer, PlayerControl target) { }
 
     void OnSettingInit(OptionsMenuBehaviour menu) { }
 }

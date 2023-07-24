@@ -27,11 +27,11 @@ class HostChatPatch
     }
 }
 
-
-[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckMurder))]
-class PlayerMurderPatch
+[HarmonyPatch(typeof(PlayerControl))]
+class PlayerKillPatch
 {
-    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
+    [HarmonyPatch(nameof(PlayerControl.CheckMurder)), HarmonyPrefix]
+    public static bool CheckMurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         
@@ -48,7 +48,18 @@ class PlayerMurderPatch
 
         return true;
     }
+    
+    [HarmonyPatch(nameof(PlayerControl.MurderPlayer)), HarmonyPostfix]
+    public static void MurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnMurderPlayer(__instance, target);
+        }
+    }
 }
+
+
 
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
 internal class ChatUpdatePatch
