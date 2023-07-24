@@ -59,8 +59,6 @@ class PlayerKillPatch
     }
 }
 
-
-
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
 internal class ChatUpdatePatch
 {

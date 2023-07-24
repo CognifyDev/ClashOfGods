@@ -17,6 +17,7 @@ role:
       description: "找出伪装者，投出内鬼"
     bait:
       name: "诱饵"
+      description: "你被击杀时，凶手会自动报告"
   neutral:
     jester:
       name: "小丑"

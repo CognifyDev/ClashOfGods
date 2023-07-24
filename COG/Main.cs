@@ -82,8 +82,14 @@ public partial class Main : BasePlugin
         // Register roles
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
         {
+            // Crewmate
             new Crewmate(),
+            new Bait(),
+            
+            // Impostor
             new Impostor(),
+            
+            // Neutral
             new Jester()
         });
 
