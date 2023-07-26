@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -176,6 +177,19 @@ public class Yaml
     public static Yaml LoadFromFile(string path)
     {
         return LoadFromString(File.ReadAllText(path));
+    }
+
+    public void WriteTo(string path, bool replace = true, Encoding? encoding = null)
+    {
+        if (replace && File.Exists(path))
+        {
+            File.Delete(path);
+        }
+
+        if (!File.Exists(path))
+        {
+            File.WriteAllText(path, Text, encoding ?? Encoding.UTF8);
+        } 
     }
 
     public static Yaml NewEmptyYaml()
