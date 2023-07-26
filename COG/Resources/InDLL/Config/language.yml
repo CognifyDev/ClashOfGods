@@ -7,12 +7,21 @@ role:
     max-num: "<color=#808080>最大职业数量</color>"
     allow-start-meeting: "<color=#CEC7C7>允许启动会议</color>"
     allow-report-body: "<color=#CEC7C7>允许报告尸体</color>"
-
-  jester:
-    name: "小丑"
-    description: "你会在被驱逐后获胜"
-  ditto:
-    name:
+  impostor:
+    impostor:
+      name: "伪装者"
+      description: "击杀船员，造成破坏"
+  crewmate:
+    crewmate:
+      name: "船员"
+      description: "找出伪装者，投出内鬼"
+    bait:
+      name: "诱饵"
+      description: "你被击杀时，凶手会自动报告"
+  neutral:
+    jester:
+      name: "小丑"
+      description: "你会在被驱逐后获胜"
 
 menu:
   general:

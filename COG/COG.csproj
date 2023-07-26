@@ -14,7 +14,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
       <EmbeddedResource Include="Resources\InDLL\Images\Setting\*.*" />
     </ItemGroup>
         

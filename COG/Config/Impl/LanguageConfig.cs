@@ -16,7 +16,19 @@ public class LanguageConfig : Config
     public string AddonsSetting { get; private set; } = null!;
 
     public string SaveGameConfigs { get; private set; } = null!;
+    
+    // Crewmate
+    public string CrewmateName { get; private set; } = null!;
+    public string CrewmateDescription { get; private set; } = null!;
 
+    public string BaitName { get; private set; } = null!;
+    public string BaitDescription { get; private set; } = null!;
+
+    // Impostor
+    public string ImpostorName { get; private set; } = null!;
+    public string ImpostorDescription { get; private set; } = null!;
+    
+    // Neutral
     public string JesterName { get; private set; } = null!;
     public string JesterDescription { get; private set; } = null!;
 
@@ -59,8 +71,20 @@ public class LanguageConfig : Config
 
             SaveGameConfigs = GetString("menu.general.save-game-configs");
 
-            JesterName = GetString("role.jester.name");
-            JesterDescription = GetString("role.jester.description");
+            // Crewmate
+            CrewmateName = GetString("role.crewmate.crewmate.name");
+            CrewmateDescription = GetString("role.crewmate.crewmate.description");
+
+            BaitName = GetString("role.crewmate.bait.name");
+            BaitDescription = GetString("role.crewmate.bait.description");
+            
+            // Impostor
+            ImpostorName = GetString("role.impostor.impostor.name");
+            ImpostorDescription = GetString("role.impostor.impostor.description");
+            
+            // Neutral
+            JesterName = GetString("role.neutral.jester.name");
+            JesterDescription = GetString("role.neutral.jester.description");
 
             Enable = GetString("option.enable");
             Disable = GetString("option.disable");
@@ -93,7 +117,7 @@ public class LanguageConfig : Config
     private string GetString(string location)
     {
         var toReturn = YamlReader.GetString(location);
-        if (toReturn == null)
+        if (toReturn is null or "" or " ")
         {
             throw new NullReferenceException();
         }

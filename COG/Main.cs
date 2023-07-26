@@ -1,12 +1,12 @@
 ﻿global using Hazel;
 global using HarmonyLib;
-using System;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
-using COG.Modules;
+using COG.Role.Impl.Crewmate;
+using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
@@ -46,7 +46,7 @@ public partial class Main : BasePlugin
     {
         Instance = this;
 
-        Logger = BepInEx.Logging.Logger.CreateLogSource(DisplayName + "   ");
+        Logger = BepInEx.Logging.Logger.CreateLogSource($"   {DisplayName}");
         Logger.LogInfo("Loading...");
 
         // Add depends to core directory
@@ -83,6 +83,14 @@ public partial class Main : BasePlugin
         // Register roles
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
         {
+            // Crewmate
+            new Crewmate(),
+            new Bait(),
+            
+            // Impostor
+            new Impostor(),
+            
+            // Neutral
             new Jester()
         });
 

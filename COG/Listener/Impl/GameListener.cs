@@ -18,6 +18,7 @@ public class GameListener : IListener
 
     public void OnSelectRoles()
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         RegisteredListeners.Clear();
         GameUtils.Data.Clear();
         var players = PlayerUtils.GetAllPlayers().Disarrange();
@@ -91,29 +92,32 @@ public class GameListener : IListener
 
     public void OnSetUpRoleText(IntroCutscene intro)
     {
-        PlayerControl? player = null;
-        Role.Role? role = null;
+        var player = PlayerControl.LocalPlayer;
 
+        Role.Role? role = null;
+        
         foreach (var keyValuePair in GameUtils.Data)
         {
-            var target = keyValuePair.Key;
-            if (intro.PlayerPrefab.name.Equals(target.name))
+            if (keyValuePair.Key.FriendCode.Equals(player.FriendCode))
             {
-                player = target;
                 role = keyValuePair.Value;
             }
         }
         
-        if (role == null || player == null) return;
+        if (role == null) return;
         
         // 游戏开始的时候显示角色信息
+        
+        Main.Logger.LogInfo(intro.YouAreText.text + " " + intro.RoleText.text + " " + intro.RoleBlurbText.text);
+        /*
         intro.YouAreText.color = role.Color;
         intro.RoleText.text = role.Name;
         intro.RoleText.color = role.Color;
         intro.RoleBlurbText.color = role.Color;
         intro.RoleBlurbText.text = role.Description;
+        */
     }
-    
+
     public void OnSetUpTeamText(IntroCutscene intro)
     {
         PlayerControl? player = null;
