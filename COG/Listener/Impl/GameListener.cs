@@ -34,6 +34,7 @@ public class GameListener : IListener
                 maxImpostors--;
 
                 Role.Role? impostorRole;
+
                 try
                 {
                     impostorRole = ((Role.RoleManager.RoleGetter)getter).GetNextTypeCampRole(CampType.Impostor);
@@ -56,12 +57,20 @@ public class GameListener : IListener
                 }
                 continue;
             }
-            setRoles:
-            var role = getter.GetNext() ?? Role.RoleManager.GetManager().GetTypeCampRoles(CampType.Crewmate)[0];
-            if (role!.CampType == CampType.Impostor) goto setRoles; 
-            RoleManager.Instance.SetRole(player, role.BaseRoleType);
-            GameUtils.Data.Add(player, role);
-            RegisteredListeners.Add(role.GetListener(player));
+        setRoles:
+            int crewmateCount = 0;
+            while (crewmateCount < maxImpostors)
+            {
+                var role = getter.GetNext() ?? Role.RoleManager.GetManager().GetTypeCampRoles(CampType.Crewmate)[0];
+                if (role!.CampType != CampType.Impostor)
+                {
+                    RoleManager.Instance.SetRole(player, role.BaseRoleType);
+                    GameUtils.Data.Add(player, role);
+                    RegisteredListeners.Add(role.GetListener(player));
+                    crewmateCount++;
+                }
+            }
+            if (crewmateCount < maxImpostors) goto setRoles;
         }
         
         ListenerManager.GetManager().RegisterListeners(RegisteredListeners.ToArray());
