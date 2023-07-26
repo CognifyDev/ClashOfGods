@@ -23,11 +23,7 @@
     </ItemGroup>
         
     <ItemGroup>
-      <None Remove="Resources\InDLL\Images\COG-BG.png" />
-    </ItemGroup>
-        
-    <ItemGroup>
-      <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
+      <EmbeddedResource Include="Resources\InDLL\Images\*.*" />
     </ItemGroup>
         
     <ItemGroup>
