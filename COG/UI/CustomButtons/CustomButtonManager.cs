@@ -9,14 +9,14 @@ public class CustomButtonManager
 
     public static CustomButtonManager GetManager() => _manager;
     
-    public void RegisterCustomButton(CustomButton option)
+    public void RegisterCustomButton(CustomButton button)
     {
-        Buttons.Add(option);
+        Buttons.Add(button);
     }
 
-    public void RegisterCustomButtons(CustomButton[] options)
+    public void RegisterCustomButtons(CustomButton[] button)
     {
-        Buttons.AddRange(options);
+        Buttons.AddRange(button);
     }
 
     public List<CustomButton> GetButtons() => Buttons;
