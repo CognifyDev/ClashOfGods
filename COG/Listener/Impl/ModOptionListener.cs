@@ -18,7 +18,6 @@ class ModOptionListener : IListener
     
     public void OnSettingInit(OptionsMenuBehaviour menu)
     {
-        Main.Logger.LogInfo("Setting init");
         var transform1 = menu.CensorChatButton.transform;
         Vector3? position = transform1.localPosition;
         var button = menu.EnableFriendInvitesButton;

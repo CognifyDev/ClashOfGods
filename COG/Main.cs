@@ -15,6 +15,7 @@ using COG.Utils;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
+using COG.UI.CustomButtons;
 
 namespace COG;
 
@@ -65,7 +66,8 @@ public partial class Main : BasePlugin
             new VersionShowerListener(),
             new PlayerListener(),
             new OptionListener(),
-            new ModOptionListener()
+            new ModOptionListener(),
+            new CustomButtonListener()
         });
 
         // Register sidebar texts
@@ -103,6 +105,12 @@ public partial class Main : BasePlugin
                     UnityEngine.Application.Quit();
                     return false;
                 }, false)
+        });
+
+        // Register custom buttons
+        CustomButtonManager.GetManager().RegisterCustomButtons(new CustomButton[]
+        {
+
         });
 
         Harmony.PatchAll();

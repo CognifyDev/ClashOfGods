@@ -41,7 +41,7 @@ public interface IListener
     void OnChatUpdate(ChatController controller) { }
 
     /// <summary>
-    /// 游戏CO开始的时候触发
+    /// 游戏开始显示身份的时候触发
     /// </summary>
     void OnCoBegin() { }
 
@@ -93,4 +93,8 @@ public interface IListener
     void OnMurderPlayer(PlayerControl killer, PlayerControl target) { }
 
     void OnSettingInit(OptionsMenuBehaviour menu) { }
+
+    void OnHudStart(HudManager hud) { }
+
+    void OnHudUpdate() { }
 }
