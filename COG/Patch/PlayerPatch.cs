@@ -1,4 +1,5 @@
 using COG.Listener;
+using COG.UI.CustomButtons;
 using HarmonyLib;
 using InnerNet;
 using UnityEngine;
@@ -112,6 +113,8 @@ class ExileControllerPatch
         {
             listener.OnPlayerExile(__instance);
         }
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons())
+            if (btn != null) btn.OnMeetingEndSpawn();
     }
 }
 
@@ -124,6 +127,8 @@ class AirshipExileControllerPatch
         {
             listener.OnAirshipPlayerExile(__instance);
         }
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons())
+            if (btn != null) btn.OnMeetingEndSpawn();
     }
 }
 

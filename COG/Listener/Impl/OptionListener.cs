@@ -39,10 +39,10 @@ public class OptionListener : IListener
             _typePage += 1;
         }
         
-        // from 49 to 57
-        for (int num = 49; num <= 57; num ++)
+        // from Alpha1 to Alpha9
+        for (int num = (int)KeyCode.Alpha1; num <= (int)KeyCode.Alpha9; num ++)
         {
-            var page = num - (49 - 1); // 指代的page
+            var page = num - ((int)KeyCode.Alpha1 - 1); // 指代的page
             var keycode = (KeyCode) num;
             if (Input.GetKeyDown(keycode))
             {
@@ -50,10 +50,10 @@ public class OptionListener : IListener
             } 
         }
         
-        // from 257 to 265
-        for (int num = 257; num <= 265; num++)
+        // from Keypad1 to Keypad9
+        for (int num = (int)KeyCode.Keypad1; num <= (int)KeyCode.Keypad9; num++)
         {
-            var page = num - (257 - 1);
+            var page = num - ((int)KeyCode.Keypad1 - 1);
             var keycode = (KeyCode) num;
             if (Input.GetKeyDown(keycode))
             {
