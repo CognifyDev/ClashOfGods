@@ -23,6 +23,14 @@
     </ItemGroup>
         
     <ItemGroup>
+      <None Remove="Resources\InDLL\Images\COG-BG.png" />
+    </ItemGroup>
+        
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\InDLL\Images\COG-BG.png" />
+    </ItemGroup>
+        
+    <ItemGroup>
         <PackageReference Include="Reactor" Version="2.2.0" />
         <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.671" Private="false" ExcludeAssets="runtime;native" />
         <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.7.11" PrivateAssets="all" />

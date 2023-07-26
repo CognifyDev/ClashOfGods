@@ -1,6 +1,7 @@
 using COG.Listener;
 using COG.Listener.Impl;
 using HarmonyLib;
+using System.Linq;
 
 namespace COG.Patch;
 
@@ -67,7 +68,8 @@ class SelectRolesPatch
 {
     public static void Prefix()
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        var listeners = ListenerManager.GetManager().GetListeners().ToList();
+        foreach (var listener in listeners)
         {
             listener.OnSelectRoles();
         }
