@@ -164,7 +164,7 @@ public class GameListener : IListener
             }
         }
         if (role == null) return;
-        manager.WinText.text = role.CampType.GetCampString() + " 胜利！";
+        manager.WinText.text = role.CampType.GetCampString() + " 胜利！"; // 暂定 等待后续修改
         manager.WinText.color = role.Color;
     }
 }

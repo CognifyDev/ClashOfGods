@@ -10,7 +10,6 @@ public static class ListUtils
         return new List<T>(enumerable);
     }
 
-
     /// <summary>
     /// 打乱一个List
     /// </summary>
