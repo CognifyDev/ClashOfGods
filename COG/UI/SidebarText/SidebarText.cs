@@ -21,11 +21,11 @@ public class SidebarText
     
     public virtual void ForResult(ref string result) {}
 
-    public static string GetOptionMessage(CustomOption.CustomOptionType type)
+    public static string GetOptionMessage(CustomOption.CustomOption.CustomOptionType type)
     {
         var text = "";
-        CustomOption? parent = null;
-        foreach (var customOption in CustomOption.Options)
+        CustomOption.CustomOption? parent = null;
+        foreach (var customOption in CustomOption.CustomOption.Options)
         {
             if (customOption == null) continue;
             if (customOption.Type != type) continue;

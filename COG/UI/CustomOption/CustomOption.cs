@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
-using static COG.Modules.CustomOption;
-using UnityEngine;
 using COG.Listener;
+using COG.Modules;
 using COG.Utils;
+using UnityEngine;
+using static COG.UI.CustomOption.CustomOption;
 
-namespace COG.Modules;
+namespace COG.UI.CustomOption;
 
 // Code base from
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
@@ -410,7 +411,7 @@ public class StringOptionIncreasePatch
     [HarmonyPrefix]
     public static bool IncreasePatch(StringOption __instance)
     {
-        CustomOption? option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
+        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
         if (option == null) return true;
 
         option.UpdateSelection(option.Selection + 1);
@@ -421,10 +422,10 @@ public class StringOptionIncreasePatch
     [HarmonyPrefix]
     public static bool DecreasePatch(StringOption __instance)
     {
-        CustomOption? option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
+        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
         if (option == null) return true;
 
-        option.UpdateSelection(option.Selection + 1);
+        option.UpdateSelection(option.Selection - 1);
         return false;
     }
     [HarmonyPatch(nameof(StringOption.OnEnable))]

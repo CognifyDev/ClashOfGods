@@ -1,5 +1,6 @@
 ﻿using COG.Config.Impl;
 using COG.Modules;
+using COG.UI.CustomOption;
 
 namespace COG.UI.SidebarText.Impl;
 
@@ -14,7 +15,7 @@ public class CrewmateSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new []
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOptionType.Crewmate)
+            HudStringPatch.GetOptByType(CustomOption.CustomOption.CustomOptionType.Crewmate)
         });
     }
 }

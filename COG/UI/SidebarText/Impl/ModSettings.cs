@@ -1,5 +1,6 @@
 ﻿using COG.Config.Impl;
 using COG.Modules;
+using COG.UI.CustomOption;
 
 namespace COG.UI.SidebarText.Impl;
 
@@ -14,7 +15,7 @@ public class ModSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new []
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOptionType.General)
+            HudStringPatch.GetOptByType(CustomOption.CustomOption.CustomOptionType.General)
         });
     }
 }
