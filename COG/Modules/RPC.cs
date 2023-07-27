@@ -7,7 +7,6 @@ namespace COG.Modules;
 public enum CustomRPC
 {
     ShareOptions = 200,
-    ShareRoles = 300
 }
 [HarmonyPatch(typeof(PlayerControl),nameof(PlayerControl.HandleRpc))]
 class RPCHandler
