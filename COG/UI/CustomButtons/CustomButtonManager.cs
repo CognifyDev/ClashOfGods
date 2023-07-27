@@ -4,20 +4,20 @@ namespace COG.UI.CustomButtons;
 
 public class CustomButtonManager
 {
-    private static CustomButtonManager _manager = new();
-    private readonly List<CustomButton> Buttons = new();
+    private static readonly CustomButtonManager Manager = new();
+    private readonly List<CustomButton> _buttons = new();
 
-    public static CustomButtonManager GetManager() => _manager;
+    public static CustomButtonManager GetManager() => Manager;
     
     public void RegisterCustomButton(CustomButton button)
     {
-        Buttons.Add(button);
+        _buttons.Add(button);
     }
 
-    public void RegisterCustomButtons(CustomButton[] button)
+    public void RegisterCustomButtons(IEnumerable<CustomButton> button)
     {
-        Buttons.AddRange(button);
+        _buttons.AddRange(button);
     }
 
-    public List<CustomButton> GetButtons() => Buttons;
+    public List<CustomButton> GetButtons() => _buttons;
 }

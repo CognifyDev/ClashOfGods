@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
+using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomButtons;
 
@@ -72,13 +73,13 @@ public class CustomButton
     // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Objects/CustomButton.cs#L40
     public static class ButtonPositions
     {
-        public static readonly Vector3 lowerRowRight = new(-2f, -0.06f, 0);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 lowerRowCenter = new(-3f, -0.06f, 0);
-        public static readonly Vector3 lowerRowLeft = new(-4f, -0.06f, 0);
-        public static readonly Vector3 upperRowRight = new(0f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 upperRowCenter = new(-1f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 upperRowLeft = new(-2f, 1f, 0f);
-        public static readonly Vector3 upperRowFarLeft = new(-3f, 1f, 0f);
+        public static readonly Vector3 LowerRowRight = new(-2f, -0.06f, 0);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f, 0);
+        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f, 0);
+        public static readonly Vector3 UpperRowRight = new(0f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowCenter = new(-1f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowLeft = new(-2f, 1f, 0f);
+        public static readonly Vector3 UpperRowFarLeft = new(-3f, 1f, 0f);
     }
 
     public void SetActive(bool active)
@@ -136,16 +137,16 @@ public class CustomButton
         this.ActionButton.OverrideText(buttonText);
         this.ActionButton.SetUsesRemaining(UsesRemaining);
 
-        int Desat = Shader.PropertyToID("_Desat");
+        int desat = Shader.PropertyToID("_Desat");
         if (CouldUse() && !isCoolingDown)
         {
             this.SpriteRenderer.color = this.TextMesh.color = Palette.EnabledColor;
-            this.Material.SetFloat(Desat, 0f);
+            this.Material.SetFloat(desat, 0f);
         }
         else
         {
             this.SpriteRenderer.color = this.TextMesh.color = Palette.DisabledClear;
-            this.Material.SetFloat(Desat, 1f);
+            this.Material.SetFloat(desat, 1f);
         }
 
         if (Hud.UseButton != null) this.GameObject.transform.localPosition = Hud.UseButton.transform.localPosition + this.Position;
@@ -156,7 +157,7 @@ public class CustomButton
     public void OnMeetingEndSpawn() => this.OnMeetingEnd();
         
 
-#nullable disable
+    #nullable disable
     public void CheckClick()
     {
         var button = this;
@@ -166,7 +167,7 @@ public class CustomButton
             {
                 button.IsEffectActive = false;
                 button.ActionButton.cooldownTimerText.color = Palette.EnabledColor;
-                button.OnEffect();
+                if (button.OnEffect != null) button.OnEffect();
                 button.ResetCooldown();
             }
             else
@@ -182,21 +183,20 @@ public class CustomButton
             }
         }
     }
-#nullable enable
 
+    #nullable enable
     // Static methods
     public static void ResetAllCooldown()
     {
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
-            if (button != null) button.ResetCooldown();
+            button.ResetCooldown();
     }
 
     public static void Init(HudManager hud)
     {
         foreach(var button in CustomButtonManager.GetManager().GetButtons())
         {
-            if (button == null) continue;
-            button.ActionButton = GameObject.Instantiate(hud.AbilityButton, hud.AbilityButton.transform.parent);
+            button.ActionButton = Object.Instantiate(hud.AbilityButton, hud.AbilityButton.transform.parent);
                 
             button.SpriteRenderer = button.ActionButton.graphic;
             button.SpriteRenderer.sprite = button.Sprite;
