@@ -1,12 +1,12 @@
 ﻿using COG.Config.Impl;
 using COG.Listener;
-using UnityEngine;
+using COG.Utils;
 
 namespace COG.Role.Impl.Crewmate;
 
 public class Bait : Role, IListener
 {
-    public Bait() : base(LanguageConfig.Instance.BaitName, Color.blue, CampType.Crewmate)
+    public Bait() : base(LanguageConfig.Instance.BaitName, ColorUtils.AsColor("#00F7FF"), CampType.Crewmate)
     {
         Description = LanguageConfig.Instance.BaitDescription;
     }

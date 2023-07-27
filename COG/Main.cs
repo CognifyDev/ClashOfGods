@@ -112,7 +112,6 @@ public partial class Main : BasePlugin
         {
             
         });
-
         Harmony.PatchAll();
     }
 }

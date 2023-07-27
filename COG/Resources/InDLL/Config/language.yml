@@ -46,9 +46,9 @@ option:
   disable: "<color=#F20D0D>关闭</color>"
   
 sidebar-text:
-  original: "<color=#FF0000>原版设置</color>"
-  neutral: "<color=#FF0000>中立设置</color>"
-  mod: "<color=#FF0000>模组设置</color>"
-  addons: "<color=#FF0000>副职业设置</color>"
-  impostor: "<color=#FF0000>伪装者设置</color>"
-  crewmate: "<color=#FF0000>船员设置</color>"
+  original: "<color=#9AFF00>原版设置</color>"
+  neutral: "<color=#9AFF00>中立设置</color>"
+  mod: "<color=#9AFF00>模组设置</color>"
+  addons: "<color=#9AFF00>副职业设置</color>"
+  impostor: "<color=#9AFF00>伪装者设置</color>"
+  crewmate: "<color=#9AFF00>船员设置</color>"

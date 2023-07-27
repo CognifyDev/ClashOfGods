@@ -1,6 +1,5 @@
 ﻿using COG.Config.Impl;
 using COG.Listener;
-using COG.Modules;
 using COG.UI.CustomOption;
 using COG.Utils;
 using UnityEngine;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace COG.Utils;
 
@@ -12,5 +13,14 @@ public class ColorUtils
     private static byte ToByte(float f) {
         f = Mathf.Clamp01(f);
         return (byte)(f * 255);
+    }
+
+    public static Color AsColor(string color)
+    {
+        byte red = Convert.ToByte(color.Substring(1, 2), 16);
+        byte green = Convert.ToByte(color.Substring(3, 2), 16);
+        byte blue = Convert.ToByte(color.Substring(5, 2), 16);
+
+        return new Color(red, green, blue);
     }
 }
