@@ -22,7 +22,8 @@ class EndGamePatch
 {
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        var list = ListenerManager.GetManager().GetListeners().ToList();
+        foreach (var listener in list)
         {
             listener.OnGameEnd(__instance, endGameResult);
         }

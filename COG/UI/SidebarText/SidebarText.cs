@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using COG.Modules;
 using COG.Utils;
-using Epic.OnlineServices.Presence;
 using UnityEngine;
 
 namespace COG.UI.SidebarText;
