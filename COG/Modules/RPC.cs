@@ -1,17 +1,20 @@
-﻿using COG.Listener;
+﻿using System.Linq;
+using COG.Listener;
+using COG.UI.CustomOption;
 
 namespace COG.Modules;
 
-enum CustomRPC
+public enum CustomRPC
 {
     ShareOptions = 200,
+    ShareRoles = 300
 }
 [HarmonyPatch(typeof(PlayerControl),nameof(PlayerControl.HandleRpc))]
 class RPCHandler
 {
     public static void Postfix([HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
-        CustomRPC rpc = (CustomRPC)callId;
+        var rpc = (CustomRPC)callId;
         switch (rpc)
         {
             case CustomRPC.ShareOptions:
@@ -25,7 +28,8 @@ class RPCHandler
         }
     }
 }
-class RPCProcedure
+
+static class RPCProcedure
 {
     public static void HandleShareOptions(byte numberOfOptions, MessageReader reader)
     {
@@ -33,10 +37,10 @@ class RPCProcedure
         {
             for (int i = 0; i < numberOfOptions; i++)
             {
-                uint optionId = reader.ReadPackedUInt32();
-                uint selection = reader.ReadPackedUInt32();
-                // CustomOption? option = CustomOption.Options.First(option => option.ID == (int)optionId);
-                // option.UpdateSelection((int)selection);
+                var optionId = reader.ReadPackedUInt32();
+                var selection = reader.ReadPackedUInt32();
+                var option = CustomOption.Options.First(option => option != null && option.ID == (int)optionId);
+                option?.UpdateSelection((int)selection);
             }
         }
         catch (System.Exception e)

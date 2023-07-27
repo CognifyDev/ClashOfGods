@@ -67,7 +67,8 @@ public partial class Main : BasePlugin
             new PlayerListener(),
             new OptionListener(),
             new ModOptionListener(),
-            new CustomButtonListener()
+            new CustomButtonListener(),
+            new RPCListener()
         });
 
         // Register sidebar texts

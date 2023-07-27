@@ -57,7 +57,7 @@ public class GameListener : IListener
                 }
                 continue;
             }
-        setRoles:
+            setRoles:
             int crewmateCount = 0;
             while (crewmateCount < maxImpostors)
             {
@@ -78,6 +78,7 @@ public class GameListener : IListener
 
     public void OnGameEnd(AmongUsClient client, EndGameResult endGameResult)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         GameStates.InGame = false;
         foreach (var registeredListener in RegisteredListeners)
         {
@@ -94,6 +95,7 @@ public class GameListener : IListener
 
     public bool OnMakePublic(GameStartManager manager)
     {
+        if (!AmongUsClient.Instance.AmHost) return false;
         GameUtils.SendGameMessage(LanguageConfig.Instance.MakePublicMessage);
         // 禁止设置为公开
         return false;
@@ -102,6 +104,13 @@ public class GameListener : IListener
     public void OnSetUpRoleText(IntroCutscene intro)
     {
         var player = PlayerControl.LocalPlayer;
+        
+        if (!AmongUsClient.Instance.AmHost)
+        {
+            // something about rpc
+            
+            return;
+        }
 
         Role.Role? role = null;
         
@@ -117,7 +126,7 @@ public class GameListener : IListener
         
         // 游戏开始的时候显示角色信息
         
-        Main.Logger.LogInfo(intro.YouAreText.text + " " + intro.RoleText.text + " " + intro.RoleBlurbText.text);
+        // Main.Logger.LogInfo(intro.YouAreText.text + " " + intro.RoleText.text + " " + intro.RoleBlurbText.text);
         /*
         intro.YouAreText.color = role.Color;
         intro.RoleText.text = role.Name;
@@ -129,6 +138,13 @@ public class GameListener : IListener
 
     public void OnSetUpTeamText(IntroCutscene intro)
     {
+        if (!AmongUsClient.Instance.AmHost)
+        {
+            // something about rpc
+            
+            return;
+        }
+
         PlayerControl? player = null;
         Role.Role? role = null;
 
@@ -154,6 +170,12 @@ public class GameListener : IListener
 
     public void OnGameEndSetEverythingUp(EndGameManager manager)
     {
+        if (!AmongUsClient.Instance.AmHost)
+        {
+            // something about rpc
+            
+            return;
+        }
         Role.Role? role = null;
         foreach (var keyValuePair in GameUtils.Data)
         {
