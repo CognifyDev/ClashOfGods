@@ -39,55 +39,6 @@ public class RoleManager
         return null;
     }
 
-    public IGetter<Role?> NewGetter()
-    {
-        return new RoleGetter();
-    }
-
-    public class RoleGetter : IGetter<Role?>
-    {
-        private readonly List<Role> _roles = new();
-
-        public RoleGetter()
-        {
-            var roles = GetManager().GetRoles();
-            foreach (var role in roles)
-            {
-                var num = role.RoleOptions[1].GetFloat();
-                for (var i = 0; i < num; i++)
-                {
-                    _roles.Add(role);
-                }
-            }
-            _roles = _roles.Disarrange();
-        }
-
-        public Role? GetNext()
-        {
-            var role = _roles[0];
-            _roles.RemoveAt(0);
-            if (!role.RoleOptions[0].GetBool())
-            {
-                return HasNext() ? GetNext() : null;
-            }
-            return role;
-        }
-
-        public bool HasNext()
-        {
-            return _roles.Count != 0;
-        }
-
-        public Role? GetNextTypeCampRole(CampType campType)
-        {
-            start:
-            var role = GetNext();
-            if (role == null) return null;
-            if (role.CampType != campType) goto start;
-            return role;
-        }
-    }
-
     public void RegisterRoles(Role[] roles)
     {
         _roles.AddRange(roles);

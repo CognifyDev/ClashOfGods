@@ -13,7 +13,20 @@ public class GameListener : IListener
 
     public void OnSelectRoles()
     {
+        if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
         
+        GameUtils.Data.Clear(); // 首先清除 防止干扰
+        
+        // 开始分配职业
+        var list = PlayerUtils.GetAllPlayers().ToList().Disarrange(); // 打乱玩家顺序
+        
+        // 开始提供可供选择的职业
+        
+        
+        foreach (var playerControl in list)
+        {
+            
+        }
     }
 
     public void OnGameEnd(AmongUsClient client, EndGameResult endGameResult)
