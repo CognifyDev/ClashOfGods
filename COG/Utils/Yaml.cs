@@ -191,7 +191,7 @@ public class Yaml
             File.WriteAllText(path, Text, encoding ?? Encoding.UTF8);
         } 
     }
-
+ 
     public static Yaml NewEmptyYaml()
     {
         return LoadFromString("");
