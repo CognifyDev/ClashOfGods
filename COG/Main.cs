@@ -110,7 +110,7 @@ public partial class Main : BasePlugin
         // Register custom buttons
         CustomButtonManager.GetManager().RegisterCustomButtons(new CustomButton[]
         {
-
+            
         });
 
         Harmony.PatchAll();

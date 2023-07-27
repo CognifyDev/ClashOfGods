@@ -192,7 +192,7 @@ public class CustomButton
             button.ResetCooldown();
     }
 
-    public static void Init(HudManager hud)
+    internal static void Init(HudManager hud)
     {
         foreach(var button in CustomButtonManager.GetManager().GetButtons())
         {

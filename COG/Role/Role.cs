@@ -3,6 +3,7 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Modules;
+using COG.UI.CustomButtons;
 using COG.Utils;
 using UnityEngine;
 
@@ -63,6 +64,21 @@ public abstract class Role
         RoleOptions.Add(option);
         RoleOptions.Add(CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
             LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, option));
+    }
+
+    /// <summary>
+    /// 添加一个按钮
+    /// </summary>
+    /// <param name="button">要添加的按钮</param>
+    protected void AddButton(CustomButton button)
+    {
+        button.HasButton = () =>
+        {
+            var player = PlayerControl.LocalPlayer;
+            var role = player.GetRoleInstance();
+            return role != null && role.Name.Equals(Name);
+        };
+        CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
     public static CustomOption.CustomOptionType ToCustomOption(Role role)

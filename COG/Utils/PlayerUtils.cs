@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using COG.States;
 
 namespace COG.Utils;
 
@@ -15,4 +14,6 @@ public static class PlayerUtils
     {
         return info.FriendCode.Equals(target.FriendCode) && info.PlayerName.Equals(target.PlayerName);
     }
+
+    public static Role.Role? GetRoleInstance(this PlayerControl player) => (from keyValuePair in GameUtils.Data where keyValuePair.Key.FriendCode.Equals(player.FriendCode) select keyValuePair.Value).FirstOrDefault();
 }

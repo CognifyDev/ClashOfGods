@@ -16,7 +16,6 @@ namespace COG.Listener.Impl
         {
             foreach (var button in CustomButtonManager.GetManager().GetButtons())
             {
-                if (button == null) continue;
                 button.Update();
             }
         }
