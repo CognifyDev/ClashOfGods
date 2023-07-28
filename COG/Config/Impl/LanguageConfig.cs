@@ -17,6 +17,10 @@ public class LanguageConfig : Config
 
     public string SaveGameConfigs { get; private set; } = null!;
     
+    // Unknown
+    public string UnknownName { get; private set; } = null!;
+    public string UnknownDescription { get; private set; } = null!;
+
     // Crewmate
     public string CrewmateName { get; private set; } = null!;
     public string CrewmateDescription { get; private set; } = null!;
@@ -70,6 +74,10 @@ public class LanguageConfig : Config
             AddonsSetting = GetString("menu.addons.name");
 
             SaveGameConfigs = GetString("menu.general.save-game-configs");
+            
+            // Unknown
+            UnknownName = GetString("role.unknown.name");
+            UnknownDescription = GetString("role.unknown.description");
 
             // Crewmate
             CrewmateName = GetString("role.crewmate.crewmate.name");

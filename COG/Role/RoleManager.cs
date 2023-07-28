@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using COG.Exception;
-using COG.Listener;
-using COG.Role.Impl;
+using System.Linq;
 using COG.Utils;
 
 namespace COG.Role;
@@ -39,55 +37,6 @@ public class RoleManager
         return null;
     }
 
-    public IGetter<Role?> NewGetter()
-    {
-        return new RoleGetter();
-    }
-
-    public class RoleGetter : IGetter<Role?>
-    {
-        private readonly List<Role> _roles = new();
-
-        public RoleGetter()
-        {
-            var roles = GetManager().GetRoles();
-            foreach (var role in roles)
-            {
-                var num = role.RoleOptions[1].GetFloat();
-                for (var i = 0; i < num; i++)
-                {
-                    _roles.Add(role);
-                }
-            }
-            _roles = _roles.Disarrange();
-        }
-
-        public Role? GetNext()
-        {
-            var role = _roles[0];
-            _roles.RemoveAt(0);
-            if (!role.RoleOptions[0].GetBool())
-            {
-                return HasNext() ? GetNext() : null;
-            }
-            return role;
-        }
-
-        public bool HasNext()
-        {
-            return _roles.Count != 0;
-        }
-
-        public Role? GetNextTypeCampRole(CampType campType)
-        {
-            start:
-            var role = GetNext();
-            if (role == null) return null;
-            if (role.CampType != campType) goto start;
-            return role;
-        }
-    }
-
     public void RegisterRoles(Role[] roles)
     {
         _roles.AddRange(roles);
@@ -96,6 +45,44 @@ public class RoleManager
     public List<Role> GetRoles()
     {
         return _roles;
+    }
+
+    /// <summary>
+    /// 获取一个新的获取器
+    /// </summary>
+    /// <returns>获取器实例</returns>
+    public RoleGetter NewGetter()
+    {
+        return new RoleGetter();
+    }
+
+    public class RoleGetter : IGetter<Role?>
+    {
+        private readonly List<Role> _roles = new();
+        private int _selection;
+
+        internal RoleGetter()
+        {
+            foreach (var role in GetManager().GetRoles().Where(role => role.ShowInOptions && role.RoleOptions[0].GetBool()))
+            {
+                _roles.Add(role);
+            }
+
+            _roles.Disarrange();
+        }
+
+        public Role? GetNext()
+        {
+            if (_selection >= _roles.Count) return null;
+            var toReturn = _roles[_selection];
+            _selection++;
+            return toReturn;
+        }
+
+        public bool HasNext()
+        {
+            return _selection < _roles.Count;
+        }
     }
 
     public static RoleManager GetManager()

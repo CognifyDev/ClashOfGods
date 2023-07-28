@@ -1,6 +1,4 @@
 using COG.Listener;
-using HarmonyLib;
-using Hazel;
 
 namespace COG.Patch;
 

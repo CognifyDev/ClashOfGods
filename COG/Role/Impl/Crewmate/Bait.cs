@@ -6,7 +6,7 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Bait : Role, IListener
 {
-    public Bait() : base(LanguageConfig.Instance.BaitName, ColorUtils.AsColor("#00F7FF"), CampType.Crewmate)
+    public Bait() : base(LanguageConfig.Instance.BaitName, ColorUtils.AsColor("#00F7FF"), CampType.Crewmate, true)
     {
         Description = LanguageConfig.Instance.BaitDescription;
     }
