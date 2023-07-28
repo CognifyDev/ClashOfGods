@@ -4,7 +4,6 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Utils;
 using InnerNet;
-using Reactor.Networking;
 using GameStates = COG.States.GameStates;
 
 namespace COG.Listener.Impl;
@@ -63,7 +62,7 @@ public class GameListener : IListener
             RoleManager.Instance.SetRole(player, role.BaseRoleType);
             GameUtils.Data.Add(player, role);
         }
-        ShareRoles(new RolesShare(GameUtils.Data));
+        ShareRoles(RolesShare.Create(GameUtils.Data));
     }
 
     private void ShareRoles(RolesShare rolesShare)
@@ -80,6 +79,11 @@ public class GameListener : IListener
         public RolesShare(Dictionary<PlayerControl, Role.Role> dictionary)
         {
             _dictionary = dictionary;
+        }
+
+        public static RolesShare Create(Dictionary<PlayerControl, Role.Role> dictionary)
+        {
+            return new RolesShare(dictionary);
         }
 
         public Dictionary<PlayerControl, Role.Role> GetRolesInformation()
