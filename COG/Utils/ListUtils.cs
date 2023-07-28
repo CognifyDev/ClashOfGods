@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace COG.Utils;
 
@@ -18,13 +19,8 @@ public static class ListUtils
     /// <returns>打乱后的List</returns>
     public static List<T> Disarrange<T>(this List<T> list)
     {
-        var random = new Random();
-        var resultList = new List<T>();
-        foreach (var item in list)
-        {
-            resultList.Insert(random.Next(resultList.Count), item);
-        }
-        return resultList;
+        Random random = new Random();
+        return list.OrderBy(_ => random.Next()).ToList();
     }
 
     public static T GetOneAndDelete<T>(this List<T> list)

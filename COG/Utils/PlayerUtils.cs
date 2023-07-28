@@ -14,6 +14,11 @@ public static class PlayerUtils
     {
         return info.FriendCode.Equals(target.FriendCode) && info.PlayerName.Equals(target.PlayerName);
     }
+    
+    public static bool IsSamePlayer(this PlayerControl player, PlayerControl target)
+    {
+        return player.name.Equals(target.name) && player.FriendCode.Equals(target.FriendCode);
+    }
 
-    public static Role.Role? GetRoleInstance(this PlayerControl player) => (from keyValuePair in GameUtils.Data where keyValuePair.Key.FriendCode.Equals(player.FriendCode) select keyValuePair.Value).FirstOrDefault();
+    public static Role.Role? GetRoleInstance(this PlayerControl player) => (from keyValuePair in GameUtils.Data where keyValuePair.Key.IsSamePlayer(player) select keyValuePair.Value).FirstOrDefault();
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AmongUs.GameOptions;
 
 namespace COG.Utils;
@@ -43,6 +44,17 @@ public class GameUtils
         }
     
         return impostorsNum;
+    }
+
+    public static Role.Role? GetLocalPlayerRole()
+    {
+        var player = PlayerControl.LocalPlayer;
+        foreach (var keyValuePair in Data.Where(keyValuePair => keyValuePair.Key.IsSamePlayer(player)))
+        {
+            return keyValuePair.Value;
+        }
+
+        return null;
     }
 
     public static NormalGameOptionsV07 GetGameOptions() => GameOptionsManager.Instance.currentNormalGameOptions;

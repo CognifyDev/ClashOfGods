@@ -1,7 +1,6 @@
 lobby:
   message-for-next-page: "按 TAB 切换下一页... %currentpage%/%pagecount%"
   make-public-message: "禁止设置为公开"
-
 role:
   unknown:
     name: "未知"
@@ -25,7 +24,19 @@ role:
     jester:
       name: "小丑"
       description: "你会在被驱逐后获胜"
-
+camp:
+  unknown:
+    name: "未知阵营"
+    description: "未知的阵营"
+  impostor:
+    name: "伪装者阵营"
+    description: "杀死船员"
+  neutral:
+    name: "中立阵营"
+    description: "掌握好权重"
+  crewmate:
+    name: "船员阵营"
+    description: "完成任务，找出内鬼"
 menu:
   general:
     name: "COG设置"
@@ -47,7 +58,6 @@ option:
     discord: "Discord"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
-  
 sidebar-text:
   original: "<color=#9AFF00>原版设置</color>"
   neutral: "<color=#9AFF00>中立设置</color>"

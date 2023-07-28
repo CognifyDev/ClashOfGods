@@ -28,12 +28,12 @@ public class Jester : Role, IListener
         var allowReportDeadBodyOption = RoleOptions[3];
         var result1 = allowStartMeetingOption.GetBool();
         var result2 = allowReportDeadBodyOption.GetBool();
-        if (!result1 && playerControl.FriendCode.Equals(_player!.FriendCode) && target == null)
+        if (!result1 && playerControl.IsSamePlayer(_player!) && target == null)
         {
             return false;
         }
 
-        return result2 || !playerControl.FriendCode.Equals(_player!.FriendCode) || target == null;
+        return result2 || playerControl.IsSamePlayer(_player!) || target == null;
     }
 
     private bool CheckNull()

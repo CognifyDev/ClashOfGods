@@ -69,7 +69,8 @@ public interface IListener
 
     void OnSetUpRoleText(IntroCutscene intro) { }
     
-    void OnSetUpTeamText(IntroCutscene intro) { }
+    void OnSetUpTeamText(IntroCutscene intro,
+        ref Il2CppSystem.Collections.Generic.List<PlayerControl> teamToDisplay) { }
 
     void OnPlayerExile(ExileController controller) { }
 
