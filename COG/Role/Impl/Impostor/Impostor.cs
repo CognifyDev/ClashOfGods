@@ -6,7 +6,7 @@ namespace COG.Role.Impl.Impostor;
 
 public class Impostor : Role
 {
-    public Impostor() : base(LanguageConfig.Instance.ImpostorName, Color.red, CampType.Impostor)
+    public Impostor() : base(LanguageConfig.Instance.ImpostorName, Color.red, CampType.Impostor, true)
     {
         Description = LanguageConfig.Instance.ImpostorDescription;
     }

@@ -5,6 +5,7 @@ using BepInEx.Unity.IL2CPP;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
+using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
@@ -85,6 +86,9 @@ public partial class Main : BasePlugin
         // Register roles
         Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
         {
+            // Unknown
+            new Unknown(),
+            
             // Crewmate
             new Crewmate(),
             new Bait(),

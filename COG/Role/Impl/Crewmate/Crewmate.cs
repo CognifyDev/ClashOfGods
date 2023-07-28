@@ -6,7 +6,7 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Crewmate : Role
 {
-    public Crewmate() : base(LanguageConfig.Instance.CrewmateName, Color.white, CampType.Crewmate)
+    public Crewmate() : base(LanguageConfig.Instance.CrewmateName, Color.white, CampType.Crewmate, true)
     {
         Description = LanguageConfig.Instance.CrewmateDescription;
     }

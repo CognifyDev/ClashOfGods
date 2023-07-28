@@ -10,7 +10,7 @@ public class Jester : Role, IListener
 {
     private PlayerControl? _player;
     
-    public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral)
+    public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral, true)
     {
         Description = LanguageConfig.Instance.JesterDescription;
         var parentOption = RoleOptions[0];

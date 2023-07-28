@@ -34,7 +34,7 @@ public abstract class Role
     /// 角色阵营
     /// </summary>
     public CampType CampType { get; }
-    
+
     /// <summary>
     /// 原版角色蓝本
     /// </summary>
@@ -49,8 +49,10 @@ public abstract class Role
     /// 是否为副职业
     /// </summary>
     public bool SubRole { get; protected set; }
+    
+    public bool ShowInOptions { get; }
 
-    protected Role(string name, Color color, CampType campType)
+    protected Role(string name, Color color, CampType campType, bool showInOptions)
     {
         Name = name;
         Description = "";
@@ -60,11 +62,16 @@ public abstract class Role
         RoleOptions = new();
         SubRole = false;
 
-        var option = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
-            ColorUtils.ToAmongUsColorString(Color, Name), false, null, true);
-        RoleOptions.Add(option);
-        RoleOptions.Add(CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
-            LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, option));
+        ShowInOptions = showInOptions;
+
+        if (ShowInOptions)
+        {
+            var option = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
+                ColorUtils.ToAmongUsColorString(Color, Name), false, null, true);
+            RoleOptions.Add(option);
+            RoleOptions.Add(CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
+                LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, option));
+        }
     }
 
     /// <summary>

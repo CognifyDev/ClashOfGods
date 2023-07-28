@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using COG.Exception;
-using COG.Listener;
-using COG.Role.Impl;
+using System.Linq;
 using COG.Utils;
 
 namespace COG.Role;
@@ -47,6 +45,44 @@ public class RoleManager
     public List<Role> GetRoles()
     {
         return _roles;
+    }
+
+    /// <summary>
+    /// 获取一个新的获取器
+    /// </summary>
+    /// <returns>获取器实例</returns>
+    public RoleGetter NewGetter()
+    {
+        return new RoleGetter();
+    }
+
+    public class RoleGetter : IGetter<Role?>
+    {
+        private readonly List<Role> _roles = new();
+        private int _selection;
+
+        internal RoleGetter()
+        {
+            foreach (var role in GetManager().GetRoles().Where(role => role.ShowInOptions && role.RoleOptions[0].GetBool()))
+            {
+                _roles.Add(role);
+            }
+
+            _roles.Disarrange();
+        }
+
+        public Role? GetNext()
+        {
+            if (_selection >= _roles.Count) return null;
+            var toReturn = _roles[_selection];
+            _selection++;
+            return toReturn;
+        }
+
+        public bool HasNext()
+        {
+            return _selection < _roles.Count;
+        }
     }
 
     public static RoleManager GetManager()
