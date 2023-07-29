@@ -67,10 +67,13 @@ public interface IListener
 
     void OnPingTrackerUpdate(PingTracker tracker) { }
 
-    void OnSetUpRoleText(IntroCutscene intro) { }
+    bool OnSetUpRoleText(IntroCutscene intro,
+        ref Il2CppSystem.Collections.IEnumerator roles) { return true; }
     
     void OnSetUpTeamText(IntroCutscene intro,
         ref Il2CppSystem.Collections.Generic.List<PlayerControl> teamToDisplay) { }
+    
+    void AfterSetUpTeamText(IntroCutscene intro) { }
 
     void OnPlayerExile(ExileController controller) { }
 

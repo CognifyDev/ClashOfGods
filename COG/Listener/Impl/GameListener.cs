@@ -1,18 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using BepInEx.Logging;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Utils;
+using Il2CppSystem;
 using InnerNet;
-using TMPro;
 using UnityEngine;
-using Enumerable = System.Linq.Enumerable;
+using Action = System.Action;
 using GameStates = COG.States.GameStates;
 
 namespace COG.Listener.Impl;
@@ -127,25 +123,61 @@ public class GameListener : IListener
         return false;
     }
 
-    public void OnSetUpRoleText(IntroCutscene intro)
+    public bool OnSetUpRoleText(IntroCutscene intro, ref Il2CppSystem.Collections.IEnumerator roles)
     {
         Main.Logger.LogInfo("Setup role text for players...");
-        Task.Run(async delegate
+
+        var myRole = GameUtils.GetLocalPlayerRole();
+        if (myRole == null)
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(0.99999999999999994638));
-            
-            var myRole = GameUtils.GetLocalPlayerRole();
-            if (myRole == null)
+            return true;
+        }
+
+        var list = new List<Il2CppSystem.Collections.IEnumerator>();
+
+        void SetupRoles()
+        {
+            if (GameOptionsManager.Instance.currentGameMode == GameModes.Normal)
             {
-                return;
+                intro.RoleText.text = myRole.Name;
+                intro.RoleText.color = myRole.Color;
+                intro.RoleBlurbText.text = myRole.Description;
+                intro.RoleBlurbText.color = myRole.Color;
+                intro.YouAreText.color = myRole.Color;
+                
+                intro.YouAreText.gameObject.SetActive(true);
+                intro.RoleText.gameObject.SetActive(true);
+                intro.RoleBlurbText.gameObject.SetActive(true);
+                
+                SoundManager.Instance.PlaySound(PlayerControl.LocalPlayer.Data.Role.IntroSound, false);
+                
+                if (intro.ourCrewmate == null)
+                {
+                    intro.ourCrewmate = intro.CreatePlayer(0, 1, PlayerControl.LocalPlayer.Data, false);
+                    intro.ourCrewmate.gameObject.SetActive(false);
+                }
+                
+                intro.ourCrewmate.gameObject.SetActive(true);
+                var transform = intro.ourCrewmate.transform;
+                transform.localPosition = new Vector3(0f, -1.05f, -18f);
+                transform.localScale = new Vector3(1f, 1f, 1f);
+                intro.ourCrewmate.ToggleName(false);
             }
-            
-            intro.YouAreText.color = myRole.Color;
-            intro.RoleText.text = myRole.Name;
-            intro.RoleText.color = myRole.Color;
-            intro.RoleBlurbText.color = myRole.Color;
-            intro.RoleBlurbText.text = myRole.Description;
-        });
+        }
+
+        list.Add(Effects.Action((Il2CppSystem.Action) (Action?)SetupRoles));
+        list.Add(Effects.Wait(2.5f));
+        void Action()
+        {
+            intro.YouAreText.gameObject.SetActive(false);
+            intro.RoleText.gameObject.SetActive(false); 
+            intro.RoleBlurbText.gameObject.SetActive(false);
+            intro.ourCrewmate.gameObject.SetActive(false);
+        }
+        list.Add(Effects.Action((Il2CppSystem.Action) (Action?)Action));
+
+        roles = Effects.Sequence(list.ToArray());
+        return false;
     }
 
     public void OnSetUpTeamText(IntroCutscene intro,
@@ -158,73 +190,24 @@ public class GameListener : IListener
         var camp = role.CampType;
         if (camp is CampType.Neutral or CampType.Unknown)
         {
-            intro.BackgroundBar.material.color = camp.GetColor();
-            intro.TeamTitle.text = camp.GetName();
-            intro.TeamTitle.color = camp.GetColor();
-            intro.ImpostorTitle.text = camp.GetName();
-            intro.ImpostorTitle.color = camp.GetColor();
-            intro.ImpostorName.text = camp.GetName();
-            intro.ImpostorName.color = camp.GetColor();
-            intro.ImpostorText.text = camp == CampType.Neutral ? LanguageConfig.Instance.NeutralCampDescription : 
-                LanguageConfig.Instance.UnknownCampDescription;
             var soloTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
             soloTeam.Add(player);
             teamToDisplay = soloTeam;
-
-            // debug
-            var type1 = intro.GetType();
-            var propertyInfos1 = type1.GetProperties();
-            Main.Logger.LogInfo(propertyInfos1.Length);
-            var i = 0;
-            foreach (var propertyInfo in propertyInfos1)
-            {
-                i++;
-                if (propertyInfo.PropertyType.FullName != null &&
-                    propertyInfo.PropertyType.FullName.ToLower().Contains("TextMeshPro".ToLower()))
-                {
-                    var textMeshPro = (TextMeshPro) propertyInfo.GetValue(intro)!;
-                    System.Console.WriteLine(propertyInfo.Name + " -> " + textMeshPro.text);
-                    File.WriteAllText($"{i + ""}.txt", textMeshPro.text, Encoding.UTF8);
-                }
-            }
-            return;
         }
+    }
+
+    public void AfterSetUpTeamText(IntroCutscene intro)
+    {
+        var role = GameUtils.GetLocalPlayerRole();
+
+        if (role == null) return;
+        var camp = role.CampType;
         
         intro.BackgroundBar.material.color = camp.GetColor();
         intro.TeamTitle.text = camp.GetName();
         intro.TeamTitle.color = camp.GetColor();
-        intro.ImpostorTitle.text = camp.GetName();
-        intro.ImpostorTitle.color = camp.GetColor();
-        intro.ImpostorName.text = camp.GetName();
-        intro.ImpostorName.color = camp.GetColor();
-        intro.ImpostorText.text = camp == CampType.Crewmate ? LanguageConfig.Instance.CrewmateCampDescription : 
-            LanguageConfig.Instance.ImpostorCampDescription;
         
-        // debug
-        var type = intro.GetType();
-        var propertyInfos = type.GetProperties();
-        Main.Logger.LogInfo(propertyInfos.Length);
-        var i1 = 0;
-        foreach (var propertyInfo in propertyInfos)
-        {
-            i1++;
-            if (propertyInfo.PropertyType.FullName != null &&
-                propertyInfo.PropertyType.FullName.ToLower().Contains("TextMeshPro".ToLower()))
-            {
-                var textMeshPro = (TextMeshPro) propertyInfo.GetValue(intro)!;
-                Main.Logger.LogInfo(propertyInfo.Name + " -> " + textMeshPro.text);
-                File.WriteAllText($"{i1 + ""}.txt", textMeshPro.text, Encoding.UTF8);
-            }
-        }
-
-        if (camp != CampType.Impostor) return;
-        var team = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
-        foreach (var keyValuePair in Enumerable.Where(GameUtils.Data, keyValuePair => keyValuePair.Value.CampType == CampType.Impostor))
-        {
-            team.Add(keyValuePair.Key);
-        }
-
-        teamToDisplay = team;
+        intro.ImpostorText.text = "";
     }
 
     public void OnGameEndSetEverythingUp(EndGameManager manager)
