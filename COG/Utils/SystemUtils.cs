@@ -21,28 +21,8 @@ public class SystemUtils
     
     public static string GetHwid()
     {
-        var hwid = string.Empty;
-
-        try
-        {
-            // 获取CPU信息
-            var cpuInfo = GetRegistryValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0", "ProcessorNameString");
-
-            // 获取主板序列号
-            var boardInfo = GetRegistryValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BaseBoardSerialNumber");
-
-            // 获取硬盘序列号
-            var diskInfo = GetRegistryValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\Scsi\Scsi Port 0\Scsi Bus 0\Target Id 0\Logical Unit Id 0", "Identifier");
-
-            // 组合硬件信息得到HWID
-            hwid = cpuInfo + diskInfo + boardInfo;
-        }
-        catch (System.Exception)
-        {
-            // ignored
-        }
-
-        return hwid.GetSHA1Hash();
+        #pragma warning disable CA1416
+        return System.Security.Principal.WindowsIdentity.GetCurrent().User!.Value.GetSHA1Hash();
     }
 
     private static string GetRegistryValue(string keyPath, string valueName)
