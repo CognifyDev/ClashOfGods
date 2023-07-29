@@ -65,7 +65,11 @@ public class RoleManager
         {
             foreach (var role in GetManager().GetRoles().Where(role => role.ShowInOptions && role.RoleOptions[0].GetBool()))
             {
-                _roles.Add(role);
+                var times = (int)role.RoleOptions[1].GetFloat();
+                for (var i = 0; i < times; i++)
+                {
+                    _roles.Add(role);
+                }
             }
 
             _roles.Disarrange();
