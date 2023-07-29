@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Listener;
-using COG.Modules;
+using COG.Rpc;
 using COG.Utils;
 using UnityEngine;
 using static COG.UI.CustomOption.CustomOption;
@@ -73,9 +73,10 @@ public class CustomOption
 
     public static void ShareOptionChange(uint optionId)
     {
+        return;
         var option = Options.FirstOrDefault(x => x.ID == optionId);
         if (option == null) return;
-        var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable);
+        var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)KnownRpc.ShareOptions, SendOption.Reliable);
         writer.Write((byte)1);
         writer.WritePacked((uint)option.ID);
         writer.WritePacked(Convert.ToUInt32(option.Selection));
@@ -84,25 +85,10 @@ public class CustomOption
 
     public static void ShareOptionSelections()
     {
+        return;
         if (PlayerControl.AllPlayerControls.Count <= 1 || AmongUsClient.Instance!.AmHost == false && PlayerControl.LocalPlayer == null) return;
-        var optionsList = new List<CustomOption?>(Options);
-        while (optionsList.Any())
-        {
-            byte amount = (byte)Math.Min(optionsList.Count, 200); // takes less than 3 bytes per option on average
-            var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable);
-            writer.Write(amount);
-            for (int i = 0; i < amount; i++)
-            {
-                var option = optionsList[0];
-                optionsList.RemoveAt(0);
-                if (option != null)
-                {
-                    writer.WritePacked((uint)option.ID);
-                    writer.WritePacked(Convert.ToUInt32(option.Selection));
-                }
-            }
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
-        }
+        Main.Logger.LogInfo("Start to share CustomOptions for online players...");
+        
     }
 
     public int GetSelection()
@@ -230,7 +216,7 @@ public class CustomOption
                     button.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
                     button.OnClick.AddListener((Action)(() =>
                     {
-                        if (settingsHighlightMap == null || copiedIndex == null) return;
+                        if (settingsHighlightMap == null!) return;
                         SetListener(settingsHighlightMap, copiedIndex);
                     }));
                 }
@@ -244,19 +230,17 @@ public class CustomOption
                 Enumerable.ToList(modifierMenu.GetComponentsInChildren<OptionBehaviour>())
             });
 
-            List<OptionBehaviour> torOptions = new List<OptionBehaviour>();
-            List<OptionBehaviour> impostorOptions = new List<OptionBehaviour>();
-            List<OptionBehaviour> neutralOptions = new List<OptionBehaviour>();
-            List<OptionBehaviour> crewmateOptions = new List<OptionBehaviour>();
-            List<OptionBehaviour> modifierOptions = new List<OptionBehaviour>();
+            var torOptions = new List<OptionBehaviour>();
+            var impostorOptions = new List<OptionBehaviour>();
+            var neutralOptions = new List<OptionBehaviour>();
+            var crewmateOptions = new List<OptionBehaviour>();
+            var modifierOptions = new List<OptionBehaviour>();
 
+            var menus = new List<Transform> { torMenu.transform, impostorMenu.transform, neutralMenu.transform, crewmateMenu.transform, modifierMenu.transform };
+            var optionBehaviours = new List<List<OptionBehaviour>> { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions };
 
-            List<Transform> menus = new List<Transform> { torMenu.transform, impostorMenu.transform, neutralMenu.transform, crewmateMenu.transform, modifierMenu.transform };
-            List<List<OptionBehaviour>> optionBehaviours = new List<List<OptionBehaviour>> { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions };
-
-            foreach (var option in Options)
+            foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {
-                if (option != null && (int)option.Type > 4) continue;
                 if (option?.OptionBehaviour == null)
                 {
                     if (option != null)
