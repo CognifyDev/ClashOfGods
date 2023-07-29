@@ -69,7 +69,8 @@ public partial class Main : BasePlugin
             new OptionListener(),
             new ModOptionListener(),
             new CustomButtonListener(),
-            new RPCListener()
+            new RPCListener(),
+            new WinnerListener()
         });
 
         // Register sidebar texts

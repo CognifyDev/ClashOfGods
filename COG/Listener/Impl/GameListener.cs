@@ -102,10 +102,6 @@ public class GameListener : IListener
         }
     }
 
-    public void OnGameEnd(AmongUsClient client, EndGameResult endGameResult)
-    {
-    }
-
     public void OnGameStart(GameStartManager manager)
     {
         // 改变按钮颜色

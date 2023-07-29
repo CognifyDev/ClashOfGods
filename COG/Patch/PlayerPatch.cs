@@ -176,3 +176,15 @@ class ReportDeadBodyPatch
         return true;
     }
 }
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
+class FixedUpdatePatch
+{
+    public static void Postfix(PlayerControl __instance)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.AfterPlayerFixedUpdate(__instance);
+        }
+    }
+}

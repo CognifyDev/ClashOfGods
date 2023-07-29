@@ -50,7 +50,7 @@ public interface IListener
     /// </summary>
     /// <param name="client">客户端</param>
     /// <param name="endGameResult">游戏结束结果</param>
-    void OnGameEnd(AmongUsClient client, EndGameResult endGameResult) { }
+    void AfterGameEnd(AmongUsClient client, ref EndGameResult endGameResult) { }
 
     /// <summary>
     /// 游戏开始的时候触发
@@ -101,4 +101,8 @@ public interface IListener
     void OnHudStart(HudManager hud) { }
 
     void OnHudUpdate() { }
+    
+    void AfterPlayerFixedUpdate(PlayerControl player) { }
+    
+    void OnGameEnd(AmongUsClient client, ref EndGameResult endGameResult) { }
 }

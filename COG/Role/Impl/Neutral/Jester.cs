@@ -1,4 +1,5 @@
 ﻿using COG.Config.Impl;
+using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -20,6 +21,7 @@ public class Jester : Role, IListener
         RoleOptions.Add(CustomOption.Create(
             parentOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true, parentOption)
         );
+        CustomWinner = new CustomWinner(CampType);
     }
 
     public bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)
@@ -46,7 +48,7 @@ public class Jester : Role, IListener
         if (CheckNull()) return;
         if (!controller.exiled.IsSamePlayer(_player!.Data)) return;
         
-        GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, true);
+        CustomWinner.SetWin(true);
     }
 
     public void OnAirshipPlayerExile(AirshipExileController controller)

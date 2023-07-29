@@ -20,12 +20,21 @@ class CoBeginPatch
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameEnd))]
 class EndGamePatch
 {
+    public static void Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
+    {
+        var list = ListenerManager.GetManager().GetListeners().ToList();
+        foreach (var listener in list)
+        {
+            listener.OnGameEnd(__instance, ref endGameResult);
+        }
+    }
+    
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
         var list = ListenerManager.GetManager().GetListeners().ToList();
         foreach (var listener in list)
         {
-            listener.OnGameEnd(__instance, endGameResult);
+            listener.AfterGameEnd(__instance, ref endGameResult);
         }
     }
 }

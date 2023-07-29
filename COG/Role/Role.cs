@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Modules;
 using COG.UI.CustomButtons;
@@ -50,7 +51,15 @@ public abstract class Role
     /// </summary>
     public bool SubRole { get; protected set; }
     
+    /// <summary>
+    /// 在选项中显示
+    /// </summary>
     public bool ShowInOptions { get; }
+    
+    /// <summary>
+    /// 自定义胜利
+    /// </summary>
+    public CustomWinner CustomWinner { get; protected set; }
 
     protected Role(string name, Color color, CampType campType, bool showInOptions)
     {
@@ -61,6 +70,7 @@ public abstract class Role
         BaseRoleType = RoleTypes.Crewmate;
         RoleOptions = new();
         SubRole = false;
+        CustomWinner = CustomWinner.Empty;
 
         ShowInOptions = showInOptions;
 
