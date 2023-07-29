@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Utils;
-using Il2CppSystem;
 using InnerNet;
 using UnityEngine;
 using Action = System.Action;
