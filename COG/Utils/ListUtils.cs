@@ -29,11 +29,4 @@ public static class ListUtils
         list.RemoveAt(0);
         return obj;
     }
-
-    public static T GetOneAndDelete<T>(this List<T> list)
-    {
-        var obj = list[0];
-        list.RemoveAt(0);
-        return obj;
-    }
 }
