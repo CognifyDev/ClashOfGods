@@ -5,9 +5,9 @@ using Reactor.Networking.Rpc;
 namespace COG.Rpc;
 
 [RegisterCustomRpc((uint) KnownRpc.ShareRoles)]
-public abstract class RoleShare : PlayerCustomRpc<Main, RoleShare.Data>
+public class RoleShare : PlayerCustomRpc<Main, RoleShare.Data>
 {
-    protected RoleShare(Main plugin, uint id) : base(plugin, id) {}
+    public RoleShare(Main plugin, uint id) : base(plugin, id) {}
     
     public readonly record struct Data(Role.Role Role);
 

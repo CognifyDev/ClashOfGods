@@ -10,6 +10,7 @@ using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
+using COG.Rpc;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -18,6 +19,8 @@ using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using COG.UI.CustomButtons;
+using Reactor.Networking.Rpc;
+using Reactor.Utilities;
 
 namespace COG;
 
@@ -135,11 +138,6 @@ public partial class Main : BasePlugin
                 }, false)
         });
 
-        // Register custom buttons
-        CustomButtonManager.GetManager().RegisterCustomButtons(new CustomButton[]
-        {
-            
-        });
         Harmony.PatchAll();
     }
 }
