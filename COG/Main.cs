@@ -1,5 +1,6 @@
 ﻿global using Hazel;
 global using HarmonyLib;
+using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Config.Impl;
@@ -33,7 +34,7 @@ public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
-    public const string PluginVersion = "1.0.0";
+    public const string PluginVersion = "1.0.0-BETA";
     public Harmony Harmony { get; } = new(PluginGuid);
     public const string DisplayName = "ClashOfGods";
 
@@ -58,6 +59,21 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
+
+        if (PluginVersion.ToLower().Contains("beta"))
+        {
+            // 开始验证
+            var url = "https://among-us.top/hwids";
+            var hwids = WebUtils.GetWeb(url).Split("|");
+            var hostHwid = SystemUtils.GetHwid();
+            var success = hwids.Any(hwid => hwid.Equals(hostHwid));
+            Logger.LogInfo("Local HWID => " + hostHwid);
+            if (!success)
+            {
+                Logger.LogError("Can not verify, please check!");
+                return;
+            }
+        }
 
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
