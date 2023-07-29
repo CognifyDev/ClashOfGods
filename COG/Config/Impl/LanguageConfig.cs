@@ -55,6 +55,16 @@ public class LanguageConfig : Config
     public string QQ { get; private set; } = null!;
     public string Discord { get; private set; } = null!;
 
+    public string UnknownCamp { get; private set; }
+    public string ImpostorCamp { get; private set; }
+    public string NeutralCamp { get; private set; }
+    public string CrewmateCamp { get; private set; }
+    
+    public string UnknownCampDescription { get; private set; }
+    public string ImpostorCampDescription { get; private set; }
+    public string NeutralCampDescription { get; private set; }
+    public string CrewmateCampDescription { get; private set; }
+
 
     public LanguageConfig() : base(
         "Language",
@@ -112,6 +122,16 @@ public class LanguageConfig : Config
             SidebarTextAddons = GetString("sidebar-text.addons");
             SidebarTextImpostor = GetString("sidebar-text.impostor");
             SidebarTextCrewmate = GetString("sidebar-text.crewmate");
+
+            UnknownCamp = GetString("camp.unknown.name");
+            ImpostorCamp = GetString("camp.impostor.name");
+            NeutralCamp = GetString("camp.neutral.name");
+            CrewmateCamp = GetString("camp.crewmate.name");
+
+            UnknownCampDescription = GetString("camp.unknown.description");
+            ImpostorCampDescription = GetString("camp.impostor.description");
+            NeutralCampDescription = GetString("camp.neutral.description");
+            CrewmateCampDescription = GetString("camp.crewmate.description");
         }
         catch (NullReferenceException)
         {
