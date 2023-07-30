@@ -8,6 +8,12 @@ class RPCHandlerPatch
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId,
         [HarmonyArgument(1)] MessageReader reader)
     {
+        
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnRPCReceived(callId, reader);
+        }
+        
         var rpcType = (RpcCalls)callId;
         var subReader = MessageReader.Get(reader);
         switch (rpcType)

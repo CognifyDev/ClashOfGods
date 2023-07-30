@@ -5,8 +5,6 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using COG.Utils;
-using InnerNet;
-using Reactor.Networking;
 using Reactor.Networking.Rpc;
 using UnityEngine;
 using Action = System.Action;
@@ -194,7 +192,13 @@ public class GameListener : IListener
     {
         
     }
-    public void OnKeyborad()
+
+    public bool BeforeGameEnd(GameManager manager)
+    {
+        return false;
+    }
+
+    public void OnKeyboardPass()
     {
         if (Input.GetKey(KeyCode.KeypadEnter))
         {

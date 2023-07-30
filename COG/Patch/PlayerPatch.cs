@@ -1,3 +1,4 @@
+using System.Linq;
 using COG.Listener;
 using COG.UI.CustomButtons;
 using HarmonyLib;
@@ -36,18 +37,13 @@ class PlayerKillPatch
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         
-        bool returnAble = false;
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        var returnAble = false;
+        foreach (var unused in ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnPlayerMurder(__instance, target) && !returnAble))
         {
-            if (!listener.OnPlayerMurder(__instance, target) && !returnAble)
-            {
-                returnAble = true;
-            }
+            returnAble = true;
         }
 
-        if (returnAble) return false;
-
-        return true;
+        return !returnAble;
     }
     
     [HarmonyPatch(nameof(PlayerControl.MurderPlayer)), HarmonyPostfix]

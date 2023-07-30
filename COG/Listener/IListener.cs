@@ -94,6 +94,7 @@ public interface IListener
     void OnRPCReceived(byte callId, MessageReader reader) { }
 
     bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target) { return true; }
+    
     void OnMurderPlayer(PlayerControl killer, PlayerControl target) { }
 
     void OnSettingInit(OptionsMenuBehaviour menu) { }
@@ -103,7 +104,10 @@ public interface IListener
     void OnHudUpdate() { }
     
     void AfterPlayerFixedUpdate(PlayerControl player) { }
-    
+
     void OnGameEnd(AmongUsClient client, ref EndGameResult endGameResult) { }
-    void OnKeyborad () { }
+    
+    void OnKeyboardPass () { }
+
+    bool BeforeGameEnd(GameManager manager) { return true; }
 }
