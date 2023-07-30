@@ -22,6 +22,7 @@ public class GameListener : IListener
     public void OnSelectRoles()
     {
         GameUtils.Data.Clear(); // 首先清除 防止干扰
+
         if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
 
         // 开始分配职业

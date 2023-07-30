@@ -25,6 +25,7 @@ public class RoleShare : PlayerCustomRpc<Main, RoleShare.Data>
 
     public override void Handle(PlayerControl innerNetObject, Data data)
     {
+        if (AmongUsClient.Instance.AmHost) return;
         Main.Logger.LogInfo("Received player " + innerNetObject.name + "'s role " + data.Role.GetType().Name);
         GameUtils.Data.Add(innerNetObject, data.Role);
     }
