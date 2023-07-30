@@ -1,5 +1,7 @@
 ﻿global using Hazel;
 global using HarmonyLib;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
@@ -39,6 +41,9 @@ public partial class Main : BasePlugin
 
     public static BepInEx.Logging.ManualLogSource Logger = null!;
 
+    public static List<string> RegisteredBetaUsers { get; private set; } = new();
+    public static bool BetaVersion { get; private set; } = false;
+
     public static Main Instance { get; private set; } = null!;
     
     /// <summary>
@@ -66,11 +71,13 @@ public partial class Main : BasePlugin
             return;
         }
 
-        if (PluginVersion.ToLower().Contains("beta") || PluginVersion.ToLower().Contains("dev"))
+        BetaVersion = PluginVersion.ToLower().Contains("beta") || PluginVersion.ToLower().Contains("dev");
+        if (BetaVersion)
         {
             // 开始验证
             var url = "https://among-us.top/hwids";
             var hwids = WebUtils.GetWeb(url).Split("|");
+            RegisteredBetaUsers = new List<string>(hwids);
             var hostHwid = SystemUtils.GetHwid();
             var success = hwids.Any(hwid => hwid.Equals(hostHwid));
             Logger.LogInfo("Local HWID => " + hostHwid);

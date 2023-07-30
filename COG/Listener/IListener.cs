@@ -108,6 +108,4 @@ public interface IListener
     void OnGameEnd(AmongUsClient client, ref EndGameResult endGameResult) { }
     
     void OnKeyboardPass () { }
-
-    bool BeforeGameEnd(GameManager manager) { return true; }
 }

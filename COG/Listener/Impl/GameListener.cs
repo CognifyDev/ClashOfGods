@@ -193,11 +193,6 @@ public class GameListener : IListener
         
     }
 
-    public bool BeforeGameEnd(GameManager manager)
-    {
-        return false;
-    }
-
     public void OnKeyboardPass()
     {
         if (Input.GetKey(KeyCode.KeypadEnter))

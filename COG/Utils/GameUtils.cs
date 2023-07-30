@@ -5,7 +5,7 @@ using AmongUs.GameOptions;
 
 namespace COG.Utils;
 
-public class GameUtils
+public static class GameUtils
 {
     public static readonly Dictionary<PlayerControl, Role.Role> Data = new();
 
@@ -49,12 +49,7 @@ public class GameUtils
     public static Role.Role? GetLocalPlayerRole()
     {
         var player = PlayerControl.LocalPlayer;
-        foreach (var keyValuePair in Data.Where(keyValuePair => keyValuePair.Key.IsSamePlayer(player)))
-        {
-            return keyValuePair.Value;
-        }
-
-        return null;
+        return Data.Where(keyValuePair => keyValuePair.Key.IsSamePlayer(player)).Select(keyValuePair => keyValuePair.Value).FirstOrDefault();
     }
 
     public static NormalGameOptionsV07 GetGameOptions() => GameOptionsManager.Instance.currentNormalGameOptions;

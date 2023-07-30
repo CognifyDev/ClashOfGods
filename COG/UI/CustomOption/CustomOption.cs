@@ -112,6 +112,8 @@ public class CustomOption
 
     public static void ShareOptionChange()
     {
+        if (PlayerControl.AllPlayerControls.Count <= 1 || PlayerControl.LocalPlayer == null || !AmongUsClient.Instance.AmHost) return;
+        
         // 当游戏选项更改的时候调用
 
         var localPlayer = PlayerControl.LocalPlayer;

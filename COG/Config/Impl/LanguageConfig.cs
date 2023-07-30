@@ -41,6 +41,7 @@ public class LanguageConfig : Config
     public string CogOptions { get; private set; } = null!;
     public string ReloadConfigs { get; private set; } = null!;
     public string Github { get; private set; } = null!;
+    public string BetaVersionRegisteredUserDisplay { get; private set; } = null!;
 
     public string MaxNumMessage { get; private set; } = null!;
     public string AllowStartMeeting { get; private set; } = null!;
@@ -111,6 +112,7 @@ public class LanguageConfig : Config
             Github = GetString("option.main.github");
             QQ = GetString("option.main.qq");
             Discord = GetString("option.main.discord");
+            BetaVersionRegisteredUserDisplay = GetString("option.main.beta-version-registered-user-display");
 
             MaxNumMessage = GetString("role.global.max-num");
             AllowStartMeeting = GetString("role.global.allow-start-meeting");

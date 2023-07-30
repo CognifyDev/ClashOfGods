@@ -108,19 +108,3 @@ class KeyboardPatch
         }
     }
 }
-
-[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.CoEndGame))]
-class GameEndControllerPatch
-{
-    [HarmonyPrefix]
-    public static bool Prefix(GameManager __instance)
-    {
-        var returnAble = true;
-        foreach (var unused in ListenerManager.GetManager().GetListeners().Where(listener => !listener.BeforeGameEnd(__instance)))
-        {
-            returnAble = false;
-        }
-
-        return returnAble;
-    }
-}

@@ -56,6 +56,7 @@ option:
     github: "Github"
     qq: "QQ"
     discord: "Discord"
+    beta-version-registered-user-display: "测试用户数量: %registered-num%"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 sidebar-text:
