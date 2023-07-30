@@ -105,4 +105,5 @@ public interface IListener
     void AfterPlayerFixedUpdate(PlayerControl player) { }
     
     void OnGameEnd(AmongUsClient client, ref EndGameResult endGameResult) { }
+    void OnKeyborad () { }
 }
