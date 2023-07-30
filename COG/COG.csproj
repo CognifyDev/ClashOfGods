@@ -1,4 +1,4 @@
-    <Project Sdk="Microsoft.NET.Sdk">
+﻿    <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latest</LangVersion>
@@ -29,7 +29,7 @@
         
     <ItemGroup>
         <PackageReference Include="Reactor" Version="2.2.0" />
-        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.671" Private="false" ExcludeAssets="runtime;native" />
+        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.672" Private="false" ExcludeAssets="runtime;native" />
         <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.7.11" PrivateAssets="all" />
 
         <PackageReference Include="BepInEx.AutoPlugin" Version="1.1.0" PrivateAssets="all" />
