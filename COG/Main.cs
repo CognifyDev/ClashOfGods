@@ -1,6 +1,5 @@
 ﻿global using Hazel;
 global using HarmonyLib;
-using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Config.Impl;
@@ -10,7 +9,6 @@ using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
-using COG.Rpc;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -18,9 +16,6 @@ using COG.Utils;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
-using COG.UI.CustomButtons;
-using Reactor.Networking.Rpc;
-using Reactor.Utilities;
 
 namespace COG;
 

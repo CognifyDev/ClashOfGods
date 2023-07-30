@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Rpc;
 using COG.Utils;
+using COG.Utils.Resolver;
 using UnityEngine;
 using static COG.UI.CustomOption.CustomOption;
 
@@ -12,10 +14,13 @@ namespace COG.UI.CustomOption;
 
 // Code base from
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
+[Serializable]
+[DataContract]
 public class CustomOption
 {
-    internal static bool FirstOpen = true;  
-  
+    internal static bool FirstOpen = true;
+
+    [Serializable]
     public enum CustomOptionType
     {
         General = 0,
@@ -24,23 +29,32 @@ public class CustomOption
         Crewmate = 3,
         Addons = 4
     }
-
+    
     public static readonly List<CustomOption?> Options = new();
-
+    
+    [DataMember]
     public readonly int ID;
+    [DataMember]
     public readonly string Name;
+    [DataMember]
     public readonly System.Object[] Selections;
 
+    [DataMember]
     public readonly int DefaultSelection;
+    [DataMember]
     public int Selection;
+    [DataMember]
     public OptionBehaviour OptionBehaviour;
+    [DataMember]
     public readonly CustomOption? Parent;
+    [DataMember]
     public readonly bool IsHeader;
+    [DataMember]
     public readonly CustomOptionType Type;
 
     // Option creation
-
-    public CustomOption(int id, CustomOptionType type, string name, System.Object[] selections, System.Object defaultValue, CustomOption? parent, bool isHeader)
+    public CustomOption(int id, CustomOptionType type, string name, System.Object[] selections,
+        System.Object defaultValue, CustomOption? parent, bool isHeader)
     {
         ID = id;
         Name = parent == null ? name : ColorUtils.ToAmongUsColorString(Color.gray, "→ ") + name;
@@ -54,25 +68,70 @@ public class CustomOption
         Options.Add(this);
     }
 
-    public static CustomOption Create(int id, CustomOptionType type, string name, string[] selections, CustomOption? parent = null, bool isHeader = false)
+    public static CustomOption Create(int id, CustomOptionType type, string name, string[] selections,
+        CustomOption? parent = null, bool isHeader = false)
     {
         return new CustomOption(id, type, name, selections, "", parent, isHeader);
     }
 
-    public static CustomOption Create(int id, CustomOptionType type, string name, float defaultValue, float min, float max, float step, CustomOption? parent = null, bool isHeader = false)
+    public static CustomOption Create(int id, CustomOptionType type, string name, float defaultValue, float min,
+        float max, float step, CustomOption? parent = null, bool isHeader = false)
     {
         List<object> selections = new();
         for (float s = min; s <= max; s += step) selections.Add(s);
         return new CustomOption(id, type, name, selections.ToArray(), defaultValue, parent, isHeader);
     }
 
-    public static CustomOption Create(int id, CustomOptionType type, string name, bool defaultValue, CustomOption? parent = null, bool isHeader = false)
+    public static CustomOption Create(int id, CustomOptionType type, string name, bool defaultValue,
+        CustomOption? parent = null, bool isHeader = false)
     {
-        return new CustomOption(id, type, name, new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable }, defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
+        return new CustomOption(id, type, name,
+            new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
+            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
 
-    public static void ShareOptionChange(uint optionId)
+    public static void LoadOptionsFromByteArray(byte[][] data)
     {
+        Options.Clear();
+        foreach (var bytes in data)
+        {
+            Options.Add(bytes.DeserializeToData<SerializableCustomOption>().ToCustomOption());
+        }
+    }
+
+    public static byte[][] WriteOptionsToByteArray()
+    {
+        return Enumerable.ToList(
+            from customOption in Options 
+            where customOption != null 
+            select new SerializableCustomOption(customOption) 
+            into serializableCustomOption 
+            select serializableCustomOption.SerializeToData()
+        ).ToArray();
+    }
+
+    public static void ShareOptionChange()
+    {
+        // 当游戏选项更改的时候调用
+
+        var localPlayer = PlayerControl.LocalPlayer;
+        
+        // 新建写入器
+        var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions, SendOption.Reliable);
+
+        var options = WriteOptionsToByteArray();
+        
+        writer.Write(options.Length);
+        
+        foreach (var option in options)
+        {
+            writer.Write(option);
+        }
+        
+        // OK 现在进行一个结束
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
+
+        /*
         return;
         var option = Options.FirstOrDefault(x => x.ID == optionId);
         if (option == null) return;
@@ -80,15 +139,18 @@ public class CustomOption
         writer.Write((byte)1);
         writer.WritePacked((uint)option.ID);
         writer.WritePacked(Convert.ToUInt32(option.Selection));
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        AmongUsClient.Instance.FinishRpcImmediately(writer);*/
     }
 
     public static void ShareOptionSelections()
     {
+        // 开局共享的游戏设置
+        ShareOptionChange();
+        /*
         return;
         if (PlayerControl.AllPlayerControls.Count <= 1 || AmongUsClient.Instance!.AmHost == false && PlayerControl.LocalPlayer == null) return;
         Main.Logger.LogInfo("Start to share CustomOptions for online players...");
-        
+        */
     }
 
     public int GetSelection()
@@ -120,7 +182,7 @@ public class CustomOption
             stringOption.oldValue = stringOption.Value = Selection;
             stringOption.ValueText.text = Selections[Selection].ToString();
 
-            ShareOptionChange((uint)ID);
+            ShareOptionChange();
         }
     }
     
@@ -245,7 +307,7 @@ public class CustomOption
                 {
                     if (option != null)
                     {
-                        StringOption stringOption = UnityEngine.Object.Instantiate(template, menus[(int)option.Type]);
+                        var stringOption = UnityEngine.Object.Instantiate(template, menus[(int)option.Type]);
                         optionBehaviours[(int)option.Type].Add(stringOption);
                         stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
                         stringOption.TitleText.text = option.Name;

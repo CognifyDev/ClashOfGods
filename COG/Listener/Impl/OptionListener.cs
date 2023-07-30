@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using COG.Config.Impl;
+using COG.Rpc;
+using COG.UI.CustomOption;
 using COG.UI.SidebarText;
 using UnityEngine;
 
@@ -30,6 +33,26 @@ public class OptionListener : IListener
         }
         text += LanguageConfig.Instance.MessageForNextPage.Replace("%currentpage%", _typePage + "").Replace("%pagecount%", pages + "");
         result = text;
+    }
+
+    public void OnRPCReceived(byte callId, MessageReader reader)
+    {
+        if (AmongUsClient.Instance.AmHost) return;
+        var knownRpc = (KnownRpc)callId;
+        if (knownRpc != KnownRpc.ShareOptions) return;
+
+        var num = reader.ReadInt32(); // 读取CustomOption个数
+
+        List<byte[]> dataList = new();
+
+        for (var i = 0; i < num; i++)
+        {
+            dataList.Add(reader.ReadBytesAndSize());
+        }
+        
+        CustomOption.LoadOptionsFromByteArray(dataList.ToArray());
+        
+        Main.Logger.LogInfo($"Loaded options from Host({num}).");
     }
 
     public void OnKeyboardJoystickUpdate(KeyboardJoystick keyboardJoystick)
