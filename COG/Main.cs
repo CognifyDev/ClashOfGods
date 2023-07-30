@@ -1,5 +1,6 @@
 ﻿global using Hazel;
 global using HarmonyLib;
+using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Config.Impl;
@@ -57,7 +58,7 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
-/*
+
         var disabledVersion = WebUtils.GetWeb("https://among-us.top/disabledVersions").Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
@@ -65,7 +66,7 @@ public partial class Main : BasePlugin
             return;
         }
 
-        if (PluginVersion.ToLower().Contains("beta"))
+        if (PluginVersion.ToLower().Contains("beta") || PluginVersion.ToLower().Contains("dev"))
         {
             // 开始验证
             var url = "https://among-us.top/hwids";
@@ -79,7 +80,7 @@ public partial class Main : BasePlugin
                 return;
             }
         }
-*/
+
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
