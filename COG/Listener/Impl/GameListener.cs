@@ -194,4 +194,11 @@ public class GameListener : IListener
     {
         
     }
+    public void OnKeyborad()
+    {
+        if (Input.GetKey(KeyCode.KeypadEnter))
+        {
+            GameStartManager.Instance.countDownTimer = 0;
+        }
+    }
 }

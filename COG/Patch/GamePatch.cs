@@ -97,3 +97,14 @@ class SetEverythingUpPatch
         }
     }
 }
+[HarmonyPatch(typeof(ControllerManager), nameof(ControllerManager.Update))]
+class KeyboradPatch
+{
+    public static void Postfix()
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnKeyborad();
+        }
+    }
+}
