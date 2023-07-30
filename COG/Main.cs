@@ -10,6 +10,7 @@ using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
+using COG.Rpc;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -18,6 +19,8 @@ using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using COG.UI.CustomButtons;
+using Reactor.Networking.Rpc;
+using Reactor.Utilities;
 
 namespace COG;
 
@@ -59,7 +62,7 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
-
+/*
         var disabledVersion = WebUtils.GetWeb("https://among-us.top/disabledVersions").Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
@@ -81,7 +84,7 @@ public partial class Main : BasePlugin
                 return;
             }
         }
-
+*/
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
@@ -92,7 +95,6 @@ public partial class Main : BasePlugin
             new OptionListener(),
             new ModOptionListener(),
             new CustomButtonListener(),
-            new RPCListener(),
             new WinnerListener()
         });
 
@@ -136,11 +138,6 @@ public partial class Main : BasePlugin
                 }, false)
         });
 
-        // Register custom buttons
-        CustomButtonManager.GetManager().RegisterCustomButtons(new CustomButton[]
-        {
-            
-        });
         Harmony.PatchAll();
     }
 }

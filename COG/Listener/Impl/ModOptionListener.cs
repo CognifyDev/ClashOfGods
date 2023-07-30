@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using COG.Config.Impl;
-using COG.Modules;
 using COG.UI.CustomOption;
 using COG.UI.ModOption;
 using UnityEngine;

@@ -3,8 +3,11 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Role;
 using COG.Role.Impl;
+using COG.Rpc;
 using COG.Utils;
 using InnerNet;
+using Reactor.Networking;
+using Reactor.Networking.Rpc;
 using UnityEngine;
 using Action = System.Action;
 using GameStates = COG.States.GameStates;
@@ -20,9 +23,8 @@ public class GameListener : IListener
 
     public void OnSelectRoles()
     {
-        if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
-
         GameUtils.Data.Clear(); // 首先清除 防止干扰
+        if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
 
         // 开始分配职业
         var players = PlayerUtils.GetAllPlayers().ToList().Disarrange(); // 打乱玩家顺序
@@ -72,33 +74,17 @@ public class GameListener : IListener
             Main.Logger.LogInfo($"{player.name}({player.Data.FriendCode}) => {value.GetType().Name}");
         }
         
-        ShareRoles(RolesShare.Create(GameUtils.Data));
+        ShareRoles();
     }
 
-    private void ShareRoles(RolesShare rolesShare)
+    private void ShareRoles()
     {
-        var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, 
-            (byte)KnownRpc.ShareRoles, SendOption.Reliable);
-        writer.WriteNetObject(rolesShare);
-    }
-
-    public class RolesShare : InnerNetObject
-    {
-        private readonly Dictionary<PlayerControl, Role.Role> _dictionary;
-        
-        public RolesShare(Dictionary<PlayerControl, Role.Role> dictionary)
+        foreach (var (player, role) in GameUtils.Data)
         {
-            _dictionary = dictionary;
-        }
-
-        public static RolesShare Create(Dictionary<PlayerControl, Role.Role> dictionary)
-        {
-            return new RolesShare(dictionary);
-        }
-
-        public Dictionary<PlayerControl, Role.Role> GetRolesInformation()
-        {
-            return _dictionary;
+            Rpc<RoleShare>.Instance.Send(new RoleShare.Data(role), ackCallback: () =>
+            {
+                Main.Logger.LogInfo("Sent " + player.name + "'s role info to online players(" + role.GetType().Name + ")");
+            });
         }
     }
 

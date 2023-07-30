@@ -1,6 +1,4 @@
-﻿using System;
-using COG.Config.Impl;
-using COG.Modules;
+﻿using COG.Config.Impl;
 using COG.UI.CustomOption;
 
 namespace COG.UI.SidebarText.Impl;

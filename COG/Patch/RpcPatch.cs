@@ -9,7 +9,7 @@ class RPCHandlerPatch
         [HarmonyArgument(1)] MessageReader reader)
     {
         var rpcType = (RpcCalls)callId;
-        MessageReader subReader = MessageReader.Get(reader);
+        var subReader = MessageReader.Get(reader);
         switch (rpcType)
         {
             case RpcCalls.SendChat:

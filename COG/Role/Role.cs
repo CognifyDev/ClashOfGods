@@ -3,7 +3,6 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
-using COG.Modules;
 using COG.UI.CustomButtons;
 using COG.UI.CustomOption;
 using COG.Utils;

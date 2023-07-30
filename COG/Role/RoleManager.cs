@@ -47,6 +47,11 @@ public class RoleManager
         return _roles;
     }
 
+    public Role? GetRoleByClassName(string name)
+    {
+        return _roles.FirstOrDefault(role => role.GetType().Name.ToLower().Equals(name));
+    }
+
     /// <summary>
     /// 获取一个新的获取器
     /// </summary>
