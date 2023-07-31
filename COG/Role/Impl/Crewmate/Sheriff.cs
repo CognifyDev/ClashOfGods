@@ -16,13 +16,6 @@ public class Sheriff : Role, IListener
         Description = LanguageConfig.Instance.SheriffDescription;
     }
 
-    public bool OnCheckMurder(PlayerControl killer, PlayerControl target)
-    {
-        if (!AmongUsClient.Instance.AmHost) return false;
-        var role = killer.GetRoleInstance();
-        return role == null || role.Name.Equals(Name);
-    }
-
     public bool OnPlayerMurder(PlayerControl killer, PlayerControl target)
     {
         if (killer == null || target == null) return true;

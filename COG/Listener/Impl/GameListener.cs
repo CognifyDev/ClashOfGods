@@ -5,7 +5,7 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using COG.Utils;
-using Reactor.Networking.Rpc;
+using InnerNet;
 using UnityEngine;
 using Action = System.Action;
 using GameStates = COG.States.GameStates;
@@ -27,6 +27,25 @@ public class GameListener : IListener
         {
             RoleManager.Instance.SetRole(key, value.BaseRoleType);
         }
+    }
+
+    public void OnRPCReceived(byte callId, MessageReader reader)
+    {
+        var knownRpc = (KnownRpc)callId;
+        if (knownRpc != KnownRpc.ShareRoles) return;
+        var roleData = reader.ReadPackedInt32();
+        var data = new Dictionary<PlayerControl, Role.Role>();
+        for (var i = 0; i < roleData; i++)
+        {
+            var playerId = reader.ReadByte();
+            var role = Role.RoleManager.GetManager().GetRoleByClassName(reader.ReadString());
+            if (role == null) continue;
+            var player = PlayerUtils.GetPlayerById(playerId);
+            if (player == null) continue;
+            data.Add(player, role);
+        }
+
+        GameUtils.Data = data;
     }
 
     public void OnSelectRoles()
@@ -92,12 +111,24 @@ public class GameListener : IListener
 
     private void ShareRoles()
     {
-        foreach (var (player, role) in GameUtils.Data)
+        var writer = AmongUsClient.Instance.StartRpcImmediately(
+            PlayerControl.LocalPlayer.NetId, (byte)KnownRpc.ShareRoles, SendOption.Reliable);
+        writer.WritePacked(GameUtils.Data.Count);
+        foreach (var (key, value) in GameUtils.Data)
         {
-            Rpc<RoleShare>.Instance.Send(new RoleShare.Data(role), ackCallback: () =>
-            {
-                Main.Logger.LogInfo("Sent " + player.name + "'s role info to online players(" + role.GetType().Name + ")");
-            });
+            writer.Write(key.PlayerId);
+            writer.Write(value.GetType().Name);
+        }
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
+    }
+
+    public class RoleShare : InnerNetObject
+    {
+        public Dictionary<PlayerControl, Role.Role> Data { get; }
+        
+        public RoleShare(Dictionary<PlayerControl, Role.Role> data)
+        {
+            Data = data;
         }
     }
 

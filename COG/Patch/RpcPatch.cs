@@ -21,7 +21,6 @@ class RPCHandlerPatch
     [HarmonyPrefix]
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
-        Main.Logger.LogInfo(callId + "");
         foreach (var listener in ListenerManager.GetManager().GetListeners())
         {
             listener.OnRPCReceived(callId, reader);

@@ -7,7 +7,7 @@ namespace COG.Utils;
 
 public static class GameUtils
 {
-    public static readonly Dictionary<PlayerControl, Role.Role> Data = new();
+    public static Dictionary<PlayerControl, Role.Role> Data { get; internal set; } = new();
 
     /// <summary>
     /// 向游戏里面发送一条信息

@@ -30,6 +30,16 @@ public static class PlayerUtils
         writer.Write(false);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
+
+    public static PlayerControl? GetPlayerById(byte playerId)
+    {
+        foreach (var playerControl in GetAllPlayers())
+        {
+            if (playerControl.PlayerId == playerId) return playerControl;
+        }
+
+        return null;
+    }
     
     public static ClientData? GetClient(this PlayerControl player)
     {

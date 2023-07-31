@@ -9,6 +9,9 @@ public class Impostor : Role
 {
     public Impostor() : base(LanguageConfig.Instance.ImpostorName, Color.red, CampType.Impostor, true)
     {
+        CanKill = true;
+        CanVent = true;
+        CanSabotage = true;
         BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.ImpostorDescription;
     }
