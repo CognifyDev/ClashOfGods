@@ -11,7 +11,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Version>1.0.0-beta-004</Version>
+        <Version>1.0.0-beta-005</Version>
     </PropertyGroup>
 
     <ItemGroup>
