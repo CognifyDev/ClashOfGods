@@ -185,7 +185,7 @@ public class CustomButton
 
 #nullable enable
     // Static methods
-    public static void ResetAllCooldown() => CustomButtonManager.GetManager().GetButtons().ForEach(b => b.ResetCooldown();
+    public static void ResetAllCooldown() => CustomButtonManager.GetManager().GetButtons().ForEach(b => b.ResetCooldown());
 
     internal static void Init(HudManager hud)
     {
