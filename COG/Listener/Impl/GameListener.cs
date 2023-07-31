@@ -14,6 +14,8 @@ namespace COG.Listener.Impl;
 
 public class GameListener : IListener
 {
+    private static readonly List<IListener> RoleListeners = new();
+
     public void OnCoBegin()
     {
         GameStates.InGame = true;
@@ -71,6 +73,11 @@ public class GameListener : IListener
         foreach (var (player, value) in GameUtils.Data)
         {
             Main.Logger.LogInfo($"{player.name}({player.Data.FriendCode}) => {value.GetType().Name}");
+        }
+        
+        foreach (var (key, value) in GameUtils.Data)
+        {
+            RoleListeners.Add(value.GetListener(key));
         }
         
         ShareRoles();
@@ -191,7 +198,11 @@ public class GameListener : IListener
 
     public void OnGameEndSetEverythingUp(EndGameManager manager)
     {
-        
+        // 取消已经注册的Listener
+        foreach (var roleListener in RoleListeners)
+        {
+            ListenerManager.GetManager().UnregisterListener(roleListener);
+        }
     }
 
     public void OnKeyboardPass()
