@@ -23,7 +23,7 @@ class HudManagerPatch
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners())
         {
-            listener.OnHudUpdate();
+            listener.OnHudUpdate(__instance);
         }
     }
 }

@@ -63,7 +63,7 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
-
+/*
         var disabledVersion = WebUtils.GetWeb("https://among-us.top/disabledVersions").Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
@@ -86,7 +86,7 @@ public partial class Main : BasePlugin
                 Logger.LogError("Can not verify, please check!");
                 return;
             }
-        }
+        }*/
         
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
@@ -121,6 +121,7 @@ public partial class Main : BasePlugin
             // Crewmate
             new Crewmate(),
             new Bait(),
+            new Sheriff(),
             
             // Impostor
             new Impostor(),

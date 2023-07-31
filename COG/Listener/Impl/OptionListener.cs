@@ -35,7 +35,7 @@ public class OptionListener : IListener
         result = text;
     }
 
-    public void OnRPCReceived(byte callId, MessageReader reader)
+    public void AfterRPCReceived(byte callId, MessageReader reader)
     {
         if (AmongUsClient.Instance.AmHost) return;
         var knownRpc = (KnownRpc)callId;

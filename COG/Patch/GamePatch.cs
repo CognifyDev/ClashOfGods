@@ -1,6 +1,4 @@
 using COG.Listener;
-using COG.Listener.Impl;
-using HarmonyLib;
 using System.Linq;
 
 namespace COG.Patch;
@@ -106,5 +104,73 @@ class KeyboardPatch
         {
             listener.OnKeyboardPass();
         }
+    }
+}
+
+[HarmonyPatch(typeof(Vent), nameof(Vent.CanUse))]
+public static class PlayerVentPatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(Vent __instance,
+        [HarmonyArgument(0)] GameData.PlayerInfo playerInfo,
+        [HarmonyArgument(1)] ref bool canUse,
+        [HarmonyArgument(2)] ref bool couldUse,
+        ref float __result)
+    {
+        var returnAble = true;
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            if (!listener.OnPlayerVent(__instance, playerInfo, ref canUse, ref couldUse, ref __result))
+            {
+                returnAble = false;
+            }
+        }
+        return returnAble;
+    }
+}
+
+[HarmonyPatch(typeof(LogicGameFlowNormal), nameof(LogicGameFlowNormal.CheckEndCriteria))]
+class GameEndChecker
+{
+    [HarmonyPrefix]
+    public static bool Prefix()
+    {
+        var returnAble = true;
+        foreach (var unused in ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnCheckGameEnd()))
+        {
+            returnAble = false;
+        }
+
+        return returnAble;
+    }
+}
+
+[HarmonyPatch(typeof(GameManager), nameof(GameManager.CheckTaskCompletion))]
+class CheckTaskCompletionPatch
+{
+    public static bool Prefix(ref bool __result)
+    {
+        var returnAble = true;
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            if (!listener.OnCheckTaskCompletion(ref __result)) returnAble = false;
+        }
+
+        return returnAble;
+    }
+}
+
+[HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap))]
+class SabotageMapOpen
+{
+    private static bool Prefix(MapBehaviour __instance)
+    {
+        var returnAble = true;
+        foreach (var unused in ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnShowSabotageMap(__instance)))
+        {
+            returnAble = false;
+        }
+
+        return returnAble;
     }
 }

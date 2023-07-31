@@ -12,7 +12,7 @@ namespace COG.Listener.Impl
     {
         public void OnHudStart(HudManager hud) => CustomButton.Init(hud);
 
-        public void OnHudUpdate()
+        public void OnHudUpdate(HudManager manager)
         {
             foreach (var button in CustomButtonManager.GetManager().GetButtons())
             {

@@ -3,5 +3,5 @@
 public enum KnownRpc : uint
 {
     ShareRoles = 100,
-    ShareOptions = 101
+    ShareOptions = 101,
 }

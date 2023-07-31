@@ -59,6 +59,21 @@ public abstract class Role
     /// 自定义胜利
     /// </summary>
     public CustomWinner CustomWinner { get; protected set; }
+    
+    /// <summary>
+    /// 是否可以跳管
+    /// </summary>
+    public bool CanVent { get; protected set; }
+    
+    /// <summary>
+    /// 是否可以击杀
+    /// </summary>
+    public bool CanKill { get; protected set; }
+    
+    /// <summary>
+    /// 是否可以破坏
+    /// </summary>
+    public bool CanSabotage { get; protected set; }
 
     protected Role(string name, Color color, CampType campType, bool showInOptions)
     {
@@ -70,6 +85,9 @@ public abstract class Role
         RoleOptions = new();
         SubRole = false;
         CustomWinner = CustomWinner.Empty;
+        CanVent = false;
+        CanKill = false;
+        CanSabotage = false;
 
         ShowInOptions = showInOptions;
 

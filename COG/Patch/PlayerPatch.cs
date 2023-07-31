@@ -184,3 +184,19 @@ class FixedUpdatePatch
         }
     }
 }
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckMurder))]
+class CheckMurderPatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
+    {
+        var returnAble = true;
+        foreach (var unused in ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnCheckMurder(__instance, target)))
+        {
+            returnAble = false;
+        }
+
+        return returnAble;
+    }
+}

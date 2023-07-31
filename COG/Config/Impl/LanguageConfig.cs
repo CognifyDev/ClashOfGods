@@ -28,6 +28,9 @@ public class LanguageConfig : Config
     public string BaitName { get; private set; } = null!;
     public string BaitDescription { get; private set; } = null!;
 
+    public string SheriffName { get; private set; } = null!;
+    public string SheriffDescription { get; private set; } = null!;
+
     // Impostor
     public string ImpostorName { get; private set; } = null!;
     public string ImpostorDescription { get; private set; } = null!;
@@ -96,6 +99,9 @@ public class LanguageConfig : Config
 
             BaitName = GetString("role.crewmate.bait.name");
             BaitDescription = GetString("role.crewmate.bait.description");
+
+            SheriffName = GetString("role.crewmate.sheriff.name");
+            SheriffDescription = GetString("role.crewmate.sheriff.description");
             
             // Impostor
             ImpostorName = GetString("role.impostor.impostor.name");

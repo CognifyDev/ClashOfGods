@@ -6,6 +6,18 @@ namespace COG.Patch;
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
 class RPCHandlerPatch
 {
+    [HarmonyPostfix]
+    public static void Postfix(
+        PlayerControl __instance,
+        [HarmonyArgument(0)] byte callId,
+        [HarmonyArgument(1)] MessageReader reader)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.AfterRPCReceived(callId, reader);
+        }
+    }
+    
     [HarmonyPrefix]
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {

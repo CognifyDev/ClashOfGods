@@ -19,6 +19,12 @@ public class GameListener : IListener
     public void OnCoBegin()
     {
         GameStates.InGame = true;
+        Main.Logger.LogInfo("Game started!");
+
+        foreach (var (key, value) in GameUtils.Data)
+        {
+            RoleManager.Instance.SetRole(key, value.BaseRoleType);
+        }
     }
 
     public void OnSelectRoles()
@@ -64,8 +70,7 @@ public class GameListener : IListener
             {
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>()!;
             }
-
-            RoleManager.Instance.SetRole(player, role.BaseRoleType);
+            
             GameUtils.Data.Add(player, role);
         }
         
@@ -205,11 +210,85 @@ public class GameListener : IListener
         }
     }
 
+    public bool OnCheckGameEnd()
+    {
+        return false; // 不允许游戏结束
+    }
+
+    public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse, ref float cooldown)
+    {
+        foreach (var (key, value) in GameUtils.Data)
+        {
+            if (!key.Data.IsSamePlayer(playerInfo)) continue;
+            var ventAble = value.CanVent;
+            canUse = ventAble;
+            couldUse = ventAble;
+            cooldown = float.MaxValue;
+            return false;
+        }
+
+        return true;
+    }
+
+    public bool OnShowSabotageMap(MapBehaviour mapBehaviour)
+    {
+        var player = PlayerControl.LocalPlayer;
+        var role = player.GetRoleInstance();
+        if (player == null || role == null) return true;
+        if (!role.CanSabotage)
+        {
+            mapBehaviour.Close();
+            mapBehaviour.ShowNormalMap();
+            return false;
+        }
+        return true;
+    }
+
     public void OnKeyboardPass()
     {
         if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))
         {
-            GameStartManager.Instance.countDownTimer = 0;
+            GameStartManager.Instance.countDownTimer = 0.1f;
+        }
+    }
+
+    public void OnHudUpdate(HudManager manager)
+    {
+        var player = PlayerControl.LocalPlayer;
+        if (player == null) return;
+        var role = player.GetRoleInstance();
+        if (role == null) return;
+
+        if (role.CanKill)
+        {
+            manager.KillButton.ToggleVisible(true);
+            player.Data.Role.CanUseKillButton = true;
+        }
+        else
+        {
+            manager.KillButton.SetDisabled();
+            manager.KillButton.ToggleVisible(false);
+        }
+
+        if (role.CanVent)
+        {
+            manager.ImpostorVentButton.ToggleVisible(true);
+            player.Data.Role.CanVent = true;
+        }
+        else
+        {
+            manager.ImpostorVentButton.SetDisabled();
+            manager.ImpostorVentButton.ToggleVisible(false);
+        }
+
+        if (role.CanSabotage)
+        {
+            manager.SabotageButton.ToggleVisible(true);
+        }
+        else
+        {
+            manager.SabotageButton.SetDisabled();
+            manager.SabotageButton.ToggleVisible(false);
         }
     }
 }

@@ -17,14 +17,14 @@ public interface IListener
     /// <param name="killer">击杀玩家的玩家</param>
     /// <param name="target">被击杀的玩家</param>
     /// <returns>是否取消事件[false为取消]</returns>
-    bool OnPlayerMurder(PlayerControl killer, PlayerControl target) { return true; }
+    bool OnPlayerMurder(PlayerControl killer, PlayerControl target) => true;
 
     /// <summary>
     /// 当房主发送消息的时候，触发这个监听器
     /// </summary>
     /// <param name="controller">聊天控制器</param>
     /// <returns>是否取消事件[false为取消]</returns>
-    bool OnHostChat(ChatController controller) { return true; }
+    bool OnHostChat(ChatController controller) => true;
 
     /// <summary>
     /// 当普通玩家发送消息的时候，触发这个监听器
@@ -32,7 +32,7 @@ public interface IListener
     /// <param name="player">玩家</param>
     /// <param name="text">信息内容</param>
     /// <returns>是否取消事件[false为取消](?)</returns>
-    bool OnPlayerChat(PlayerControl player, string text) { return true; }
+    bool OnPlayerChat(PlayerControl player, string text) => true;
 
     /// <summary>
     /// 聊天更新的时候触发
@@ -63,12 +63,12 @@ public interface IListener
     /// </summary>
     /// <param name="manager"></param>
     /// <returns></returns>
-    bool OnMakePublic(GameStartManager manager) { return true; }
+    bool OnMakePublic(GameStartManager manager) => true;
 
     void OnPingTrackerUpdate(PingTracker tracker) { }
 
     bool OnSetUpRoleText(IntroCutscene intro,
-        ref Il2CppSystem.Collections.IEnumerator roles) { return true; }
+        ref Il2CppSystem.Collections.IEnumerator roles) => true;
     
     void OnSetUpTeamText(IntroCutscene intro,
         ref Il2CppSystem.Collections.Generic.List<PlayerControl> teamToDisplay) { }
@@ -101,11 +101,23 @@ public interface IListener
 
     void OnHudStart(HudManager hud) { }
 
-    void OnHudUpdate() { }
+    void OnHudUpdate(HudManager manager) { }
     
     void AfterPlayerFixedUpdate(PlayerControl player) { }
 
     void OnGameEnd(AmongUsClient client, ref EndGameResult endGameResult) { }
     
     void OnKeyboardPass () { }
+
+    bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse, ref float cooldown) => true;
+
+    bool OnCheckGameEnd() => true;
+
+    bool OnCheckTaskCompletion(ref bool allow) => true;
+
+    bool OnShowSabotageMap(MapBehaviour mapBehaviour) => true;
+
+    bool OnCheckMurder(PlayerControl killer, PlayerControl target) => true;
+    
+    void AfterRPCReceived(byte callId, MessageReader reader) { }
 }
