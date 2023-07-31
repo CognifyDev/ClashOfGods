@@ -11,7 +11,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Version>1.0.0-beta-003</Version>
+        <Version>1.0.0-beta-004</Version>
     </PropertyGroup>
 
     <ItemGroup>
@@ -39,6 +39,10 @@
 
     <ItemGroup>
         <PackageReference Include="GitInfo" Version="2.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Game\" />
     </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">

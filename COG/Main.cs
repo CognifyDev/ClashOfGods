@@ -97,8 +97,7 @@ public partial class Main : BasePlugin
             new PlayerListener(),
             new OptionListener(),
             new ModOptionListener(),
-            new CustomButtonListener(),
-            new WinnerListener()
+            new CustomButtonListener()
         });
 
         // Register sidebar texts

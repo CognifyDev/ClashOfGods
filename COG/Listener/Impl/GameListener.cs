@@ -15,11 +15,11 @@ namespace COG.Listener.Impl;
 public class GameListener : IListener
 {
     private static readonly List<IListener> RoleListeners = new();
-    private static bool ForceStarted;
+    // private static bool _forceStarted;
 
     public void OnCoBegin()
     {
-        ForceStarted = false;
+        // _forceStarted = false;
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
 
@@ -210,10 +210,33 @@ public class GameListener : IListener
         {
             ListenerManager.GetManager().UnregisterListener(roleListener);
         }
+        RoleListeners.Clear();
     }
 
     public bool OnCheckGameEnd()
     {
+        var aliveImpostors = new List<PlayerControl>();
+        foreach (var (key, value) in GameUtils.Data)
+        {
+            if (value.CampType == CampType.Impostor) aliveImpostors.Add(key);
+        }
+
+        if (PlayerUtils.GetAllAlivePlayers().Count <= 1)
+        {
+            TempData.winners.Clear();
+            return true;
+        }
+
+        if (aliveImpostors.Count >= PlayerUtils.GetAllAlivePlayers().Count)
+        {
+            TempData.winners.Clear();
+            foreach (var aliveImpostor in aliveImpostors)
+            {
+                TempData.winners.Add(new WinningPlayerData(aliveImpostor.Data));
+            }
+            return true;
+        }
+
         return false; // 不允许游戏结束
     }
 
@@ -234,16 +257,30 @@ public class GameListener : IListener
 
     public void OnKeyboardPass()
     {
-        if ((!Input.GetKey(KeyCode.RightShift) && !Input.GetKey(KeyCode.LeftShift)) || ForceStarted) return;
-        ForceStarted = true;
-        GameStartManager.Instance.countDownTimer = 0.1f;
+        // 有BUG 暂时不用
+        /*
+        if (GameStates.InGame || !GameStates.IsLobby || GameStates.IsMeeting || GameStates.IsVoting || GameStates.IsInTask) return;
+        if (GameStartManager.Instance.startState != GameStartManager.StartingStates.Countdown) return;
+        if (_forceStarted) return;
+        if ((!Input.GetKey(KeyCode.RightShift) && !Input.GetKey(KeyCode.LeftShift)) || _forceStarted) return;
+        _forceStarted = true;
+        GameStartManager.Instance.countDownTimer = 1f;
+        */
     }
 
     public void OnHudUpdate(HudManager manager)
     {
         var player = PlayerControl.LocalPlayer;
         if (player == null) return;
-        var role = player.GetRoleInstance();
+        Role.Role? role;
+        try
+        {
+            role = player.GetRoleInstance();
+        }
+        catch
+        {
+            return;
+        }
         if (role == null) return;
 
         if (role.CanKill)

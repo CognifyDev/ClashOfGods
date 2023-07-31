@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.UI.CustomButtons;
 using COG.UI.CustomOption;
@@ -54,12 +53,7 @@ public abstract class Role
     /// 在选项中显示
     /// </summary>
     public bool ShowInOptions { get; }
-    
-    /// <summary>
-    /// 自定义胜利
-    /// </summary>
-    public CustomWinner CustomWinner { get; protected set; }
-    
+
     /// <summary>
     /// 是否可以跳管
     /// </summary>
@@ -84,7 +78,6 @@ public abstract class Role
         BaseRoleType = RoleTypes.Crewmate;
         RoleOptions = new();
         SubRole = false;
-        CustomWinner = CustomWinner.Empty;
         CanVent = false;
         CanKill = false;
         CanSabotage = false;
