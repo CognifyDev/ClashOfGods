@@ -1,3 +1,4 @@
+using System.Linq;
 using COG.Listener;
 
 namespace COG.Patch;
@@ -5,10 +6,10 @@ namespace COG.Patch;
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
 class RPCHandlerPatch
 {
-    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId,
-        [HarmonyArgument(1)] MessageReader reader)
+    [HarmonyPrefix]
+    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
-        
+        Main.Logger.LogInfo(callId + "");
         foreach (var listener in ListenerManager.GetManager().GetListeners())
         {
             listener.OnRPCReceived(callId, reader);
@@ -20,19 +21,15 @@ class RPCHandlerPatch
         {
             case RpcCalls.SendChat:
                 var text = subReader.ReadString();
-                bool returnAble = false;
-                foreach (var listener in ListenerManager.GetManager().GetListeners())
+                var returnAble = false;
+                foreach (var unused in ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnPlayerChat(__instance, text) && !returnAble))
                 {
-                    if (!listener.OnPlayerChat(__instance, text) && !returnAble)
-                    {
-                        returnAble = true;
-                    }
+                    returnAble = true;
                 }
 
                 if (returnAble) return false;
                 break;
         }
-
         return true;
     }
 }

@@ -196,7 +196,7 @@ public class GameListener : IListener
 
     public void OnKeyboardPass()
     {
-        if (Input.GetKey(KeyCode.KeypadEnter))
+        if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))
         {
             GameStartManager.Instance.countDownTimer = 0;
         }
