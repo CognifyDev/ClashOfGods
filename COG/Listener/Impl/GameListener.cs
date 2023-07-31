@@ -15,9 +15,11 @@ namespace COG.Listener.Impl;
 public class GameListener : IListener
 {
     private static readonly List<IListener> RoleListeners = new();
+    private static bool ForceStarted;
 
     public void OnCoBegin()
     {
+        ForceStarted = false;
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
 
@@ -230,26 +232,11 @@ public class GameListener : IListener
         return true;
     }
 
-    public bool OnShowSabotageMap(MapBehaviour mapBehaviour)
-    {
-        var player = PlayerControl.LocalPlayer;
-        var role = player.GetRoleInstance();
-        if (player == null || role == null) return true;
-        if (!role.CanSabotage)
-        {
-            mapBehaviour.Close();
-            mapBehaviour.ShowNormalMap();
-            return false;
-        }
-        return true;
-    }
-
     public void OnKeyboardPass()
     {
-        if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))
-        {
-            GameStartManager.Instance.countDownTimer = 0.1f;
-        }
+        if ((!Input.GetKey(KeyCode.RightShift) && !Input.GetKey(KeyCode.LeftShift)) || ForceStarted) return;
+        ForceStarted = true;
+        GameStartManager.Instance.countDownTimer = 0.1f;
     }
 
     public void OnHudUpdate(HudManager manager)
@@ -263,32 +250,38 @@ public class GameListener : IListener
         {
             manager.KillButton.ToggleVisible(true);
             player.Data.Role.CanUseKillButton = true;
+            manager.KillButton.gameObject.SetActive(true);
         }
         else
         {
             manager.KillButton.SetDisabled();
             manager.KillButton.ToggleVisible(false);
+            manager.KillButton.gameObject.SetActive(false);
         }
 
         if (role.CanVent)
         {
             manager.ImpostorVentButton.ToggleVisible(true);
             player.Data.Role.CanVent = true;
+            manager.ImpostorVentButton.gameObject.SetActive(true);
         }
         else
         {
             manager.ImpostorVentButton.SetDisabled();
             manager.ImpostorVentButton.ToggleVisible(false);
+            manager.ImpostorVentButton.gameObject.SetActive(false);
         }
 
         if (role.CanSabotage)
         {
             manager.SabotageButton.ToggleVisible(true);
+            manager.SabotageButton.gameObject.SetActive(true);
         }
         else
         {
             manager.SabotageButton.SetDisabled();
             manager.SabotageButton.ToggleVisible(false);
+            manager.SabotageButton.gameObject.SetActive(false);
         }
     }
 }
