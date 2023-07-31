@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
@@ -47,10 +48,9 @@ public class CustomButton
     /// <param name="hotkey">按钮的热键</param>
     /// <param name="text">按钮的文本</param>
     /// <param name="cooldown">按钮的冷却</param>
-    /// <param name="hud">HudManager 的实例</param>
     /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
     /// <param name="hotkeyName">热键名称（留空为自动取名，如果无热键则没有名称）</param>
-    public CustomButton(Action onClick, Action onMeetingEnd, Action? onEffect, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime, HudManager hud, int usesLimit, string hotkeyName = "")
+    public CustomButton(Action onClick, Action onMeetingEnd, Action? onEffect, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime, int usesLimit, string hotkeyName = "")
     {
         OnClick = onClick;
         OnMeetingEnd = onMeetingEnd;
@@ -64,7 +64,6 @@ public class CustomButton
         HasEffect = hasEffect;
         Cooldown = cooldown;
         EffectTime = effectTime;
-        Hud = hud;
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
     }
@@ -184,20 +183,17 @@ public class CustomButton
         }
     }
 
-    #nullable enable
+#nullable enable
     // Static methods
-    public static void ResetAllCooldown()
-    {
-        foreach (var button in CustomButtonManager.GetManager().GetButtons())
-            button.ResetCooldown();
-    }
+    public static void ResetAllCooldown() => CustomButtonManager.GetManager().GetButtons().ForEach(b => b.ResetCooldown());
 
     internal static void Init(HudManager hud)
     {
         foreach(var button in CustomButtonManager.GetManager().GetButtons())
         {
             button.ActionButton = Object.Instantiate(hud.AbilityButton, hud.AbilityButton.transform.parent);
-                
+
+            button.Hud = hud;
             button.SpriteRenderer = button.ActionButton.graphic;
             button.SpriteRenderer.sprite = button.Sprite;
 
@@ -213,14 +209,14 @@ public class CustomButton
             button.PassiveButton = button.ActionButton.GetComponent<PassiveButton>();
             button.TextMesh = button.ActionButton.buttonLabelText;
             button.TextMesh.text = button.Text;
+            var tm = button.TextMesh;
+            tm.fontSizeMax = tm.fontSizeMin = tm.fontSize;
             button.PassiveButton.OnClick = new();
 
-            void Action()
-            {
-                button.CheckClick();
-            }
+            void Action() => button.CheckClick();
+            
 
-            button.PassiveButton.OnClick.AddListener((UnityAction) (Action?)Action);
+            button.PassiveButton.OnClick.AddListener((UnityAction)Action);
             button.SetActive(false);
         }
     }
