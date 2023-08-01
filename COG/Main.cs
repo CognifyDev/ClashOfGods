@@ -64,7 +64,8 @@ public partial class Main : BasePlugin
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
 
-        var disabledVersion = WebUtils.GetWeb("https://among-us.top/disabledVersions").Split("|");
+        /*
+         *var disabledVersion = WebUtils.GetWeb("https://among-us.top/disabledVersions").Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
             Logger.LogError("The version of the mod has been disabled!");
@@ -87,6 +88,8 @@ public partial class Main : BasePlugin
                 return;
             }
         }
+         * 
+         */
         
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]

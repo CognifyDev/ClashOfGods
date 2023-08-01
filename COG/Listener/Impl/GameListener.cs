@@ -31,6 +31,8 @@ public class GameListener : IListener
 
     public void OnRPCReceived(byte callId, MessageReader reader)
     {
+        Main.Logger.LogInfo("Received rpc " + callId + " Length => " + reader.Length);
+        
         var knownRpc = (KnownRpc)callId;
         if (knownRpc != KnownRpc.ShareRoles) return;
         var roleData = reader.ReadPackedInt32();
@@ -46,6 +48,14 @@ public class GameListener : IListener
         }
 
         GameUtils.Data = data;
+    }
+
+    public void AfterPlayerFixedUpdate(PlayerControl player)
+    {
+        GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
+        GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Engineer, 0, 0);
+        GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
+        GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
     }
 
     public void OnSelectRoles()
@@ -105,8 +115,6 @@ public class GameListener : IListener
         {
             RoleListeners.Add(value.GetListener(key));
         }
-        
-        ShareRoles();
     }
 
     private void ShareRoles()
