@@ -90,7 +90,6 @@ public partial class Main : BasePlugin
         }
          * 
          */
-        
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
@@ -100,7 +99,8 @@ public partial class Main : BasePlugin
             new PlayerListener(),
             new OptionListener(),
             new ModOptionListener(),
-            new CustomButtonListener()
+            new CustomButtonListener(),
+            new RpcListener()
         });
 
         // Register sidebar texts

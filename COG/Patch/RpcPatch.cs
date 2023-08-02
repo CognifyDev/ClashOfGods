@@ -7,12 +7,9 @@ namespace COG.Patch;
 class RPCHandlerPatch
 {
     [HarmonyPostfix]
-    public static void Postfix(
-        PlayerControl __instance,
-        [HarmonyArgument(0)] byte callId,
-        [HarmonyArgument(1)] MessageReader reader)
+    public static void Postfix([HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
         {
             listener.AfterRPCReceived(callId, reader);
         }
