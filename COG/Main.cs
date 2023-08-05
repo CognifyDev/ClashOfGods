@@ -5,6 +5,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
+using COG.Command;
+using COG.Command.Impl;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
@@ -143,6 +145,12 @@ public partial class Main : BasePlugin
                     UnityEngine.Application.Quit();
                     return false;
                 }, false)
+        });
+        
+        // Register Commands
+        CommandManager.GetManager().RegisterCommands(new Command.Command[]
+        {
+            new RpcCommand()
         });
 
         Harmony.PatchAll();
