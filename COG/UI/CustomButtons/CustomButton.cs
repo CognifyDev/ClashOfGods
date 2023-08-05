@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
@@ -76,9 +75,6 @@ public class CustomButton
         return new(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text, false, cooldown, effectTime, usesLimit, hotkeyName);
     }
 
-    /// <summary>
-    /// 用来实例化，没有这玩意出大问题
-    /// </summary>
     public CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime, int usesLimit, string hotkeyName)
     {
         OnClick = onClick;
@@ -96,7 +92,14 @@ public class CustomButton
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
     }
+
+    /// <summary>
+    /// 给按钮先实例化用，如
+    /// CustomButton btn = new();   
+    /// btn = CustomButton.Create(/*Code here...*/);
+    /// </summary>
     public CustomButton() { }
+
     // Position from The Other Roles
     // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Objects/CustomButton.cs#L40
     public static class ButtonPositions
