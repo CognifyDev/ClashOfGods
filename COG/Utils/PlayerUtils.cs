@@ -67,8 +67,4 @@ public static class PlayerUtils
         return !player.Data.IsDead;
     }
 
-    public static void RpcVaporize(this PlayerControl player, PlayerControl target)
-    {
-    }
-
 }
