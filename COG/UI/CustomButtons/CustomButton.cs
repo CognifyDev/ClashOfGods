@@ -95,18 +95,17 @@ public class CustomButton
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
     }
-    public CustomButton() { }
     // Position from The Other Roles
     // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Objects/CustomButton.cs#L40
     public static class ButtonPositions
     {
-        public static readonly Vector3 LowerRowRight = new(-2f, -0.06f, 0);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f, 0);
-        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f, 0);
-        public static readonly Vector3 UpperRowRight = new(0f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 UpperRowCenter = new(-1f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 UpperRowLeft = new(-2f, 1f, 0f);
-        public static readonly Vector3 UpperRowFarLeft = new(-3f, 1f, 0f);
+        public static readonly Vector3 LowerRowRight = new(-2f, -0.06f， 0);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f， 0);
+        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f， 0);
+        public static readonly Vector3 UpperRowRight = new(0f， 1f， 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowCenter = new(-1f， 1f， 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowLeft = new(-2f， 1f， 0f);
+        public static readonly Vector3 UpperRowFarLeft = new(-3f， 1f， 0f);
     }
 
     /// <summary>
@@ -120,13 +119,13 @@ public class CustomButton
     // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Objects/CustomButton.cs#L40
     public static class ButtonPositions
     {
-        public static readonly Vector3 LowerRowRight = new(-2f, -0.06f, 0);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f, 0);
-        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f, 0);
-        public static readonly Vector3 UpperRowRight = new(0f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 UpperRowCenter = new(-1f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 UpperRowLeft = new(-2f, 1f, 0f);
-        public static readonly Vector3 UpperRowFarLeft = new(-3f, 1f, 0f);
+        public static readonly Vector3 LowerRowRight = new(-2f, -0.06f， 0);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f， 0);
+        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f， 0);
+        public static readonly Vector3 UpperRowRight = new(0f， 1f， 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowCenter = new(-1f， 1f， 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowLeft = new(-2f， 1f， 0f);
+        public static readonly Vector3 UpperRowFarLeft = new(-3f， 1f， 0f);
     }
 
     public void SetActive(bool active)
