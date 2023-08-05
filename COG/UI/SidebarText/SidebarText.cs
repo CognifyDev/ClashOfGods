@@ -35,7 +35,7 @@ public class SidebarText
             text += parent.Name + Environment.NewLine;
             SetOptions:
             if (customOption.Name.Equals("") || customOption.Name.Equals(" ")) continue;
-            text += ColorUtils.ToAmongUsColorString(Color.gray, "→ ") + customOption.Name + Environment.NewLine;
+            text += ColorUtils.ToColorString(Color.gray, "→ ") + customOption.Name + Environment.NewLine;
         }
 
         return text;
