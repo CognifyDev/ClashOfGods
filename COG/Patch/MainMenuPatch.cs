@@ -27,6 +27,7 @@ public static class MainMenuPatch
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.2f, 0.38f),
             LanguageConfig.Instance.Github,
             () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); }, Color.blue);
+
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.7f, 0.38f),
             LanguageConfig.Instance.QQ,
             () =>
@@ -34,13 +35,15 @@ public static class MainMenuPatch
                 Application.OpenURL(
                     "https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R63D8foTESsZ9TmGFbkaSPix0q9WGwtq&authKey=1rfvioSJhdni%2BpFvBqS5rFXkZKXNDeeFO50ZKGPzwtlLKwmJqftlDcolx%2FkJ3jLC&noverify=0&group_code=607761127");
             }, Color.cyan);
+
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f),
             LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); },
             Color.gray);
+
         if (Main.BetaVersion)
             CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
-                LanguageConfig.Instance.BetaVersionRegisteredUserDisplay.Replace("%registered-num%",
-                    Main.RegisteredBetaUsers.Count + ""), () => { }, Color.yellow);
+                LanguageConfig.Instance.BetaVersionRegisteredUserDisplay.CustomFormat(Main.RegisteredBetaUsers.Count),
+                () => { }, Color.yellow);
     }
 
     /// <summary>

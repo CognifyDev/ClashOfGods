@@ -1,9 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
+using COG.Listener;
+using COG.Role.Impl.Crewmate;
+using COG.Role;
 using InnerNet;
+using UnityEngine;
 using GameStates = COG.States.GameStates;
+using System;
 
 namespace COG.Utils;
+
+public enum ColorType
+{
+    Unknown = -1,
+    Light,
+    Dark,
+}
 
 public static class PlayerUtils
 {
@@ -76,5 +88,93 @@ public static class PlayerUtils
         if (GameStates.IsLobby) return true;
         if (player == null) return false;
         return !player.Data.IsDead;
+    }
+
+    public static bool IsRole(this PlayerControl player, Role.Role role) => player.GetRoleInstance() == role;
+
+    public static DeadBody? GetClosestBody(List<DeadBody> untargetable)
+    {
+        DeadBody? result = null;
+
+        float num = PlayerControl.LocalPlayer.MaxReportDistance;
+        if (!ShipStatus.Instance) return null;
+        var position = PlayerControl.LocalPlayer.GetTruePosition();
+
+        foreach (var body in GameObject.FindObjectsOfType<DeadBody>().Where(b => !untargetable.Contains(b)))
+        {
+            var vector = body.TruePosition - position;
+            float magnitude = vector.magnitude;
+            if (magnitude <= num && !PhysicsHelpers.AnyNonTriggersBetween(position, vector.normalized, magnitude, Constants.ShipAndObjectsMask))
+            {
+                result = body;
+                num = magnitude;
+            }
+        }
+        return result;
+    }
+
+    public static ColorType GetColorType(this PlayerControl player) => player.cosmetics.ColorId switch
+    {
+        0 or 3 or 4 or 5 or 7 or 10 or 11 or 13 or 14 or 17 => ColorType.Light,
+        1 or 2 or 6 or 8 or 9 or 12 or 15 or 16 or 18 => ColorType.Dark,
+        _ => ColorType.Unknown
+    };
+}
+
+
+
+
+public enum DeathReason
+{
+    Unknown = -1,
+    Default,
+    Misfire,
+    BySheriffKill,
+}
+
+public class DeadPlayerManager : IListener
+{
+    public static List<DeadPlayer> DeadPlayers { get; private set; } = new();
+
+    public class DeadPlayer
+    {
+        public DateTime DeadTime { get; private set; }
+        public DeathReason? DeathReason { get; private set; }
+        public PlayerControl Player { get; private set; }
+        public PlayerControl Killer { get; private set; }
+        public Role.Role? Role { get; private set; }
+        public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl killer)
+        {
+            DeadTime = deadTime;
+            DeathReason = deathReason;
+            Player = player;
+            Killer = killer;
+            Role = player.GetRoleInstance();
+            DeadPlayers.Add(this);
+        }
+
+        //先这样，以后再改，反正暂时用不着
+        public override string ToString() => Player + " was killed by " + Killer;
+    }
+
+    public void OnMurderPlayer(PlayerControl killer, PlayerControl target)
+    {
+        if (!(target.Data.IsDead && killer && target)) return;
+
+        var reason = GetDeathReason(killer, target);
+        new DeadPlayer(DateTime.Now, reason, target, killer);
+    }
+    public void OnCoBegin() => DeadPlayers.Clear();
+    
+
+    private static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
+    {
+        try
+        {
+            if (killer == target && killer.IsRole(Sheriff.Instance)) return DeathReason.Misfire;
+            if (killer != target && killer.IsRole(Sheriff.Instance) && target.GetRoleInstance()!.CampType != CampType.Crewmate) return DeathReason.BySheriffKill;
+            return DeathReason.Default;
+        }
+        catch { return DeathReason.Unknown; }
     }
 }

@@ -59,7 +59,7 @@ public class CustomOption
         object defaultValue, CustomOption? parent, bool isHeader)
     {
         ID = id;
-        Name = parent == null ? name : ColorUtils.ToAmongUsColorString(Color.gray, "→ ") + name;
+        Name = parent == null ? name : ColorUtils.ToColorString(Color.gray, "→ ") + name;
         Selections = selections;
         var index = Array.IndexOf(selections, defaultValue);
         DefaultSelection = index >= 0 ? index : 0;

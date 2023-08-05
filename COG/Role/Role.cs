@@ -32,12 +32,16 @@ public abstract class Role
         if (ShowInOptions)
         {
             var option = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
-                ColorUtils.ToAmongUsColorString(Color, Name), false, null, true);
+                ColorUtils.ToColorString(Color, Name), false, null, true);
             RoleOptions.Add(option);
             RoleOptions.Add(CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
                 LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, option));
         }
+        
+        Instance = this;
     }
+
+    public static Role Instance { get; protected set; }
 
     /// <summary>
     ///     角色颜色

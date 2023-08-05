@@ -5,7 +5,7 @@ namespace COG.Utils;
 
 public class ColorUtils
 {
-    public static string ToAmongUsColorString(Color color, string str)
+    public static string ToColorString(Color color, string str)
     {
         return
             $"<color=#{ToByte(color.r):X2}{ToByte(color.g):X2}{ToByte(color.b):X2}{ToByte(color.a):X2}>{str}</color>";
