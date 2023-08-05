@@ -118,23 +118,20 @@ public class CustomOption
 
         var localPlayer = PlayerControl.LocalPlayer;
         
-        foreach (var playerControl in PlayerUtils.GetAllPlayers())
-        {
-            // 新建写入器
-            var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions, SendOption.Reliable, playerControl.GetClientID());
+        // 新建写入器
+        var writer = RpcUtils.StartRpcImmediately(localPlayer, (byte)KnownRpc.ShareOptions);
 
-            var options = WriteOptionsToByteArray();
+        var options = WriteOptionsToByteArray();
         
-            writer.Write(options.Length);
+        writer.Write(options.Length);
         
-            foreach (var option in options)
-            {
-                writer.Write(option);
-            }
-        
-            // OK 现在进行一个结束
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
+        foreach (var option in options)
+        {
+            writer.Write(option);
         }
+        
+        // OK 现在进行一个结束
+        writer.Finish();
 
         /*
         return;

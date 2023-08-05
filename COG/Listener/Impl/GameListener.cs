@@ -119,18 +119,14 @@ public class GameListener : IListener
 
     private void ShareRoles()
     {
-        foreach (var playerControl in PlayerUtils.GetAllPlayers())
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
+        writer.WritePacked(GameUtils.Data.Count);
+        foreach (var (key, value) in GameUtils.Data)
         {
-            var writer = AmongUsClient.Instance.StartRpcImmediately(
-                PlayerControl.LocalPlayer.NetId, (byte)KnownRpc.ShareRoles, SendOption.Reliable, playerControl.GetClientID());
-            writer.WritePacked(GameUtils.Data.Count);
-            foreach (var (key, value) in GameUtils.Data)
-            {
-                writer.Write(key.PlayerId);
-                writer.Write(value.GetType().Name);
-            }
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            writer.Write(key.PlayerId);
+            writer.Write(value.GetType().Name);
         }
+        writer.Finish();
     }
 
     public class RoleShare : InnerNetObject
