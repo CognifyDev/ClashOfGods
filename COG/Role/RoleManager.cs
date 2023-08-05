@@ -8,19 +8,17 @@ public class RoleManager
 {
     private static readonly RoleManager Manager = new();
 
+    private readonly List<Role> _roles = new();
+
     public Role[] GetTypeCampRoles(CampType campType)
     {
         var list = new List<Role>();
         foreach (var role in _roles)
-        {
             if (role.CampType == campType && role.RoleOptions[0].GetBool())
                 list.Add(role);
-        }
 
         return list.ToArray();
     }
-
-    private readonly List<Role> _roles = new();
 
     public void RegisterRole(Role role)
     {
@@ -30,9 +28,8 @@ public class RoleManager
     public Role? GetTypeRoleInstance<T>()
     {
         foreach (var role in _roles)
-        {
-            if (role is T) return role;
-        }
+            if (role is T)
+                return role;
 
         return null;
     }
@@ -53,12 +50,17 @@ public class RoleManager
     }
 
     /// <summary>
-    /// 获取一个新的获取器
+    ///     获取一个新的获取器
     /// </summary>
     /// <returns>获取器实例</returns>
     public RoleGetter NewGetter()
     {
         return new RoleGetter();
+    }
+
+    public static RoleManager GetManager()
+    {
+        return Manager;
     }
 
     public class RoleGetter : IGetter<Role?>
@@ -68,13 +70,11 @@ public class RoleManager
 
         internal RoleGetter()
         {
-            foreach (var role in GetManager().GetRoles().Where(role => role.ShowInOptions && role.RoleOptions[0].GetBool()))
+            foreach (var role in GetManager().GetRoles()
+                         .Where(role => role.ShowInOptions && role.RoleOptions[0].GetBool()))
             {
                 var times = (int)role.RoleOptions[1].GetFloat();
-                for (var i = 0; i < times; i++)
-                {
-                    _roles.Add(role);
-                }
+                for (var i = 0; i < times; i++) _roles.Add(role);
             }
 
             _roles.Disarrange();
@@ -92,10 +92,5 @@ public class RoleManager
         {
             return _selection < _roles.Count;
         }
-    }
-
-    public static RoleManager GetManager()
-    {
-        return Manager;
     }
 }

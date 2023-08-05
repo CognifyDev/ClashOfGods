@@ -11,7 +11,7 @@ public class OriginalSettings : SidebarText
     public override void ForResult(ref string result)
     {
         Objects.Clear();
-        Objects.AddRange(new []
+        Objects.AddRange(new[]
         {
             result
         });

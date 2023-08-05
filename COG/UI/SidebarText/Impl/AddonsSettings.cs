@@ -8,11 +8,11 @@ public class AddonsSettings : SidebarText
     public AddonsSettings() : base(LanguageConfig.Instance.SidebarTextAddons)
     {
     }
-    
+
     public override void ForResult(ref string result)
     {
         Objects.Clear();
-        Objects.AddRange(new []
+        Objects.AddRange(new[]
         {
             HudStringPatch.GetOptByType(CustomOption.CustomOption.CustomOptionType.Addons)
         });

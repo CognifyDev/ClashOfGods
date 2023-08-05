@@ -4,9 +4,9 @@ public static class ServerPath
 {
     [HarmonyPatch(typeof(ServerManager), nameof(ServerManager.LoadServers))]
     [HarmonyPostfix]
-    static void AddServer(ServerManager __instance)
+    private static void AddServer(ServerManager __instance)
     {
-        IRegionInfo[] regionInfos = new IRegionInfo[]
+        IRegionInfo[] regionInfos =
         {
             CreateRegionInfo("au-sh.pafyx.top", "梦服上海(新)", 22000),
             CreateRegionInfo("au-as.duikbo.at", "Modded Asia (MAS)", 443, true),
@@ -14,11 +14,11 @@ public static class ServerPath
             CreateRegionInfo("au-eu.duikbo.at", "Modded EU (MEU)", 443, true),
             CreateRegionInfo("server.among-us.top", "Commandf1's Server", 443, true)
         };
-        
+
         regionInfos.Do(__instance.AddOrUpdateRegion);
     }
 
-    static IRegionInfo CreateRegionInfo(string name, string ip, ushort port, bool isHttps = false)
+    private static IRegionInfo CreateRegionInfo(string name, string ip, ushort port, bool isHttps = false)
     {
         var serverIp = isHttps ? "https://" : "http://" + ip;
         var serverInfo = new ServerInfo(name, serverIp, port, false);

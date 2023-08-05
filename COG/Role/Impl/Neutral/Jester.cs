@@ -9,7 +9,7 @@ namespace COG.Role.Impl.Neutral;
 public class Jester : Role, IListener
 {
     private PlayerControl? _player;
-    
+
     public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral, true)
     {
         Description = LanguageConfig.Instance.JesterDescription;
@@ -28,24 +28,16 @@ public class Jester : Role, IListener
         var allowReportDeadBodyOption = RoleOptions[3];
         var result1 = allowStartMeetingOption.GetBool();
         var result2 = allowReportDeadBodyOption.GetBool();
-        if (!result1 && playerControl.IsSamePlayer(_player!) && target == null)
-        {
-            return false;
-        }
+        if (!result1 && playerControl.IsSamePlayer(_player!) && target == null) return false;
 
         return result2 || playerControl.IsSamePlayer(_player!) || target == null;
-    }
-
-    private bool CheckNull()
-    {
-        return _player == null;
     }
 
     public void OnPlayerExile(ExileController controller)
     {
         if (CheckNull()) return;
         if (!controller.exiled.IsSamePlayer(_player!.Data)) return;
-        
+
         TempData.winners.Clear();
         TempData.winners.Add(new WinningPlayerData(_player.Data));
         GameManager.Instance.EndGame();
@@ -54,6 +46,11 @@ public class Jester : Role, IListener
     public void OnAirshipPlayerExile(AirshipExileController controller)
     {
         OnPlayerExile(controller);
+    }
+
+    private bool CheckNull()
+    {
+        return _player == null;
     }
 
     public override IListener GetListener(PlayerControl player)

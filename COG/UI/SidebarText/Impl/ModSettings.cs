@@ -8,11 +8,11 @@ public class ModSettings : SidebarText
     public ModSettings() : base(LanguageConfig.Instance.SidebarTextMod)
     {
     }
-    
+
     public override void ForResult(ref string result)
     {
         Objects.Clear();
-        Objects.AddRange(new []
+        Objects.AddRange(new[]
         {
             HudStringPatch.GetOptByType(CustomOption.CustomOption.CustomOptionType.General)
         });

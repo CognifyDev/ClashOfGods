@@ -4,11 +4,14 @@ namespace COG.UI.ModOption;
 
 public class ModOptionManager
 {
-    private static ModOptionManager _manager = new();
+    private static readonly ModOptionManager _manager = new();
     private readonly List<ModOption> Options = new();
 
-    public static ModOptionManager GetManager() => _manager;
-    
+    public static ModOptionManager GetManager()
+    {
+        return _manager;
+    }
+
     public void RegisterModOption(ModOption option)
     {
         Options.Add(option);
@@ -19,5 +22,8 @@ public class ModOptionManager
         Options.AddRange(options);
     }
 
-    public List<ModOption> GetOptions() => Options;
+    public List<ModOption> GetOptions()
+    {
+        return Options;
+    }
 }

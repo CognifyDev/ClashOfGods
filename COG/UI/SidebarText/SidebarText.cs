@@ -7,17 +7,19 @@ namespace COG.UI.SidebarText;
 
 public class SidebarText
 {
-    public string Title { get; protected set; }
-    
-    public List<string> Objects { get; protected set; }
-
     public SidebarText(string title)
     {
         Title = title;
-        Objects = new();
+        Objects = new List<string>();
     }
-    
-    public virtual void ForResult(ref string result) {}
+
+    public string Title { get; protected set; }
+
+    public List<string> Objects { get; protected set; }
+
+    public virtual void ForResult(ref string result)
+    {
+    }
 
     public static string GetOptionMessage(CustomOption.CustomOption.CustomOptionType type)
     {

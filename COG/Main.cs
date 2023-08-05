@@ -1,9 +1,9 @@
 ﻿global using Hazel;
 global using HarmonyLib;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using BepInEx;
+using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using COG.Command;
 using COG.Command.Impl;
@@ -21,6 +21,7 @@ using COG.Utils;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
+using UnityEngine;
 
 namespace COG;
 
@@ -38,18 +39,18 @@ public partial class Main : BasePlugin
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string PluginVersion = "1.0.0-BETA";
-    public Harmony Harmony { get; } = new(PluginGuid);
     public const string DisplayName = "ClashOfGods";
 
-    public static BepInEx.Logging.ManualLogSource Logger = null!;
+    public static ManualLogSource Logger = null!;
+    public Harmony Harmony { get; } = new(PluginGuid);
 
     public static List<string> RegisteredBetaUsers { get; private set; } = new();
-    public static bool BetaVersion { get; private set; } = false;
+    public static bool BetaVersion { get; private set; }
 
     public static Main Instance { get; private set; } = null!;
-    
+
     /// <summary>
-    /// 插件的启动方法
+    ///     插件的启动方法
     /// </summary>
     public override void Load()
     {
@@ -89,7 +90,7 @@ public partial class Main : BasePlugin
                 return;
             }
         }
-        
+
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
@@ -120,15 +121,15 @@ public partial class Main : BasePlugin
         {
             // Unknown
             new Unknown(),
-            
+
             // Crewmate
             new Crewmate(),
             new Bait(),
             new Sheriff(),
-            
+
             // Impostor
             new Impostor(),
-            
+
             // Neutral
             new Jester()
         });
@@ -140,11 +141,11 @@ public partial class Main : BasePlugin
                 () =>
                 {
                     LanguageConfig.LoadLanguageConfig();
-                    UnityEngine.Application.Quit();
+                    Application.Quit();
                     return false;
                 }, false)
         });
-        
+
         // Register Commands
         CommandManager.GetManager().RegisterCommands(new Command.Command[]
         {

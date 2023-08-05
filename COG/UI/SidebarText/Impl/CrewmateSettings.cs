@@ -8,11 +8,11 @@ public class CrewmateSettings : SidebarText
     public CrewmateSettings() : base(LanguageConfig.Instance.SidebarTextCrewmate)
     {
     }
-    
+
     public override void ForResult(ref string result)
     {
         Objects.Clear();
-        Objects.AddRange(new []
+        Objects.AddRange(new[]
         {
             HudStringPatch.GetOptByType(CustomOption.CustomOption.CustomOptionType.Crewmate)
         });

@@ -1,53 +1,41 @@
-using COG.Listener;
 using System.Linq;
+using COG.Listener;
 
 namespace COG.Patch;
 
 [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
-class CoBeginPatch
+internal class CoBeginPatch
 {
     public static void Prefix()
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
-            listener.OnCoBegin();
-        }
+        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnCoBegin();
     }
 }
 
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameEnd))]
-class EndGamePatch
+internal class EndGamePatch
 {
     public static void Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
         var list = ListenerManager.GetManager().GetListeners().ToList();
-        foreach (var listener in list)
-        {
-            listener.OnGameEnd(__instance, ref endGameResult);
-        }
+        foreach (var listener in list) listener.OnGameEnd(__instance, ref endGameResult);
     }
-    
+
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
         var list = ListenerManager.GetManager().GetListeners().ToList();
-        foreach (var listener in list)
-        {
-            listener.AfterGameEnd(__instance, ref endGameResult);
-        }
+        foreach (var listener in list) listener.AfterGameEnd(__instance, ref endGameResult);
     }
 }
 
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Start))]
-class GameStartManagerStartPatch
+internal class GameStartManagerStartPatch
 {
     public static void Postfix(GameStartManager __instance)
     {
         HostSartPatch.timer = 600f;
 
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
-            listener.OnGameStart(__instance);
-        }
+        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameStart(__instance);
     }
 }
 
@@ -56,14 +44,10 @@ internal class MakePublicPatch
 {
     public static bool Prefix(GameStartManager __instance)
     {
-        bool returnAble = false;
+        var returnAble = false;
         foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
             if (!listener.OnMakePublic(__instance) && !returnAble)
-            {
                 returnAble = true;
-            }
-        }
 
         if (returnAble) return false;
 
@@ -72,38 +56,31 @@ internal class MakePublicPatch
 }
 
 [HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SelectRoles))]
-class SelectRolesPatch
+internal class SelectRolesPatch
 {
     public static void Prefix()
     {
         var listeners = ListenerManager.GetManager().GetListeners().ToList();
-        foreach (var listener in listeners)
-        {
-            listener.OnSelectRoles();
-        }
+        foreach (var listener in listeners) listener.OnSelectRoles();
     }
 }
 
 [HarmonyPatch(typeof(EndGameManager), nameof(EndGameManager.SetEverythingUp))]
-class SetEverythingUpPatch
+internal class SetEverythingUpPatch
 {
     public static void Postfix(EndGameManager __instance)
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
             listener.OnGameEndSetEverythingUp(__instance);
-        }
     }
 }
+
 [HarmonyPatch(typeof(ControllerManager), nameof(ControllerManager.Update))]
-class KeyboardPatch
+internal class KeyboardPatch
 {
     public static void Postfix()
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
-            listener.OnKeyboardPass();
-        }
+        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnKeyboardPass();
     }
 }
 
@@ -119,57 +96,49 @@ public static class PlayerVentPatch
     {
         var returnAble = true;
         foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
             if (!listener.OnPlayerVent(__instance, playerInfo, ref canUse, ref couldUse, ref __result))
-            {
                 returnAble = false;
-            }
-        }
         return returnAble;
     }
 }
 
 [HarmonyPatch(typeof(LogicGameFlowNormal), nameof(LogicGameFlowNormal.CheckEndCriteria))]
-class GameEndChecker
+internal class GameEndChecker
 {
     [HarmonyPrefix]
     public static bool Prefix()
     {
         var returnAble = true;
-        foreach (var unused in ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnCheckGameEnd()))
-        {
+        foreach (var unused in
+                 ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnCheckGameEnd()))
             returnAble = false;
-        }
 
         return returnAble;
     }
 }
 
 [HarmonyPatch(typeof(GameManager), nameof(GameManager.CheckTaskCompletion))]
-class CheckTaskCompletionPatch
+internal class CheckTaskCompletionPatch
 {
     public static bool Prefix(ref bool __result)
     {
         var returnAble = true;
         foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
-            if (!listener.OnCheckTaskCompletion(ref __result)) returnAble = false;
-        }
+            if (!listener.OnCheckTaskCompletion(ref __result))
+                returnAble = false;
 
         return returnAble;
     }
 }
 
 [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap))]
-class SabotageMapOpen
+internal class SabotageMapOpen
 {
     private static bool Prefix(MapBehaviour __instance)
     {
         var returnAble = true;
-        foreach (var unused in ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnShowSabotageMap(__instance)))
-        {
-            returnAble = false;
-        }
+        foreach (var unused in ListenerManager.GetManager().GetListeners()
+                     .Where(listener => !listener.OnShowSabotageMap(__instance))) returnAble = false;
 
         return returnAble;
     }

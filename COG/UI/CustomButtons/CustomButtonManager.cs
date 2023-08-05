@@ -7,8 +7,11 @@ public class CustomButtonManager
     private static readonly CustomButtonManager Manager = new();
     private readonly List<CustomButton> _buttons = new();
 
-    public static CustomButtonManager GetManager() => Manager;
-    
+    public static CustomButtonManager GetManager()
+    {
+        return Manager;
+    }
+
     public void RegisterCustomButton(CustomButton button)
     {
         _buttons.Add(button);
@@ -19,5 +22,8 @@ public class CustomButtonManager
         _buttons.AddRange(button);
     }
 
-    public List<CustomButton> GetButtons() => _buttons;
+    public List<CustomButton> GetButtons()
+    {
+        return _buttons;
+    }
 }

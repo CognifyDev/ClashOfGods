@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using COG.UI.CustomButtons;
-using UnityEngine;
+﻿using COG.UI.CustomButtons;
 
-namespace COG.Listener.Impl
+namespace COG.Listener.Impl;
+
+internal class CustomButtonListener : IListener
 {
-    class CustomButtonListener : IListener
+    public void OnHudStart(HudManager hud)
     {
-        public void OnHudStart(HudManager hud) => CustomButton.Init(hud);
+        CustomButton.Init(hud);
+    }
 
-        public void OnHudUpdate(HudManager manager)
-        {
-            foreach (var button in CustomButtonManager.GetManager().GetButtons())
-            {
-                button.Update();
-            }
-        }
+    public void OnHudUpdate(HudManager manager)
+    {
+        foreach (var button in CustomButtonManager.GetManager().GetButtons()) button.Update();
     }
 }

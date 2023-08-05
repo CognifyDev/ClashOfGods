@@ -2,12 +2,13 @@
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Utils;
+using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
 public class Sheriff : Role, IListener
 {
-    public Sheriff() : base(LanguageConfig.Instance.SheriffName, UnityEngine.Color.yellow, CampType.Crewmate, true)
+    public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate, true)
     {
         CanVent = false;
         CanKill = true;
@@ -20,12 +21,8 @@ public class Sheriff : Role, IListener
     {
         if (killer == null || target == null) return true;
         if (killer.GetRoleInstance()!.Name.Equals(Name))
-        {
             if (target.GetRoleInstance()!.CampType == CampType.Crewmate)
-            {
                 killer.MurderPlayer(killer);
-            }
-        }
 
         return true;
     }

@@ -17,17 +17,16 @@ public class RpcCommand : Command
         {
             var callId = byte.Parse(args[0]);
             List<byte> bytes = new();
-            for (var i = 1; i < args.Length; i++)
-            {
-                bytes.Add(byte.Parse(args[i]));
-            }
-            
+            for (var i = 1; i < args.Length; i++) bytes.Add(byte.Parse(args[i]));
+
             foreach (var playerControl in PlayerUtils.GetAllPlayers())
             {
-                var writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, callId, SendOption.Reliable, playerControl.GetClientID());
+                var writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, callId, SendOption.Reliable,
+                    playerControl.GetClientID());
                 writer.Write(bytes.ToArray());
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
-                GameUtils.SendGameMessage("成功向" + playerControl.name + "发送Rpc " + callId + " " + bytes.ToArray().AsString());
+                GameUtils.SendGameMessage("成功向" + playerControl.name + "发送Rpc " + callId + " " +
+                                          bytes.ToArray().AsString());
             }
         }
         catch

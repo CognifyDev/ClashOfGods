@@ -2,5 +2,7 @@
 
 public class GetterCanNotGetException : System.Exception
 {
-    public GetterCanNotGetException(string message) : base(message) {}
+    public GetterCanNotGetException(string message) : base(message)
+    {
+    }
 }

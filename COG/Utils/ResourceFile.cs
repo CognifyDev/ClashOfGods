@@ -6,13 +6,13 @@ namespace COG.Utils;
 
 public class ResourceFile
 {
-    public string Path { get; }
-    
     public ResourceFile(string path)
     {
         Path = path;
     }
-    
+
+    public string Path { get; }
+
     public string GetResourcesText()
     {
         var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(Path);

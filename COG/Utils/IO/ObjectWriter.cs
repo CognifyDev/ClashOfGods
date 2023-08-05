@@ -5,12 +5,12 @@ namespace COG.Utils.IO;
 
 public class ObjectWriter<T>
 {
-    public string Data { get; }
-
     public ObjectWriter(T obj)
     {
         Data = JsonSerializer.Serialize(obj);
     }
+
+    public string Data { get; }
 
     public void WriteTo(string path)
     {

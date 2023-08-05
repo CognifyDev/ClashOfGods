@@ -4,11 +4,11 @@ using COG.Config.Impl;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
+using COG.States;
 using COG.Utils;
-using InnerNet;
+using Il2CppSystem;
+using Il2CppSystem.Collections;
 using UnityEngine;
-using Action = System.Action;
-using GameStates = COG.States.GameStates;
 
 namespace COG.Listener.Impl;
 
@@ -23,10 +23,7 @@ public class GameListener : IListener
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
 
-        foreach (var (key, value) in GameUtils.Data)
-        {
-            RoleManager.Instance.SetRole(key, value.BaseRoleType);
-        }
+        foreach (var (key, value) in GameUtils.Data) RoleManager.Instance.SetRole(key, value.BaseRoleType);
     }
 
     public void OnRPCReceived(byte callId, MessageReader reader)
@@ -99,34 +96,17 @@ public class GameListener : IListener
             {
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>()!;
             }
-            
+
             GameUtils.Data.Add(player, role);
         }
-        
+
         // 打印职业分配信息
         foreach (var (player, value) in GameUtils.Data)
-        {
             Main.Logger.LogInfo($"{player.name}({player.Data.FriendCode}) => {value.GetType().Name}");
-        }
-        
-        foreach (var (key, value) in GameUtils.Data)
-        {
-            RoleListeners.Add(value.GetListener(key));
-        }
-        
-        ShareRoles();
-    }
 
-    private void ShareRoles()
-    {
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
-        writer.WritePacked(GameUtils.Data.Count);
-        foreach (var (key, value) in GameUtils.Data)
-        {
-            writer.Write(key.PlayerId);
-            writer.Write(value.GetType().Name);
-        }
-        writer.Finish();
+        foreach (var (key, value) in GameUtils.Data) RoleListeners.Add(value.GetListener(key));
+
+        ShareRoles();
     }
 
     public void OnGameStart(GameStartManager manager)
@@ -144,17 +124,14 @@ public class GameListener : IListener
         return false;
     }
 
-    public bool OnSetUpRoleText(IntroCutscene intro, ref Il2CppSystem.Collections.IEnumerator roles)
+    public bool OnSetUpRoleText(IntroCutscene intro, ref IEnumerator roles)
     {
         Main.Logger.LogInfo("Setup role text for players...");
 
         var myRole = GameUtils.GetLocalPlayerRole();
-        if (myRole == null)
-        {
-            return true;
-        }
+        if (myRole == null) return true;
 
-        var list = new List<Il2CppSystem.Collections.IEnumerator>();
+        var list = new List<IEnumerator>();
 
         void SetupRoles()
         {
@@ -165,19 +142,19 @@ public class GameListener : IListener
                 intro.RoleBlurbText.text = myRole.Description;
                 intro.RoleBlurbText.color = myRole.Color;
                 intro.YouAreText.color = myRole.Color;
-                
+
                 intro.YouAreText.gameObject.SetActive(true);
                 intro.RoleText.gameObject.SetActive(true);
                 intro.RoleBlurbText.gameObject.SetActive(true);
-                
+
                 SoundManager.Instance.PlaySound(PlayerControl.LocalPlayer.Data.Role.IntroSound, false);
-                
+
                 if (intro.ourCrewmate == null)
                 {
                     intro.ourCrewmate = intro.CreatePlayer(0, 1, PlayerControl.LocalPlayer.Data, false);
                     intro.ourCrewmate.gameObject.SetActive(false);
                 }
-                
+
                 intro.ourCrewmate.gameObject.SetActive(true);
                 var transform = intro.ourCrewmate.transform;
                 transform.localPosition = new Vector3(0f, -1.05f, -18f);
@@ -186,16 +163,18 @@ public class GameListener : IListener
             }
         }
 
-        list.Add(Effects.Action((Il2CppSystem.Action) (Action?)SetupRoles));
+        list.Add(Effects.Action((Action)(System.Action?)SetupRoles));
         list.Add(Effects.Wait(2.5f));
+
         void Action()
         {
             intro.YouAreText.gameObject.SetActive(false);
-            intro.RoleText.gameObject.SetActive(false); 
+            intro.RoleText.gameObject.SetActive(false);
             intro.RoleBlurbText.gameObject.SetActive(false);
             intro.ourCrewmate.gameObject.SetActive(false);
         }
-        list.Add(Effects.Action((Il2CppSystem.Action) (Action?)Action));
+
+        list.Add(Effects.Action((Action)(System.Action?)Action));
 
         roles = Effects.Sequence(list.ToArray());
         return false;
@@ -223,21 +202,18 @@ public class GameListener : IListener
 
         if (role == null) return;
         var camp = role.CampType;
-        
+
         intro.BackgroundBar.material.color = camp.GetColor();
         intro.TeamTitle.text = camp.GetName();
         intro.TeamTitle.color = camp.GetColor();
-        
+
         intro.ImpostorText.text = "";
     }
 
     public void OnGameEndSetEverythingUp(EndGameManager manager)
     {
         // 取消已经注册的Listener
-        foreach (var roleListener in RoleListeners)
-        {
-            ListenerManager.GetManager().UnregisterListener(roleListener);
-        }
+        foreach (var roleListener in RoleListeners) ListenerManager.GetManager().UnregisterListener(roleListener);
         RoleListeners.Clear();
     }
 
@@ -245,9 +221,8 @@ public class GameListener : IListener
     {
         var aliveImpostors = new List<PlayerControl>();
         foreach (var (key, value) in GameUtils.Data)
-        {
-            if (value.CampType == CampType.Impostor) aliveImpostors.Add(key);
-        }
+            if (value.CampType == CampType.Impostor)
+                aliveImpostors.Add(key);
 
         if (PlayerUtils.GetAllAlivePlayers().Count <= 1)
         {
@@ -259,16 +234,15 @@ public class GameListener : IListener
         {
             TempData.winners.Clear();
             foreach (var aliveImpostor in aliveImpostors)
-            {
                 TempData.winners.Add(new WinningPlayerData(aliveImpostor.Data));
-            }
             return true;
         }
 
         return false; // 不允许游戏结束
     }
 
-    public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse, ref float cooldown)
+    public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,
+        ref float cooldown)
     {
         foreach (var (key, value) in GameUtils.Data)
         {
@@ -309,6 +283,7 @@ public class GameListener : IListener
         {
             return;
         }
+
         if (role == null) return;
 
         if (role.CanKill)
@@ -348,5 +323,18 @@ public class GameListener : IListener
             manager.SabotageButton.ToggleVisible(false);
             manager.SabotageButton.gameObject.SetActive(false);
         }
+    }
+
+    private void ShareRoles()
+    {
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
+        writer.WritePacked(GameUtils.Data.Count);
+        foreach (var (key, value) in GameUtils.Data)
+        {
+            writer.Write(key.PlayerId);
+            writer.Write(value.GetType().Name);
+        }
+
+        writer.Finish();
     }
 }

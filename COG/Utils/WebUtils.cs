@@ -26,7 +26,7 @@ public class WebUtils
         catch (HttpRequestException)
         {
         }
-        
+
         // 请求失败时返回空字符串
         return string.Empty;
     }

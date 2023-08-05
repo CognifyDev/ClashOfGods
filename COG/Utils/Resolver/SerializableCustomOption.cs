@@ -6,14 +6,13 @@ namespace COG.Utils.Resolver;
 [Serializable]
 public class SerializableCustomOption
 {
-    private readonly int _id;
-    private readonly string _name;
-    private readonly object[] _selections;
-
     private readonly int _defaultSelection;
-    private readonly int _selection;
-    private readonly SerializableCustomOption? _parent;
+    private readonly int _id;
     private readonly bool _isHeader;
+    private readonly string _name;
+    private readonly SerializableCustomOption? _parent;
+    private readonly int _selection;
+    private readonly object[] _selections;
     private readonly CustomOption.CustomOptionType _type;
 
     public SerializableCustomOption(CustomOption customOption)
@@ -34,7 +33,7 @@ public class SerializableCustomOption
         var obj = new CustomOption(_id, _type, _name, _selections, _defaultSelection,
             _parent?.ToCustomOption(), _isHeader)
         {
-            Selection = _selection,
+            Selection = _selection
         };
         return obj;
     }

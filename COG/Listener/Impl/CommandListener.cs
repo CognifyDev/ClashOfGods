@@ -9,8 +9,8 @@ public class CommandListener : IListener
     {
         var text = controller.freeChatField.textArea.text;
         if (!text.ToLower().StartsWith("/")) return true;
-        
-        bool cancellable = false;
+
+        var cancellable = false;
         foreach (var command in CommandManager.GetManager().GetCommands())
         {
             if (text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) || ContainAliases(text, command))
@@ -25,14 +25,11 @@ public class CommandListener : IListener
     {
         if (!text.ToLower().StartsWith("/")) return true;
 
-        bool cancellable = false;
+        var cancellable = false;
         foreach (var command in CommandManager.GetManager().GetCommands())
         {
-            if (command.HostOnly)
-            {
-                continue;
-            }
-            
+            if (command.HostOnly) continue;
+
             if (text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) || ContainAliases(text, command))
                 command.OnExecute(player, AsCommandStringArray(text));
             if (command.Cancellable) cancellable = true;
@@ -40,7 +37,7 @@ public class CommandListener : IListener
 
         return !cancellable;
     }
-    
+
     private string[] AsCommandStringArray(string text)
     {
         // /command <arg1> <arg3> <arg2>...
@@ -51,12 +48,10 @@ public class CommandListener : IListener
     }
 
     private bool ContainAliases(string text, Command.Command command)
-    { 
+    {
         foreach (var alias in command.Aliases)
-        {
-            if (text.Split(" ")[0].ToLower().Equals("/" + alias.ToLower())) 
+            if (text.Split(" ")[0].ToLower().Equals("/" + alias.ToLower()))
                 return true;
-        }
         return false;
     }
 }

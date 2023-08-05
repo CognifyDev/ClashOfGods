@@ -7,21 +7,33 @@ namespace COG.Utils;
 
 public static class PlayerUtils
 {
-    public static List<PlayerControl> GetAllPlayers() =>
-        PlayerControl.AllPlayerControls.ToArray().Where(player => player != null).ToList();
+    public static List<PlayerControl> GetAllPlayers()
+    {
+        return PlayerControl.AllPlayerControls.ToArray().Where(player => player != null).ToList();
+    }
 
-    public static List<PlayerControl> GetAllAlivePlayers() =>
-        PlayerControl.AllPlayerControls.ToArray().Where(player => player != null && player.IsAlive()).ToList();
+    public static List<PlayerControl> GetAllAlivePlayers()
+    {
+        return PlayerControl.AllPlayerControls.ToArray().Where(player => player != null && player.IsAlive()).ToList();
+    }
 
-    public static bool IsSamePlayer(this GameData.PlayerInfo info, GameData.PlayerInfo target) =>
-        info.FriendCode.Equals(target.FriendCode) && info.PlayerName.Equals(target.PlayerName);
+    public static bool IsSamePlayer(this GameData.PlayerInfo info, GameData.PlayerInfo target)
+    {
+        return info.FriendCode.Equals(target.FriendCode) && info.PlayerName.Equals(target.PlayerName);
+    }
 
-    public static bool IsSamePlayer(this PlayerControl player, PlayerControl target) =>
-        player.name.Equals(target.name) && player.FriendCode.Equals(target.FriendCode);
+    public static bool IsSamePlayer(this PlayerControl player, PlayerControl target)
+    {
+        return player.name.Equals(target.name) && player.FriendCode.Equals(target.FriendCode);
+    }
 
-    public static Role.Role? GetRoleInstance(this PlayerControl player) =>
-        (from keyValuePair in GameUtils.Data where keyValuePair.Key.IsSamePlayer(player) select keyValuePair.Value)
-        .FirstOrDefault();
+    public static Role.Role? GetRoleInstance(this PlayerControl player)
+    {
+        return (from keyValuePair in GameUtils.Data
+                where keyValuePair.Key.IsSamePlayer(player)
+                select keyValuePair.Value)
+            .FirstOrDefault();
+    }
 
     public static void SetNamePrivately(PlayerControl target, PlayerControl seer, string name)
     {
@@ -36,9 +48,8 @@ public static class PlayerUtils
     public static PlayerControl? GetPlayerById(byte playerId)
     {
         foreach (var playerControl in GetAllPlayers())
-        {
-            if (playerControl.PlayerId == playerId) return playerControl;
-        }
+            if (playerControl.PlayerId == playerId)
+                return playerControl;
 
         return null;
     }
@@ -56,7 +67,7 @@ public static class PlayerUtils
     }
 
     /// <summary>
-    /// 检测玩家是否存活
+    ///     检测玩家是否存活
     /// </summary>
     /// <param name="player">玩家实例</param>
     /// <returns></returns>
@@ -66,5 +77,4 @@ public static class PlayerUtils
         if (player == null) return false;
         return !player.Data.IsDead;
     }
-
 }

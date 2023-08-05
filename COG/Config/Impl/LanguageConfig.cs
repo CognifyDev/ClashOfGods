@@ -5,69 +5,11 @@ namespace COG.Config.Impl;
 
 public class LanguageConfig : Config
 {
-    public static LanguageConfig Instance { get; private set; }
-    public string MessageForNextPage { get; private set; } = null!;
-    public string MakePublicMessage { get; private set; } = null!;
-
-    public string GeneralSetting { get; private set; } = null!;
-    public string ImpostorRolesSetting { get; private set; } = null!;
-    public string NeutralRolesSetting { get; private set; } = null!;
-    public string CrewmateRolesSetting { get; private set; } = null!;
-    public string AddonsSetting { get; private set; } = null!;
-
-    public string SaveGameConfigs { get; private set; } = null!;
-    
-    // Unknown
-    public string UnknownName { get; private set; } = null!;
-    public string UnknownDescription { get; private set; } = null!;
-
-    // Crewmate
-    public string CrewmateName { get; private set; } = null!;
-    public string CrewmateDescription { get; private set; } = null!;
-
-    public string BaitName { get; private set; } = null!;
-    public string BaitDescription { get; private set; } = null!;
-
-    public string SheriffName { get; private set; } = null!;
-    public string SheriffDescription { get; private set; } = null!;
-
-    // Impostor
-    public string ImpostorName { get; private set; } = null!;
-    public string ImpostorDescription { get; private set; } = null!;
-    
-    // Neutral
-    public string JesterName { get; private set; } = null!;
-    public string JesterDescription { get; private set; } = null!;
-
-    public string Enable { get; private set; } = null!;
-    public string Disable { get; private set; } = null!;
-    public string CogOptions { get; private set; } = null!;
-    public string ReloadConfigs { get; private set; } = null!;
-    public string Github { get; private set; } = null!;
-    public string BetaVersionRegisteredUserDisplay { get; private set; } = null!;
-
-    public string MaxNumMessage { get; private set; } = null!;
-    public string AllowStartMeeting { get; private set; } = null!;
-    public string AllowReportDeadBody { get; private set; } = null!;
-
-    public string SidebarTextOriginal { get; private set; } = null!;
-    public string SidebarTextNeutral { get; private set; } = null!;
-    public string SidebarTextMod { get; private set; } = null!;
-    public string SidebarTextAddons { get; private set; } = null!;
-    public string SidebarTextImpostor { get; private set; } = null!;
-    public string SidebarTextCrewmate { get; private set; } = null!;
-    public string QQ { get; private set; } = null!;
-    public string Discord { get; private set; } = null!;
-
-    public string UnknownCamp { get; private set; }
-    public string ImpostorCamp { get; private set; }
-    public string NeutralCamp { get; private set; }
-    public string CrewmateCamp { get; private set; }
-    
-    public string UnknownCampDescription { get; private set; }
-    public string ImpostorCampDescription { get; private set; }
-    public string NeutralCampDescription { get; private set; }
-    public string CrewmateCampDescription { get; private set; }
+    static LanguageConfig()
+    {
+        Instance = new LanguageConfig();
+        LoadLanguageConfig();
+    }
 
 
     public LanguageConfig() : base(
@@ -88,7 +30,7 @@ public class LanguageConfig : Config
             AddonsSetting = GetString("menu.addons.name");
 
             SaveGameConfigs = GetString("menu.general.save-game-configs");
-            
+
             // Unknown
             UnknownName = GetString("role.unknown.name");
             UnknownDescription = GetString("role.unknown.description");
@@ -102,11 +44,11 @@ public class LanguageConfig : Config
 
             SheriffName = GetString("role.crewmate.sheriff.name");
             SheriffDescription = GetString("role.crewmate.sheriff.description");
-            
+
             // Impostor
             ImpostorName = GetString("role.impostor.impostor.name");
             ImpostorDescription = GetString("role.impostor.impostor.description");
-            
+
             // Neutral
             JesterName = GetString("role.neutral.jester.name");
             JesterDescription = GetString("role.neutral.jester.description");
@@ -150,21 +92,76 @@ public class LanguageConfig : Config
         }
     }
 
+    public static LanguageConfig Instance { get; private set; }
+    public string MessageForNextPage { get; private set; } = null!;
+    public string MakePublicMessage { get; private set; } = null!;
+
+    public string GeneralSetting { get; private set; } = null!;
+    public string ImpostorRolesSetting { get; private set; } = null!;
+    public string NeutralRolesSetting { get; private set; } = null!;
+    public string CrewmateRolesSetting { get; private set; } = null!;
+    public string AddonsSetting { get; private set; } = null!;
+
+    public string SaveGameConfigs { get; private set; } = null!;
+
+    // Unknown
+    public string UnknownName { get; private set; } = null!;
+    public string UnknownDescription { get; private set; } = null!;
+
+    // Crewmate
+    public string CrewmateName { get; private set; } = null!;
+    public string CrewmateDescription { get; private set; } = null!;
+
+    public string BaitName { get; private set; } = null!;
+    public string BaitDescription { get; private set; } = null!;
+
+    public string SheriffName { get; private set; } = null!;
+    public string SheriffDescription { get; private set; } = null!;
+
+    // Impostor
+    public string ImpostorName { get; private set; } = null!;
+    public string ImpostorDescription { get; private set; } = null!;
+
+    // Neutral
+    public string JesterName { get; private set; } = null!;
+    public string JesterDescription { get; private set; } = null!;
+
+    public string Enable { get; private set; } = null!;
+    public string Disable { get; private set; } = null!;
+    public string CogOptions { get; private set; } = null!;
+    public string ReloadConfigs { get; private set; } = null!;
+    public string Github { get; private set; } = null!;
+    public string BetaVersionRegisteredUserDisplay { get; private set; } = null!;
+
+    public string MaxNumMessage { get; private set; } = null!;
+    public string AllowStartMeeting { get; private set; } = null!;
+    public string AllowReportDeadBody { get; private set; } = null!;
+
+    public string SidebarTextOriginal { get; private set; } = null!;
+    public string SidebarTextNeutral { get; private set; } = null!;
+    public string SidebarTextMod { get; private set; } = null!;
+    public string SidebarTextAddons { get; private set; } = null!;
+    public string SidebarTextImpostor { get; private set; } = null!;
+    public string SidebarTextCrewmate { get; private set; } = null!;
+    public string QQ { get; private set; } = null!;
+    public string Discord { get; private set; } = null!;
+
+    public string UnknownCamp { get; private set; }
+    public string ImpostorCamp { get; private set; }
+    public string NeutralCamp { get; private set; }
+    public string CrewmateCamp { get; private set; }
+
+    public string UnknownCampDescription { get; private set; }
+    public string ImpostorCampDescription { get; private set; }
+    public string NeutralCampDescription { get; private set; }
+    public string CrewmateCampDescription { get; private set; }
+
     private string GetString(string location)
     {
         var toReturn = YamlReader.GetString(location);
-        if (toReturn is null or "" or " ")
-        {
-            throw new NullReferenceException();
-        }
+        if (toReturn is null or "" or " ") throw new NullReferenceException();
 
         return toReturn;
-    }
-
-    static LanguageConfig()
-    {
-        Instance = new LanguageConfig();
-        LoadLanguageConfig();
     }
 
     internal static void LoadLanguageConfig()

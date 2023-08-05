@@ -9,15 +9,6 @@ namespace COG.Utils;
 
 public class Yaml
 {
-    /// <summary>
-    /// Yaml内容
-    /// </summary>
-    public string Text { get; private set; }
-    /// <summary>
-    /// Yaml Stream
-    /// </summary>
-    public YamlStream YamlStream { get; }
-
     private Yaml(string text)
     {
         Text = text;
@@ -30,7 +21,17 @@ public class Yaml
     }
 
     /// <summary>
-    /// 获取Int值
+    ///     Yaml内容
+    /// </summary>
+    public string Text { get; private set; }
+
+    /// <summary>
+    ///     Yaml Stream
+    /// </summary>
+    public YamlStream YamlStream { get; }
+
+    /// <summary>
+    ///     获取Int值
     /// </summary>
     /// <param name="location">路径，例如: GetInt("abab.sb"),"."表示下级</param>
     /// <returns>Int值</returns>
@@ -38,14 +39,11 @@ public class Yaml
     {
         var str = GetString(location);
         if (str == null) return null;
-        if (int.TryParse(str, out int result))
-        {
-            return result;
-        }
+        if (int.TryParse(str, out var result)) return result;
 
         return null;
     }
-    
+
     public List<string>? GetStringList(string location)
     {
         var locations = location.Contains('.') ? location.Split(".") : new[] { location };
@@ -55,17 +53,14 @@ public class Yaml
 
         YamlNode? valueNode = rootNode;
         foreach (var loc in locations)
-        {
             try
             {
                 if (valueNode is YamlMappingNode mappingNode)
                 {
                     var keyNode = new YamlScalarNode(loc);
                     if (mappingNode.Children.TryGetValue(keyNode, out valueNode))
-                    {
                         // 继续向下查找
                         continue;
-                    }
                 }
 
                 // 如果找不到对应的键或节点不是一个映射节点，则返回空列表
@@ -75,16 +70,14 @@ public class Yaml
             {
                 return null;
             }
-        }
 
         // 如果值节点是一个列表节点，则将列表中的值添加到结果列表中
         if (valueNode is YamlSequenceNode sequenceNode)
         {
             var result = new List<string>();
             foreach (var item in sequenceNode.Children)
-            {
-                if (item is YamlScalarNode { Value: not null } scalarNode) result.Add(scalarNode.Value);
-            }
+                if (item is YamlScalarNode { Value: not null } scalarNode)
+                    result.Add(scalarNode.Value);
             return result;
         }
 
@@ -96,14 +89,11 @@ public class Yaml
     {
         var str = GetString(location);
         if (str == null) return null;
-        if (byte.TryParse(str, out byte result))
-        {
-            return result;
-        }
+        if (byte.TryParse(str, out var result)) return result;
 
         return null;
     }
-    
+
     public string? GetString(string location)
     {
         var locations = location.Contains('.') ? location.Split(".") : new[] { location };
@@ -113,17 +103,14 @@ public class Yaml
 
         YamlNode? valueNode = rootNode;
         foreach (var loc in locations)
-        {
             try
             {
                 if (valueNode is YamlMappingNode mappingNode)
                 {
                     var keyNode = new YamlScalarNode(loc);
                     if (mappingNode.Children.TryGetValue(keyNode, out valueNode))
-                    {
                         // 继续向下查找
                         continue;
-                    }
                 }
 
                 // 如果找不到对应的键或节点不是一个映射节点，则返回 null
@@ -133,11 +120,10 @@ public class Yaml
             {
                 return null;
             }
-        }
-        
+
         return $"{valueNode}";
     }
-    
+
     public void Set(string location, dynamic obj)
     {
         var deserializer = new DeserializerBuilder()
@@ -158,7 +144,7 @@ public class Yaml
     {
         var parts = location.Split('.');
 
-        for (int i = 0; i < parts.Length - 1; i++)
+        for (var i = 0; i < parts.Length - 1; i++)
         {
             if (!yamlObject.ContainsKey(parts[i]))
                 yamlObject[parts[i]] = new Dictionary<string, object>();
@@ -168,12 +154,12 @@ public class Yaml
 
         yamlObject[parts[^1]] = value;
     }
-    
+
     public static Yaml LoadFromString(string text)
     {
         return new Yaml(text);
     }
-    
+
     public static Yaml LoadFromFile(string path)
     {
         return LoadFromString(File.ReadAllText(path));
@@ -181,17 +167,11 @@ public class Yaml
 
     public void WriteTo(string path, bool replace = true, Encoding? encoding = null)
     {
-        if (replace && File.Exists(path))
-        {
-            File.Delete(path);
-        }
+        if (replace && File.Exists(path)) File.Delete(path);
 
-        if (!File.Exists(path))
-        {
-            File.WriteAllText(path, Text, encoding ?? Encoding.UTF8);
-        } 
+        if (!File.Exists(path)) File.WriteAllText(path, Text, encoding ?? Encoding.UTF8);
     }
- 
+
     public static Yaml NewEmptyYaml()
     {
         return LoadFromString("");

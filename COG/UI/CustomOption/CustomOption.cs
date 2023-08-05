@@ -2,13 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Rpc;
 using COG.Utils;
 using COG.Utils.Resolver;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
+using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomOption;
 
@@ -18,8 +22,6 @@ namespace COG.UI.CustomOption;
 [DataContract]
 public class CustomOption
 {
-    internal static bool FirstOpen = true;
-
     [Serializable]
     public enum CustomOptionType
     {
@@ -29,37 +31,37 @@ public class CustomOption
         Crewmate = 3,
         Addons = 4
     }
-    
-    public static readonly List<CustomOption?> Options = new();
-    
-    [DataMember]
-    public readonly int ID;
-    [DataMember]
-    public readonly string Name;
-    [DataMember]
-    public readonly System.Object[] Selections;
 
-    [DataMember]
-    public readonly int DefaultSelection;
-    [DataMember]
-    public int Selection;
-    [DataMember]
-    public OptionBehaviour OptionBehaviour;
-    [DataMember]
-    public readonly CustomOption? Parent;
-    [DataMember]
-    public readonly bool IsHeader;
-    [DataMember]
-    public readonly CustomOptionType Type;
+    internal static bool FirstOpen = true;
+
+    public static readonly List<CustomOption?> Options = new();
+
+    [DataMember] public int Selection;
+
+    [DataMember] public OptionBehaviour OptionBehaviour;
+
+    [DataMember] public readonly int DefaultSelection;
+
+    [DataMember] public readonly int ID;
+
+    [DataMember] public readonly bool IsHeader;
+
+    [DataMember] public readonly string Name;
+
+    [DataMember] public readonly CustomOption? Parent;
+
+    [DataMember] public readonly object[] Selections;
+
+    [DataMember] public readonly CustomOptionType Type;
 
     // Option creation
-    public CustomOption(int id, CustomOptionType type, string name, System.Object[] selections,
-        System.Object defaultValue, CustomOption? parent, bool isHeader)
+    public CustomOption(int id, CustomOptionType type, string name, object[] selections,
+        object defaultValue, CustomOption? parent, bool isHeader)
     {
         ID = id;
         Name = parent == null ? name : ColorUtils.ToAmongUsColorString(Color.gray, "→ ") + name;
         Selections = selections;
-        int index = Array.IndexOf(selections, defaultValue);
+        var index = Array.IndexOf(selections, defaultValue);
         DefaultSelection = index >= 0 ? index : 0;
         Parent = parent;
         IsHeader = isHeader;
@@ -78,7 +80,7 @@ public class CustomOption
         float max, float step, CustomOption? parent = null, bool isHeader = false)
     {
         List<object> selections = new();
-        for (float s = min; s <= max; s += step) selections.Add(s);
+        for (var s = min; s <= max; s += step) selections.Add(s);
         return new CustomOption(id, type, name, selections.ToArray(), defaultValue, parent, isHeader);
     }
 
@@ -93,43 +95,38 @@ public class CustomOption
     public static void LoadOptionsFromByteArray(byte[][] data)
     {
         Options.Clear();
-        foreach (var bytes in data)
-        {
-            Options.Add(bytes.DeserializeToData<SerializableCustomOption>().ToCustomOption());
-        }
+        foreach (var bytes in data) Options.Add(bytes.DeserializeToData<SerializableCustomOption>().ToCustomOption());
     }
 
     public static byte[][] WriteOptionsToByteArray()
     {
         return Enumerable.ToList(
-            from customOption in Options 
-            where customOption != null 
-            select new SerializableCustomOption(customOption) 
-            into serializableCustomOption 
+            from customOption in Options
+            where customOption != null
+            select new SerializableCustomOption(customOption)
+            into serializableCustomOption
             select serializableCustomOption.SerializeToData()
         ).ToArray();
     }
 
     public static void ShareOptionChange()
     {
-        if (PlayerControl.AllPlayerControls.Count <= 1 || PlayerControl.LocalPlayer == null || !AmongUsClient.Instance.AmHost) return;
-        
+        if (PlayerControl.AllPlayerControls.Count <= 1 || PlayerControl.LocalPlayer == null ||
+            !AmongUsClient.Instance.AmHost) return;
+
         // 当游戏选项更改的时候调用
 
         var localPlayer = PlayerControl.LocalPlayer;
-        
+
         // 新建写入器
         var writer = RpcUtils.StartRpcImmediately(localPlayer, (byte)KnownRpc.ShareOptions);
 
         var options = WriteOptionsToByteArray();
-        
+
         writer.Write(options.Length);
-        
-        foreach (var option in options)
-        {
-            writer.Write(option);
-        }
-        
+
+        foreach (var option in options) writer.Write(option);
+
         // OK 现在进行一个结束
         writer.Finish();
 
@@ -187,9 +184,9 @@ public class CustomOption
             ShareOptionChange();
         }
     }
-    
+
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
-    class GameOptionsMenuStartPatch
+    private class GameOptionsMenuStartPatch
     {
         public static void Postfix(GameOptionsMenu __instance)
         {
@@ -198,7 +195,7 @@ public class CustomOption
 
         private static void CreateClassicTabs(GameOptionsMenu __instance)
         {
-            bool isReturn = SetNames(
+            var isReturn = SetNames(
                 new Dictionary<string, string>
                 {
                     ["COGSettings"] = LanguageConfig.Instance.GeneralSetting,
@@ -211,44 +208,48 @@ public class CustomOption
             if (isReturn) return;
 
             // Setup COG tab
-            var template = UnityEngine.Object.FindObjectsOfType<StringOption>().FirstOrDefault();
+            var template = Object.FindObjectsOfType<StringOption>().FirstOrDefault();
             if (template == null) return;
             var gameSettings = GameObject.Find("Game Settings");
-            var gameSettingMenu = UnityEngine.Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
+            var gameSettingMenu = Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
 
             var parent = gameSettings.transform.parent;
-            var torSettings = UnityEngine.Object.Instantiate(gameSettings, parent);
+            var torSettings = Object.Instantiate(gameSettings, parent);
             var torMenu = GetMenu(torSettings, "COGSettings");
 
-            var impostorSettings = UnityEngine.Object.Instantiate(gameSettings, parent);
+            var impostorSettings = Object.Instantiate(gameSettings, parent);
             var impostorMenu = GetMenu(impostorSettings, "ImpostorSettings");
 
-            var neutralSettings = UnityEngine.Object.Instantiate(gameSettings, parent);
+            var neutralSettings = Object.Instantiate(gameSettings, parent);
             var neutralMenu = GetMenu(neutralSettings, "NeutralSettings");
 
-            var crewmateSettings = UnityEngine.Object.Instantiate(gameSettings, parent);
+            var crewmateSettings = Object.Instantiate(gameSettings, parent);
             var crewmateMenu = GetMenu(crewmateSettings, "CrewmateSettings");
 
-            var addonsSettings = UnityEngine.Object.Instantiate(gameSettings, parent);
+            var addonsSettings = Object.Instantiate(gameSettings, parent);
             var modifierMenu = GetMenu(addonsSettings, "AddonsSettings");
 
             var roleTab = GameObject.Find("RoleTab");
             var gameTab = GameObject.Find("GameTab");
 
-            var cogTab = UnityEngine.Object.Instantiate(roleTab, roleTab.transform.parent);
+            var cogTab = Object.Instantiate(roleTab, roleTab.transform.parent);
             var cogTabHighlight = GetTabHighlight(cogTab, "COGTab", "COG.Resources.InDLL.Images.Setting.COG.png");
 
-            var impostorTab = UnityEngine.Object.Instantiate(roleTab, cogTab.transform);
-            var impostorTabHighlight = GetTabHighlight(impostorTab, "ImpostorTab", "COG.Resources.InDLL.Images.Setting.Imposter.png");
+            var impostorTab = Object.Instantiate(roleTab, cogTab.transform);
+            var impostorTabHighlight = GetTabHighlight(impostorTab, "ImpostorTab",
+                "COG.Resources.InDLL.Images.Setting.Imposter.png");
 
-            var neutralTab = UnityEngine.Object.Instantiate(roleTab, impostorTab.transform);
-            var neutralTabHighlight = GetTabHighlight(neutralTab, "NeutralTab", "COG.Resources.InDLL.Images.Setting.Neutral.png");
+            var neutralTab = Object.Instantiate(roleTab, impostorTab.transform);
+            var neutralTabHighlight =
+                GetTabHighlight(neutralTab, "NeutralTab", "COG.Resources.InDLL.Images.Setting.Neutral.png");
 
-            var crewmateTab = UnityEngine.Object.Instantiate(roleTab, neutralTab.transform);
-            var crewmateTabHighlight = GetTabHighlight(crewmateTab, "CrewmateTab", "COG.Resources.InDLL.Images.Setting.Crewmate.png");
+            var crewmateTab = Object.Instantiate(roleTab, neutralTab.transform);
+            var crewmateTabHighlight = GetTabHighlight(crewmateTab, "CrewmateTab",
+                "COG.Resources.InDLL.Images.Setting.Crewmate.png");
 
-            var modifierTab = UnityEngine.Object.Instantiate(roleTab, crewmateTab.transform);
-            var modifierTabHighlight = GetTabHighlight(modifierTab, "ModifierTab", "COG.Resources.InDLL.Images.Setting.SubRole.png");
+            var modifierTab = Object.Instantiate(roleTab, crewmateTab.transform);
+            var modifierTabHighlight = GetTabHighlight(modifierTab, "ModifierTab",
+                "COG.Resources.InDLL.Images.Setting.SubRole.png");
 
             // Position of Tab Icons
             gameTab.transform.position += Vector3.left * 3f;
@@ -272,12 +273,12 @@ public class CustomOption
                     [crewmateSettings.gameObject] = crewmateTabHighlight,
                     [addonsSettings.gameObject] = modifierTabHighlight
                 };
-                for (int i = 0; i < tabs.Length; i++)
+                for (var i = 0; i < tabs.Length; i++)
                 {
                     var button = tabs[i].GetComponentInChildren<PassiveButton>();
                     if (button == null) continue;
-                    int copiedIndex = i;
-                    button.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                    var copiedIndex = i;
+                    button.OnClick = new Button.ButtonClickedEvent();
                     button.OnClick.AddListener((Action)(() =>
                     {
                         if (settingsHighlightMap == null!) return;
@@ -286,7 +287,8 @@ public class CustomOption
                 }
             }
 
-            DestroyOptions(new List<List<OptionBehaviour>>{
+            DestroyOptions(new List<List<OptionBehaviour>>
+            {
                 Enumerable.ToList(torMenu.GetComponentsInChildren<OptionBehaviour>()),
                 Enumerable.ToList(impostorMenu.GetComponentsInChildren<OptionBehaviour>()),
                 Enumerable.ToList(neutralMenu.GetComponentsInChildren<OptionBehaviour>()),
@@ -300,40 +302,42 @@ public class CustomOption
             var crewmateOptions = new List<OptionBehaviour>();
             var modifierOptions = new List<OptionBehaviour>();
 
-            var menus = new List<Transform> { torMenu.transform, impostorMenu.transform, neutralMenu.transform, crewmateMenu.transform, modifierMenu.transform };
-            var optionBehaviours = new List<List<OptionBehaviour>> { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions };
+            var menus = new List<Transform>
+            {
+                torMenu.transform, impostorMenu.transform, neutralMenu.transform, crewmateMenu.transform,
+                modifierMenu.transform
+            };
+            var optionBehaviours = new List<List<OptionBehaviour>>
+                { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions };
 
             foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {
                 if (option?.OptionBehaviour == null)
-                {
                     if (option != null)
                     {
-                        var stringOption = UnityEngine.Object.Instantiate(template, menus[(int)option.Type]);
+                        var stringOption = Object.Instantiate(template, menus[(int)option.Type]);
                         optionBehaviours[(int)option.Type].Add(stringOption);
                         stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
                         stringOption.TitleText.text = option.Name;
                         if (FirstOpen)
-                        {
                             stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
-                        }
                         else
-                        {
                             stringOption.Value = stringOption.oldValue = option.Selection;
-                        }
 
                         stringOption.ValueText.text = option.Selections[option.Selection].ToString();
 
                         option.OptionBehaviour = stringOption;
                     }
-                }
+
                 option?.OptionBehaviour.gameObject.SetActive(true);
             }
 
             SetOptions(
                 new List<GameOptionsMenu> { torMenu, impostorMenu, neutralMenu, crewmateMenu, modifierMenu },
-                new List<List<OptionBehaviour>> { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions },
-                new List<GameObject> { torSettings, impostorSettings, neutralSettings, crewmateSettings, addonsSettings }
+                new List<List<OptionBehaviour>>
+                    { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions },
+                new List<GameObject>
+                    { torSettings, impostorSettings, neutralSettings, crewmateSettings, addonsSettings }
             );
 
             AdaptTaskCount(__instance);
@@ -341,12 +345,13 @@ public class CustomOption
 
         private static void SetListener(Dictionary<GameObject, SpriteRenderer> settingsHighlightMap, int index)
         {
-            foreach (KeyValuePair<GameObject, SpriteRenderer> entry in settingsHighlightMap)
+            foreach (var entry in settingsHighlightMap)
             {
                 if (entry.Key == null || entry.Value == null) continue;
                 entry.Key.SetActive(false);
                 entry.Value.enabled = false;
             }
+
             settingsHighlightMap.ElementAt(index).Key.SetActive(true);
             settingsHighlightMap.ElementAt(index).Value.enabled = true;
         }
@@ -354,28 +359,27 @@ public class CustomOption
         private static void DestroyOptions(List<List<OptionBehaviour>> optionBehavioursList)
         {
             foreach (var option in optionBehavioursList.SelectMany(optionBehaviours => optionBehaviours))
-            {
-                UnityEngine.Object.Destroy(option.gameObject);
-            }
+                Object.Destroy(option.gameObject);
         }
 
         private static bool SetNames(Dictionary<string, string> gameObjectNameDisplayNameMap)
         {
-            foreach (KeyValuePair<string, string> entry in gameObjectNameDisplayNameMap)
-            {
+            foreach (var entry in gameObjectNameDisplayNameMap)
                 if (GameObject.Find(entry.Key) != null)
-                { // Settings setup has already been performed, fixing the title of the tab and returning
-                    GameObject.Find(entry.Key).transform.FindChild("GameGroup").FindChild("Text").GetComponent<TMPro.TextMeshPro>().SetText(entry.Value);
+                {
+                    // Settings setup has already been performed, fixing the title of the tab and returning
+                    GameObject.Find(entry.Key).transform.FindChild("GameGroup").FindChild("Text")
+                        .GetComponent<TextMeshPro>().SetText(entry.Value);
                     return true;
                 }
-            }
 
             return false;
         }
 
         private static GameOptionsMenu GetMenu(GameObject setting, string settingName)
         {
-            var menu = setting.transform.FindChild("GameGroup").FindChild("SliderInner").GetComponent<GameOptionsMenu>();
+            var menu = setting.transform.FindChild("GameGroup").FindChild("SliderInner")
+                .GetComponent<GameOptionsMenu>();
             setting.name = settingName;
 
             return menu;
@@ -383,29 +387,35 @@ public class CustomOption
 
         private static SpriteRenderer GetTabHighlight(GameObject tab, string tabName, string tabSpritePath)
         {
-            var tabHighlight = tab.transform.FindChild("Hat Button").FindChild("Tab Background").GetComponent<SpriteRenderer>();
-            tab.transform.FindChild("Hat Button").FindChild("Icon").GetComponent<SpriteRenderer>().sprite = Utils.ResourceUtils.LoadSprite(tabSpritePath, 100f);
+            var tabHighlight = tab.transform.FindChild("Hat Button").FindChild("Tab Background")
+                .GetComponent<SpriteRenderer>();
+            tab.transform.FindChild("Hat Button").FindChild("Icon").GetComponent<SpriteRenderer>().sprite =
+                ResourceUtils.LoadSprite(tabSpritePath, 100f);
             tab.name = "tabName";
 
             return tabHighlight;
         }
+
         private static SpriteRenderer GetTabHighlight(GameObject tab, string tabName, Sprite tabSprite)
         {
-            var tabHighlight = tab.transform.FindChild("Hat Button").FindChild("Tab Background").GetComponent<SpriteRenderer>();
+            var tabHighlight = tab.transform.FindChild("Hat Button").FindChild("Tab Background")
+                .GetComponent<SpriteRenderer>();
             tab.transform.FindChild("Hat Button").FindChild("Icon").GetComponent<SpriteRenderer>().sprite = tabSprite;
             tab.name = "tabName";
 
             return tabHighlight;
         }
 
-        private static void SetOptions(List<GameOptionsMenu> menus, List<List<OptionBehaviour>> options, List<GameObject> settings)
+        private static void SetOptions(List<GameOptionsMenu> menus, List<List<OptionBehaviour>> options,
+            List<GameObject> settings)
         {
             if (!(menus.Count == options.Count && options.Count == settings.Count))
             {
                 Main.Logger.LogError("List counts are not equal");
                 return;
             }
-            for (int i = 0; i < menus.Count; i++)
+
+            for (var i = 0; i < menus.Count; i++)
             {
                 menus[i].Children = options[i].ToArray();
                 settings[i].gameObject.SetActive(false);
@@ -415,37 +425,37 @@ public class CustomOption
         private static void AdaptTaskCount(GameOptionsMenu __instance)
         {
             // Adapt task count for main options
-            var commonTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumCommonTasks")?.TryCast<NumberOption>();
+            var commonTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumCommonTasks")
+                ?.TryCast<NumberOption>();
             if (commonTasksOption != null) commonTasksOption.ValidRange = new FloatRange(0f, 4f);
 
-            var shortTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumShortTasks")?.TryCast<NumberOption>();
+            var shortTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumShortTasks")
+                ?.TryCast<NumberOption>();
             if (shortTasksOption != null) shortTasksOption.ValidRange = new FloatRange(0f, 23f);
 
-            var longTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumLongTasks")?.TryCast<NumberOption>();
+            var longTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumLongTasks")
+                ?.TryCast<NumberOption>();
             if (longTasksOption != null) longTasksOption.ValidRange = new FloatRange(0f, 15f);
         }
     }
 }
+
 [HarmonyPatch(typeof(StringOption), nameof(StringOption.OnEnable))]
 public class StringOptionEnablePatch
 {
     public static bool Prefix(StringOption __instance)
     {
-        CustomOption? option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
+        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
         if (option == null) return true;
 
         __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
         __instance.TitleText.text = option.Name;
-        
+
         if (FirstOpen)
-        {
             __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
-        }
         else
-        {
             __instance.Value = __instance.oldValue = option.Selection;
-        }
-        
+
         __instance.ValueText.text = option.Selections[option.Selection].ToString();
 
         return false;
@@ -476,10 +486,11 @@ public class StringOptionIncreasePatch
         option.UpdateSelection(option.Selection - 1);
         return false;
     }
+
     [HarmonyPatch(nameof(StringOption.OnEnable))]
     public static bool OnEnablePatch(StringOption __instance)
     {
-        CustomOption? option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
+        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
         if (option == null) return true;
 
         __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
@@ -490,37 +501,36 @@ public class StringOptionIncreasePatch
         return false;
     }
 }
-    
+
 public abstract class SyncSettingPatch
 {
-
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings)), HarmonyPostfix]
+    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
+    [HarmonyPostfix]
     public static void SyncSetting()
     {
         ShareOptionSelections();
     }
 
-    [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoSpawnPlayer)), HarmonyPostfix]
+    [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoSpawnPlayer))]
+    [HarmonyPostfix]
     public static void SyncOnSpawnPlayer()
     {
-        if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost)
-        {
-            ShareOptionSelections();
-        }
+        if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost) ShareOptionSelections();
     }
 }
 
-
 [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Update))]
-class GameOptionsMenuUpdatePatch
+internal class GameOptionsMenuUpdatePatch
 {
     private static float timer = 1f;
-    private static float timerForBugFix = 1f;
+    private static readonly float timerForBugFix = 1f;
+
     public static void Postfix(GameOptionsMenu __instance)
     {
         // Return Menu Update if in normal among us settings 
-        var gameSettingMenu = UnityEngine.Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
-        if (gameSettingMenu != null && (gameSettingMenu.RegularGameSettings.active || gameSettingMenu.RolesSettings.gameObject.active)) return;
+        var gameSettingMenu = Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
+        if (gameSettingMenu != null && (gameSettingMenu.RegularGameSettings.active ||
+                                        gameSettingMenu.RolesSettings.gameObject.active)) return;
 
         __instance.GetComponentInParent<Scroller>().ContentYBounds.max = -0.5F + __instance.Children.Length * 0.55F;
         timer += Time.deltaTime;
@@ -531,8 +541,8 @@ class GameOptionsMenuUpdatePatch
 
         if (timerForBugFix < 3.0f) FirstOpen = false;
 
-        float offset = 2.75f;
-        foreach (CustomOption? option in Options)
+        var offset = 2.75f;
+        foreach (var option in Options)
         {
             if (GameObject.Find("COGSettings") && option.Type != CustomOptionType.General)
                 continue;
@@ -546,16 +556,19 @@ class GameOptionsMenuUpdatePatch
                 continue;
             if (option?.OptionBehaviour != null && option.OptionBehaviour.gameObject != null)
             {
-                bool enabled = true;
+                var enabled = true;
                 var parent = option.Parent;
                 while (enabled)
-                {
                     if (parent != null)
                     {
                         enabled = parent.Selection != 0;
                         parent = parent.Parent;
-                    } else break;
-                }
+                    }
+                    else
+                    {
+                        break;
+                    }
+
                 option.OptionBehaviour.gameObject.SetActive(enabled);
                 if (enabled)
                 {
@@ -570,36 +583,28 @@ class GameOptionsMenuUpdatePatch
     }
 }
 
-
 [HarmonyPatch]
-class HudStringPatch
+internal class HudStringPatch
 {
     [HarmonyPatch(typeof(IGameOptionsExtensions), nameof(IGameOptionsExtensions.ToHudString))]
     private static void Postfix(ref string __result)
     {
-        if (GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return; // Allow Vanilla Hide N Seek
+        if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek)
+            return; // Allow Vanilla Hide N Seek
 
         foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
             listener.OnIGameOptionsExtensionsDisplay(ref __result);
-        }
     }
-    
+
     public static string GetOptByType(CustomOptionType type)
     {
-        string txt = "";
+        var txt = "";
         List<CustomOption> opt = new();
         foreach (var option in Options)
-        {
             if (option != null && option.Type == type)
-            {
                 opt.Add(option);
-            }
-        }
         foreach (var option in opt)
-        {
             txt += option.Name + ": " + option.Selections[option.Selection] + Environment.NewLine;
-        }
         return txt;
     }
 }
@@ -610,8 +615,6 @@ public static class GameOptionsNextPagePatch
     public static void Postfix(KeyboardJoystick __instance)
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
             listener.OnKeyboardJoystickUpdate(__instance);
-        }
     }
 }
