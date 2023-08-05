@@ -120,4 +120,6 @@ public interface IListener
     bool OnCheckMurder(PlayerControl killer, PlayerControl target) => true;
     
     void AfterRPCReceived(byte callId, MessageReader reader) { }
+
+    bool OnDeadBodyClick(DeadBody deadBody) { return true; }
 }
