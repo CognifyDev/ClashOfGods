@@ -207,6 +207,10 @@ public interface IListener
         return true;
     }
 
+    void OnCoSetTasks(PlayerControl player, List<GameData.TaskInfo> tasks)
+    {
+    }
+
     private class EmptyListener : IListener
     {
     }

@@ -82,6 +82,8 @@ public class LanguageConfig : Config
             ImpostorCampDescription = GetString("camp.impostor.description");
             NeutralCampDescription = GetString("camp.neutral.description");
             CrewmateCampDescription = GetString("camp.crewmate.description");
+
+            KillAction = GetString("action.kill");
         }
         catch (NullReferenceException)
         {
@@ -155,6 +157,8 @@ public class LanguageConfig : Config
     public string ImpostorCampDescription { get; private set; }
     public string NeutralCampDescription { get; private set; }
     public string CrewmateCampDescription { get; private set; }
+    
+    public string KillAction { get; private set; }
 
     private string GetString(string location)
     {

@@ -23,8 +23,8 @@ public abstract class Role
         BaseRoleType = RoleTypes.Crewmate;
         RoleOptions = new List<CustomOption>();
         SubRole = false;
-        CanVent = false;
-        CanKill = false;
+        CanVent = campType == CampType.Impostor;
+        CanKill = campType == CampType.Impostor;
         CanSabotage = false;
 
         ShowInOptions = showInOptions;
@@ -111,7 +111,7 @@ public abstract class Role
 
     public static CustomOption.CustomOptionType ToCustomOption(Role role)
     {
-        if (role.CampType == CampType.Unknown) return CustomOption.CustomOptionType.Addons;
+        if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.CustomOptionType.Addons;
         return (CustomOption.CustomOptionType)role.CampType;
     }
 
