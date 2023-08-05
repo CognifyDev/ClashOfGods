@@ -39,7 +39,7 @@ public class CustomButton
     /// </summary>
     /// <param name="onClick">点击后按钮的动作（自动判断是否还在冷却）</param>
     /// <param name="onMeetingEnd">会议结束后按钮的动作</param>
-    /// <param name="onEffect">按钮等待时间结束后的动作（如纵火犯按下浇油按钮后要等待 <paramref name="effectTime"/> 秒，结束后便执行此动作）（此处为null或 <paramref name="hasEffect"/> 为false则不执行）</param>
+    /// <param name="onEffect">按钮等待时间结束后的动作（如纵火犯按下浇油按钮后要等待 <paramref name="effectTime"/> 秒,结束后便执行此动作）（此处为null或 <paramref name="hasEffect"/> 为false则不执行）</param>
     /// <param name="couldUse">使用按钮的条件</param>
     /// <param name="hasButton">玩家拥有此按钮的条件</param>
     /// <param name="sprite">按钮的图标</param>
@@ -48,7 +48,7 @@ public class CustomButton
     /// <param name="text">按钮的文本</param>
     /// <param name="cooldown">按钮的冷却</param>
     /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
-    /// <param name="hotkeyName">热键名称（留空为自动取名，如果无热键则没有名称）</param>
+    /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, float cooldown, float effectTime, int usesLimit, string hotkeyName = "")
     {
@@ -68,7 +68,7 @@ public class CustomButton
     /// <param name="text">按钮的文本</param>
     /// <param name="cooldown">按钮的冷却</param>
     /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
-    /// <param name="hotkeyName">热键名称（留空为自动取名，如果无热键则没有名称）</param>
+    /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, float cooldown, int usesLimit, string hotkeyName = "")
     {
@@ -76,7 +76,7 @@ public class CustomButton
     }
 
     /// <summary>
-    /// 用来实例化，没有这玩意出大问题
+    /// 用来实例化,没有这玩意出大问题
     /// </summary>
     public CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime, int usesLimit, string hotkeyName)
     {
@@ -109,7 +109,7 @@ public class CustomButton
     }
 
     /// <summary>
-    /// 给按钮先实例化用，如
+    /// 给按钮先实例化用,如
     /// CustomButton btn = new();   
     /// btn = CustomButton.Create(/*Code here...*/);
     /// </summary>
@@ -119,13 +119,13 @@ public class CustomButton
     // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Objects/CustomButton.cs#L40
     public static class ButtonPositions
     {
-        public static readonly Vector3 LowerRowRight = new(-2f, -0.06f， 0);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f， 0);
-        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f， 0);
-        public static readonly Vector3 UpperRowRight = new(0f， 1f， 0f);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 UpperRowCenter = new(-1f， 1f， 0f);  // Not usable for imps beacuse of new button positions!
-        public static readonly Vector3 UpperRowLeft = new(-2f， 1f， 0f);
-        public static readonly Vector3 UpperRowFarLeft = new(-3f， 1f， 0f);
+        public static readonly Vector3 LowerRowRight = new(-2f, -0.06f, 0);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f, 0);
+        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f, 0);
+        public static readonly Vector3 UpperRowRight = new(0f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowCenter = new(-1f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowLeft = new(-2f, 1f, 0f);
+        public static readonly Vector3 UpperRowFarLeft = new(-3f, 1f, 0f);
     }
 
     public void SetActive(bool active)
