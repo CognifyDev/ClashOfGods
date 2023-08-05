@@ -102,7 +102,8 @@ public partial class Main : BasePlugin
             new ModOptionListener(),
             new CustomButtonListener(),
             new RpcListener(),
-            new GameObjectListener()
+            new GameObjectListener(),
+            new DeadPlayerManager()
         });
 
         // Register sidebar texts

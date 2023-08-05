@@ -37,7 +37,11 @@ public abstract class Role
             RoleOptions.Add(CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
                 LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, option));
         }
+        
+        Instance = this;
     }
+
+    public static Role Instance { get; protected set; }
 
     /// <summary>
     ///     角色颜色
