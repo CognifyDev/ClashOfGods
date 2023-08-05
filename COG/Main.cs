@@ -100,7 +100,8 @@ public partial class Main : BasePlugin
             new OptionListener(),
             new ModOptionListener(),
             new CustomButtonListener(),
-            new RpcListener()
+            new RpcListener(),
+            new GameObjectListener()
         });
 
         // Register sidebar texts

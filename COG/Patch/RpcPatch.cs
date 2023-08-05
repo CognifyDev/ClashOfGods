@@ -9,6 +9,7 @@ class RPCHandlerPatch
     [HarmonyPostfix]
     public static void Postfix([HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
+        Main.Logger.LogInfo($"Rpc {callId} received, rpc length => {reader.Length}");
         foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
         {
             listener.AfterRPCReceived(callId, reader);

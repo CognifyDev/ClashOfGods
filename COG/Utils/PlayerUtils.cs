@@ -10,22 +10,24 @@ public static class PlayerUtils
     public static List<PlayerControl> GetAllPlayers() =>
         PlayerControl.AllPlayerControls.ToArray().Where(player => player != null).ToList();
 
-    public static List<PlayerControl> GetAllAlivePlayers() => 
+    public static List<PlayerControl> GetAllAlivePlayers() =>
         PlayerControl.AllPlayerControls.ToArray().Where(player => player != null && player.IsAlive()).ToList();
 
     public static bool IsSamePlayer(this GameData.PlayerInfo info, GameData.PlayerInfo target) =>
         info.FriendCode.Equals(target.FriendCode) && info.PlayerName.Equals(target.PlayerName);
-    
+
     public static bool IsSamePlayer(this PlayerControl player, PlayerControl target) =>
         player.name.Equals(target.name) && player.FriendCode.Equals(target.FriendCode);
 
-    public static Role.Role? GetRoleInstance(this PlayerControl player) => 
-        (from keyValuePair in GameUtils.Data where keyValuePair.Key.IsSamePlayer(player) select keyValuePair.Value).FirstOrDefault();
+    public static Role.Role? GetRoleInstance(this PlayerControl player) =>
+        (from keyValuePair in GameUtils.Data where keyValuePair.Key.IsSamePlayer(player) select keyValuePair.Value)
+        .FirstOrDefault();
 
     public static void SetNamePrivately(PlayerControl target, PlayerControl seer, string name)
     {
         var writer =
-            AmongUsClient.Instance.StartRpcImmediately(target.NetId, (byte)RpcCalls.SetName, SendOption.Reliable, seer.GetClientID());
+            AmongUsClient.Instance.StartRpcImmediately(target.NetId, (byte)RpcCalls.SetName, SendOption.Reliable,
+                seer.GetClientID());
         writer.Write(name);
         writer.Write(false);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -40,10 +42,11 @@ public static class PlayerUtils
 
         return null;
     }
-    
+
     public static ClientData? GetClient(this PlayerControl player)
     {
-        var client = AmongUsClient.Instance.allClients.ToArray().FirstOrDefault(cd => cd.Character.PlayerId == player.PlayerId);
+        var client = AmongUsClient.Instance.allClients.ToArray()
+            .FirstOrDefault(cd => cd.Character.PlayerId == player.PlayerId);
         return client;
     }
 
@@ -63,4 +66,9 @@ public static class PlayerUtils
         if (player == null) return false;
         return !player.Data.IsDead;
     }
+
+    public static void RpcVaporize(this PlayerControl player, PlayerControl target)
+    {
+    }
+
 }
