@@ -5,6 +5,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
+using COG.Command;
+using COG.Command.Impl;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
@@ -64,8 +66,7 @@ public partial class Main : BasePlugin
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
 
-        /*
-         *var disabledVersion = WebUtils.GetWeb("https://among-us.top/disabledVersions").Split("|");
+        var disabledVersion = WebUtils.GetWeb("https://among-us.top/disabledVersions").Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
             Logger.LogError("The version of the mod has been disabled!");
@@ -88,8 +89,7 @@ public partial class Main : BasePlugin
                 return;
             }
         }
-         * 
-         */
+        
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
@@ -143,6 +143,12 @@ public partial class Main : BasePlugin
                     UnityEngine.Application.Quit();
                     return false;
                 }, false)
+        });
+        
+        // Register Commands
+        CommandManager.GetManager().RegisterCommands(new Command.Command[]
+        {
+            new RpcCommand()
         });
 
         Harmony.PatchAll();

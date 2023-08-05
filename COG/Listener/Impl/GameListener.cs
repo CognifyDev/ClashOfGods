@@ -31,8 +31,6 @@ public class GameListener : IListener
 
     public void OnRPCReceived(byte callId, MessageReader reader)
     {
-        Main.Logger.LogInfo("Received rpc " + callId + " Length => " + reader.Length);
-        
         var knownRpc = (KnownRpc)callId;
         if (knownRpc != KnownRpc.ShareRoles) return;
         var roleData = reader.ReadPackedInt32();
@@ -115,19 +113,20 @@ public class GameListener : IListener
         {
             RoleListeners.Add(value.GetListener(key));
         }
+        
+        ShareRoles();
     }
 
     private void ShareRoles()
     {
-        var writer = AmongUsClient.Instance.StartRpcImmediately(
-            PlayerControl.LocalPlayer.NetId, (byte)KnownRpc.ShareRoles, SendOption.Reliable);
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
         writer.WritePacked(GameUtils.Data.Count);
         foreach (var (key, value) in GameUtils.Data)
         {
             writer.Write(key.PlayerId);
             writer.Write(value.GetType().Name);
         }
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        writer.Finish();
     }
 
     public class RoleShare : InnerNetObject

@@ -119,7 +119,7 @@ public class CustomOption
         var localPlayer = PlayerControl.LocalPlayer;
         
         // 新建写入器
-        var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions, SendOption.Reliable);
+        var writer = RpcUtils.StartRpcImmediately(localPlayer, (byte)KnownRpc.ShareOptions);
 
         var options = WriteOptionsToByteArray();
         
@@ -131,7 +131,7 @@ public class CustomOption
         }
         
         // OK 现在进行一个结束
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        writer.Finish();
 
         /*
         return;
