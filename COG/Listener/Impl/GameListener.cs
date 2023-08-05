@@ -129,16 +129,6 @@ public class GameListener : IListener
         writer.Finish();
     }
 
-    public class RoleShare : InnerNetObject
-    {
-        public Dictionary<PlayerControl, Role.Role> Data { get; }
-        
-        public RoleShare(Dictionary<PlayerControl, Role.Role> data)
-        {
-            Data = data;
-        }
-    }
-
     public void OnGameStart(GameStartManager manager)
     {
         // 改变按钮颜色
