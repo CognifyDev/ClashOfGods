@@ -1,5 +1,6 @@
 using System.Linq;
 using COG.Listener;
+using Il2CppSystem.Collections.Generic;
 
 namespace COG.Patch;
 
@@ -132,7 +133,7 @@ internal class CheckTaskCompletionPatch
 }
 
 [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap))]
-internal class SabotageMapOpen
+class SabotageMapOpen
 {
     private static bool Prefix(MapBehaviour __instance)
     {
@@ -141,5 +142,17 @@ internal class SabotageMapOpen
                      .Where(listener => !listener.OnShowSabotageMap(__instance))) returnAble = false;
 
         return returnAble;
+    }
+}
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CoSetTasks))]
+class TaskPatch
+{
+    public static void Prefix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnCoSetTasks(__instance, tasks);
+        }
     }
 }

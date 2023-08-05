@@ -70,11 +70,14 @@ public class CustomButton
     /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
     /// <param name="hotkeyName">热键名称（留空为自动取名，如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, float cooldown, float effectTime, int usesLimit, string hotkeyName = "")
+    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, float cooldown, int usesLimit, string hotkeyName = "")
     {
-        return new(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text, false, cooldown, effectTime, usesLimit, hotkeyName);
+        return new(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text, false, cooldown, -1f, usesLimit, hotkeyName);
     }
 
+    /// <summary>
+    /// 用来实例化，没有这玩意出大问题
+    /// </summary>
     public CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime, int usesLimit, string hotkeyName)
     {
         OnClick = onClick;
@@ -91,6 +94,19 @@ public class CustomButton
         EffectTime = effectTime;
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
+    }
+    public CustomButton() { }
+    // Position from The Other Roles
+    // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Objects/CustomButton.cs#L40
+    public static class ButtonPositions
+    {
+        public static readonly Vector3 LowerRowRight = new(-2f, -0.06f, 0);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f, 0);
+        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f, 0);
+        public static readonly Vector3 UpperRowRight = new(0f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowCenter = new(-1f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
+        public static readonly Vector3 UpperRowLeft = new(-2f, 1f, 0f);
+        public static readonly Vector3 UpperRowFarLeft = new(-3f, 1f, 0f);
     }
 
     /// <summary>
@@ -187,10 +203,9 @@ public class CustomButton
             
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) this.CheckClick();
     }
-
+  
     public void OnMeetingEndSpawn() => this.OnMeetingEnd();
         
-
     #nullable disable
     public void CheckClick()
     {

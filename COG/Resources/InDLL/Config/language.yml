@@ -69,3 +69,5 @@ sidebar-text:
   addons: "<color=#9AFF00>副职业设置</color>"
   impostor: "<color=#9AFF00>伪装者设置</color>"
   crewmate: "<color=#9AFF00>船员设置</color>"
+action:
+  kill: "击杀"

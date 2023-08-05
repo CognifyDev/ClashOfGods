@@ -28,6 +28,7 @@ public class GameListener : IListener
 
     public void OnRPCReceived(byte callId, MessageReader reader)
     {
+        if (AmongUsClient.Instance.AmHost) return;
         var knownRpc = (KnownRpc)callId;
         if (knownRpc != KnownRpc.ShareRoles) return;
         var roleData = reader.ReadPackedInt32();
