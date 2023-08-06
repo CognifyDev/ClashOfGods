@@ -108,6 +108,8 @@ public class GameListener : IListener
         foreach (var (key, value) in GameUtils.Data) RoleListeners.Add(value.GetListener(key));
 
         ShareRoles();
+
+        SavePlayerRoles();
     }
 
     public void OnGameStart(GameStartManager manager)
@@ -337,5 +339,11 @@ public class GameListener : IListener
         }
 
         writer.Finish();
+    }
+
+    private void SavePlayerRoles()
+    {
+        PlayerRole.CachedRoles.Clear();
+        foreach (var pair in GameUtils.Data) new PlayerRole(pair.Key, pair.Value, pair.Key.Data.PlayerName);
     }
 }

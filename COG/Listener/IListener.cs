@@ -68,10 +68,18 @@ public interface IListener
     }
 
     /// <summary>
-    ///     游戏开始的时候触发
+    ///     游戏开始倒计时结束后触发
     /// </summary>
     /// <param name="manager"></param>
     void OnGameStart(GameStartManager manager)
+    {
+    }
+
+    /// <summary>
+    ///     游戏真正开始（玩家可移动）时触发
+    /// </summary>
+    /// <param name="manager"></param>
+    void OnGameStart(GameManager manager)
     {
     }
 
