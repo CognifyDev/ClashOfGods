@@ -105,7 +105,7 @@ public partial class Main : BasePlugin
             new RpcListener(),
             new GameObjectListener(),
             new DeadPlayerManager(),
-            new CustomWinner()
+            new CustomWinnerListener()
         });
 
         // Register sidebar texts
