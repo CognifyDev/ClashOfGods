@@ -22,6 +22,7 @@ using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine;
+using COG.UI.CustomWinner;
 
 namespace COG;
 
@@ -103,7 +104,8 @@ public partial class Main : BasePlugin
             new CustomButtonListener(),
             new RpcListener(),
             new GameObjectListener(),
-            new DeadPlayerManager()
+            new DeadPlayerManager(),
+            new CustomWinner()
         });
 
         // Register sidebar texts
