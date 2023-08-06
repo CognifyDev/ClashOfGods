@@ -127,6 +127,7 @@ public static class PlayerUtils
 public enum DeathReason
 {
     Unknown = -1,
+    Disconnected,
     Default,
     Misfire,
     BySheriffKill,
@@ -141,15 +142,17 @@ public class DeadPlayerManager : IListener
         public DateTime DeadTime { get; private set; }
         public DeathReason? DeathReason { get; private set; }
         public PlayerControl Player { get; private set; }
-        public PlayerControl Killer { get; private set; }
+        public PlayerControl? Killer { get; private set; }
         public Role.Role? Role { get; private set; }
-        public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl killer)
+        public byte PlayerId { get; private set; }
+        public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl? killer)
         {
             DeadTime = deadTime;
             DeathReason = deathReason;
             Player = player;
             Killer = killer;
             Role = player.GetRoleInstance();
+            PlayerId = player.PlayerId;
             DeadPlayers.Add(this);
         }
 
@@ -164,9 +167,13 @@ public class DeadPlayerManager : IListener
         var reason = GetDeathReason(killer, target);
         new DeadPlayer(DateTime.Now, reason, target, killer);
     }
+    public void OnPlayerLeft(AmongUsClient client, ClientData data, DisconnectReasons reason)
+    {
+        if (DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
+        new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
+    }
     public void OnCoBegin() => DeadPlayers.Clear();
     
-
     private static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
     {
         try
@@ -176,5 +183,22 @@ public class DeadPlayerManager : IListener
             return DeathReason.Default;
         }
         catch { return DeathReason.Unknown; }
+    }
+}
+
+public class PlayerRole
+{
+    public static List<PlayerRole> CachedRoles { get; set; } = new();
+    public PlayerControl Player;
+    public Role.Role Role;
+    public string PlayerName;
+    public byte PlayerId;
+    public PlayerRole(PlayerControl player, Role.Role role, string name)
+    {
+        Player = player;
+        Role = role;
+        PlayerName = name;
+        PlayerId = player.PlayerId;
+        CachedRoles.Add(this);
     }
 }

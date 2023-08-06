@@ -156,3 +156,15 @@ class TaskPatch
         }
     }
 }
+
+[HarmonyPatch(typeof(GameManager),nameof(GameManager.StartGame))]
+class GameStartPatch
+{
+    public static void Postfix(GameManager __instance)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnGameStart(__instance);
+        }
+    }
+}
