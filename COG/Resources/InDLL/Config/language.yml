@@ -71,3 +71,11 @@ sidebar-text:
   crewmate: "<color=#9AFF00>船员设置</color>"
 action:
   kill: "击杀"
+game:
+  end:
+    show-players-roles-message: "玩家职业: "
+  survival-data:
+    alive: "存活"
+    disconnected: "掉线"
+    default: "死亡"
+    unknown: "未知"

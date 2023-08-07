@@ -5,6 +5,7 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using COG.States;
+using COG.UI.CustomWinner;
 using COG.Utils;
 using Il2CppSystem;
 using Il2CppSystem.Collections;
@@ -189,8 +190,7 @@ public class GameListener : IListener
         var role = GameUtils.GetLocalPlayerRole();
         var player = PlayerControl.LocalPlayer;
 
-        if (role == null) return;
-        var camp = role.CampType;
+        var camp = role?.CampType;
         if (camp is CampType.Neutral or CampType.Unknown)
         {
             var soloTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
@@ -229,19 +229,15 @@ public class GameListener : IListener
 
         if (PlayerUtils.GetAllAlivePlayers().Count <= 1)
         {
-            TempData.winners.Clear();
+            CustomWinnerManager.RegisterCustomWinners(PlayerUtils.GetAllAlivePlayers());
             return true;
         }
 
-        if (aliveImpostors.Count >= PlayerUtils.GetAllAlivePlayers().Count)
-        {
-            TempData.winners.Clear();
-            foreach (var aliveImpostor in aliveImpostors)
-                TempData.winners.Add(new WinningPlayerData(aliveImpostor.Data));
-            return true;
-        }
+        if (aliveImpostors.Count < PlayerUtils.GetAllAlivePlayers().Count) return false; // 不允许游戏结束
+        foreach (var aliveImpostor in aliveImpostors)
+            CustomWinnerManager.RegisterCustomWinner(aliveImpostor.Data);
+        return true;
 
-        return false; // 不允许游戏结束
     }
 
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,

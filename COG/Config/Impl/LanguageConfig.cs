@@ -84,6 +84,13 @@ public class LanguageConfig : Config
             CrewmateCampDescription = GetString("camp.crewmate.description");
 
             KillAction = GetString("action.kill");
+
+            ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
+
+            Alive = GetString("game.survival-data.alive");
+            Disconnected = GetString("game.survival-data.disconnected");
+            DefaultKillReason = GetString("game.survival-data.default");
+            UnknownKillReason = GetString("game.survival-data.unknown");
         }
         catch (NullReferenceException)
         {
@@ -159,6 +166,13 @@ public class LanguageConfig : Config
     public string CrewmateCampDescription { get; private set; }
     
     public string KillAction { get; private set; }
+    
+    public string ShowPlayersRolesMessage { get; private set; }
+    
+    public string Alive { get; private set; }
+    public string Disconnected { get; private set; }
+    public string DefaultKillReason { get; private set; }
+    public string UnknownKillReason { get; private set; }
 
     private string GetString(string location)
     {

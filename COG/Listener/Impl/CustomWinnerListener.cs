@@ -1,8 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
+using COG.Config.Impl;
 using COG.UI.CustomWinner;
+using COG.Utils;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace COG.Listener.Impl;
 
@@ -15,12 +19,15 @@ public class CustomWinnerListener : IListener
         SetUpWinnerPlayers(manager);
         SetUpWinText(manager);
         SetUpRoleSummary(manager);
+        
+        CustomWinnerManager.ResetCustomWinners();
     }
-    public static void SetUpWinnerPlayers(EndGameManager manager)
-    {
-        manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList().ForEach(pb => pb.gameObject.Destroy());
 
-        _ = TempData.winners.ToArray().ToList().OrderBy(b => b.IsYou ? -1 : 0).ToList();
+    private static void SetUpWinnerPlayers(EndGameManager manager)
+    {
+        ListUtils.ToList(manager.transform.GetComponentsInChildren<PoolablePlayer>()).ForEach(pb => pb.gameObject.Destroy());
+
+        // var sortedList = TempData.winners.ToArray().ToList().OrderBy(b => b.IsYou ? -1 : 0).ToList();
         var num = 0;
         var ceiling = Mathf.CeilToInt(7.5f);
         
@@ -32,10 +39,10 @@ public class CustomWinnerListener : IListener
             var winnerControl = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(p => p.cosmetics.ColorId == winner.ColorId);
             if (!winnerControl) continue;
 
-            var winnerRole = Utils.PlayerUtils.GetRoleInstance(winnerControl!);
+            var winnerRole = winnerControl!.GetRoleInstance();
             if (winnerRole == null) continue;
 
-            var offsetMultiplier = (num % 2 == 0) ? -1 : 1;
+            var offsetMultiplier = num % 2 == 0 ? -1 : 1;
             var indexOffset = (num + 1) / 2;
             var lerpFactor = indexOffset / ceiling;
             var scaleLerp = Mathf.Lerp(1f, 0.75f, lerpFactor);
@@ -45,7 +52,7 @@ public class CustomWinnerListener : IListener
                 FloatRange.SpreadToEdges(-1.125f, 0f, indexOffset, ceiling),
                 positionOffset + indexOffset * 0.01f) * 0.9f;
 
-            float scaleValue = Mathf.Lerp(1f, 0.65f, lerpFactor) * 0.9f;
+            var scaleValue = Mathf.Lerp(1f, 0.65f, lerpFactor) * 0.9f;
             var scale = new Vector3(scaleValue, scaleValue, 1f);
 
             winnerPotable.transform.localScale = scale;
@@ -71,23 +78,24 @@ public class CustomWinnerListener : IListener
             num++;
         }
     }
-    public static void SetUpWinText(EndGameManager manager)
+    private static void SetUpWinText(EndGameManager manager)
     {
         var template = manager.WinText;
         var pos = template.transform.position;
         var winText = Object.Instantiate(template);
 
-        winText.transform.position = new(pos.x, pos.y - 0.5f, pos.z);
-        winText.transform.localScale = new(0.7f, 0.7f, 1f);
+        winText.transform.position = new Vector3(pos.x, pos.y - 0.5f, pos.z);
+        winText.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
         winText.text = CustomWinnerManager.WinText;
         winText.color = CustomWinnerManager.WinColor;
         manager.BackgroundBar.material.SetColor(Color1, CustomWinnerManager.WinColor);
 
         // Reset
-        CustomWinnerManager.WinText = "";
-        CustomWinnerManager.WinColor = Color.white;
+        CustomWinnerManager.SetWinText("");
+        CustomWinnerManager.SetWinColor(Color.white);
     }
-    public static void SetUpRoleSummary(EndGameManager manager)
+    
+    private static void SetUpRoleSummary(EndGameManager manager)
     {
         var position = Camera.main!.ViewportToWorldPoint(new Vector3(0f, 1f, Camera.main.nearClipPlane));
         var roleSummary = Object.Instantiate(manager.WinText);
@@ -97,19 +105,19 @@ public class CustomWinnerListener : IListener
         roleSummary.fontSizeMax = roleSummary.fontSizeMin = roleSummary.fontSize = 1.5f;
         roleSummary.color = Color.white;
 
-        StringBuilder summary = new("All players and their roles at the end of the game: \n");
-        foreach(var role in Utils.PlayerRole.CachedRoles)
+        StringBuilder summary = new($"{LanguageConfig.Instance.ShowPlayersRolesMessage}");
+        summary.Append(Environment.NewLine);
+        foreach(var role in PlayerRole.CachedRoles)
         {
-            var deadPlayer = Utils.DeadPlayerManager.DeadPlayers.Where(dp => dp.PlayerId == role.PlayerId).FirstOrDefault();
+            var deadPlayer = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
             summary.Append(role.PlayerName).Append(' ').Append(role.Role.Name);
-            summary.Append(' ').Append(Utils.ColorUtils.ToColorString(deadPlayer == null ? 
+            summary.Append(' ').Append(ColorUtils.ToColorString(deadPlayer == null ? 
                     Palette.AcceptedGreen : 
                     Palette.ImpostorRed, 
-                deadPlayer == null ? 
-                    "Alive" : 
-                    (deadPlayer.DeathReason.ToString() ?? 
-                     "Unknown")));
-            summary.Append('\n');
+                deadPlayer == null ?
+                    LanguageConfig.Instance.Alive : 
+                    deadPlayer.DeathReason == null ? LanguageConfig.Instance.UnknownKillReason : deadPlayer.DeathReason.GetLanguageDeathReason()));
+            summary.Append(Environment.NewLine);
         }
 
         roleSummary.text = summary.ToString();

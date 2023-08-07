@@ -7,6 +7,7 @@ using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 using System;
+using COG.Config.Impl;
 
 namespace COG.Utils;
 
@@ -128,9 +129,7 @@ public enum DeathReason
 {
     Unknown = -1,
     Disconnected,
-    Default,
-    Misfire,
-    BySheriffKill,
+    Default
 }
 
 public class DeadPlayerManager : IListener
@@ -178,8 +177,6 @@ public class DeadPlayerManager : IListener
     {
         try
         {
-            if (killer == target && killer.IsRole(Sheriff.Instance)) return DeathReason.Misfire;
-            if (killer != target && killer.IsRole(Sheriff.Instance) && target.GetRoleInstance()!.CampType != CampType.Crewmate) return DeathReason.BySheriffKill;
             return DeathReason.Default;
         }
         catch { return DeathReason.Unknown; }
@@ -200,5 +197,18 @@ public class PlayerRole
         PlayerName = name;
         PlayerId = player.PlayerId;
         CachedRoles.Add(this);
+    }
+}
+
+public static class DeathReasonUtils
+{
+    public static string GetLanguageDeathReason(this DeathReason? deathReason)
+    {
+        return deathReason switch
+        {
+            DeathReason.Default => LanguageConfig.Instance.DefaultKillReason,
+            DeathReason.Disconnected => LanguageConfig.Instance.Disconnected,
+            _ => LanguageConfig.Instance.UnknownKillReason
+        };
     }
 }
