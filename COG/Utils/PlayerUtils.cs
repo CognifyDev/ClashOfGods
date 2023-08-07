@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using COG.Listener;
-using COG.Role.Impl.Crewmate;
-using COG.Role;
 using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
@@ -20,14 +18,16 @@ public enum ColorType
 
 public static class PlayerUtils
 {
+    internal static readonly List<PlayerControl> Players = new();
+
     public static List<PlayerControl> GetAllPlayers()
     {
-        return PlayerControl.AllPlayerControls.ToArray().Where(player => player != null).ToList();
+        return Players.ToArray().Where(player => player != null).ToList();
     }
 
     public static List<PlayerControl> GetAllAlivePlayers()
     {
-        return PlayerControl.AllPlayerControls.ToArray().Where(player => player != null && player.IsAlive()).ToList();
+        return Players.ToArray().Where(player => player != null && player.IsAlive()).ToList();
     }
 
     public static bool IsSamePlayer(this GameData.PlayerInfo info, GameData.PlayerInfo target)

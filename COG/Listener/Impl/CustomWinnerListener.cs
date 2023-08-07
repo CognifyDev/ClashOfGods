@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using COG.Config.Impl;
@@ -31,15 +32,23 @@ public class CustomWinnerListener : IListener
         var num = 0;
         var ceiling = Mathf.CeilToInt(7.5f);
         
-        foreach (var winner in TempData.winners)
+        Main.Logger.LogInfo($"Winners number => {CustomWinnerManager.AllWinners.Count}");
+        
+        TempData.winners.Clear();
+        foreach (var playerControl in CustomWinnerManager.AllWinners)
+        {
+            TempData.winners.Add(new WinningPlayerData(playerControl.Data));
+        }
+
+        foreach (var winner in CustomWinnerManager.AllWinners)
         {
             if (!(manager.PlayerPrefab && manager.transform)) break;
-                
-            var winnerPotable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
-            var winnerControl = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(p => p.cosmetics.ColorId == winner.ColorId);
-            if (!winnerControl) continue;
+            Main.Logger.LogInfo($"Set up winner message for {manager.PlayerPrefab.name} at {manager.transform.position.ToString()}");
 
-            var winnerRole = winnerControl!.GetRoleInstance();
+            var winnerPotable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
+            if (!winner) continue;
+
+            var winnerRole = winner!.GetRoleInstance();
             if (winnerRole == null) continue;
 
             var offsetMultiplier = num % 2 == 0 ? -1 : 1;
@@ -56,9 +65,9 @@ public class CustomWinnerListener : IListener
             var scale = new Vector3(scaleValue, scaleValue, 1f);
 
             winnerPotable.transform.localScale = scale;
-            winnerPotable.UpdateFromPlayerOutfit(winner, PlayerMaterial.MaskType.ComplexUI, winner.IsDead, true);
+            winnerPotable.UpdateFromPlayerOutfit(new WinningPlayerData(winner.Data), PlayerMaterial.MaskType.ComplexUI, winner.IsAlive(), true);
 
-            if (winner.IsDead)
+            if (!winner.IsAlive())
             {
                 winnerPotable.SetBodyAsGhost();
                 winnerPotable.SetDeadFlipX(num % 2 == 0);
@@ -70,10 +79,10 @@ public class CustomWinnerListener : IListener
 
             var namePos = winnerPotable.cosmetics.nameText.transform.localPosition;
 
-            winnerPotable.SetName(winner.PlayerName + "\n" + winnerRole.Name);
+            winnerPotable.SetName(winner.name + Environment.NewLine + winnerRole.Name);
             winnerPotable.SetNameColor(winnerRole.Color);
-            winnerPotable.SetNamePosition(new(namePos.x, namePos.y, -15f));
-            winnerPotable.SetNameScale(new(1 / scale.x, 1 / scale.y, 1 / scale.z));
+            winnerPotable.SetNamePosition(new Vector3(namePos.x, namePos.y, -15f));
+            winnerPotable.SetNameScale(new Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
 
             num++;
         }
@@ -110,7 +119,7 @@ public class CustomWinnerListener : IListener
         foreach(var role in PlayerRole.CachedRoles)
         {
             var deadPlayer = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
-            summary.Append(role.PlayerName).Append(' ').Append(role.Role.Name);
+            summary.Append(role.PlayerName).Append(' ').Append(ColorUtils.ToColorString(role.Role.Color, role.Role.Name));
             summary.Append(' ').Append(ColorUtils.ToColorString(deadPlayer == null ? 
                     Palette.AcceptedGreen : 
                     Palette.ImpostorRed, 

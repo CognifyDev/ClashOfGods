@@ -118,6 +118,13 @@ public class GameListener : IListener
         // 改变按钮颜色
         manager.MakePublicButton.color = Palette.DisabledClear;
         manager.privatePublicText.color = Palette.DisabledClear;
+        
+        PlayerUtils.Players.Clear();
+        foreach (var player in PlayerControl.AllPlayerControls)
+        {
+            if (player != null) 
+                PlayerUtils.Players.Add(player);
+        }
     }
 
     public bool OnMakePublic(GameStartManager manager)
@@ -235,7 +242,7 @@ public class GameListener : IListener
 
         if (aliveImpostors.Count < PlayerUtils.GetAllAlivePlayers().Count) return false; // 不允许游戏结束
         foreach (var aliveImpostor in aliveImpostors)
-            CustomWinnerManager.RegisterCustomWinner(aliveImpostor.Data);
+            CustomWinnerManager.RegisterCustomWinner(aliveImpostor);
         return true;
 
     }
