@@ -22,7 +22,6 @@ using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine;
-using COG.UI.CustomWinner;
 
 namespace COG;
 
@@ -156,5 +155,16 @@ public partial class Main : BasePlugin
         });
 
         Harmony.PatchAll();
+    }
+
+    public override bool Unload()
+    {
+        CommandManager.GetManager().GetCommands().Clear();
+        ModOptionManager.GetManager().GetOptions().Clear();
+        Role.RoleManager.GetManager().GetRoles().Clear();
+        ListenerManager.GetManager().GetListeners().Clear();
+        SidebarTextManager.GetManager().GetSidebarTexts().Clear();
+        PlayerUtils.Players.Clear();
+        return false;
     }
 }

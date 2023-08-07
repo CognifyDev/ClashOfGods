@@ -172,7 +172,6 @@ internal class CheckMurderPatch
         var returnAble = true;
         foreach (var unused in ListenerManager.GetManager().GetListeners()
                      .Where(listener => !listener.OnCheckMurder(__instance, target))) returnAble = false;
-
         return returnAble;
     }
 }

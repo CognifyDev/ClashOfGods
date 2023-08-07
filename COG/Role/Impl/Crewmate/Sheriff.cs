@@ -18,8 +18,8 @@ public class Sheriff : Role, IListener
             () => {}, 
             () => false, 
             () => true, 
-            ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 115f)!,
-            CustomButton.ButtonPositions.LowerRowRight,
+            ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
+            CustomButton.ButtonPositions.UpperRowRight,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             15f,
@@ -31,9 +31,9 @@ public class Sheriff : Role, IListener
     public bool OnPlayerMurder(PlayerControl killer, PlayerControl target)
     {
         if (killer == null || target == null) return true;
-        if (killer.GetRoleInstance()!.Name.Equals(Name))
-            if (target.GetRoleInstance()!.CampType == CampType.Crewmate)
-                killer.MurderPlayer(killer);
+        if (!killer.GetRoleInstance()!.Name.Equals(Name)) return true;
+        if (target.GetRoleInstance()!.CampType == CampType.Crewmate)
+            killer.MurderPlayer(killer);
 
         return true;
     }

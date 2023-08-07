@@ -229,6 +229,7 @@ public class GameListener : IListener
 
     public bool OnCheckGameEnd()
     {
+        return false;
         var aliveImpostors = new List<PlayerControl>();
         foreach (var (key, value) in GameUtils.Data)
             if (value.CampType == CampType.Impostor)
@@ -244,7 +245,6 @@ public class GameListener : IListener
         foreach (var aliveImpostor in aliveImpostors)
             CustomWinnerManager.RegisterCustomWinner(aliveImpostor);
         return true;
-
     }
 
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,
@@ -331,7 +331,7 @@ public class GameListener : IListener
         }
     }
 
-    private void ShareRoles()
+    private static void ShareRoles()
     {
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
         writer.WritePacked(GameUtils.Data.Count);
@@ -347,6 +347,6 @@ public class GameListener : IListener
     private void SavePlayerRoles()
     {
         PlayerRole.CachedRoles.Clear();
-        foreach (var pair in GameUtils.Data) new PlayerRole(pair.Key, pair.Value, pair.Key.Data.PlayerName);
+        foreach (var pair in GameUtils.Data) _ = new PlayerRole(pair.Key, pair.Value, pair.Key.Data.PlayerName);
     }
 }
