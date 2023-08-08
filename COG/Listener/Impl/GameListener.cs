@@ -5,6 +5,7 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using COG.States;
+using COG.UI.CustomOption;
 using COG.UI.CustomWinner;
 using COG.Utils;
 using Il2CppSystem;
@@ -67,13 +68,15 @@ public class GameListener : IListener
         var rolesToAdd = new List<Role.Role>(); // 新建集合，用来存储可用的职业 
 
         // 获取最大可以启用的内鬼数量
-        var maxImpostorsNum = GameUtils.GetImpostorsNum();
+        var maxImpostorsNum = GameOptionsData.MaxImpostors.Count;
+        float neutralNum = GameOption.NeutralNumber.GetFloat();
 
         // 新建一个获取器
         var getter = Role.RoleManager.GetManager().NewGetter();
 
         // 获取已经获取的内鬼职业数量
         var equalsImpostorsNum = 0;
+        var equalsNeutralsNum = 0;
 
         // 开始获取可以分配的职业
         while (getter.HasNext())
@@ -83,6 +86,8 @@ public class GameListener : IListener
             if (rolesToAdd.Count >= players.Count) break;
             if (equalsImpostorsNum >= maxImpostorsNum && next.CampType == CampType.Impostor) continue;
             if (next.CampType == CampType.Impostor) equalsImpostorsNum++;
+            if (equalsNeutralsNum >= neutralNum && next.CampType == CampType.Neutral) continue;
+            if (next.CampType == CampType.Neutral) neutralNum++;
             rolesToAdd.Add(next);
         }
 

@@ -1,5 +1,6 @@
 using System.Linq;
 using COG.Listener;
+using COG.UI.CustomOption;
 using Il2CppSystem.Collections.Generic;
 
 namespace COG.Patch;
@@ -109,6 +110,7 @@ internal class GameEndChecker
     [HarmonyPrefix]
     public static bool Prefix()
     {
+        if (GameOption.NeverEndGame.GetBool()) return false;
         var returnAble = true;
         foreach (var unused in
                  ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnCheckGameEnd()))

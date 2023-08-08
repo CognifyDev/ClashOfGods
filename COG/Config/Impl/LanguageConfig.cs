@@ -20,6 +20,7 @@ public class LanguageConfig : Config
     {
         try
         {
+
             MessageForNextPage = GetString("lobby.message-for-next-page");
             MakePublicMessage = GetString("lobby.make-public-message");
 
@@ -30,6 +31,8 @@ public class LanguageConfig : Config
             AddonsSetting = GetString("menu.addons.name");
 
             SaveGameConfigs = GetString("menu.general.save-game-configs");
+
+            NeverGameEnd = GetString("setting.game-never-end");
 
             // Unknown
             UnknownName = GetString("role.unknown.name");
@@ -50,6 +53,7 @@ public class LanguageConfig : Config
             ImpostorDescription = GetString("role.impostor.impostor.description");
 
             // Neutral
+            NeutralNumber = GetString("setting.neutral-number");
             JesterName = GetString("role.neutral.jester.name");
             JesterDescription = GetString("role.neutral.jester.description");
 
@@ -173,7 +177,8 @@ public class LanguageConfig : Config
     public string Disconnected { get; private set; }
     public string DefaultKillReason { get; private set; }
     public string UnknownKillReason { get; private set; }
-
+    public string NeutralNumber { get; private set; }
+    public string NeverGameEnd { get; private set; }
     private string GetString(string location)
     {
         var toReturn = YamlReader.GetString(location);

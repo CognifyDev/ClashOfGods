@@ -27,6 +27,9 @@ role:
     jester:
       name: "小丑"
       description: "你会在被驱逐后获胜"
+setting:
+  neutral-number: "中立数量"
+  game-never-end: "游戏不结束"
 camp:
   unknown:
     name: "未知阵营"
@@ -74,7 +77,7 @@ action:
 game:
   end:
     show-players-roles-message: "玩家职业: "
-  survival-data:
+  survival-data: 
     alive: "存活"
     disconnected: "掉线"
     default: "死亡"

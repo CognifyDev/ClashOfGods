@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
+using COG.UI.CustomOption;
 
 namespace COG.Utils;
 
@@ -19,29 +20,6 @@ public static class GameUtils
             DestroyableSingleton<HudManager>.Instance.Notifier.AddItem(text);
     }
 
-    public static int GetImpostorsNum()
-    {
-        var players = PlayerUtils.GetAllPlayers();
-        if (players == null) throw new NullReferenceException("Player list is null");
-
-        var playersNum = players.Count;
-        int impostorsNum;
-
-        switch (playersNum)
-        {
-            case <= 6:
-                impostorsNum = 1;
-                break;
-            case <= 8:
-                impostorsNum = 2;
-                break;
-            default:
-                impostorsNum = 3;
-                break;
-        }
-
-        return impostorsNum;
-    }
 
     public static Role.Role? GetLocalPlayerRole()
     {

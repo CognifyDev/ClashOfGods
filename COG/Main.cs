@@ -22,6 +22,7 @@ using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine;
+using COG.UI.CustomOption;
 
 namespace COG;
 
@@ -55,7 +56,7 @@ public partial class Main : BasePlugin
     public override void Load()
     {
         Instance = this;
-
+        GameOption.GameOptions();
         Logger = BepInEx.Logging.Logger.CreateLogSource($"   {DisplayName}");
         Logger.LogInfo("Loading...");
 
