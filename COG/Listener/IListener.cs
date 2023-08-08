@@ -124,11 +124,15 @@ public interface IListener
     {
     }
 
+    void OnPlayerJoin(AmongUsClient client, ClientData data)
+    {
+    }
+
     void OnSelectRoles()
     {
     }
 
-    void OnPlayerJoined(AmongUsClient amongUsClient)
+    void OnGameJoined(AmongUsClient amongUsClient, string gameCode)
     {
     }
 

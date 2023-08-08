@@ -229,22 +229,12 @@ public class GameListener : IListener
 
     public bool OnCheckGameEnd()
     {
+        if (!CustomGameEndLogicManager.CheckGameEndForImpostors()) return false;
+        if (!CustomGameEndLogicManager.CheckGameEndForCrewmates()) return false;
+        if (!CustomGameEndLogicManager.CheckEndForLastPlayer()) return false;
+        if (!CustomGameEndLogicManager.CheckEndForJesterExiled()) return false;
+        
         return false;
-        var aliveImpostors = new List<PlayerControl>();
-        foreach (var (key, value) in GameUtils.Data)
-            if (value.CampType == CampType.Impostor)
-                aliveImpostors.Add(key);
-
-        if (PlayerUtils.GetAllAlivePlayers().Count <= 1)
-        {
-            CustomWinnerManager.RegisterCustomWinners(PlayerUtils.GetAllAlivePlayers());
-            return true;
-        }
-
-        if (aliveImpostors.Count < PlayerUtils.GetAllAlivePlayers().Count) return false; // 不允许游戏结束
-        foreach (var aliveImpostor in aliveImpostors)
-            CustomWinnerManager.RegisterCustomWinner(aliveImpostor);
-        return true;
     }
 
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,

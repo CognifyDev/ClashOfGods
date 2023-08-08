@@ -20,69 +20,67 @@ public class CustomWinnerListener : IListener
         SetUpWinnerPlayers(manager);
         SetUpWinText(manager);
         SetUpRoleSummary(manager);
-        
-        CustomWinnerManager.ResetCustomWinners();
     }
 
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
         ListUtils.ToList(manager.transform.GetComponentsInChildren<PoolablePlayer>()).ForEach(pb => pb.gameObject.Destroy());
 
-        // var sortedList = TempData.winners.ToArray().ToList().OrderBy(b => b.IsYou ? -1 : 0).ToList();
-        var num = 0;
-        var ceiling = Mathf.CeilToInt(7.5f);
-        
-        Main.Logger.LogInfo($"Winners number => {CustomWinnerManager.AllWinners.Count}");
-        
-        TempData.winners.Clear();
-        foreach (var playerControl in CustomWinnerManager.AllWinners)
-        {
-            TempData.winners.Add(new WinningPlayerData(playerControl.Data));
-        }
+        int num = 0;
+        int ceiling = Mathf.CeilToInt(7.5f);
 
-        foreach (var winner in CustomWinnerManager.AllWinners)
+        TempData.winners.Clear();
+        CustomWinnerManager.AllWinners.ForEach((Il2CppSystem.Action<WinningPlayerData>)(w => TempData.winners.Add(w)));
+
+        Main.Logger.LogInfo($"Winners number => {TempData.winners.Count}");
+
+        foreach (var winner in TempData.winners.ToArray().OrderBy(b => b.IsYou ? -1 : 0))
         {
             if (!(manager.PlayerPrefab && manager.transform)) break;
-            Main.Logger.LogInfo($"Set up winner message for {manager.PlayerPrefab.name} at {manager.transform.position.ToString()}");
 
-            var winnerPotable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
-            if (!winner) continue;
+            var winnerPoolable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
+            if (winner == null) continue;
 
-            var winnerRole = winner!.GetRoleInstance();
+            var winnerRole = PlayerRole.GetRole(winner.PlayerName);
             if (winnerRole == null) continue;
 
-            var offsetMultiplier = num % 2 == 0 ? -1 : 1;
-            var indexOffset = (num + 1) / 2;
-            var lerpFactor = indexOffset / ceiling;
-            var scaleLerp = Mathf.Lerp(1f, 0.75f, lerpFactor);
+            // ↓↓↓ These variables are from The Other Roles
+            // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Patches/EndGamePatch.cs#L239
+            // Variable names optimizing by ChatGPT
+            int offsetMultiplier = num % 2 == 0 ? -1 : 1;
+            int indexOffset = (num + 1) / 2;
+            int lerpFactor = indexOffset / ceiling;
+            float scaleLerp = Mathf.Lerp(1f, 0.75f, lerpFactor);
             float positionOffset = num == 0 ? -8 : -1;
 
-            winnerPotable.transform.localPosition = new Vector3(offsetMultiplier * indexOffset * scaleLerp,
+            winnerPoolable.transform.localPosition = new Vector3(offsetMultiplier * indexOffset * scaleLerp,
                 FloatRange.SpreadToEdges(-1.125f, 0f, indexOffset, ceiling),
                 positionOffset + indexOffset * 0.01f) * 0.9f;
 
             var scaleValue = Mathf.Lerp(1f, 0.65f, lerpFactor) * 0.9f;
             var scale = new Vector3(scaleValue, scaleValue, 1f);
 
-            winnerPotable.transform.localScale = scale;
-            winnerPotable.UpdateFromPlayerOutfit(new WinningPlayerData(winner.Data), PlayerMaterial.MaskType.ComplexUI, winner.IsAlive(), true);
+            winnerPoolable.transform.localScale = scale;
+            winnerPoolable.UpdateFromPlayerOutfit(winner, PlayerMaterial.MaskType.ComplexUI, winner.IsDead, true);
 
-            if (!winner.IsAlive())
+            if (winner.IsDead)
             {
-                winnerPotable.SetBodyAsGhost();
-                winnerPotable.SetDeadFlipX(num % 2 == 0);
+                winnerPoolable.SetBodyAsGhost();
+                winnerPoolable.SetDeadFlipX(num % 2 == 0);
             }
             else
             {
-                winnerPotable.SetFlipX(num % 2 == 0);
+                winnerPoolable.SetFlipX(num % 2 == 0);
             }
 
-            var namePos = winnerPotable.cosmetics.nameText.transform.localPosition;
+            var namePos = winnerPoolable.cosmetics.nameText.transform.localPosition;
 
-            winnerPotable.SetName(winner.name + Environment.NewLine + winnerRole.Name);
-            winnerPotable.SetNameColor(winnerRole.Color);
-            winnerPotable.SetNamePosition(new Vector3(namePos.x, namePos.y, -15f));
-            winnerPotable.SetNameScale(new Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
+            winnerPoolable.SetName(winner.PlayerName + Environment.NewLine + winnerRole.Name);
+            winnerPoolable.SetNameColor(winnerRole.Color);
+            winnerPoolable.SetNamePosition(new Vector3(namePos.x, namePos.y, -15f));
+            winnerPoolable.SetNameScale(new Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
+
+            Main.Logger.LogInfo($"Set up winner message for {winner.PlayerName} at {manager.transform.position.ToString()}");
 
             num++;
         }
@@ -102,6 +100,7 @@ public class CustomWinnerListener : IListener
         // Reset
         CustomWinnerManager.SetWinText("");
         CustomWinnerManager.SetWinColor(Color.white);
+        CustomWinnerManager.ResetCustomWinners();
     }
     
     private static void SetUpRoleSummary(EndGameManager manager)

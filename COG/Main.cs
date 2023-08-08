@@ -104,7 +104,8 @@ public partial class Main : BasePlugin
             new RpcListener(),
             new GameObjectListener(),
             new DeadPlayerManager(),
-            new CustomWinnerListener()
+            new CustomWinnerListener(),
+            new CachedPlayer()
         });
 
         // Register sidebar texts
@@ -165,6 +166,7 @@ public partial class Main : BasePlugin
         ListenerManager.GetManager().GetListeners().Clear();
         SidebarTextManager.GetManager().GetSidebarTexts().Clear();
         PlayerUtils.Players.Clear();
+        Harmony.UnpatchAll();
         return false;
     }
 }

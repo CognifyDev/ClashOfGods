@@ -33,21 +33,6 @@ public class Jester : Role, IListener
         return result2 || playerControl.IsSamePlayer(_player!) || target == null;
     }
 
-    public void OnPlayerExile(ExileController controller)
-    {
-        if (CheckNull()) return;
-        if (!controller.exiled.IsSamePlayer(_player!.Data)) return;
-
-        TempData.winners.Clear();
-        TempData.winners.Add(new WinningPlayerData(_player.Data));
-        GameManager.Instance.EndGame();
-    }
-
-    public void OnAirshipPlayerExile(AirshipExileController controller)
-    {
-        OnPlayerExile(controller);
-    }
-
     private bool CheckNull()
     {
         return _player == null;
