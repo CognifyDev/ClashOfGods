@@ -25,13 +25,9 @@ public class RoleManager
         _roles.Add(role);
     }
 
-    public Role? GetTypeRoleInstance<T>()
+    public Role GetTypeRoleInstance<T>() where T : Role
     {
-        foreach (var role in _roles)
-            if (role is T)
-                return role;
-
-        return null;
+        return _roles.OfType<T>().FirstOrDefault()!;
     }
 
     public void RegisterRoles(Role[] roles)

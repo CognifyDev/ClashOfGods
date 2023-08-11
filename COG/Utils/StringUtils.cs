@@ -9,21 +9,19 @@ public static class StringUtils
 {
     public static string GetSHA1Hash(this string input)
     {
-        using SHA1 sha1 = SHA1.Create();
+        using var sha1 = SHA1.Create();
         var inputBytes = Encoding.UTF8.GetBytes(input);
         var hashBytes = sha1.ComputeHash(inputBytes);
 
         var sb = new StringBuilder();
-        foreach (var b in hashBytes)
-        {
-            sb.Append(b.ToString("x2"));
-        }
+        foreach (var b in hashBytes) sb.Append(b.ToString("x2"));
 
         return sb.ToString();
     }
+
     public static string CustomFormat(this string text, params object[] args)
     {
-        bool isInArg = false;
+        var isInArg = false;
         string temp = "", result = text;
         List<string> argsStr = new();
 
@@ -41,6 +39,7 @@ public static class StringUtils
                     argsStr.Add(temp);
                     temp = "";
                 }
+
                 continue;
             }
 
@@ -49,7 +48,7 @@ public static class StringUtils
 
         if (isInArg) throw new FormatException("The ending % character is missing.");
 
-        int count = 0;
+        var count = 0;
         foreach (var arg in argsStr)
         {
             result = result.Replace(arg, args[count].ToString());

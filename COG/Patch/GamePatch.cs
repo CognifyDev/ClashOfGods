@@ -133,7 +133,7 @@ internal class CheckTaskCompletionPatch
 }
 
 [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap))]
-class SabotageMapOpen
+internal class SabotageMapOpen
 {
     private static bool Prefix(MapBehaviour __instance)
     {
@@ -146,25 +146,19 @@ class SabotageMapOpen
 }
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CoSetTasks))]
-class TaskPatch
+internal class TaskPatch
 {
     public static void Prefix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
-            listener.OnCoSetTasks(__instance, tasks);
-        }
+        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnCoSetTasks(__instance, tasks);
     }
 }
 
-[HarmonyPatch(typeof(GameManager),nameof(GameManager.StartGame))]
-class GameStartPatch
+[HarmonyPatch(typeof(GameManager), nameof(GameManager.StartGame))]
+internal class GameStartPatch
 {
     public static void Postfix(GameManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
-            listener.OnGameStart(__instance);
-        }
+        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameStart(__instance);
     }
 }

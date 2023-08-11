@@ -96,7 +96,7 @@ public class GameListener : IListener
             }
             catch
             {
-                role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>()!;
+                role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
             }
 
             GameUtils.Data.Add(player, role);
@@ -118,13 +118,11 @@ public class GameListener : IListener
         // 改变按钮颜色
         manager.MakePublicButton.color = Palette.DisabledClear;
         manager.privatePublicText.color = Palette.DisabledClear;
-        
+
         PlayerUtils.Players.Clear();
         foreach (var player in PlayerControl.AllPlayerControls)
-        {
-            if (player != null) 
+            if (player != null)
                 PlayerUtils.Players.Add(player);
-        }
     }
 
     public bool OnMakePublic(GameStartManager manager)
@@ -229,12 +227,7 @@ public class GameListener : IListener
 
     public bool OnCheckGameEnd()
     {
-        if (!CustomGameEndLogicManager.CheckGameEndForImpostors()) return false;
-        if (!CustomGameEndLogicManager.CheckGameEndForCrewmates()) return false;
-        if (!CustomGameEndLogicManager.CheckEndForLastPlayer()) return false;
-        if (!CustomGameEndLogicManager.CheckEndForJesterExiled()) return false;
-        
-        return false;
+        return CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,

@@ -7,7 +7,8 @@ public static class ColorUtils
 {
     public static string ToColorString(Color color, string str)
     {
-        return $"<color=#{ToByte(color.r):X2}{ToByte(color.g):X2}{ToByte(color.b):X2}{ToByte(color.a):X2}>{str}</color>";
+        return
+            $"<color=#{ToByte(color.r):X2}{ToByte(color.g):X2}{ToByte(color.b):X2}{ToByte(color.a):X2}>{str}</color>";
     }
 
     public static string ToColorHaxString(this Color color)

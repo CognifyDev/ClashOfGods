@@ -1,13 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using COG.Listener;
-using InnerNet;
-using UnityEngine;
-using GameStates = COG.States.GameStates;
-using System;
 using COG.Config.Impl;
-using COG.Role.Impl;
+using COG.Listener;
 using COG.Role;
+using COG.Role.Impl;
+using InnerNet;
+using GameStates = COG.States.GameStates;
+using Object = UnityEngine.Object;
 
 namespace COG.Utils;
 
@@ -15,16 +15,22 @@ public enum ColorType
 {
     Unknown = -1,
     Light,
-    Dark,
+    Dark
 }
 
 public static class PlayerUtils
 {
     internal static readonly List<PlayerControl> Players = new();
-    public static List<KeyValuePair<PlayerControl, Role.Role>> AllImpostors => GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Impostor).ToList();
-    public static List<KeyValuePair<PlayerControl, Role.Role>> AllCremates => GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Crewmate).ToList();
-    public static List<KeyValuePair<PlayerControl, Role.Role>> AllNeutrals => GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Neutral).ToList();
-    
+
+    public static List<KeyValuePair<PlayerControl, Role.Role>> AllImpostors =>
+        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Impostor).ToList();
+
+    public static List<KeyValuePair<PlayerControl, Role.Role>> AllCremates =>
+        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Crewmate).ToList();
+
+    public static List<KeyValuePair<PlayerControl, Role.Role>> AllNeutrals =>
+        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Neutral).ToList();
+
     public static List<PlayerControl> GetAllPlayers()
     {
         return Players.ToArray().Where(player => player != null).ToList();
@@ -96,35 +102,43 @@ public static class PlayerUtils
         return !player.Data.IsDead;
     }
 
-    public static bool IsRole(this PlayerControl player, Role.Role role) => player.GetRoleInstance() == role;
+    public static bool IsRole(this PlayerControl player, Role.Role role)
+    {
+        return player.GetRoleInstance() == role;
+    }
 
     public static DeadBody? GetClosestBody(List<DeadBody> untargetable)
     {
         DeadBody? result = null;
 
-        float num = PlayerControl.LocalPlayer.MaxReportDistance;
+        var num = PlayerControl.LocalPlayer.MaxReportDistance;
         if (!ShipStatus.Instance) return null;
         var position = PlayerControl.LocalPlayer.GetTruePosition();
 
-        foreach (var body in GameObject.FindObjectsOfType<DeadBody>().Where(b => !untargetable.Contains(b)))
+        foreach (var body in Object.FindObjectsOfType<DeadBody>().Where(b => !untargetable.Contains(b)))
         {
             var vector = body.TruePosition - position;
-            float magnitude = vector.magnitude;
-            if (magnitude <= num && !PhysicsHelpers.AnyNonTriggersBetween(position, vector.normalized, magnitude, Constants.ShipAndObjectsMask))
+            var magnitude = vector.magnitude;
+            if (magnitude <= num && !PhysicsHelpers.AnyNonTriggersBetween(position, vector.normalized, magnitude,
+                    Constants.ShipAndObjectsMask))
             {
                 result = body;
                 num = magnitude;
             }
         }
+
         return result;
     }
 
-    public static ColorType GetColorType(this PlayerControl player) => player.cosmetics.ColorId switch
+    public static ColorType GetColorType(this PlayerControl player)
     {
-        0 or 3 or 4 or 5 or 7 or 10 or 11 or 13 or 14 or 17 => ColorType.Light,
-        1 or 2 or 6 or 8 or 9 or 12 or 15 or 16 or 18 => ColorType.Dark,
-        _ => ColorType.Unknown
-    };
+        return player.cosmetics.ColorId switch
+        {
+            0 or 3 or 4 or 5 or 7 or 10 or 11 or 13 or 14 or 17 => ColorType.Light,
+            1 or 2 or 6 or 8 or 9 or 12 or 15 or 16 or 18 => ColorType.Dark,
+            _ => ColorType.Unknown
+        };
+    }
 
     public static string GetLanguageDeathReason(this DeathReason? deathReason)
     {
@@ -137,29 +151,62 @@ public static class PlayerUtils
     }
 }
 
-
-
-
 public enum DeathReason
 {
     Unknown = -1,
     Disconnected,
     Default,
-    Exiled,
+    Exiled
 }
 
 public class DeadPlayerManager : IListener
 {
-    public static List<DeadPlayer> DeadPlayers { get; private set; } = new();
+    public static List<DeadPlayer> DeadPlayers { get; } = new();
+
+    public void OnMurderPlayer(PlayerControl killer, PlayerControl target)
+    {
+        if (!(target.Data.IsDead && killer && target)) return;
+
+        var reason = GetDeathReason(killer, target);
+        new DeadPlayer(DateTime.Now, reason, target, killer);
+    }
+
+    public void OnPlayerLeft(AmongUsClient client, ClientData data, DisconnectReasons reason)
+    {
+        if (DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
+        new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
+    }
+
+    public void OnCoBegin()
+    {
+        DeadPlayers.Clear();
+    }
+
+    public void OnPlayerExile(ExileController controller)
+    {
+        if (controller.exiled == null) return;
+        new DeadPlayer(DateTime.Now, DeathReason.Exiled, controller.exiled.Object, null);
+    }
+
+    public void OnAirshipPlayerExile(AirshipExileController controller)
+    {
+        OnPlayerExile(controller);
+    }
+
+    public static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
+    {
+        try
+        {
+            return DeathReason.Default;
+        }
+        catch
+        {
+            return DeathReason.Unknown;
+        }
+    }
 
     public class DeadPlayer
     {
-        public DateTime DeadTime { get; private set; }
-        public DeathReason? DeathReason { get; private set; }
-        public PlayerControl Player { get; private set; }
-        public PlayerControl? Killer { get; private set; }
-        public Role.Role? Role { get; private set; }
-        public byte PlayerId { get; private set; }
         public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl? killer)
         {
             DeadTime = deadTime;
@@ -171,48 +218,23 @@ public class DeadPlayerManager : IListener
             DeadPlayers.Add(this);
         }
 
+        public DateTime DeadTime { get; private set; }
+        public DeathReason? DeathReason { get; }
+        public PlayerControl Player { get; }
+        public PlayerControl? Killer { get; }
+        public Role.Role? Role { get; private set; }
+        public byte PlayerId { get; }
+
         //先这样，以后再改，反正暂时用不着
-        public override string ToString() => Player + " was killed by " + Killer;
-    }
-
-    public void OnMurderPlayer(PlayerControl killer, PlayerControl target)
-    {
-        if (!(target.Data.IsDead && killer && target)) return;
-
-        var reason = GetDeathReason(killer, target);
-        new DeadPlayer(DateTime.Now, reason, target, killer);
-    }
-    public void OnPlayerLeft(AmongUsClient client, ClientData data, DisconnectReasons reason)
-    {
-        if (DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
-        new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
-    }
-    public void OnCoBegin() => DeadPlayers.Clear();
-    
-    public static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
-    {
-        try
+        public override string ToString()
         {
-            return DeathReason.Default;
+            return Player + " was killed by " + Killer;
         }
-        catch { return DeathReason.Unknown; }
     }
-
-    public void OnPlayerExile(ExileController controller)
-    {
-        if (controller.exiled == null) return;
-        new DeadPlayer(DateTime.Now, DeathReason.Exiled, controller.exiled.Object, null);
-    }
-    public void OnAirshipPlayerExile(AirshipExileController controller) => OnPlayerExile(controller);
 }
 
 public class PlayerRole
 {
-    public static List<PlayerRole> CachedRoles { get; set; } = new();
-    public PlayerControl Player { get; private set; }
-    public Role.Role Role { get; private set; }
-    public string PlayerName { get; private set; }
-    public byte PlayerId { get; private set; }
     public PlayerRole(PlayerControl player, Role.Role role, string name)
     {
         Player = player;
@@ -222,26 +244,22 @@ public class PlayerRole
         CachedRoles.Add(this);
     }
 
-    public static Role.Role GetRole(string? playerName = null, byte? playerId = null) => CachedRoles.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) != null
-        ? CachedRoles.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!.Role
-        : Unknown.Instance;
-    
+    public static List<PlayerRole> CachedRoles { get; set; } = new();
+    public PlayerControl Player { get; private set; }
+    public Role.Role Role { get; }
+    public string PlayerName { get; }
+    public byte PlayerId { get; }
+
+    public static Role.Role GetRole(string? playerName = null, byte? playerId = null)
+    {
+        return CachedRoles.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) != null
+            ? CachedRoles.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!.Role
+            : COG.Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
+    }
 }
 
 public class CachedPlayer : IListener
 {
-    public static List<CachedPlayer> AllPlayers { get; private set; } = new();
-    public static CachedPlayer LocalPlayer { get; private set; }
-
-    public PlayerControl? Player { get; private set; }
-    public Role.Role MyRole => PlayerRole.CachedRoles.Where(dp => dp.PlayerId == this.PlayerId).FirstOrDefault()?.Role ?? Unknown.Instance;
-    public string? PlayerName { get; private set; }
-    public byte PlayerId { get; private set; }
-    public int ColorId { get; private set; }
-    public string? FriendCode { get; private set; }
-    public DeadPlayerManager.DeadPlayer? DeadStatus => DeadPlayerManager.DeadPlayers.Where(dp => dp.PlayerId == this.PlayerId).FirstOrDefault();
-    public bool IsDead => DeadStatus == null;
-    public bool PlayerIsNull => Player == null;
     public CachedPlayer(PlayerControl player)
     {
         if (!player) return;
@@ -257,25 +275,63 @@ public class CachedPlayer : IListener
         if (player == PlayerControl.LocalPlayer) LocalPlayer = this;
     }
 
-    public CachedPlayer() { } // For registering listeners
-
-    public void OnPlayerJoin(AmongUsClient amongUsClient, ClientData data) => new CachedPlayer(data.Character);
-    public void OnCoBegin() => AllPlayers.RemoveAll(cp => cp.IsDead && /* Will not continue if cp.IsDead is true */ (cp.DeadStatus!.DeathReason == DeathReason.Disconnected));
-    public void OnGameJoined(AmongUsClient amongUsClient, string gameIdString) => AllPlayers.Clear();// Reset
-
-    public static CachedPlayer? FindPlayer(PlayerControl? player = null, string? name = null, byte? playerId = null, int colorId = -1)
+    public CachedPlayer()
     {
-        foreach(var cp in AllPlayers)
-        {
+    } // For registering listeners
+
+    public static List<CachedPlayer> AllPlayers { get; } = new();
+    public static CachedPlayer LocalPlayer { get; private set; }
+
+    public PlayerControl? Player { get; }
+
+    public Role.Role MyRole => PlayerRole.CachedRoles.FirstOrDefault(dp => dp.PlayerId == PlayerId)?.Role ??
+                               Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
+
+    public string? PlayerName { get; }
+    public byte PlayerId { get; }
+    public int ColorId { get; }
+    public string? FriendCode { get; private set; }
+
+    public DeadPlayerManager.DeadPlayer? DeadStatus =>
+        DeadPlayerManager.DeadPlayers.Where(dp => dp.PlayerId == PlayerId).FirstOrDefault();
+
+    public bool IsDead => DeadStatus == null;
+    public bool PlayerIsNull => Player == null;
+
+    public void OnPlayerJoin(AmongUsClient amongUsClient, ClientData data)
+    {
+        new CachedPlayer(data.Character);
+    }
+
+    public void OnCoBegin()
+    {
+        AllPlayers.RemoveAll(cp =>
+            cp.IsDead && /* Will not continue if cp.IsDead is true */
+            cp.DeadStatus!.DeathReason == DeathReason.Disconnected);
+    }
+
+    public void OnGameJoined(AmongUsClient amongUsClient, string gameIdString)
+    {
+        AllPlayers.Clear();
+        // Reset
+    }
+
+    public static CachedPlayer? FindPlayer(PlayerControl? player = null, string? name = null, byte? playerId = null,
+        int colorId = -1)
+    {
+        foreach (var cp in AllPlayers)
             if (
                 (player && cp.Player == player)
                 || cp.PlayerName == name
                 || cp.PlayerId == playerId
                 || colorId == cp.ColorId
-                ) return cp;
-        }
+            )
+                return cp;
         return null;
     }
 
-    public static implicit operator bool(CachedPlayer player) => player != null;
+    public static implicit operator bool(CachedPlayer player)
+    {
+        return player != null;
+    }
 }

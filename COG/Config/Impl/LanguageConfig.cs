@@ -164,11 +164,11 @@ public class LanguageConfig : Config
     public string ImpostorCampDescription { get; private set; }
     public string NeutralCampDescription { get; private set; }
     public string CrewmateCampDescription { get; private set; }
-    
+
     public string KillAction { get; private set; }
-    
+
     public string ShowPlayersRolesMessage { get; private set; }
-    
+
     public string Alive { get; private set; }
     public string Disconnected { get; private set; }
     public string DefaultKillReason { get; private set; }

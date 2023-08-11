@@ -122,7 +122,8 @@ internal class OnGameJoinedPatch
 {
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] string gameIdString)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameJoined(__instance, gameIdString);
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+            listener.OnGameJoined(__instance, gameIdString);
     }
 }
 

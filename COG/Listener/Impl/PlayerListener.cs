@@ -8,9 +8,9 @@ public class PlayerListener : IListener
 {
     public void OnPlayerLeft(AmongUsClient client, ClientData data, DisconnectReasons reason)
     {
-        foreach (var playerControl in from playerControl in PlayerUtils.Players let typePlayer = client.PlayerPrefab where playerControl.IsSamePlayer(typePlayer) select playerControl)
-        {
-            PlayerUtils.Players.Remove(playerControl);
-        }
+        foreach (var playerControl in from playerControl in PlayerUtils.Players
+                 let typePlayer = client.PlayerPrefab
+                 where playerControl.IsSamePlayer(typePlayer)
+                 select playerControl) PlayerUtils.Players.Remove(playerControl);
     }
 }

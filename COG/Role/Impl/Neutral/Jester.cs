@@ -1,12 +1,14 @@
-﻿using COG.Config.Impl;
+﻿using System.Linq;
+using COG.Config.Impl;
 using COG.Listener;
 using COG.UI.CustomOption;
+using COG.UI.CustomWinner;
 using COG.Utils;
 using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
-public class Jester : Role, IListener
+public class Jester : Role, IListener, ICustomWinner
 {
     private PlayerControl? _player;
 
@@ -20,6 +22,24 @@ public class Jester : Role, IListener
         RoleOptions.Add(CustomOption.Create(
             parentOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true, parentOption)
         );
+
+        CustomWinnerManager.RegisterCustomWinnerInstance(this);
+    }
+
+    public bool CanWin()
+    {
+        var jester = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp =>
+            dp.Role == RoleManager.GetManager().GetTypeRoleInstance<Jester>() &&
+            dp.DeathReason == Utils.DeathReason.Exiled);
+        if (jester == null) return true;
+        GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);
+        CustomWinnerManager.RegisterCustomWinner(jester.Player);
+        return false;
+    }
+
+    public ulong GetWeight()
+    {
+        return ICustomWinner.GetOrder(4);
     }
 
     public bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)

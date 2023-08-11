@@ -14,6 +14,8 @@ using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
+using COG.UI.CustomWinner;
+using COG.UI.CustomWinner.Impl;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -153,6 +155,14 @@ public partial class Main : BasePlugin
         CommandManager.GetManager().RegisterCommands(new Command.Command[]
         {
             new RpcCommand()
+        });
+
+        // Register CustomWinners
+        CustomWinnerManager.RegisterCustomWinnersInstances(new ICustomWinner[]
+        {
+            new CrewmatesCustomWinner(),
+            new ImpostorsCustomWinner(),
+            new LastPlayerCustomWinner()
         });
 
         Harmony.PatchAll();

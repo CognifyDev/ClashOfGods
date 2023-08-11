@@ -14,10 +14,10 @@ public class Sheriff : Role, IListener
         BaseRoleType = RoleTypes.Crewmate;
         Description = LanguageConfig.Instance.SheriffDescription;
         var killButton = CustomButton.Create(
-            () => {}, 
-            () => {}, 
-            () => false, 
-            () => true, 
+            () => { },
+            () => { },
+            () => false,
+            () => true,
             ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
             CustomButton.ButtonPositions.UpperRowRight,
             KeyCode.Q,
