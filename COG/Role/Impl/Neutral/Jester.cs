@@ -44,6 +44,7 @@ public class Jester : Role, IListener, ICustomWinner
 
     public bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)
     {
+        if (!CheckNull()) return true;
         var allowStartMeetingOption = RoleOptions[2];
         var allowReportDeadBodyOption = RoleOptions[3];
         var result1 = allowStartMeetingOption.GetBool();
@@ -55,7 +56,7 @@ public class Jester : Role, IListener, ICustomWinner
 
     private bool CheckNull()
     {
-        return _player == null;
+        return _player != null;
     }
 
     public override IListener GetListener(PlayerControl player)
