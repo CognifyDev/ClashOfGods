@@ -18,6 +18,18 @@ public static class CampUtils
         };
     }
 
+    public static string GetDescription(this CampType campType)
+    {
+        return campType switch
+        {
+            CampType.Crewmate => LanguageConfig.Instance.CrewmateCampDescription,
+            CampType.Unknown => LanguageConfig.Instance.UnknownCampDescription,
+            CampType.Impostor => LanguageConfig.Instance.ImpostorCampDescription,
+            CampType.Neutral => LanguageConfig.Instance.NeutralCampDescription,
+            _ => LanguageConfig.Instance.UnknownCampDescription
+        };
+    }
+
     public static string GetName(this CampType campType)
     {
         return campType switch

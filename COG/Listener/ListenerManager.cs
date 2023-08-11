@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace COG.Listener;
 
@@ -18,7 +19,7 @@ public class ListenerManager
         _listeners.Add(listener);
     }
 
-    public void RegisterListeners(IListener[] listeners)
+    public void RegisterListeners(IEnumerable<IListener> listeners)
     {
         _listeners.AddRange(listeners);
     }
@@ -26,6 +27,16 @@ public class ListenerManager
     public void UnregisterListener(IListener listener)
     {
         _listeners.Remove(listener);
+    }
+
+    public IListener? GetTypeListener<T>() where T : IListener
+    {
+        foreach (var listener in _listeners.OfType<T>())
+        {
+            return listener;
+        }
+
+        return null;
     }
 
     public List<IListener> GetListeners()

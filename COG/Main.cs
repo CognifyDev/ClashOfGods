@@ -2,8 +2,6 @@
 global using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using AsmResolver.DotNet.Signatures.Marshal;
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
@@ -42,7 +40,7 @@ public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
-    public static readonly string PluginVersion = ProjectUtils.GetProjectVersion()!;
+    public static string PluginVersion { get; private set; } = "Unknown";
     public const string DisplayName = "ClashOfGods";
 
     public static ManualLogSource Logger = null!;
@@ -59,9 +57,11 @@ public partial class Main : BasePlugin
     public override void Load()
     {
         Instance = this;
+        PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
 
         Logger = BepInEx.Logging.Logger.CreateLogSource($"   {DisplayName}");
         Logger.LogInfo("Loading...");
+        Logger.LogInfo("Mod Version => " + PluginVersion);
 
         // Add depends to core directory
         ResourceUtils.WriteToFileFromResource(

@@ -215,7 +215,7 @@ public class GameListener : IListener
         intro.TeamTitle.text = camp.GetName();
         intro.TeamTitle.color = camp.GetColor();
 
-        intro.ImpostorText.text = "";
+        intro.ImpostorText.text = camp.GetDescription();
     }
 
     public void OnGameEndSetEverythingUp(EndGameManager manager)

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
+using COG.Listener;
+using COG.Listener.Impl;
 
 namespace COG.Utils;
 
@@ -48,6 +50,12 @@ public static class GameUtils
         var player = PlayerControl.LocalPlayer;
         return Data.Where(keyValuePair => keyValuePair.Key.IsSamePlayer(player))
             .Select(keyValuePair => keyValuePair.Value).FirstOrDefault();
+    }
+
+    public static void SetupEverythingEndUp()
+    {
+        var gameListener = ListenerManager.GetManager().GetTypeListener<GameListener>()!;
+        // ready to finish
     }
 
     public static NormalGameOptionsV07 GetGameOptions()
