@@ -1,4 +1,5 @@
-﻿using AmongUs.GameOptions;
+﻿using System;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.UI.CustomButtons;
@@ -14,10 +15,23 @@ public class Sheriff : Role, IListener
         BaseRoleType = RoleTypes.Crewmate;
         Description = LanguageConfig.Instance.SheriffDescription;
         var killButton = CustomButton.Create(
+            () =>
+            {
+                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
+                PlayerControl.LocalPlayer.MurderPlayer(target);
+            },
             () => { },
-            () => { },
+            () =>
+            {
+                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
+                if (target == null) return false;
+                var localPlayer = PlayerControl.LocalPlayer;
+                var localLocation = localPlayer.GetTruePosition();
+                var targetLocation = target.GetTruePosition();
+                var distance = Vector2.Distance(localLocation, targetLocation);
+                return GameUtils.GetGameOptions().KillDistance >= distance;
+            },
             () => false,
-            () => true,
             ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
             CustomButton.ButtonPositions.UpperRowRight,
             KeyCode.Q,
@@ -34,7 +48,6 @@ public class Sheriff : Role, IListener
         if (!killer.GetRoleInstance()!.Name.Equals(Name)) return true;
         if (target.GetRoleInstance()!.CampType == CampType.Crewmate)
             killer.MurderPlayer(killer);
-
         return true;
     }
 

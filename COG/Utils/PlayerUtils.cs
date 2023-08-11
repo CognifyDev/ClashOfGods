@@ -6,6 +6,7 @@ using COG.Listener;
 using COG.Role;
 using COG.Role.Impl;
 using InnerNet;
+using UnityEngine;
 using GameStates = COG.States.GameStates;
 using Object = UnityEngine.Object;
 
@@ -35,6 +36,36 @@ public static class PlayerUtils
     {
         return Players.ToArray().Where(player => player != null).ToList();
     }
+
+    /// <summary>
+    /// 获取距离目标玩家位置最近的玩家
+    /// </summary>
+    /// <param name="target">目标玩家</param>
+    /// <param name="mustAlive">是否必须为活着的玩家</param>
+    /// <returns>最近位置的玩家</returns>
+    public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true)
+    {
+        var targetLocation = target.GetTruePosition();
+        var players = mustAlive ? GetAllAlivePlayers() : GetAllPlayers();
+
+        PlayerControl? closestPlayer = null;
+        var closestDistance = float.MaxValue;
+
+        foreach (var player in players)
+        {
+            if (player == target) continue;
+
+            var playerLocation = player.GetTruePosition();
+            var distance = Vector2.Distance(targetLocation, playerLocation);
+
+            if (!(distance < closestDistance)) continue;
+            closestDistance = distance;
+            closestPlayer = player;
+        }
+
+        return closestPlayer;
+    }
+
 
     public static List<PlayerControl> GetAllAlivePlayers()
     {
@@ -168,13 +199,13 @@ public class DeadPlayerManager : IListener
         if (!(target.Data.IsDead && killer && target)) return;
 
         var reason = GetDeathReason(killer, target);
-        new DeadPlayer(DateTime.Now, reason, target, killer);
+        _ = new DeadPlayer(DateTime.Now, reason, target, killer);
     }
 
     public void OnPlayerLeft(AmongUsClient client, ClientData data, DisconnectReasons reason)
     {
         if (DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
-        new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
+        _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
     }
 
     public void OnCoBegin()
@@ -185,7 +216,7 @@ public class DeadPlayerManager : IListener
     public void OnPlayerExile(ExileController controller)
     {
         if (controller.exiled == null) return;
-        new DeadPlayer(DateTime.Now, DeathReason.Exiled, controller.exiled.Object, null);
+        _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, controller.exiled.Object, null);
     }
 
     public void OnAirshipPlayerExile(AirshipExileController controller)
@@ -271,8 +302,6 @@ public class CachedPlayer : IListener
         FriendCode = player.FriendCode;
 
         AllPlayers.Add(this);
-
-        if (player == PlayerControl.LocalPlayer) LocalPlayer = this;
     }
 
     public CachedPlayer()
@@ -280,7 +309,6 @@ public class CachedPlayer : IListener
     } // For registering listeners
 
     public static List<CachedPlayer> AllPlayers { get; } = new();
-    public static CachedPlayer LocalPlayer { get; private set; }
 
     public PlayerControl? Player { get; }
 
@@ -293,14 +321,14 @@ public class CachedPlayer : IListener
     public string? FriendCode { get; private set; }
 
     public DeadPlayerManager.DeadPlayer? DeadStatus =>
-        DeadPlayerManager.DeadPlayers.Where(dp => dp.PlayerId == PlayerId).FirstOrDefault();
+        DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == PlayerId);
 
     public bool IsDead => DeadStatus == null;
     public bool PlayerIsNull => Player == null;
 
     public void OnPlayerJoin(AmongUsClient amongUsClient, ClientData data)
     {
-        new CachedPlayer(data.Character);
+        _ = new CachedPlayer(data.Character);
     }
 
     public void OnCoBegin()
@@ -330,7 +358,7 @@ public class CachedPlayer : IListener
         return null;
     }
 
-    public static implicit operator bool(CachedPlayer player)
+    public static implicit operator bool(CachedPlayer? player)
     {
         return player != null;
     }
