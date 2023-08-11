@@ -120,9 +120,9 @@ internal class AirshipExileControllerPatch
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameJoined))]
 internal class OnGameJoinedPatch
 {
-    public static void Postfix(AmongUsClient __instance)
+    public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] string gameIdString)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnPlayerJoined(__instance);
+        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameJoined(__instance, gameIdString);
     }
 }
 
@@ -134,6 +134,16 @@ internal class OnPlayerLeftPatch
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners())
             listener.OnPlayerLeft(__instance, data, reason);
+    }
+}
+
+[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerJoined))]
+internal class OnPlayerJoinedPatch
+{
+    public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+            listener.OnPlayerJoin(__instance, data);
     }
 }
 
