@@ -2,6 +2,7 @@
 global using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using AsmResolver.DotNet.Signatures.Marshal;
 using BepInEx;
 using BepInEx.Logging;
@@ -41,7 +42,7 @@ public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
-    public const string PluginVersion = "1.0.0-BETA";
+    public static readonly string PluginVersion = ProjectUtils.GetProjectVersion()!;
     public const string DisplayName = "ClashOfGods";
 
     public static ManualLogSource Logger = null!;
@@ -70,7 +71,7 @@ public partial class Main : BasePlugin
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
 
-        var disabledVersion = WebUtils.GetWeb("https://among-us.top/disabledVersions").Split("|");
+        var disabledVersion = WebUtils.GetWeb("https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions").Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
             Logger.LogError("The version of the mod has been disabled!");
@@ -81,7 +82,7 @@ public partial class Main : BasePlugin
         if (BetaVersion)
         {
             // 开始验证
-            var url = "https://among-us.top/hwids";
+            const string url = "https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
             var hwids = WebUtils.GetWeb(url).Split("|");
             RegisteredBetaUsers = new List<string>(hwids);
             var hostHwid = SystemUtils.GetHwid();
