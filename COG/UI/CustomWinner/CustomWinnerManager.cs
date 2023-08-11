@@ -7,7 +7,7 @@ namespace COG.UI.CustomWinner;
 
 public static class CustomWinnerManager
 {
-    private static readonly List<ICustomWinner> CustomWinners = new();
+    public static readonly List<ICustomWinner> CustomWinners = new();
     public static Il2CppSystem.Collections.Generic.List<WinningPlayerData> AllWinners { get; } = new();
 
     public static string WinText { get; private set; } = "";

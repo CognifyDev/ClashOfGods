@@ -2,6 +2,7 @@
 global using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
+using AsmResolver.DotNet.Signatures.Marshal;
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
@@ -170,11 +171,14 @@ public partial class Main : BasePlugin
 
     public override bool Unload()
     {
+        // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
         Role.RoleManager.GetManager().GetRoles().Clear();
         ListenerManager.GetManager().GetListeners().Clear();
         SidebarTextManager.GetManager().GetSidebarTexts().Clear();
+        CustomWinnerManager.AllWinners.Clear();
+        CustomWinnerManager.CustomWinners.Clear();
         PlayerUtils.Players.Clear();
         Harmony.UnpatchAll();
         return false;
