@@ -28,6 +28,7 @@ using UnityEngine.SceneManagement;
 using COG.Config;
 using System.Threading.Tasks;
 using System;
+using UnityEngine.Events;
 
 namespace COG;
 
@@ -171,9 +172,8 @@ public partial class Main : BasePlugin
                         return false;
                     }
                     Unload();
-                    popup.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
-                    Task.Delay(TimeSpan.FromSeconds(3));
                     SceneManager.LoadScene("MainMenu");
+                    popup.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }, false)
         });
