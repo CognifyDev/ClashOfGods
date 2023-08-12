@@ -91,6 +91,10 @@ public class LanguageConfig : Config
             Disconnected = GetString("game.survival-data.disconnected");
             DefaultKillReason = GetString("game.survival-data.default");
             UnknownKillReason = GetString("game.survival-data.unknown");
+
+            UnloadModButtonName = GetString("unload-mod.button");
+            UnloadModSuccessfulMessage = GetString("unload-mod.success");
+            UnloadModInGameErrorMsg = GetString("unload-mod.error-in-game");
         }
         catch (NullReferenceException)
         {
@@ -173,6 +177,10 @@ public class LanguageConfig : Config
     public string Disconnected { get; private set; }
     public string DefaultKillReason { get; private set; }
     public string UnknownKillReason { get; private set; }
+
+    public string UnloadModButtonName { get; private set; }
+    public string UnloadModSuccessfulMessage { get; private set; }
+    public string UnloadModInGameErrorMsg { get; private set; }
 
     private string GetString(string location)
     {
