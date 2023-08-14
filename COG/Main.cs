@@ -29,6 +29,9 @@ using COG.Config;
 using System.Threading.Tasks;
 using System;
 using UnityEngine.Events;
+using COG.Patch;
+using Reactor.Utilities.Extensions;
+using Reactor.Utilities;
 
 namespace COG;
 
@@ -165,14 +168,16 @@ public partial class Main : BasePlugin
                     size.x *= 2.5f;
                     bg.size = size;
                     popup.TextAreaTMP.fontSizeMin = popup.TextAreaTMP.fontSizeMax = popup.TextAreaTMP.fontSize;
+
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
+
                     if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.NotJoined)
                     {
                         popup.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
                         return false;
                     }
+
                     Unload();
-                    SceneManager.LoadScene("MainMenu");
                     popup.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }, false)
@@ -207,6 +212,9 @@ public partial class Main : BasePlugin
         CustomWinnerManager.CustomWinners.Clear();
         PlayerUtils.Players.Clear();
         Harmony.UnpatchAll();
+        MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
+        (MainMenuPatch.CustomBG ?? new GameObject()).Destroy();
+        PluginSingleton<ReactorPlugin>.Instance.Unload();
         return false;
     }
 }

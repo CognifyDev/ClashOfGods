@@ -27,7 +27,7 @@ public static class BeginCrewmatePatch
         IntroCutscene __instance,
         ref List<PlayerControl> teamToDisplay)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
             listener.OnSetUpTeamText(__instance, ref teamToDisplay);
     }
 
@@ -45,7 +45,7 @@ public static class IntroCutsceneBeginImpostorPatch
         IntroCutscene __instance,
         ref List<PlayerControl> yourTeam)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
             listener.OnSetUpTeamText(__instance, ref yourTeam);
     }
 
