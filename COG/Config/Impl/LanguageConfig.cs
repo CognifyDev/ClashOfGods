@@ -92,9 +92,9 @@ public class LanguageConfig : Config
             DefaultKillReason = GetString("game.survival-data.default");
             UnknownKillReason = GetString("game.survival-data.unknown");
 
-            UnloadModButtonName = GetString("unload-mod.button");
-            UnloadModSuccessfulMessage = GetString("unload-mod.success");
-            UnloadModInGameErrorMsg = GetString("unload-mod.error-in-game");
+            UnloadModButtonName = GetString("option.main.unload-mod.name");
+            UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
+            UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
         }
         catch (NullReferenceException)
         {
