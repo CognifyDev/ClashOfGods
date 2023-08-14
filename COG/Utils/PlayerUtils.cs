@@ -24,17 +24,17 @@ public static class PlayerUtils
     internal static readonly List<PlayerControl> Players = new();
 
     public static List<KeyValuePair<PlayerControl, Role.Role>> AllImpostors =>
-        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Impostor).ToList();
+        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Impostor).ToListCustom();
 
     public static List<KeyValuePair<PlayerControl, Role.Role>> AllCremates =>
-        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Crewmate).ToList();
+        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Crewmate).ToListCustom();
 
     public static List<KeyValuePair<PlayerControl, Role.Role>> AllNeutrals =>
-        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Neutral).ToList();
+        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Neutral).ToListCustom();
 
     public static List<PlayerControl> GetAllPlayers()
     {
-        return Players.ToArray().Where(player => player != null).ToList();
+        return Players.ToArray().Where(player => player != null).ToListCustom();
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public static class PlayerUtils
 
     public static List<PlayerControl> GetAllAlivePlayers()
     {
-        return Players.ToArray().Where(player => player != null && player.IsAlive()).ToList();
+        return Players.ToArray().Where(player => player != null && player.IsAlive()).ToListCustom();
     }
 
     public static bool IsSamePlayer(this GameData.PlayerInfo info, GameData.PlayerInfo target)

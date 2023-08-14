@@ -12,8 +12,8 @@ namespace COG.Patch;
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuPatch
 {
-    private static GameObject? _customBg;
-    private static readonly List<PassiveButton> Buttons = new();
+    public static GameObject? CustomBG;
+    public static readonly List<PassiveButton> Buttons = new();
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]
     [HarmonyPrefix]
@@ -78,9 +78,9 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     private static void LoadImage()
     {
-        _customBg = new GameObject("CustomBG");
-        _customBg.transform.position = new Vector3(1.8f, 0.2f, 0f);
-        var bgRenderer = _customBg.AddComponent<SpriteRenderer>();
+        CustomBG = new GameObject("CustomBG");
+        CustomBG.transform.position = new Vector3(1.8f, 0.2f, 0f);
+        var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
         bgRenderer.sprite = ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 295f);
     }
 
@@ -90,7 +90,7 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     private static void Hide()
     {
-        if (_customBg != null) _customBg.SetActive(false);
+        if (CustomBG != null) CustomBG.SetActive(false);
         foreach (var btn in Buttons) btn.gameObject.SetActive(false);
     }
 
@@ -98,7 +98,7 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     private static void Show()
     {
-        if (_customBg != null) _customBg.SetActive(true);
+        if (CustomBG != null) CustomBG.SetActive(true);
         foreach (var btn in Buttons)
         {
             if (btn == null || btn.gameObject == null) continue;

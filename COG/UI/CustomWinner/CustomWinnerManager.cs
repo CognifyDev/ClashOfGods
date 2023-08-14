@@ -45,7 +45,7 @@ public static class CustomWinnerManager
 
     public static void RegisterCustomWinnersInstances(IEnumerable<ICustomWinner> customWinners)
     {
-        ListUtils.ToList(customWinners).ForEach(RegisterCustomWinnerInstance);
+        ListUtils.ToListCustom(customWinners).ForEach(RegisterCustomWinnerInstance);
     }
 
     internal static bool CheckEndForCustomWinners()

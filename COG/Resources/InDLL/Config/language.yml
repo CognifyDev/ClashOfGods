@@ -79,3 +79,7 @@ game:
     disconnected: "掉线"
     default: "死亡"
     unknown: "未知"
+unload-mod:
+  button: "临时禁用模组"
+  success: "模组已成功被临时禁用！\n如果您仍想要继续游玩模组，请重启游戏。"
+  error-in-game: "请先离开本局游戏再进行操作。"

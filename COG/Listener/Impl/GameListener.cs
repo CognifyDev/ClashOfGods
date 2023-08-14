@@ -62,7 +62,7 @@ public class GameListener : IListener
         if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
 
         // 开始分配职业
-        var players = PlayerUtils.GetAllPlayers().ToList().Disarrange(); // 打乱玩家顺序
+        var players = PlayerUtils.GetAllPlayers().ToListCustom().Disarrange(); // 打乱玩家顺序
 
         var rolesToAdd = new List<Role.Role>(); // 新建集合，用来存储可用的职业 
 
