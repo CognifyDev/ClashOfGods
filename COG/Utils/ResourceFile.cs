@@ -9,15 +9,16 @@ public class ResourceFile
     public ResourceFile(string path)
     {
         Path = path;
+        Stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(Path);
     }
 
     public string Path { get; }
+    public Stream? Stream { get; }
 
     public string GetResourcesText()
     {
-        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(Path);
-        stream!.Position = 0;
-        using StreamReader reader = new(stream, Encoding.UTF8);
+        Stream!.Position = 0;
+        using StreamReader reader = new(Stream, Encoding.UTF8);
         return reader.ReadToEnd();
     }
 }

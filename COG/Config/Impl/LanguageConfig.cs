@@ -12,7 +12,7 @@ public class LanguageConfig : Config
     }
 
 
-    public LanguageConfig() : base(
+    private LanguageConfig() : base(
         "Language",
         DataDirectoryName + "/language.yml",
         new ResourceFile("COG.Resources.InDLL.Config.language.yml")
@@ -159,28 +159,28 @@ public class LanguageConfig : Config
     public string QQ { get; private set; } = null!;
     public string Discord { get; private set; } = null!;
 
-    public string UnknownCamp { get; private set; }
-    public string ImpostorCamp { get; private set; }
-    public string NeutralCamp { get; private set; }
-    public string CrewmateCamp { get; private set; }
+    public string UnknownCamp { get; private set; } = null!;
+    public string ImpostorCamp { get; private set; } = null!;
+    public string NeutralCamp { get; private set; } = null!;
+    public string CrewmateCamp { get; private set; } = null!;
 
-    public string UnknownCampDescription { get; private set; }
-    public string ImpostorCampDescription { get; private set; }
-    public string NeutralCampDescription { get; private set; }
-    public string CrewmateCampDescription { get; private set; }
+    public string UnknownCampDescription { get; private set; } = null!;
+    public string ImpostorCampDescription { get; private set; } = null!;
+    public string NeutralCampDescription { get; private set; } = null!;
+    public string CrewmateCampDescription { get; private set; } = null!;
 
-    public string KillAction { get; private set; }
+    public string KillAction { get; private set; } = null!;
 
-    public string ShowPlayersRolesMessage { get; private set; }
+    public string ShowPlayersRolesMessage { get; private set; } = null!;
 
-    public string Alive { get; private set; }
-    public string Disconnected { get; private set; }
-    public string DefaultKillReason { get; private set; }
-    public string UnknownKillReason { get; private set; }
+    public string Alive { get; private set; } = null!;
+    public string Disconnected { get; private set; } = null!;
+    public string DefaultKillReason { get; private set; } = null!;
+    public string UnknownKillReason { get; private set; } = null!;
 
-    public string UnloadModButtonName { get; private set; }
-    public string UnloadModSuccessfulMessage { get; private set; }
-    public string UnloadModInGameErrorMsg { get; private set; }
+    public string UnloadModButtonName { get; private set; } = null!;
+    public string UnloadModSuccessfulMessage { get; private set; } = null!;
+    public string UnloadModInGameErrorMsg { get; private set; } = null!;
 
     private string GetString(string location)
     {

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Xml.Linq;
 
 namespace COG.Utils;
 
@@ -10,8 +11,14 @@ public static class ProjectUtils
     /// <returns>项目版本</returns>
     public static string? GetProjectVersion()
     {
-        var attributes = Assembly.GetExecutingAssembly()
-            .GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
-        return attributes.Length > 0 ? ((AssemblyFileVersionAttribute)attributes[0]).Version : null;
+        try
+        {
+            return XDocument.Load(new ResourceFile("COG.COG.csproj").Stream!)
+                .Descendants("Version").FirstOrDefault()?.Value;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
