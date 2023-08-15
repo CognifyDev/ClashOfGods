@@ -1,11 +1,12 @@
 ﻿using System;
+using COG.UI.CustomButtons;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace COG.UI.CustomButtons;
+namespace COG.UI.CustomButton;
 
 public class CustomButton
 {
@@ -57,15 +58,6 @@ public class CustomButton
         EffectTime = effectTime;
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
-    }
-
-    /// <summary>
-    ///     给按钮先实例化用,如
-    ///     CustomButton btn = new();
-    ///     btn = CustomButton.Create(/*Code here...*/);
-    /// </summary>
-    public CustomButton()
-    {
     }
 
     /// <summary>

@@ -22,7 +22,7 @@ public static class ServerPath
     {
         var serverIp = isHttps ? "https://" : "http://" + ip;
         var serverInfo = new ServerInfo(name, serverIp, port, false);
-        ServerInfo[] ServerInfo = { serverInfo };
-        return new StaticHttpRegionInfo(name, StringNames.NoTranslation, ip, ServerInfo).Cast<IRegionInfo>();
+        ServerInfo[] serverInfos = { serverInfo };
+        return new StaticHttpRegionInfo(name, StringNames.NoTranslation, ip, serverInfos).Cast<IRegionInfo>();
     }
 }

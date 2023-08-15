@@ -12,16 +12,15 @@ public class Jester : Role, IListener, ICustomWinner
 {
     private PlayerControl? _player;
 
+    private readonly CustomOption _allowStartMeeting, _allowReportDeadBody;
+
     public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral, true)
     {
         Description = LanguageConfig.Instance.JesterDescription;
-        var parentOption = RoleOptions[0];
-        RoleOptions.Add(CustomOption.Create(
-            parentOption.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true, parentOption)
-        );
-        RoleOptions.Add(CustomOption.Create(
-            parentOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true, parentOption)
-        );
+        _allowStartMeeting = CustomOption.Create(
+            MainRoleOption.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true, MainRoleOption);
+        _allowReportDeadBody = CustomOption.Create(
+            MainRoleOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true, MainRoleOption);
 
         CustomWinnerManager.RegisterCustomWinnerInstance(this);
     }
@@ -45,10 +44,8 @@ public class Jester : Role, IListener, ICustomWinner
     public bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)
     {
         if (!CheckNull()) return true;
-        var allowStartMeetingOption = RoleOptions[2];
-        var allowReportDeadBodyOption = RoleOptions[3];
-        var result1 = allowStartMeetingOption.GetBool();
-        var result2 = allowReportDeadBodyOption.GetBool();
+        var result1 = _allowStartMeeting.GetBool();
+        var result2 = _allowReportDeadBody.GetBool();
         if (!result1 && playerControl.IsSamePlayer(_player!) && target == null) return false;
 
         return result2 || playerControl.IsSamePlayer(_player!) || target == null;

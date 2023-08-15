@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
+using COG.UI.CustomButton;
 using COG.UI.CustomButtons;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -21,7 +21,6 @@ public abstract class Role
         Color = color;
         CampType = campType;
         BaseRoleType = RoleTypes.Crewmate;
-        RoleOptions = new List<CustomOption>();
         SubRole = false;
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
@@ -31,11 +30,10 @@ public abstract class Role
 
         if (ShowInOptions)
         {
-            var option = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
+            MainRoleOption = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
                 ColorUtils.ToColorString(Color, Name), false, null, true);
-            RoleOptions.Add(option);
-            RoleOptions.Add(CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
-                LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, option));
+            RoleNumberOption = CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
+                LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, MainRoleOption);
         }
     }
 
@@ -65,11 +63,6 @@ public abstract class Role
     public RoleTypes BaseRoleType { get; protected set; }
 
     /// <summary>
-    ///     角色设置
-    /// </summary>
-    public List<CustomOption> RoleOptions { get; }
-
-    /// <summary>
     ///     是否为副职业
     /// </summary>
     public bool SubRole { get; protected set; }
@@ -93,6 +86,16 @@ public abstract class Role
     ///     是否可以破坏
     /// </summary>
     public bool CanSabotage { get; protected set; }
+    
+    /// <summary>
+    /// 角色的Option
+    /// </summary>
+    public CustomOption MainRoleOption { get; }
+    
+    /// <summary>
+    /// 选择角色数量的option
+    /// </summary>
+    public CustomOption RoleNumberOption { get; }
 
     /// <summary>
     ///     添加一个按钮

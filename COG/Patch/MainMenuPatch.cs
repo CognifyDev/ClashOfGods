@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using COG.Config.Impl;
 using COG.Utils;
 using TMPro;
@@ -66,7 +67,7 @@ public static class MainMenuPatch
         var buttonSprite = button.transform.FindChild("Inactive").GetComponent<SpriteRenderer>();
         buttonSprite.color = color;
         __instance.StartCoroutine(Effects.Lerp(0.5f,
-            new Action<float>(p => { button.GetComponentInChildren<TMP_Text>().SetText(text); })));
+            new Action<float>(_ => { button.GetComponentInChildren<TMP_Text>().SetText(text); })));
 
         button.OnClick = new Button.ButtonClickedEvent();
         button.OnClick.AddListener(action);
@@ -99,9 +100,8 @@ public static class MainMenuPatch
     private static void Show()
     {
         if (CustomBG != null) CustomBG.SetActive(true);
-        foreach (var btn in Buttons)
+        foreach (var btn in Buttons.Where(btn => btn != null && btn.gameObject != null))
         {
-            if (btn == null || btn.gameObject == null) continue;
             btn.gameObject.SetActive(true);
         }
     }

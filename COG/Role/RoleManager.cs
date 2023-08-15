@@ -14,7 +14,7 @@ public class RoleManager
     {
         var list = new List<Role>();
         foreach (var role in _roles)
-            if (role.CampType == campType && role.RoleOptions[0].GetBool())
+            if (role.CampType == campType && role.MainRoleOption.GetBool())
                 list.Add(role);
 
         return list.ToArray();
@@ -67,9 +67,9 @@ public class RoleManager
         internal RoleGetter()
         {
             foreach (var role in GetManager().GetRoles()
-                         .Where(role => role.ShowInOptions && role.RoleOptions[0].GetBool()))
+                         .Where(role => role.ShowInOptions && role.MainRoleOption.GetBool()))
             {
-                var times = (int)role.RoleOptions[1].GetFloat();
+                var times = (int)role.RoleNumberOption.GetFloat();
                 for (var i = 0; i < times; i++) _roles.Add(role);
             }
 

@@ -2,6 +2,7 @@
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
+using COG.UI.CustomButton;
 using COG.UI.CustomButtons;
 using COG.Utils;
 using UnityEngine;

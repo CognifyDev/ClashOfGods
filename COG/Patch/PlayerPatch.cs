@@ -111,9 +111,7 @@ internal class AirshipExileControllerPatch
     public static void Postfix(AirshipExileController __instance)
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnAirshipPlayerExile(__instance);
-        foreach (var btn in CustomButtonManager.GetManager().GetButtons())
-            if (btn != null)
-                btn.OnMeetingEndSpawn();
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
     }
 }
 

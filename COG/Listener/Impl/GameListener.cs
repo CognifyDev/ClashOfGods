@@ -16,6 +16,8 @@ namespace COG.Listener.Impl;
 public class GameListener : IListener
 {
     private static readonly List<IListener> RoleListeners = new();
+
+    public static bool HasStartedRoom { get; private set; } = false;
     // private static bool _forceStarted;
 
     public void OnCoBegin()
@@ -115,6 +117,14 @@ public class GameListener : IListener
 
     public void OnGameStart(GameStartManager manager)
     {
+        if (HasStartedRoom)
+        {
+            GameUtils.ForceClearGameData();
+        }
+        else
+        {
+            HasStartedRoom = true;
+        }
         // 改变按钮颜色
         manager.MakePublicButton.color = Palette.DisabledClear;
         manager.privatePublicText.color = Palette.DisabledClear;
@@ -227,6 +237,7 @@ public class GameListener : IListener
 
     public bool OnCheckGameEnd()
     {
+        return false;
         return CustomWinnerManager.CheckEndForCustomWinners();
     }
 

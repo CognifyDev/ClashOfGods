@@ -32,6 +32,7 @@ using UnityEngine.Events;
 using COG.Patch;
 using Reactor.Utilities.Extensions;
 using Reactor.Utilities;
+using Object = UnityEngine.Object;
 
 namespace COG;
 
@@ -162,23 +163,27 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.UnloadModButtonName,
                 () =>
                 {
-                    var popup = GameObject.Instantiate(DiscordManager.Instance.discordPopup, Camera.main.transform);
-                    var bg = popup.transform.Find("Background").GetComponent<SpriteRenderer>();
-                    var size = bg.size;
-                    size.x *= 2.5f;
-                    bg.size = size;
-                    popup.TextAreaTMP.fontSizeMin = popup.TextAreaTMP.fontSizeMax = popup.TextAreaTMP.fontSize;
-
-                    DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-
-                    if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.NotJoined)
+                    if (Camera.main != null)
                     {
-                        popup.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
-                        return false;
+                        var popup = Object.Instantiate(DiscordManager.Instance.discordPopup, Camera.main.transform);
+                        var bg = popup.transform.Find("Background").GetComponent<SpriteRenderer>();
+                        var size = bg.size;
+                        size.x *= 2.5f;
+                        bg.size = size;
+                        popup.TextAreaTMP.fontSizeMin = popup.TextAreaTMP.fontSizeMax = popup.TextAreaTMP.fontSize;
+
+                        DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
+
+                        if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.NotJoined)
+                        {
+                            popup.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
+                            return false;
+                        }
+
+                        Unload();
+                        popup.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     }
 
-                    Unload();
-                    popup.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }, false)
         });
@@ -213,7 +218,7 @@ public partial class Main : BasePlugin
         PlayerUtils.Players.Clear();
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
-        (MainMenuPatch.CustomBG ?? new GameObject()).Destroy();
+        (MainMenuPatch.CustomBG ? MainMenuPatch.CustomBG : new GameObject())!.Destroy();
         PluginSingleton<ReactorPlugin>.Instance.Unload();
         return false;
     }
