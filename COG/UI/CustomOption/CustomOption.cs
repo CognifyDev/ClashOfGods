@@ -100,13 +100,11 @@ public class CustomOption
 
     public static byte[][] WriteOptionsToByteArray()
     {
-        return Enumerable.ToList(
-            from customOption in Options
+        return (from customOption in Options
             where customOption != null
             select new SerializableCustomOption(customOption)
             into serializableCustomOption
-            select serializableCustomOption.SerializeToData()
-        ).ToArray();
+            select serializableCustomOption.SerializeToData()).ToList().ToArray();
     }
 
     public static void ShareOptionChange()
@@ -289,11 +287,11 @@ public class CustomOption
 
             DestroyOptions(new List<List<OptionBehaviour>>
             {
-                Enumerable.ToList(torMenu.GetComponentsInChildren<OptionBehaviour>()),
-                Enumerable.ToList(impostorMenu.GetComponentsInChildren<OptionBehaviour>()),
-                Enumerable.ToList(neutralMenu.GetComponentsInChildren<OptionBehaviour>()),
-                Enumerable.ToList(crewmateMenu.GetComponentsInChildren<OptionBehaviour>()),
-                Enumerable.ToList(modifierMenu.GetComponentsInChildren<OptionBehaviour>())
+                torMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
+                impostorMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
+                neutralMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
+                crewmateMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
+                modifierMenu.GetComponentsInChildren<OptionBehaviour>().ToList()
             });
 
             var torOptions = new List<OptionBehaviour>();

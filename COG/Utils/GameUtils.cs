@@ -4,9 +4,7 @@ using System.Linq;
 using AmongUs.GameOptions;
 using COG.Listener;
 using COG.Listener.Impl;
-using GameCore;
-using InnerNet;
-using GameStates = COG.States.GameStates;
+using COG.States;
 
 namespace COG.Utils;
 
@@ -56,20 +54,17 @@ public static class GameUtils
     }
 
     /// <summary>
-    /// 强制清除游戏状态
+    ///     强制清除游戏状态
     /// </summary>
     public static void ForceClearGameData()
     {
         GameStates.InGame = false;
         Data.Clear();
         var gameManager = GameManager.Instance;
-        if (gameManager != null)
-        {
-            gameManager.EndGame();
-        }
+        if (gameManager != null) gameManager.EndGame();
 
         var gameListener = ListenerManager.GetManager().GetTypeListener<GameListener>()!;
-        
+
         try
         {
             gameListener.OnGameEndSetEverythingUp(null!);

@@ -50,7 +50,7 @@ public abstract class Role
     /// <summary>
     ///     角色介绍
     /// </summary>
-    public string Description { get; protected set; }
+    public string Description { get; protected init; }
 
     /// <summary>
     ///     角色阵营
@@ -60,12 +60,12 @@ public abstract class Role
     /// <summary>
     ///     原版角色蓝本
     /// </summary>
-    public RoleTypes BaseRoleType { get; protected set; }
+    public RoleTypes BaseRoleType { get; protected init; }
 
     /// <summary>
     ///     是否为副职业
     /// </summary>
-    public bool SubRole { get; protected set; }
+    public bool SubRole { get; }
 
     /// <summary>
     ///     在选项中显示
@@ -75,27 +75,27 @@ public abstract class Role
     /// <summary>
     ///     是否可以跳管
     /// </summary>
-    public bool CanVent { get; protected set; }
+    public bool CanVent { get; protected init; }
 
     /// <summary>
     ///     是否可以击杀
     /// </summary>
-    public bool CanKill { get; protected set; }
+    public bool CanKill { get; protected init; }
 
     /// <summary>
     ///     是否可以破坏
     /// </summary>
-    public bool CanSabotage { get; protected set; }
-    
+    public bool CanSabotage { get; protected init; }
+
     /// <summary>
-    /// 角色的Option
+    ///     角色的Option
     /// </summary>
-    public CustomOption MainRoleOption { get; }
-    
+    public CustomOption? MainRoleOption { get; }
+
     /// <summary>
-    /// 选择角色数量的option
+    ///     选择角色数量的option
     /// </summary>
-    public CustomOption RoleNumberOption { get; }
+    public CustomOption? RoleNumberOption { get; }
 
     /// <summary>
     ///     添加一个按钮
@@ -112,7 +112,7 @@ public abstract class Role
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
-    public static CustomOption.CustomOptionType ToCustomOption(Role role)
+    protected static CustomOption.CustomOptionType ToCustomOption(Role role)
     {
         if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.CustomOptionType.Addons;
         return (CustomOption.CustomOptionType)role.CampType;

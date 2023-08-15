@@ -11,8 +11,8 @@ public class CrewmatesCustomWinner : ICustomWinner
         foreach (var player in PlayerUtils.GetAllPlayers()) taskComplete = !player.Data.IsIncomplete;
         if (!taskComplete)
         {
-            if (Enumerable.ToList(PlayerUtils.AllImpostors.Where(pair => pair.Key && !pair.Key.Data.IsDead)
-                    .Select(pair => pair.Key)).Count == 0)
+            if (PlayerUtils.AllImpostors.Where(pair => pair.Key && !pair.Key.Data.IsDead)
+                    .Select(pair => pair.Key).ToList().Count == 0)
             {
                 CustomWinnerManager.RegisterCustomWinners(PlayerUtils.AllCremates.Select(p => p.Key));
                 CustomWinnerManager.SetWinText("Crewmates win");

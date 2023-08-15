@@ -10,17 +10,18 @@ namespace COG.Role.Impl.Neutral;
 
 public class Jester : Role, IListener, ICustomWinner
 {
-    private PlayerControl? _player;
-
     private readonly CustomOption _allowStartMeeting, _allowReportDeadBody;
+    private PlayerControl? _player;
 
     public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral, true)
     {
         Description = LanguageConfig.Instance.JesterDescription;
         _allowStartMeeting = CustomOption.Create(
-            MainRoleOption.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true, MainRoleOption);
+            MainRoleOption.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true,
+            MainRoleOption);
         _allowReportDeadBody = CustomOption.Create(
-            MainRoleOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true, MainRoleOption);
+            MainRoleOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true,
+            MainRoleOption);
 
         CustomWinnerManager.RegisterCustomWinnerInstance(this);
     }

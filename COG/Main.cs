@@ -10,6 +10,7 @@ using COG.Command.Impl;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
+using COG.Patch;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
@@ -20,19 +21,13 @@ using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
 using COG.Utils;
+using InnerNet;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using COG.Config;
-using System.Threading.Tasks;
-using System;
-using UnityEngine.Events;
-using COG.Patch;
-using Reactor.Utilities.Extensions;
 using Reactor.Utilities;
-using Object = UnityEngine.Object;
+using Reactor.Utilities.Extensions;
+using UnityEngine;
 
 namespace COG;
 
@@ -49,10 +44,10 @@ public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
-    public static string PluginVersion { get; private set; } = "Unknown";
     public const string DisplayName = "ClashOfGods";
 
     public static ManualLogSource Logger = null!;
+    public static string PluginVersion { get; private set; } = "Unknown";
     public Harmony Harmony { get; } = new(PluginGuid);
 
     public static List<string> RegisteredBetaUsers { get; private set; } = new();
@@ -80,7 +75,10 @@ public partial class Main : BasePlugin
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
 
-        var disabledVersion = WebUtils.GetWeb("https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions").Split("|");
+        var disabledVersion = WebUtils
+            .GetWeb(
+                "https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
+            .Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
             Logger.LogError("The version of the mod has been disabled!");
@@ -91,7 +89,8 @@ public partial class Main : BasePlugin
         if (BetaVersion)
         {
             // 开始验证
-            const string url = "https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
+            const string url =
+                "https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
             var hwids = WebUtils.GetWeb(url).Split("|");
             RegisteredBetaUsers = new List<string>(hwids);
             var hostHwid = SystemUtils.GetHwid();
@@ -174,7 +173,7 @@ public partial class Main : BasePlugin
 
                         DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
 
-                        if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.NotJoined)
+                        if (AmongUsClient.Instance.GameState != InnerNetClient.GameStates.NotJoined)
                         {
                             popup.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
                             return false;

@@ -100,9 +100,6 @@ public static class MainMenuPatch
     private static void Show()
     {
         if (CustomBG != null) CustomBG.SetActive(true);
-        foreach (var btn in Buttons.Where(btn => btn != null && btn.gameObject != null))
-        {
-            btn.gameObject.SetActive(true);
-        }
+        foreach (var btn in Buttons.Where(btn => btn != null && btn.gameObject != null)) btn.gameObject.SetActive(true);
     }
 }

@@ -31,10 +31,7 @@ public class ListenerManager
 
     public IListener? GetTypeListener<T>() where T : IListener
     {
-        foreach (var listener in _listeners.OfType<T>())
-        {
-            return listener;
-        }
+        foreach (var listener in _listeners.OfType<T>()) return listener;
 
         return null;
     }
