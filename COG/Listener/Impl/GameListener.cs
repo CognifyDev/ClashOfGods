@@ -233,6 +233,7 @@ public class GameListener : IListener
 
     public bool OnCheckGameEnd()
     {
+        return false;
         return CustomWinnerManager.CheckEndForCustomWinners();
     }
 
