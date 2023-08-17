@@ -62,29 +62,29 @@ internal class ChatUpdatePatch
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Update))]
 internal class HostSartPatch
 {
-    public static float timer = 600;
-    private static string currentText = "";
-    private static bool update;
+    public static float Timer = 600;
+    private static string _currentText = "";
+    private static bool _update;
 
     public static void Prefix(GameStartManager __instance)
     {
         // show time
         if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||
             AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return;
-        update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
+        _update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
     }
 
     public static void Postfix(GameStartManager __instance)
     {
         // showtime
-        if (update) currentText = __instance.PlayerCounter.text;
+        if (_update) _currentText = __instance.PlayerCounter.text;
         if (!AmongUsClient.Instance.AmHost) return;
-        timer = Mathf.Max(0f, timer -= Time.deltaTime);
-        var minutes = (int)timer / 60;
-        var seconds = (int)timer % 60;
+        Timer = Mathf.Max(0f, Timer -= Time.deltaTime);
+        var minutes = (int)Timer / 60;
+        var seconds = (int)Timer % 60;
 
         var suffix = $"({minutes:00}:{seconds:00})";
-        __instance.PlayerCounter.text = currentText + suffix;
+        __instance.PlayerCounter.text = _currentText + suffix;
         __instance.PlayerCounter.autoSizeTextContainer = true;
     }
 }
