@@ -9,6 +9,7 @@ using COG.UI.CustomWinner;
 using COG.Utils;
 using Il2CppSystem;
 using Il2CppSystem.Collections;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace COG.Listener.Impl;
@@ -17,7 +18,7 @@ public class GameListener : IListener
 {
     private static readonly List<IListener> RoleListeners = new();
 
-    public static bool HasStartedRoom { get; private set; }
+    private static bool HasStartedRoom { get; set; }
     // private static bool _forceStarted;
 
     public void OnCoBegin()
@@ -26,7 +27,8 @@ public class GameListener : IListener
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
 
-        foreach (var (key, value) in GameUtils.Data) RoleManager.Instance.SetRole(key, value.BaseRoleType);
+        foreach (var (key, value) in GameUtils.Data)
+            RoleManager.Instance.SetRole(key, value.BaseRoleType);
     }
 
     public void OnRPCReceived(byte callId, MessageReader reader)
@@ -51,10 +53,13 @@ public class GameListener : IListener
 
     public void AfterPlayerFixedUpdate(PlayerControl player)
     {
-        GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
-        GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Engineer, 0, 0);
-        GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
-        GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
+        if (GameStates.IsLobby && AmongUsClient.Instance.AmHost)
+        {
+            GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
+            GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Engineer, 0, 0);
+            GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
+            GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
+        }
     }
 
     public void OnSelectRoles()
@@ -233,7 +238,6 @@ public class GameListener : IListener
 
     public bool OnCheckGameEnd()
     {
-        return false;
         return CustomWinnerManager.CheckEndForCustomWinners();
     }
 

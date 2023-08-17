@@ -68,14 +68,10 @@ internal class HostSartPatch
 
     public static void Prefix(GameStartManager __instance)
     {
-        // start with no limit
-        GameStartManager.Instance.MinPlayers = 1;
-        {
-            // showtime
-            if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||
-                AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return;
-            update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
-        }
+        // show time
+        if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||
+            AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return;
+        update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
     }
 
     public static void Postfix(GameStartManager __instance)
