@@ -104,7 +104,7 @@ public class CustomOption
             where customOption != null
             select new SerializableCustomOption(customOption)
             into serializableCustomOption
-            select serializableCustomOption.SerializeToData()).ToList().ToArray();
+            select serializableCustomOption.SerializeToData()).ToArray();
     }
 
     public static void ShareOptionChange()

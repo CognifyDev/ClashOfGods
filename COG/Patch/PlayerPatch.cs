@@ -1,5 +1,6 @@
 using System.Linq;
 using COG.Listener;
+using COG.States;
 using COG.UI.CustomButtons;
 using InnerNet;
 using UnityEngine;
@@ -60,7 +61,7 @@ internal class ChatUpdatePatch
 }
 
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Update))]
-internal class HostSartPatch
+internal class HostStartPatch
 {
     public static float Timer = 600;
     private static string _currentText = "";
@@ -68,10 +69,18 @@ internal class HostSartPatch
 
     public static void Prefix(GameStartManager __instance)
     {
-        // show time
-        if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||
-            AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return;
-        _update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
+        if (GlobalCustomOption.DebugMode.GetBool())
+        {
+            // start with no limit
+            GameStartManager.Instance.MinPlayers = 1;
+        }
+        
+        {
+            // showtime
+            if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||
+                AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return;
+            _update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
+        }
     }
 
     public static void Postfix(GameStartManager __instance)

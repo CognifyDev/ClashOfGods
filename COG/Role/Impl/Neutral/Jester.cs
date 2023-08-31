@@ -17,7 +17,7 @@ public class Jester : Role, IListener, ICustomWinner
     {
         Description = LanguageConfig.Instance.JesterDescription;
         _allowStartMeeting = CustomOption.Create(
-            MainRoleOption.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true,
+            MainRoleOption!.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true,
             MainRoleOption);
         _allowReportDeadBody = CustomOption.Create(
             MainRoleOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true,

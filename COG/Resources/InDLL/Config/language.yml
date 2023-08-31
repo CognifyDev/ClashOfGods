@@ -44,6 +44,7 @@ menu:
   general:
     name: "COG设置"
     save-game-configs: "保存游戏设置"
+    debug-mode: "<color=#9AFF00>调试模式</color>"
   impostor:
     name: "内鬼职业设置"
   neutral:

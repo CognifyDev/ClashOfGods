@@ -52,7 +52,7 @@ public class GameListener : IListener
         }
     }
 
-    public void OnSelectRoles()
+    private void SelectRoles()
     {
         GameUtils.Data.Clear(); // 首先清除 防止干扰
 
@@ -107,8 +107,15 @@ public class GameListener : IListener
         }
 
         foreach (var playerRole in GameUtils.Data) RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
+    }
 
-        ShareRoles();
+    public void OnSelectRoles()
+    {
+        if (!AmongUsClient.Instance.AmHost) return;
+        foreach (var playerRole in GameUtils.Data)
+        {
+            playerRole.Player.SetRole(playerRole.Role.BaseRoleType);
+        }
     }
 
     public void OnGameStart(GameStartManager manager)
@@ -223,11 +230,12 @@ public class GameListener : IListener
         // 取消已经注册的Listener
         foreach (var roleListener in RoleListeners) ListenerManager.GetManager().UnregisterListener(roleListener);
         RoleListeners.Clear();
+        _sharedRoles = false;
     }
 
     public bool OnCheckGameEnd()
     {
-        return CustomWinnerManager.CheckEndForCustomWinners();
+        return !GlobalCustomOption.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,
@@ -319,8 +327,28 @@ public class GameListener : IListener
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
         
         // ready for share roles
+        writer.Write(GameUtils.Data.Count);
+        foreach (var playerRole in GameUtils.Data)
+        {
+            writer.WritePacked(playerRole.Player.PlayerId);
+            writer.WritePacked(playerRole.Role.Id);
+        }
         
-
         writer.Finish();
+    }
+
+    private static bool _sharedRoles;
+
+    public void OnGameStartManagerUpdate(GameStartManager manager)
+    {
+        if (manager.startState != GameStartManager.StartingStates.Countdown) return;
+        if (manager.countDownTimer <= 0.5f && !_sharedRoles)
+        {
+            Main.Logger.LogInfo("Select roles for players...");
+            SelectRoles();
+            Main.Logger.LogInfo("Share roles for players...");
+            ShareRoles();
+            _sharedRoles = true;
+        }
     }
 }

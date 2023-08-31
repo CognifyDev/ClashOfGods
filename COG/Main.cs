@@ -15,6 +15,8 @@ using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
+using COG.States;
+using COG.UI.CustomOption;
 using COG.UI.CustomWinner;
 using COG.UI.CustomWinner.Impl;
 using COG.UI.ModOption;
@@ -200,6 +202,8 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
+        
+        GlobalCustomOption.Init();
 
         Harmony.PatchAll();
     }

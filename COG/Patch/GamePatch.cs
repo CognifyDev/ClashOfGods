@@ -34,7 +34,7 @@ internal class GameStartManagerStartPatch
 {
     public static void Postfix(GameStartManager __instance)
     {
-        HostSartPatch.Timer = 600f;
+        HostStartPatch.Timer = 600f;
 
         foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameStart(__instance);
     }
@@ -160,5 +160,18 @@ internal class GameStartPatch
     public static void Postfix(GameManager __instance)
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameStart(__instance);
+    }
+}
+
+[HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Update))]
+public class GameStartManagerUpdatePatch
+{
+    [HarmonyPrefix]
+    public static void Prefix(GameStartManager __instance)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            listener.OnGameStartManagerUpdate(__instance);
+        }
     }
 }

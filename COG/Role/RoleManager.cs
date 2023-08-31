@@ -45,6 +45,11 @@ public class RoleManager
         return _roles.FirstOrDefault(role => role.GetType().Name.ToLower().Equals(name));
     }
 
+    public Role? GetRoleById(int id)
+    {
+        return _roles.FirstOrDefault(role => role.Id.Equals(id));
+    }
+
     /// <summary>
     ///     获取一个新的获取器
     /// </summary>
@@ -67,10 +72,13 @@ public class RoleManager
         internal RoleGetter()
         {
             foreach (var role in GetManager().GetRoles()
-                         .Where(role => role.ShowInOptions && role.MainRoleOption.GetBool()))
+                         .Where(role => role.MainRoleOption != null && role.ShowInOptions && role.MainRoleOption.GetBool()))
             {
-                var times = (int)role.RoleNumberOption.GetFloat();
-                for (var i = 0; i < times; i++) _roles.Add(role);
+                if (role.RoleNumberOption != null)
+                {
+                    var times = (int)role.RoleNumberOption.GetFloat();
+                    for (var i = 0; i < times; i++) _roles.Add(role);
+                }
             }
 
             _roles.Disarrange();

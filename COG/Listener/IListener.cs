@@ -223,6 +223,10 @@ public interface IListener
     {
     }
 
+    void OnGameStartManagerUpdate(GameStartManager manager)
+    {
+    }
+
     private class EmptyListener : IListener
     {
     }

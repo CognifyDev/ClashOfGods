@@ -27,6 +27,7 @@ public abstract class Role
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
         CanSabotage = false;
+        Id = GetType().GetHashCode();
 
         ShowInOptions = showInOptions;
 
@@ -38,6 +39,11 @@ public abstract class Role
                 LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, MainRoleOption);
         }
     }
+    
+    /// <summary>
+    ///     角色特征码
+    /// </summary>
+    public int Id { get; }
 
     /// <summary>
     ///     角色颜色

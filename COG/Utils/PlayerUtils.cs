@@ -102,11 +102,7 @@ public static class PlayerUtils
 
     public static PlayerControl? GetPlayerById(byte playerId)
     {
-        foreach (var playerControl in GetAllPlayers())
-            if (playerControl.PlayerId == playerId)
-                return playerControl;
-
-        return null;
+        return GetAllPlayers().FirstOrDefault(playerControl => playerControl.PlayerId == playerId);
     }
 
     public static ClientData? GetClient(this PlayerControl player)

@@ -30,6 +30,7 @@ public class LanguageConfig : Config
             AddonsSetting = GetString("menu.addons.name");
 
             SaveGameConfigs = GetString("menu.general.save-game-configs");
+            DebugMode = GetString("menu.general.debug-mode");
 
             // Unknown
             UnknownName = GetString("role.unknown.name");
@@ -116,6 +117,7 @@ public class LanguageConfig : Config
     public string AddonsSetting { get; private set; } = null!;
 
     public string SaveGameConfigs { get; private set; } = null!;
+    public string DebugMode { get; private set; } = null!;
 
     // Unknown
     public string UnknownName { get; private set; } = null!;
