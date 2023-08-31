@@ -1,5 +1,8 @@
-﻿namespace COG.Role;
+﻿using System;
 
+namespace COG.Role;
+
+[Serializable]
 public enum CampType
 {
     Unknown = 0,

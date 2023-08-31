@@ -117,7 +117,7 @@ public partial class Main : BasePlugin
             new GameObjectListener(),
             new DeadPlayerManager(),
             new CustomWinnerListener(),
-            new CachedPlayer()
+            CachedPlayer.GetCachedPlayerListener()
         });
 
         // Register sidebar texts

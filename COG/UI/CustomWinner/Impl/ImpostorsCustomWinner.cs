@@ -8,13 +8,13 @@ public class ImpostorsCustomWinner : ICustomWinner
 {
     public bool CanWin()
     {
-        var aliveImpostors = PlayerUtils.AllImpostors.Where(pair => pair.Key && !pair.Key.Data.IsDead)
-            .Select(pair => pair.Key).ToList();
-        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Impostor).ToList()
-            .ForEach(pair => aliveImpostors.Add(pair.Key));
+        var aliveImpostors = PlayerUtils.AllImpostors.Where(pair => pair.Player && !pair.Player.Data.IsDead)
+            .Select(pair => pair.Player).ToList();
+        GameUtils.Data.Where(pair => pair.Role.CampType == CampType.Impostor).ToList()
+            .ForEach(pair => aliveImpostors.Add(pair.Player));
         if (aliveImpostors.Count < PlayerUtils.GetAllAlivePlayers().Count) return true;
         if (aliveImpostors.Count >= PlayerUtils.AllCremates
-                .Where(pair => pair.Key && !pair.Key.Data.IsDead).Select(pair => pair.Key).ToList().Count)
+                .Where(pair => pair.Player && !pair.Player.Data.IsDead).Select(pair => pair.Player).ToList().Count)
         {
             CustomWinnerManager.RegisterCustomWinners(aliveImpostors);
             CustomWinnerManager.SetWinText("Impostors win");

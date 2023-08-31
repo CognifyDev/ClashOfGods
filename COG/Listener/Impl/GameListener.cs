@@ -9,7 +9,6 @@ using COG.UI.CustomWinner;
 using COG.Utils;
 using Il2CppSystem;
 using Il2CppSystem.Collections;
-using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace COG.Listener.Impl;
@@ -27,8 +26,8 @@ public class GameListener : IListener
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
 
-        foreach (var (key, value) in GameUtils.Data)
-            RoleManager.Instance.SetRole(key, value.BaseRoleType);
+        foreach (var playerRole in GameUtils.Data)
+            RoleManager.Instance.SetRole(playerRole.Player, playerRole.Role.BaseRoleType);
     }
 
     public void OnRPCReceived(byte callId, MessageReader reader)
@@ -36,19 +35,10 @@ public class GameListener : IListener
         if (AmongUsClient.Instance.AmHost) return;
         var knownRpc = (KnownRpc)callId;
         if (knownRpc != KnownRpc.ShareRoles) return;
-        var roleData = reader.ReadPackedInt32();
-        var data = new Dictionary<PlayerControl, Role.Role>();
-        for (var i = 0; i < roleData; i++)
-        {
-            var playerId = reader.ReadByte();
-            var role = Role.RoleManager.GetManager().GetRoleByClassName(reader.ReadString());
-            if (role == null) continue;
-            var player = PlayerUtils.GetPlayerById(playerId);
-            if (player == null) continue;
-            data.Add(player, role);
-        }
+        
+        // already for roles
 
-        GameUtils.Data = data;
+        // GameUtils.Data = data;
     }
 
     public void AfterPlayerFixedUpdate(PlayerControl player)
@@ -106,18 +96,19 @@ public class GameListener : IListener
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
             }
 
-            GameUtils.Data.Add(player, role);
+            GameUtils.Data.Add(new PlayerRole(player, role));
         }
 
         // 打印职业分配信息
-        foreach (var (player, value) in GameUtils.Data)
-            Main.Logger.LogInfo($"{player.name}({player.Data.FriendCode}) => {value.GetType().Name}");
+        foreach (var playerRole in GameUtils.Data)
+        {
+            Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
+                                $" => {playerRole.Role.GetType().Name}");
+        }
 
-        foreach (var (key, value) in GameUtils.Data) RoleListeners.Add(value.GetListener(key));
+        foreach (var playerRole in GameUtils.Data) RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
 
         ShareRoles();
-
-        SavePlayerRoles();
     }
 
     public void OnGameStart(GameStartManager manager)
@@ -155,32 +146,30 @@ public class GameListener : IListener
 
         void SetupRoles()
         {
-            if (GameOptionsManager.Instance.currentGameMode == GameModes.Normal)
+            if (GameOptionsManager.Instance.currentGameMode != GameModes.Normal) return;
+            intro.RoleText.text = myRole.Name;
+            intro.RoleText.color = myRole.Color;
+            intro.RoleBlurbText.text = myRole.Description;
+            intro.RoleBlurbText.color = myRole.Color;
+            intro.YouAreText.color = myRole.Color;
+
+            intro.YouAreText.gameObject.SetActive(true);
+            intro.RoleText.gameObject.SetActive(true);
+            intro.RoleBlurbText.gameObject.SetActive(true);
+
+            SoundManager.Instance.PlaySound(PlayerControl.LocalPlayer.Data.Role.IntroSound, false);
+
+            if (intro.ourCrewmate == null)
             {
-                intro.RoleText.text = myRole.Name;
-                intro.RoleText.color = myRole.Color;
-                intro.RoleBlurbText.text = myRole.Description;
-                intro.RoleBlurbText.color = myRole.Color;
-                intro.YouAreText.color = myRole.Color;
-
-                intro.YouAreText.gameObject.SetActive(true);
-                intro.RoleText.gameObject.SetActive(true);
-                intro.RoleBlurbText.gameObject.SetActive(true);
-
-                SoundManager.Instance.PlaySound(PlayerControl.LocalPlayer.Data.Role.IntroSound, false);
-
-                if (intro.ourCrewmate == null)
-                {
-                    intro.ourCrewmate = intro.CreatePlayer(0, 1, PlayerControl.LocalPlayer.Data, false);
-                    intro.ourCrewmate.gameObject.SetActive(false);
-                }
-
-                intro.ourCrewmate.gameObject.SetActive(true);
-                var transform = intro.ourCrewmate.transform;
-                transform.localPosition = new Vector3(0f, -1.05f, -18f);
-                transform.localScale = new Vector3(1f, 1f, 1f);
-                intro.ourCrewmate.ToggleName(false);
+                intro.ourCrewmate = intro.CreatePlayer(0, 1, PlayerControl.LocalPlayer.Data, false);
+                intro.ourCrewmate.gameObject.SetActive(false);
             }
+
+            intro.ourCrewmate.gameObject.SetActive(true);
+            var transform = intro.ourCrewmate.transform;
+            transform.localPosition = new Vector3(0f, -1.05f, -18f);
+            transform.localScale = new Vector3(1f, 1f, 1f);
+            intro.ourCrewmate.ToggleName(false);
         }
 
         list.Add(Effects.Action((Action)(System.Action?)SetupRoles));
@@ -244,10 +233,10 @@ public class GameListener : IListener
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,
         ref float cooldown)
     {
-        foreach (var (key, value) in GameUtils.Data)
+        foreach (var playerRole in GameUtils.Data)
         {
-            if (!key.Data.IsSamePlayer(playerInfo)) continue;
-            var ventAble = value.CanVent;
+            if (!playerRole.Player.Data.IsSamePlayer(playerInfo)) continue;
+            var ventAble = playerRole.Role.CanVent;
             canUse = ventAble;
             couldUse = ventAble;
             cooldown = float.MaxValue;
@@ -328,19 +317,10 @@ public class GameListener : IListener
     private static void ShareRoles()
     {
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
-        writer.WritePacked(GameUtils.Data.Count);
-        foreach (var (key, value) in GameUtils.Data)
-        {
-            writer.Write(key.PlayerId);
-            writer.Write(value.GetType().Name);
-        }
+        
+        // ready for share roles
+        
 
         writer.Finish();
-    }
-
-    private void SavePlayerRoles()
-    {
-        PlayerRole.CachedRoles.Clear();
-        foreach (var pair in GameUtils.Data) _ = new PlayerRole(pair.Key, pair.Value, pair.Key.Data.PlayerName);
     }
 }

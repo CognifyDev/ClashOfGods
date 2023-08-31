@@ -1,4 +1,5 @@
-﻿using AmongUs.GameOptions;
+﻿using System;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.UI.CustomButton;
@@ -12,6 +13,7 @@ namespace COG.Role;
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
+[Serializable]
 public abstract class Role
 {
     protected Role(string name, Color color, CampType campType, bool showInOptions)

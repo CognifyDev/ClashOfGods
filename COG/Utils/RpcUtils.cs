@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using COG.Rpc;
 using InnerNet;
 
 namespace COG.Utils;

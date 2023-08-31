@@ -23,14 +23,14 @@ public static class PlayerUtils
 {
     internal static readonly List<PlayerControl> Players = new();
 
-    public static List<KeyValuePair<PlayerControl, Role.Role>> AllImpostors =>
-        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Impostor).ToListCustom();
+    public static List<PlayerRole> AllImpostors =>
+        GameUtils.Data.Where(pair => pair.Role.CampType == CampType.Impostor).ToListCustom();
 
-    public static List<KeyValuePair<PlayerControl, Role.Role>> AllCremates =>
-        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Crewmate).ToListCustom();
+    public static List<PlayerRole> AllCremates =>
+        GameUtils.Data.Where(pair => pair.Role.CampType == CampType.Crewmate).ToListCustom();
 
-    public static List<KeyValuePair<PlayerControl, Role.Role>> AllNeutrals =>
-        GameUtils.Data.Where(pair => pair.Value.CampType == CampType.Neutral).ToListCustom();
+    public static List<PlayerRole> AllNeutrals =>
+        GameUtils.Data.Where(pair => pair.Role.CampType == CampType.Neutral).ToListCustom();
 
     public static List<PlayerControl> GetAllPlayers()
     {
@@ -85,8 +85,8 @@ public static class PlayerUtils
     public static Role.Role? GetRoleInstance(this PlayerControl player)
     {
         return (from keyValuePair in GameUtils.Data
-                where keyValuePair.Key.IsSamePlayer(player)
-                select keyValuePair.Value)
+                where keyValuePair.Player.IsSamePlayer(player)
+                select keyValuePair.Role)
             .FirstOrDefault();
     }
 
@@ -266,25 +266,23 @@ public class DeadPlayerManager : IListener
 
 public class PlayerRole
 {
-    public PlayerRole(PlayerControl player, Role.Role role, string name)
+    public PlayerRole(PlayerControl player, Role.Role role)
     {
         Player = player;
         Role = role;
-        PlayerName = name;
+        PlayerName = player.name;
         PlayerId = player.PlayerId;
-        CachedRoles.Add(this);
     }
-
-    public static List<PlayerRole> CachedRoles { get; set; } = new();
-    public PlayerControl Player { get; private set; }
+    
+    public PlayerControl Player { get; }
     public Role.Role Role { get; }
     public string PlayerName { get; }
     public byte PlayerId { get; }
 
     public static Role.Role GetRole(string? playerName = null, byte? playerId = null)
     {
-        return CachedRoles.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) != null
-            ? CachedRoles.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!.Role
+        return GameUtils.Data.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) != null
+            ? GameUtils.Data.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!.Role
             : COG.Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 }
@@ -304,15 +302,20 @@ public class CachedPlayer : IListener
         AllPlayers.Add(this);
     }
 
-    public CachedPlayer()
+    private CachedPlayer()
     {
-    } // For registering listeners
+    } // For registering listener
+
+    internal static IListener GetCachedPlayerListener()
+    {
+        return new CachedPlayer();
+    }
 
     public static List<CachedPlayer> AllPlayers { get; } = new();
 
     public PlayerControl? Player { get; }
 
-    public Role.Role MyRole => PlayerRole.CachedRoles.FirstOrDefault(dp => dp.PlayerId == PlayerId)?.Role ??
+    public Role.Role MyRole => GameUtils.Data.FirstOrDefault(dp => dp.PlayerId == PlayerId)?.Role ??
                                Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
 
     public string? PlayerName { get; }

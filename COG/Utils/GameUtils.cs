@@ -10,7 +10,7 @@ namespace COG.Utils;
 
 public static class GameUtils
 {
-    public static Dictionary<PlayerControl, Role.Role> Data { get; internal set; } = new();
+    public static List<PlayerRole> Data { get; } = new();
 
     /// <summary>
     ///     向游戏里面发送一条信息
@@ -49,8 +49,7 @@ public static class GameUtils
     public static Role.Role? GetLocalPlayerRole()
     {
         var player = PlayerControl.LocalPlayer;
-        return Data.Where(keyValuePair => keyValuePair.Key.IsSamePlayer(player))
-            .Select(keyValuePair => keyValuePair.Value).FirstOrDefault();
+        return (from playerRole in Data where playerRole.Player.Equals(player) select playerRole.Role).FirstOrDefault();
     }
 
     /// <summary>
