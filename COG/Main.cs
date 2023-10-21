@@ -21,6 +21,7 @@ using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
 using COG.Utils;
+using COG.Utils.Version;
 using InnerNet;
 using Reactor;
 using Reactor.Networking;
@@ -46,6 +47,7 @@ public partial class Main : BasePlugin
     public const string PluginGuid = "top.cog.clashofgods";
     public const string DisplayName = "ClashOfGods";
 
+    public static VersionInfo VersionInfo { get; private set; } = null!;
     public static ManualLogSource Logger = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
     public Harmony Harmony { get; } = new(PluginGuid);
@@ -62,6 +64,8 @@ public partial class Main : BasePlugin
     {
         Instance = this;
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
+        VersionInfo = PluginVersion.Equals("Unknown") ? VersionInfo.Empty 
+            : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
 
         Logger = BepInEx.Logging.Logger.CreateLogSource($"   {DisplayName}");
         Logger.LogInfo("Loading...");
