@@ -25,6 +25,8 @@ public class GameListener : IListener
         // _forceStarted = false;
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
+        
+        if (!AmongUsClient.Instance.AmHost) return;
 
         foreach (var playerRole in GameUtils.Data)
             RoleManager.Instance.SetRole(playerRole.Player, playerRole.Role.BaseRoleType);
@@ -52,7 +54,7 @@ public class GameListener : IListener
         }
     }
 
-    private void SelectRoles()
+    private static void SelectRoles()
     {
         GameUtils.Data.Clear(); // 首先清除 防止干扰
 
@@ -341,8 +343,9 @@ public class GameListener : IListener
 
     public void OnGameStartManagerUpdate(GameStartManager manager)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         if (manager.startState != GameStartManager.StartingStates.Countdown) return;
-        if (manager.countDownTimer <= 0.5f && !_sharedRoles)
+        if (manager.countDownTimer <= 1.0f && !_sharedRoles)
         {
             Main.Logger.LogInfo("Select roles for players...");
             SelectRoles();

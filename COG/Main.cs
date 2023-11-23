@@ -16,7 +16,6 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.States;
-using COG.UI.CustomOption;
 using COG.UI.CustomWinner;
 using COG.UI.CustomWinner.Impl;
 using COG.UI.ModOption;
@@ -48,7 +47,6 @@ public partial class Main : BasePlugin
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string DisplayName = "ClashOfGods";
-
     public static VersionInfo VersionInfo { get; private set; } = null!;
     public static ManualLogSource Logger = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
