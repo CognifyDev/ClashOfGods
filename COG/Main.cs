@@ -51,6 +51,7 @@ public partial class Main : BasePlugin
     
     public static VersionInfo VersionInfo { get; private set; } = null!;
 
+    public static VersionInfo VersionInfo { get; private set; } = null!;
     public static ManualLogSource Logger = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
     public Harmony Harmony { get; } = new(PluginGuid);
