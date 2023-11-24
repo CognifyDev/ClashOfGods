@@ -17,7 +17,7 @@ public class Sheriff : Role, IListener
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                PlayerControl.LocalPlayer.MurderPlayer(target);
+                PlayerControl.LocalPlayer.CmdCheckMurder(target);
             },
             () => { },
             () =>
@@ -46,7 +46,7 @@ public class Sheriff : Role, IListener
         if (killer == null || target == null) return true;
         if (!killer.GetRoleInstance()!.Name.Equals(Name)) return true;
         if (target.GetRoleInstance()!.CampType == CampType.Crewmate)
-            killer.MurderPlayer(killer);
+            killer.MurderPlayer(killer, MurderResultFlags.Succeeded);
         return true;
     }
 
