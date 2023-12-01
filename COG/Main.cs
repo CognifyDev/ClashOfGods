@@ -47,9 +47,7 @@ public partial class Main : BasePlugin
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string DisplayName = "ClashOfGods";
-    
     public static VersionInfo VersionInfo { get; private set; } = null!;
-    
     public static ManualLogSource Logger = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
     public Harmony Harmony { get; } = new(PluginGuid);
