@@ -2,6 +2,6 @@
 
 public interface IPluginBase
 {
-    void OnEnable();
-    void OnDisable();
+    public void OnEnable();
+    public void OnDisable();
 }

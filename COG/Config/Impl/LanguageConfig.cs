@@ -107,6 +107,8 @@ public class LanguageConfig : Config
     }
 
     public static LanguageConfig Instance { get; private set; }
+    
+    
     public string MessageForNextPage { get; private set; } = null!;
     public string MakePublicMessage { get; private set; } = null!;
 

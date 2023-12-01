@@ -44,6 +44,15 @@ public class Yaml
         return null;
     }
 
+    public bool? GetBool(string location)
+    {
+        var str = GetString(location);
+        if (str == null) return null;
+        if (bool.TryParse(str, out var result)) return result;
+
+        return null;
+    }
+
     public List<string>? GetStringList(string location)
     {
         var locations = location.Contains('.') ? location.Split(".") : new[] { location };

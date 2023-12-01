@@ -11,6 +11,7 @@ using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Patch;
+using COG.Plugin;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
@@ -106,9 +107,14 @@ public partial class Main : BasePlugin
                 return;
             }
         }
+        
+        // Load plugins
+        PluginManager.Init();
+        PluginManager.GetInstance().LoadPluginsFromDirectory();
+        
 
         // Register listeners
-        ListenerManager.GetManager().RegisterListeners(new IListener[]
+        ListenerManager.GetManager().RegisterListeners(new[]
         {
             new CommandListener(),
             new GameListener(),
@@ -160,6 +166,7 @@ public partial class Main : BasePlugin
                 () =>
                 {
                     LanguageConfig.LoadLanguageConfig();
+                    SettingsConfig.LoadSettingsConfig();
                     Application.Quit();
                     return false;
                 }, false),
@@ -213,6 +220,7 @@ public partial class Main : BasePlugin
     public override bool Unload()
     {
         // 卸载插件时候，卸载一切东西
+        PluginManager.GetInstance().UnloadAllPlugins();
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
         Role.RoleManager.GetManager().GetRoles().Clear();
