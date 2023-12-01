@@ -40,6 +40,12 @@ public class GameListener : IListener
         
         // already for roles
 
+        var count= reader.ReadInt32();
+        for (int i = 0; i < count; i++)
+        {
+            // TODO 写职业收到后执行操作
+        }
+        
         // GameUtils.Data = data;
     }
 

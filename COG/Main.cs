@@ -68,7 +68,7 @@ public partial class Main : BasePlugin
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
         VersionInfo = PluginVersion.Equals("Unknown") ? VersionInfo.Empty 
             : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
-
+        
         Logger = BepInEx.Logging.Logger.CreateLogSource($"   {DisplayName}");
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
