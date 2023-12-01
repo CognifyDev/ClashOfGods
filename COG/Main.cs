@@ -79,6 +79,12 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/Jint.dll",
+            "COG.Resources.InDLL.Depends.Jint.dll");
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/Jint.xml",
+            "COG.Resources.InDLL.Depends.Jint.xml");
 
         var disabledVersion = WebUtils
             .GetWeb(
