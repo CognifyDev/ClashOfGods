@@ -110,7 +110,7 @@ public partial class Main : BasePlugin
         
         // Load plugins
         PluginManager.Init();
-        PluginManager.GetInstance().LoadPluginsFromDirectory();
+        if (SettingsConfig.Instance.EnablePlugin) PluginManager.GetInstance().LoadPluginsFromDirectory();
         
 
         // Register listeners
