@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using COG.Utils;
 
 namespace COG.Plugin;
 
@@ -42,11 +43,12 @@ public class PluginManager
             _plugins.Add(plugin);
             
             plugin.PluginBase.OnEnable();
-            Main.Logger.LogInfo($"Plugin {fileInfo.Name} was successfully loaded.");
+            Main.Logger.LogInfo($"Plugin {plugin.Name} was successfully loaded.");
         }
-        catch
+        catch(System.Exception e)
         {
-            Main.Logger.LogError($"Can not load file {fileInfo.Name} as plugin.");
+            Main.Logger.LogError($"[{fileInfo.GetNameWithoutExtension()}] Can not load file {fileInfo.Name} as a plugin.");
+            Main.Logger.LogError($"[{fileInfo.GetNameWithoutExtension()}] {e.Message}");
         }
     }
 
@@ -66,6 +68,7 @@ public class PluginManager
     public void LoadPluginsFromDirectory()
     {
         var filesNames = Directory.GetFiles(PluginsDirectory);
+        Main.Logger.LogInfo($"Found {filesNames.Length} plugin(s)");
         foreach (var fileName in filesNames)
         {
             LoadPlugin(new FileInfo(fileName));

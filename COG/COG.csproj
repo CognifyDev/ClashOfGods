@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <DebugType>embedded</DebugType>
 
@@ -31,6 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Esprima" Version="3.0.2" />
         <PackageReference Include="Jint" Version="3.0.0-beta-2056" />
         <PackageReference Include="Reactor" Version="2.2.0" />
         <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.672" Private="false" ExcludeAssets="runtime;native" />

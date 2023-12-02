@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using COG.Plugin.API;
+using COG.Utils;
 using COG.Value;
+using Jint;
 
 namespace COG.Plugin;
 
@@ -11,16 +13,20 @@ public class Plugin
     
     public string Name { get; }
     
-    public IPluginBase PluginBase { get; private set; }
+    public PluginBase PluginBase { get; private set; }
     
     protected internal Plugin(FileSystemInfo fileInfo)
     {
-        Name = fileInfo.Name;
+        Name = fileInfo.GetNameWithoutExtension();
         Code = File.ReadAllText(fileInfo.FullName);
 
-        var engine = new Jint.Engine();
+        var options = new Options();
+        options.Strict = false;
+        options.Strict(false);
+        var engine = new Engine(options);
+        
         engine.Execute(Code);
-        var plugin = engine.GetValue(ConstantValue.PluginMainClassName).ToObject() as IPluginBase;
+        var plugin = engine.GetValue(ConstantValue.PluginMainClassName).ToObject() as PluginBase;
         PluginBase = plugin ?? throw new NullReferenceException();
     }
 }

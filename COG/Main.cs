@@ -85,6 +85,12 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/Jint.xml",
             "COG.Resources.InDLL.Depends.Jint.xml");
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/Esprima.dll",
+            "COG.Resources.InDLL.Depends.Esprima.dll");
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/Esprima.xml",
+            "COG.Resources.InDLL.Depends.Esprima.xml");
 
         var disabledVersion = WebUtils
             .GetWeb(
