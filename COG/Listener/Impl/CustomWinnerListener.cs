@@ -119,7 +119,7 @@ public class CustomWinnerListener : IListener
 
         StringBuilder summary = new($"{LanguageConfig.Instance.ShowPlayersRolesMessage}");
         summary.Append(Environment.NewLine);
-        foreach (var role in GameUtils.Data)
+        foreach (var role in GameUtils.PlayerRoleData)
         {
             var deadPlayer = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
             summary.Append(role.PlayerName).Append(' ')

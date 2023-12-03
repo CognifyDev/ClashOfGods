@@ -28,19 +28,39 @@ public class GameListener : IListener
         
         if (!AmongUsClient.Instance.AmHost) return;
 
-        foreach (var playerRole in GameUtils.Data)
+        foreach (var playerRole in GameUtils.PlayerRoleData)
             RoleManager.Instance.SetRole(playerRole.Player, playerRole.Role.BaseRoleType);
     }
 
     public void OnRPCReceived(byte callId, MessageReader reader)
     {
-        if (AmongUsClient.Instance.AmHost) return;
+        if (AmongUsClient.Instance.AmHost) return; //不是房主就返回
         var knownRpc = (KnownRpc)callId;
-        if (knownRpc != KnownRpc.ShareRoles) return;
-        
-        // already for roles
 
-        // GameUtils.Data = data;
+        switch (knownRpc)
+        {
+            case KnownRpc.ShareRoles:
+                //清除原列表，防止干扰
+                GameUtils.PlayerRoleData.Clear();
+                //开始读入数据
+                int count = reader.ReadInt32();//读入玩家与职业的数量
+                List<PlayerRole> pr = new();
+                for(int i = 0; i > count; i++)
+                {
+                    int pId = reader.ReadPackedInt32();//读取接收的玩家Id
+                    int rId = reader.ReadPackedInt32();//读取该玩家的职业特征码
+                    var player = PlayerUtils.GetPlayerById((byte)pId);
+                    var role = Role.RoleManager.GetManager().GetRoleById(rId);
+                    if (!player || role == null) continue;
+                    pr.Add(new(player!, role));
+                }
+                GameUtils.PlayerRoleData = pr;
+                break;
+            case KnownRpc.ShareOptions:
+                //TODO
+                break;
+        }
+
     }
 
     public void AfterPlayerFixedUpdate(PlayerControl player)
@@ -56,7 +76,7 @@ public class GameListener : IListener
 
     private static void SelectRoles()
     {
-        GameUtils.Data.Clear(); // 首先清除 防止干扰
+        GameUtils.PlayerRoleData.Clear(); // 首先清除 防止干扰
 
         if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
 
@@ -98,25 +118,25 @@ public class GameListener : IListener
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
             }
 
-            GameUtils.Data.Add(new PlayerRole(player, role));
+            GameUtils.PlayerRoleData.Add(new PlayerRole(player, role));
         }
 
         // 打印职业分配信息
-        foreach (var playerRole in GameUtils.Data)
+        foreach (var playerRole in GameUtils.PlayerRoleData)
         {
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                 $" => {playerRole.Role.GetType().Name}");
         }
 
-        foreach (var playerRole in GameUtils.Data) RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
+        foreach (var playerRole in GameUtils.PlayerRoleData) RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
     }
 
     public void OnSelectRoles()
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        foreach (var playerRole in GameUtils.Data)
+        foreach (var playerRole in GameUtils.PlayerRoleData)
         {
-            playerRole.Player.SetRole(playerRole.Role.BaseRoleType);
+            playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
         }
     }
 
@@ -243,7 +263,7 @@ public class GameListener : IListener
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,
         ref float cooldown)
     {
-        foreach (var playerRole in GameUtils.Data)
+        foreach (var playerRole in GameUtils.PlayerRoleData)
         {
             if (!playerRole.Player.Data.IsSamePlayer(playerInfo)) continue;
             var ventAble = playerRole.Role.CanVent;
@@ -329,8 +349,8 @@ public class GameListener : IListener
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
         
         // ready for share roles
-        writer.Write(GameUtils.Data.Count);
-        foreach (var playerRole in GameUtils.Data)
+        writer.Write(GameUtils.PlayerRoleData.Count);
+        foreach (var playerRole in GameUtils.PlayerRoleData)
         {
             writer.WritePacked(playerRole.Player.PlayerId);
             writer.WritePacked(playerRole.Role.Id);

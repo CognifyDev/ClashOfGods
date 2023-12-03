@@ -10,7 +10,7 @@ namespace COG.Utils;
 
 public static class GameUtils
 {
-    public static List<PlayerRole> Data { get; } = new();
+    public static List<PlayerRole> PlayerRoleData { get; set; } = new();
 
     /// <summary>
     ///     向游戏里面发送一条信息
@@ -49,7 +49,7 @@ public static class GameUtils
     public static Role.Role? GetLocalPlayerRole()
     {
         var player = PlayerControl.LocalPlayer;
-        return (from playerRole in Data where playerRole.Player.Equals(player) select playerRole.Role).FirstOrDefault();
+        return (from playerRole in PlayerRoleData where playerRole.Player.Equals(player) select playerRole.Role).FirstOrDefault();
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public static class GameUtils
     public static void ForceClearGameData()
     {
         GameStates.InGame = false;
-        Data.Clear();
+        PlayerRoleData.Clear();
         var gameManager = GameManager.Instance;
         if (gameManager != null) gameManager.EndGame();
 
