@@ -227,6 +227,10 @@ public interface IListener
     {
     }
 
+    void OnGameStartCountdownEnd(GameStartManager manager)
+    {
+    }
+
     private class EmptyListener : IListener
     {
     }

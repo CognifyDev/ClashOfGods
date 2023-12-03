@@ -341,17 +341,14 @@ public class GameListener : IListener
 
     private static bool _sharedRoles;
 
-    public void OnGameStartManagerUpdate(GameStartManager manager)
+    public void OnGameStartCountdownEnd(GameStartManager manager)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        if (manager.startState != GameStartManager.StartingStates.Countdown) return;
-        if (manager.countDownTimer <= 1.0f && !_sharedRoles)
-        {
-            Main.Logger.LogInfo("Select roles for players...");
-            SelectRoles();
-            Main.Logger.LogInfo("Share roles for players...");
-            ShareRoles();
-            _sharedRoles = true;
-        }
+        Main.Logger.LogInfo("Select roles for players...");
+        SelectRoles();
+        Main.Logger.LogInfo("Share roles for players...");
+        ShareRoles();
+        _sharedRoles = true;
+        
     }
 }
