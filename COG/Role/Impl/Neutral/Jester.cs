@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
-public class Jester : Role, IListener, ICustomWinner
+public class Jester : Role, IListener, IWinnable
 {
     private readonly CustomOption _allowStartMeeting, _allowReportDeadBody;
     private PlayerControl? _player;
@@ -31,15 +31,15 @@ public class Jester : Role, IListener, ICustomWinner
         var jester = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp =>
             dp.Role == RoleManager.GetManager().GetTypeRoleInstance<Jester>() &&
             dp.DeathReason == Utils.DeathReason.Exiled);
-        if (jester == null) return true;
+        if (jester == null) return false;
         GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);
         CustomWinnerManager.RegisterCustomWinner(jester.Player);
-        return false;
+        return true;
     }
 
     public ulong GetWeight()
     {
-        return ICustomWinner.GetOrder(4);
+        return IWinnable.GetOrder(4);
     }
 
     public bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)

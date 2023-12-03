@@ -1,6 +1,6 @@
 ﻿namespace COG.UI.CustomWinner;
 
-public interface ICustomWinner
+public interface IWinnable
 {
     /// <summary>
     ///     检测是否可以胜利

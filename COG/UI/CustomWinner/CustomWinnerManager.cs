@@ -7,7 +7,7 @@ namespace COG.UI.CustomWinner;
 
 public static class CustomWinnerManager
 {
-    public static readonly List<ICustomWinner> CustomWinners = new();
+    public static readonly List<IWinnable> CustomWinners = new();
     public static Il2CppSystem.Collections.Generic.List<WinningPlayerData> AllWinners { get; } = new();
 
     public static string WinText { get; private set; } = "";
@@ -38,12 +38,12 @@ public static class CustomWinnerManager
         WinColor = color;
     }
 
-    public static void RegisterCustomWinnerInstance(ICustomWinner customWinner)
+    public static void RegisterCustomWinnerInstance(IWinnable customWinner)
     {
         CustomWinners.Add(customWinner);
     }
 
-    public static void RegisterCustomWinnersInstances(IEnumerable<ICustomWinner> customWinners)
+    public static void RegisterCustomWinnersInstances(IEnumerable<IWinnable> customWinners)
     {
         customWinners.ToListCustom().ForEach(RegisterCustomWinnerInstance);
     }
@@ -52,6 +52,6 @@ public static class CustomWinnerManager
     {
         // 按照权重从大到小排序
         CustomWinners.Sort((first, second) => second.GetWeight().CompareTo(first.GetWeight()));
-        return CustomWinners.All(customWinner => customWinner.CanWin());
+        return CustomWinners.All(customWinner => !customWinner.CanWin());
     }
 }
