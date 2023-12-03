@@ -4,7 +4,7 @@ using COG.Utils;
 
 namespace COG.UI.CustomWinner.Impl;
 
-public class ImpostorsCustomWinner : ICustomWinner
+public class ImpostorsCustomWinner : IWinnable
 {
     public bool CanWin()
     {
@@ -12,7 +12,7 @@ public class ImpostorsCustomWinner : ICustomWinner
             .Select(pair => pair.Player).ToList();
         GameUtils.Data.Where(pair => pair.Role.CampType == CampType.Impostor).ToList()
             .ForEach(pair => aliveImpostors.Add(pair.Player));
-        if (aliveImpostors.Count < PlayerUtils.GetAllAlivePlayers().Count) return true;
+        if (aliveImpostors.Count < PlayerUtils.GetAllAlivePlayers().Count) return false;
         if (aliveImpostors.Count >= PlayerUtils.AllCremates
                 .Where(pair => pair.Player && !pair.Player.Data.IsDead).Select(pair => pair.Player).ToList().Count)
         {
@@ -20,14 +20,14 @@ public class ImpostorsCustomWinner : ICustomWinner
             CustomWinnerManager.SetWinText("Impostors win");
             CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
             GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public ulong GetWeight()
     {
-        return ICustomWinner.GetOrder(1);
+        return IWinnable.GetOrder(1);
     }
 }

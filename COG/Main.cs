@@ -198,7 +198,7 @@ public partial class Main : BasePlugin
         });
 
         // Register CustomWinners
-        CustomWinnerManager.RegisterCustomWinnersInstances(new ICustomWinner[]
+        CustomWinnerManager.RegisterCustomWinnersInstances(new IWinnable[]
         {
             new CrewmatesCustomWinner(),
             new ImpostorsCustomWinner(),

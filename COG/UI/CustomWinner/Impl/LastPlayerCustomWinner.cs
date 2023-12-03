@@ -4,22 +4,22 @@ using UnityEngine;
 
 namespace COG.UI.CustomWinner.Impl;
 
-public class LastPlayerCustomWinner : ICustomWinner
+public class LastPlayerCustomWinner : IWinnable
 {
     public bool CanWin()
     {
-        if (PlayerUtils.GetAllAlivePlayers().Count > 1) return true;
+        if (PlayerUtils.GetAllAlivePlayers().Count > 1) return false;
         var lastPlayer = PlayerUtils.GetAllAlivePlayers().FirstOrDefault();
-        if (!lastPlayer) return true;
+        if (!lastPlayer) return false;
         CustomWinnerManager.RegisterCustomWinners(PlayerUtils.GetAllAlivePlayers());
         CustomWinnerManager.SetWinText($"{lastPlayer!.Data.PlayerName} win");
         CustomWinnerManager.SetWinColor(Color.white);
         GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
-        return false;
+        return true;
     }
 
     public ulong GetWeight()
     {
-        return ICustomWinner.GetOrder(3);
+        return IWinnable.GetOrder(3);
     }
 }

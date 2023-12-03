@@ -3,7 +3,7 @@ using COG.Utils;
 
 namespace COG.UI.CustomWinner.Impl;
 
-public class CrewmatesCustomWinner : ICustomWinner
+public class CrewmatesCustomWinner : IWinnable
 {
     public bool CanWin()
     {
@@ -18,7 +18,7 @@ public class CrewmatesCustomWinner : ICustomWinner
                 CustomWinnerManager.SetWinText("Crewmates win");
                 CustomWinnerManager.SetWinColor(Palette.CrewmateBlue);
                 GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);
-                return false;
+                return true;
             }
         }
         else
@@ -29,11 +29,11 @@ public class CrewmatesCustomWinner : ICustomWinner
             GameManager.Instance.RpcEndGame(GameOverReason.HumansByTask, false);
         }
 
-        return true;
+        return false;
     }
 
     public ulong GetWeight()
     {
-        return ICustomWinner.GetOrder(2);
+        return IWinnable.GetOrder(2);
     }
 }
