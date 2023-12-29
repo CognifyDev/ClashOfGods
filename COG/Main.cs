@@ -166,27 +166,15 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.UnloadModButtonName,
                 () =>
                 {
-                    if (Camera.main != null)
+                    DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
+                    if (AmongUsClient.Instance.GameState != InnerNetClient.GameStates.NotJoined)
                     {
-                        var popup = Object.Instantiate(DiscordManager.Instance.discordPopup, Camera.main.transform);
-                        var bg = popup.transform.Find("Background").GetComponent<SpriteRenderer>();
-                        var size = bg.size;
-                        size.x *= 2.5f;
-                        bg.size = size;
-                        popup.TextAreaTMP.fontSizeMin = popup.TextAreaTMP.fontSizeMax = popup.TextAreaTMP.fontSize;
-
-                        DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-
-                        if (AmongUsClient.Instance.GameState != InnerNetClient.GameStates.NotJoined)
-                        {
-                            popup.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
-                            return false;
-                        }
-
-                        Unload();
-                        popup.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
+                        GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
+                        return false;
                     }
 
+                    Unload();
+                    GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }, false)
         });

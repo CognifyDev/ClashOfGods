@@ -46,7 +46,7 @@ public class Sheriff : Role, IListener
         if (killer == null || target == null) return true;
         if (!killer.GetRoleInstance()!.Name.Equals(Name)) return true;
         if (target.GetRoleInstance()!.CampType == CampType.Crewmate)
-            killer.MurderPlayer(killer, MurderResultFlags.Succeeded);
+            killer.MurderPlayer(killer, GameUtils.DefaultFlag);
         return true;
     }
 
