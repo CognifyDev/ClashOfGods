@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Utils;
+using InnerNet;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,7 @@ public static class MainMenuPatch
 {
     public static GameObject? CustomBG;
     public static readonly List<PassiveButton> Buttons = new();
+    public static bool PopupCreated = false;
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]
     [HarmonyPrefix]
@@ -83,6 +85,22 @@ public static class MainMenuPatch
         CustomBG.transform.position = new Vector3(1.8f, 0.2f, 0f);
         var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
         bgRenderer.sprite = ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 295f);
+    }
+
+    [HarmonyPatch(nameof(MainMenuManager.Start))]
+    [HarmonyPostfix]
+    private static void InitPopup()
+    {
+        if (PopupCreated) return;
+        if (!Camera.main) return;
+        var popup = Object.Instantiate(DiscordManager.Instance.discordPopup, Camera.main.transform);
+        var bg = popup.transform.Find("Background").GetComponent<SpriteRenderer>();
+        var size = bg.size;
+        size.x *= 2.5f;
+        bg.size = size;
+        popup.TextAreaTMP.fontSizeMin = popup.TextAreaTMP.fontSizeMax = popup.TextAreaTMP.fontSize;
+        GameUtils.Popup = popup;
+        PopupCreated = true;
     }
 
     [HarmonyPatch(nameof(MainMenuManager.OpenAccountMenu))]

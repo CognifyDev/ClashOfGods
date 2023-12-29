@@ -12,6 +12,10 @@ public static class GameUtils
 {
     public static List<PlayerRole> PlayerRoleData { get; set; } = new();
 
+    public static GenericPopup? Popup { get; set; }
+
+    public const MurderResultFlags DefaultFlag = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
+
     /// <summary>
     ///     向游戏里面发送一条信息
     /// </summary>
