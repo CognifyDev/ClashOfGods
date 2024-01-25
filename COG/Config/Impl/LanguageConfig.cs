@@ -20,82 +20,7 @@ public class LanguageConfig : Config
     {
         try
         {
-            MessageForNextPage = GetString("lobby.message-for-next-page");
-            MakePublicMessage = GetString("lobby.make-public-message");
-
-            GeneralSetting = GetString("menu.general.name");
-            ImpostorRolesSetting = GetString("menu.impostor.name");
-            NeutralRolesSetting = GetString("menu.neutral.name");
-            CrewmateRolesSetting = GetString("menu.crewmate.name");
-            AddonsSetting = GetString("menu.addons.name");
-
-            SaveGameConfigs = GetString("menu.general.save-game-configs");
-            DebugMode = GetString("menu.general.debug-mode");
-
-            // Unknown
-            UnknownName = GetString("role.unknown.name");
-            UnknownDescription = GetString("role.unknown.description");
-
-            // Crewmate
-            CrewmateName = GetString("role.crewmate.crewmate.name");
-            CrewmateDescription = GetString("role.crewmate.crewmate.description");
-
-            BaitName = GetString("role.crewmate.bait.name");
-            BaitDescription = GetString("role.crewmate.bait.description");
-
-            SheriffName = GetString("role.crewmate.sheriff.name");
-            SheriffDescription = GetString("role.crewmate.sheriff.description");
-
-            // Impostor
-            ImpostorName = GetString("role.impostor.impostor.name");
-            ImpostorDescription = GetString("role.impostor.impostor.description");
-
-            // Neutral
-            JesterName = GetString("role.neutral.jester.name");
-            JesterDescription = GetString("role.neutral.jester.description");
-
-            Enable = GetString("option.enable");
-            Disable = GetString("option.disable");
-            CogOptions = GetString("option.main.cog-options");
-            ReloadConfigs = GetString("option.main.reload-configs");
-            Github = GetString("option.main.github");
-            QQ = GetString("option.main.qq");
-            Discord = GetString("option.main.discord");
-            BetaVersionRegisteredUserDisplay = GetString("option.main.beta-version-registered-user-display");
-
-            MaxNumMessage = GetString("role.global.max-num");
-            AllowStartMeeting = GetString("role.global.allow-start-meeting");
-            AllowReportDeadBody = GetString("role.global.allow-report-body");
-
-            SidebarTextOriginal = GetString("sidebar-text.original");
-            SidebarTextNeutral = GetString("sidebar-text.neutral");
-            SidebarTextMod = GetString("sidebar-text.mod");
-            SidebarTextAddons = GetString("sidebar-text.addons");
-            SidebarTextImpostor = GetString("sidebar-text.impostor");
-            SidebarTextCrewmate = GetString("sidebar-text.crewmate");
-
-            UnknownCamp = GetString("camp.unknown.name");
-            ImpostorCamp = GetString("camp.impostor.name");
-            NeutralCamp = GetString("camp.neutral.name");
-            CrewmateCamp = GetString("camp.crewmate.name");
-
-            UnknownCampDescription = GetString("camp.unknown.description");
-            ImpostorCampDescription = GetString("camp.impostor.description");
-            NeutralCampDescription = GetString("camp.neutral.description");
-            CrewmateCampDescription = GetString("camp.crewmate.description");
-
-            KillAction = GetString("action.kill");
-
-            ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
-
-            Alive = GetString("game.survival-data.alive");
-            Disconnected = GetString("game.survival-data.disconnected");
-            DefaultKillReason = GetString("game.survival-data.default");
-            UnknownKillReason = GetString("game.survival-data.unknown");
-
-            UnloadModButtonName = GetString("option.main.unload-mod.name");
-            UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
-            UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
+            GetTranslations();
         }
         catch (NullReferenceException)
         {
@@ -104,6 +29,102 @@ public class LanguageConfig : Config
             LoadConfig(true);
             Instance = new LanguageConfig();
         }
+    }
+
+    private LanguageConfig(string path) : base(
+       "Language",
+       path
+    )
+    {
+        try
+        {
+            GetTranslations();
+        }
+        catch
+        {
+            GameUtils.Popup?.Show("An error occoured when loading language from disk.");
+            Instance = new LanguageConfig();
+        }
+    }
+
+    private void GetTranslations()
+    {
+        MessageForNextPage = GetString("lobby.message-for-next-page");
+        MakePublicMessage = GetString("lobby.make-public-message");
+
+        GeneralSetting = GetString("menu.general.name");
+        ImpostorRolesSetting = GetString("menu.impostor.name");
+        NeutralRolesSetting = GetString("menu.neutral.name");
+        CrewmateRolesSetting = GetString("menu.crewmate.name");
+        AddonsSetting = GetString("menu.addons.name");
+
+        SaveGameConfigs = GetString("menu.general.save-game-configs");
+        DebugMode = GetString("menu.general.debug-mode");
+
+        // Unknown
+        UnknownName = GetString("role.unknown.name");
+        UnknownDescription = GetString("role.unknown.description");
+
+        // Crewmate
+        CrewmateName = GetString("role.crewmate.crewmate.name");
+        CrewmateDescription = GetString("role.crewmate.crewmate.description");
+
+        BaitName = GetString("role.crewmate.bait.name");
+        BaitDescription = GetString("role.crewmate.bait.description");
+
+        SheriffName = GetString("role.crewmate.sheriff.name");
+        SheriffDescription = GetString("role.crewmate.sheriff.description");
+
+        // Impostor
+        ImpostorName = GetString("role.impostor.impostor.name");
+        ImpostorDescription = GetString("role.impostor.impostor.description");
+
+        // Neutral
+        JesterName = GetString("role.neutral.jester.name");
+        JesterDescription = GetString("role.neutral.jester.description");
+
+        Enable = GetString("option.enable");
+        Disable = GetString("option.disable");
+        CogOptions = GetString("option.main.cog-options");
+        LoadCustomLanguage = GetString("option.main.load-custom-lang");
+        Github = GetString("option.main.github");
+        QQ = GetString("option.main.qq");
+        Discord = GetString("option.main.discord");
+        BetaVersionRegisteredUserDisplay = GetString("option.main.beta-version-registered-user-display");
+
+        MaxNumMessage = GetString("role.global.max-num");
+        AllowStartMeeting = GetString("role.global.allow-start-meeting");
+        AllowReportDeadBody = GetString("role.global.allow-report-body");
+
+        SidebarTextOriginal = GetString("sidebar-text.original");
+        SidebarTextNeutral = GetString("sidebar-text.neutral");
+        SidebarTextMod = GetString("sidebar-text.mod");
+        SidebarTextAddons = GetString("sidebar-text.addons");
+        SidebarTextImpostor = GetString("sidebar-text.impostor");
+        SidebarTextCrewmate = GetString("sidebar-text.crewmate");
+
+        UnknownCamp = GetString("camp.unknown.name");
+        ImpostorCamp = GetString("camp.impostor.name");
+        NeutralCamp = GetString("camp.neutral.name");
+        CrewmateCamp = GetString("camp.crewmate.name");
+
+        UnknownCampDescription = GetString("camp.unknown.description");
+        ImpostorCampDescription = GetString("camp.impostor.description");
+        NeutralCampDescription = GetString("camp.neutral.description");
+        CrewmateCampDescription = GetString("camp.crewmate.description");
+
+        KillAction = GetString("action.kill");
+
+        ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
+
+        Alive = GetString("game.survival-data.alive");
+        Disconnected = GetString("game.survival-data.disconnected");
+        DefaultKillReason = GetString("game.survival-data.default");
+        UnknownKillReason = GetString("game.survival-data.unknown");
+
+        UnloadModButtonName = GetString("option.main.unload-mod.name");
+        UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
+        UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
     }
 
     public static LanguageConfig Instance { get; private set; }
@@ -144,7 +165,7 @@ public class LanguageConfig : Config
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;
-    public string ReloadConfigs { get; private set; } = null!;
+    public string LoadCustomLanguage { get; private set; } = null!;
     public string Github { get; private set; } = null!;
     public string BetaVersionRegisteredUserDisplay { get; private set; } = null!;
 
@@ -196,5 +217,10 @@ public class LanguageConfig : Config
     {
         Instance.LoadConfig(true);
         Instance = new LanguageConfig();
+    }
+
+    internal static void LoadLanguageConfig(string path)
+    {
+        Instance = new LanguageConfig(path);
     }
 }

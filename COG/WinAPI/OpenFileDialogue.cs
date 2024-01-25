@@ -34,6 +34,7 @@ namespace COG.WinAPI
                 ofn.nFilterIndex = defaultFilterIdx.Value;
             }
             Open(ofn);
+            Main.Logger.LogInfo($"Opened file: {ofn.stringFile ?? "None"}");
             return new(ofn.stringFile, ofn.stringFileTitle);
         }
 
