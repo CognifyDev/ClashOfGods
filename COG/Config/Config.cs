@@ -7,7 +7,7 @@ namespace COG.Config;
 
 public class Config
 {
-    public static readonly string DataDirectoryName = $"{Main.DisplayName}_DATA";
+    public const string DataDirectoryName = $"{Main.DisplayName}_DATA";
 
     public Config(string name, string path, string text)
     {
@@ -24,6 +24,14 @@ public class Config
         Path = path;
         Text = resourceFile.GetResourcesText();
         LoadConfig();
+    }
+
+    public Config(string name, string path)
+    {
+        Name = name;
+        Path = path;
+        Text = File.ReadAllText(Path, Encoding.UTF8);
+        YamlReader = Yaml.LoadFromString(Text);
     }
 
     public static List<Config> Configs { get; } = new();

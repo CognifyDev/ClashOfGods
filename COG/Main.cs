@@ -30,6 +30,10 @@ using Reactor.Networking.Attributes;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
+using COG.WinAPI;
+using System.IO;
+using COG.Config;
+using UnityEngine.SceneManagement;
 
 namespace COG;
 
@@ -156,11 +160,14 @@ public partial class Main : BasePlugin
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]
         {
-            new(LanguageConfig.Instance.ReloadConfigs,
+            new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
                 {
-                    LanguageConfig.LoadLanguageConfig();
-                    Application.Quit();
+                    var p = OpenFileDialogue.Open(filter:"*.yml", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
+                    if(p.FilePath is null) return false;
+                    LanguageConfig.LoadLanguageConfig(p.FilePath!);
+                    DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
+                    SceneManager.LoadScene("MainMenu");
                     return false;
                 }, false),
             new(LanguageConfig.Instance.UnloadModButtonName,
@@ -211,7 +218,7 @@ public partial class Main : BasePlugin
         PlayerUtils.Players.Clear();
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
-        (MainMenuPatch.CustomBG ? MainMenuPatch.CustomBG : new GameObject())!.Destroy();
+        MainMenuPatch.CustomBG?.Destroy();
         PluginSingleton<ReactorPlugin>.Instance.Unload();
         return false;
     }

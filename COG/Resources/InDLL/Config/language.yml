@@ -56,7 +56,7 @@ menu:
 option:
   main:
     cog-options: "COG选项"
-    reload-configs: "替换且重新加载语言文件且重启游戏"
+    load-custom-lang: "加载自定义语言文件"
     unload-mod:
       name: "临时禁用模组"
       success: "模组已成功被临时禁用！\n如果您仍想要继续游玩模组，请重启游戏"
