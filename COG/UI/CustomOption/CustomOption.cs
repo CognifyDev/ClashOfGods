@@ -109,7 +109,7 @@ public class CustomOption
     public static byte[][] WriteOptionsToByteArray()
     {
         return (from customOption in Options
-                where customOption != null && customOption.ID >= 0 //非空且不是预设用选项
+                where customOption != null && customOption.ID != -1 && customOption.ID != -2 //非空且不是预设用选项
                 select new SerializableCustomOption(customOption)
             into serializableCustomOption
                 select serializableCustomOption.SerializeToData()).ToArray();
