@@ -84,33 +84,33 @@ public partial class Main : BasePlugin
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
 
-        //var disabledVersion = WebUtils
-        //    .GetWeb(
-        //        "https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
-        //    .Split("|");
-        //if (disabledVersion.Any(s => PluginVersion.Equals(s)))
-        //{
-        //    Logger.LogError("The version of the mod has been disabled!");
-        //    return;
-        //}
+        var disabledVersion = WebUtils
+            .GetWeb(
+                "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
+            .Split("|");
+        if (disabledVersion.Any(s => PluginVersion.Equals(s)))
+        {
+            Logger.LogError("The version of the mod has been disabled!");
+            return;
+        }
 
-        //BetaVersion = PluginVersion.ToLower().Contains("beta") || PluginVersion.ToLower().Contains("dev");
-        //if (BetaVersion)
-        //{
-        //    // 开始验证
-        //    const string url =
-        //        "https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
-        //    var hwids = WebUtils.GetWeb(url).Split("|");
-        //    RegisteredBetaUsers = new List<string>(hwids);
-        //    var hostHwid = SystemUtils.GetHwid();
-        //    var success = hwids.Any(hwid => hwid.Equals(hostHwid));
-        //    Logger.LogInfo("Local HWID => " + hostHwid);
-        //    if (!success)
-        //    {
-        //        Logger.LogError("Can not verify, please check!");
-        //        return;
-        //    }
-        //}
+        BetaVersion = PluginVersion.ToLower().Contains("beta") || PluginVersion.ToLower().Contains("dev");
+        if (BetaVersion)
+        {
+            // 开始验证
+            const string url =
+                "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
+            var hwids = WebUtils.GetWeb(url).Split("|");
+            RegisteredBetaUsers = new List<string>(hwids);
+            var hostHwid = SystemUtils.GetHwid();
+            var success = hwids.Any(hwid => hwid.Equals(hostHwid));
+            Logger.LogInfo("Local HWID => " + hostHwid);
+            if (!success)
+            {
+                Logger.LogError("Can not verify, please check!");
+                return;
+            }
+        }
 
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new IListener[]
