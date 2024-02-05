@@ -54,7 +54,7 @@ public class LuaPluginLoader : IPlugin
             _name = pluginYaml.GetString("name")!;
             _author = pluginYaml.GetString("author")!;
             _version = pluginYaml.GetString("version")!;
-            _mainClass = pluginYaml.GetString("main-class")!;
+            _mainClass = pluginYaml.GetString("main")!;
         }
         catch
         {
@@ -97,6 +97,7 @@ public class LuaPluginLoader : IPlugin
                 LuaController.RegisterFunction(functionRegisterAttribute.FunctionName, null, methodInfo);
             }
         }
+        
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
@@ -112,25 +113,25 @@ public class LuaPluginLoader : IPlugin
     
     private class Functions
     {
-        [FunctionRegister("info")]
+        [FunctionRegister("logInfo")]
         public static void Info(string param)
         {
             Main.Logger.LogInfo(param);
         }
         
-        [FunctionRegister("error")]
+        [FunctionRegister("logError")]
         public static void Error(string param)
         {
             Main.Logger.LogError(param);
         }
         
-        [FunctionRegister("warning")]
+        [FunctionRegister("logWarning")]
         public static void Warning(string param)
         {
             Main.Logger.LogWarning(param);
         }
         
-        [FunctionRegister("debug")]
+        [FunctionRegister("logDebug")]
         public static void Debug(string param)
         {
             Main.Logger.LogDebug(param);

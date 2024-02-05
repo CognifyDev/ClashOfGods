@@ -176,8 +176,8 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
                 {
-                    var p = OpenFileDialogue.Open(filter:"*.yml", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
-                    if(p.FilePath is null) return false;
+                    var p = OpenFileDialogue.Open(filter:"*", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
+                    if(p.FilePath is null or "") return false;
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     SceneManager.LoadScene("MainMenu");
