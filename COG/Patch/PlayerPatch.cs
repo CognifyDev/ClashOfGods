@@ -78,7 +78,7 @@ internal class HostStartPatch
         {
             // showtime
             if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||
-                AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return;
+                !__instance.GameRoomNameCode.isActiveAndEnabled) return;
             _update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
         }
     }

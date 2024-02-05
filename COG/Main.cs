@@ -34,6 +34,7 @@ using COG.WinAPI;
 using System.IO;
 using COG.Config;
 using UnityEngine.SceneManagement;
+using Mode = COG.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG;
 
@@ -85,7 +86,7 @@ public partial class Main : BasePlugin
 
         var disabledVersion = WebUtils
             .GetWeb(
-                "https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
+                "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
             .Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
@@ -98,7 +99,7 @@ public partial class Main : BasePlugin
         {
             // 开始验证
             const string url =
-                "https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
+                "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
             var hwids = WebUtils.GetWeb(url).Split("|");
             RegisteredBetaUsers = new List<string>(hwids);
             var hostHwid = SystemUtils.GetHwid();
@@ -163,7 +164,7 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
                 {
-                    var p = OpenFileDialogue.Open(filter:"*.yml", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
+                    var p = OpenFileDialogue.Open(Mode.Open, filter:"*.yml", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
                     if(p.FilePath is null) return false;
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
