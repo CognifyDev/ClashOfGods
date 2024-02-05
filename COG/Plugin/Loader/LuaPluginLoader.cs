@@ -114,10 +114,13 @@ public class LuaPluginLoader : IPlugin
     private class Functions
     {
         [FunctionRegister("logInfo")]
-        public static void Info(string param)
-        {
-            Main.Logger.LogInfo(param);
-        }
+
+        public static void Info(string param) 
+            => Main.Logger.LogInfo(param);
+
+        [FunctionRegister("info")]
+        public static void Info0(string param) 
+            => Info(param);
         
         [FunctionRegister("logError")]
         public static void Error(string param)
