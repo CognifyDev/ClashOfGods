@@ -7,8 +7,8 @@ namespace COG.Plugin.Manager;
 
 public static class PluginManager
 {
-    private static readonly string PluginDirectoryPath = Config.Config.DataDirectoryName + "\\plugins";
-    
+    private const string PluginDirectoryPath = Config.Config.DataDirectoryName + "\\plugins";
+
     private static readonly List<IPlugin> Plugins = new();
 
     static PluginManager()
@@ -30,34 +30,35 @@ public static class PluginManager
     /// </summary>
     /// <param name="path">the path of the plugin</param>
     /// <returns>the result of the plugin loaded</returns>
-    public static bool LoadPlugin(string path)
+    public static IPlugin? LoadPlugin(string path)
     {
         try
         {
             IPlugin plugin = new LuaPluginLoader(path);
             Plugins.Add(plugin);
-            return true;
+            return plugin;
         }
         catch (CannotLoadPluginException e)
         {
             Main.Logger.LogError(e.Message);
-            return false;
+            return null;
         }
     }
 
     public static void LoadPlugins()
     {
-        var files = Directory.GetFiles(PluginDirectoryPath);
+        var files = Directory.GetDirectories(PluginDirectoryPath);
         foreach (var file in files)
         {
-            var fileInfo = new FileInfo(file);
-            if (LoadPlugin(file))
+            var directoryInfo = new DirectoryInfo(file);
+            var plugin = LoadPlugin(file);
+            if (plugin != null)
             {
-                Main.Logger.LogInfo("File " + fileInfo.Name + " was loaded as a plugin successfully.");
+                Main.Logger.LogInfo($"Plugin {plugin.GetName()} v{plugin.GetVersion()} made by {plugin.GetAuthor()} was successfully loaded.");
             }
             else
             {
-                Main.Logger.LogError("File " + fileInfo.Name + " can not be loaded as a plugin.");
+                Main.Logger.LogError("Directory " + directoryInfo.Name + " can not be loaded as a plugin.");
             }
         }
         

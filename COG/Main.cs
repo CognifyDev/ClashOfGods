@@ -246,6 +246,7 @@ public partial class Main : BasePlugin
         {
             plugin.OnDisable();
         }
+        
         return false;
     }
 }
