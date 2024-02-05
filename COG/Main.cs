@@ -177,7 +177,7 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
                 {
-                    var p = OpenFileDialogue.Open(filter:"*", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
+                    var p = OpenFileDialogue.Open(Mode.Open, filter:"*", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
                     if(p.FilePath is null or "") return false;
 
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);

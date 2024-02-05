@@ -31,6 +31,7 @@ namespace COG.WinAPI
         /// <summary>
         /// 更加易用的打开/保存对话框方法，但有一定限制
         /// </summary>
+        /// <param name="mode">对话框模式</param>
         /// <param name="filter">文件筛选器</param>
         /// <param name="title">对话框标题</param>
         /// <param name="defaultDir">打开对话框后默认所在目录</param>
