@@ -1,18 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Rpc;
 using COG.Utils;
 using COG.Utils.Resolver;
+using COG.WinAPI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
 using Object = UnityEngine.Object;
+using Mode = COG.WinAPI.OpenFileDialogue.OpenFileMode;
+using COG.States;
 
 namespace COG.UI.CustomOption;
 
@@ -92,6 +98,8 @@ public class CustomOption
             defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
 
+
+
     public static void LoadOptionsFromByteArray(byte[][] data)
     {
         Options.Clear();
@@ -101,10 +109,10 @@ public class CustomOption
     public static byte[][] WriteOptionsToByteArray()
     {
         return (from customOption in Options
-            where customOption != null
-            select new SerializableCustomOption(customOption)
+                where customOption != null && customOption.ID != -1 && customOption.ID != -2 //非空且不是预设用选项
+                select new SerializableCustomOption(customOption)
             into serializableCustomOption
-            select serializableCustomOption.SerializeToData()).ToArray();
+                select serializableCustomOption.SerializeToData()).ToArray();
     }
 
     public static void ShareOptionChange()
@@ -121,7 +129,7 @@ public class CustomOption
 
         var options = WriteOptionsToByteArray();
 
-        writer.Write(options.Length);
+        writer.Write(options.Length - 2); //两个预设用的选项不计算在内
 
         foreach (var option in options) writer.Write(option);
 
@@ -148,6 +156,59 @@ public class CustomOption
         if (PlayerControl.AllPlayerControls.Count <= 1 || AmongUsClient.Instance!.AmHost == false && PlayerControl.LocalPlayer == null) return;
         Main.Logger.LogInfo("Start to share CustomOptions for online players...");
         */
+    }
+
+    public static void LoadOptionFromPreset(string path)
+    {
+        try
+        {
+            if (!File.Exists(path)) return;
+            using StreamReader reader = new(path, Encoding.UTF8);
+            string line = "";
+            while ((line = reader.ReadLine()!) != null)
+            {
+                var optionInfo = line.Split(" ");
+                var optionID = optionInfo[0];
+                var optionSelection = optionInfo[1];
+
+                var option = Options.FirstOrDefault(o => o.ID.ToString() == optionID);
+                if (option == null) continue;
+                option.UpdateSelection(int.Parse(optionSelection));
+            }
+        }
+        catch (System.Exception e)
+        {
+            Main.Logger.LogError("Error loading options: " + e);
+        }
+    }
+
+    public static void SaveCurrentOption(string path)
+    {
+        try
+        {
+            var realPath = path.EndsWith(".cog") ? path : path + ".cog";
+            using StreamWriter writer = new(realPath, false, Encoding.UTF8);
+            foreach (var option in Options.Where(o => o != null && o!.ID is not -1 or -2).OrderBy(o => o!.ID))
+                writer.WriteLine(option!.ID + " " + option.Selection);
+        }
+        catch (System.Exception e)
+        {
+            Main.Logger.LogError("Error saving options: " + e);
+        }
+    }
+
+    public static void SaveOptionWithDialogue()
+    {
+        var file = OpenFileDialogue.Open(Mode.Save, "Preset File(*.cog)\0*.cog\0\0");
+        if (file.FilePath is null) return;
+        SaveCurrentOption(file.FilePath);
+    }
+
+    public static void OpenPresetWithDialogue()
+    {
+        var file = OpenFileDialogue.Open(Mode.Open, "Preset File(*.cog)\0*.cog\0\0");
+        if (file.FilePath is null) return;
+        LoadOptionFromPreset(file.FilePath);
     }
 
     public int GetSelection()
@@ -310,13 +371,14 @@ public class CustomOption
 
             foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {
-                if (option?.OptionBehaviour == null)
-                    if (option != null)
+                if (option?.OptionBehaviour == null && option != null)
+                {
+                    if (option.ID != -1 && option.ID != -2)
                     {
                         var stringOption = Object.Instantiate(template, menus[(int)option.Type]);
                         optionBehaviours[(int)option.Type].Add(stringOption);
                         stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
-                        stringOption.TitleText.text = option.Name;
+                        stringOption.TitleText.text = stringOption.name = option.Name;
                         if (FirstOpen)
                             stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
                         else
@@ -326,6 +388,19 @@ public class CustomOption
 
                         option.OptionBehaviour = stringOption;
                     }
+                    else // 对预设用选项处理
+                    {
+                        var templateToggle = GameObject.Find("ResetToDefault")?.GetComponent<ToggleOption>();
+                        if (!templateToggle) return;
+
+                        var strOpt = Object.Instantiate(templateToggle, menus[(int)option.Type]);
+                        strOpt!.transform.Find("CheckBox")?.gameObject.SetActive(false);
+                        strOpt.TitleText.transform.localPosition = Vector3.zero;
+                        strOpt.name = option.Name;
+
+                        option.OptionBehaviour = strOpt;
+                    }
+                }
 
                 option?.OptionBehaviour.gameObject.SetActive(true);
             }
@@ -438,30 +513,8 @@ public class CustomOption
     }
 }
 
-[HarmonyPatch(typeof(StringOption), nameof(StringOption.OnEnable))]
-public class StringOptionEnablePatch
-{
-    public static bool Prefix(StringOption __instance)
-    {
-        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
-        if (option == null) return true;
-
-        __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
-        __instance.TitleText.text = option.Name;
-
-        if (FirstOpen)
-            __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
-        else
-            __instance.Value = __instance.oldValue = option.Selection;
-
-        __instance.ValueText.text = option.Selections[option.Selection].ToString();
-
-        return false;
-    }
-}
-
 [HarmonyPatch(typeof(StringOption))]
-public class StringOptionIncreasePatch
+public class StringOptionPatch
 {
     [HarmonyPatch(nameof(StringOption.Increase))]
     [HarmonyPrefix]
@@ -486,20 +539,27 @@ public class StringOptionIncreasePatch
     }
 
     [HarmonyPatch(nameof(StringOption.OnEnable))]
+    [HarmonyPrefix]
     public static bool OnEnablePatch(StringOption __instance)
     {
-        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
+        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance && option.ID != -1 && option.ID != -2);
         if (option == null) return true;
 
         __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
         __instance.TitleText.text = option.Name;
-        __instance.Value = __instance.oldValue = option.Selection;
+
+        if (FirstOpen)
+            __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
+        else
+            __instance.Value = __instance.oldValue = option.Selection;
+
         __instance.ValueText.text = option.Selections[option.Selection].ToString();
 
         return false;
     }
 }
 
+[HarmonyPatch]
 public abstract class SyncSettingPatch
 {
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
@@ -540,7 +600,7 @@ internal class GameOptionsMenuUpdatePatch
         if (timerForBugFix < 3.0f) FirstOpen = false;
 
         var offset = 2.75f;
-        foreach (var option in Options)
+        foreach (var option in Options.Where(o => o != null))
         {
             if (GameObject.Find("COGSettings") && option.Type != CustomOptionType.General)
                 continue;
@@ -578,6 +638,19 @@ internal class GameOptionsMenuUpdatePatch
                 }
             }
         }
+
+        
+
+
+        //每帧更新预设选项名称与按下按钮操作
+        var load = (ToggleOption)GlobalCustomOption.LoadPreset.OptionBehaviour;
+        var save = (ToggleOption)GlobalCustomOption.SavePreset.OptionBehaviour;
+
+        load.TitleText.text = GlobalCustomOption.LoadPreset.Name;
+        save.TitleText.text = GlobalCustomOption.SavePreset.Name;
+
+        load.OnValueChanged = new Action<OptionBehaviour>((_) => OpenPresetWithDialogue());
+        save.OnValueChanged = new Action<OptionBehaviour>((_) => SaveOptionWithDialogue());
     }
 }
 
@@ -599,7 +672,7 @@ internal class HudStringPatch
         var txt = "";
         List<CustomOption> opt = new();
         foreach (var option in Options)
-            if (option != null && option.Type == type)
+            if (option != null && option.Type == type && option.ID != -1 && option.ID != -2)
                 opt.Add(option);
         foreach (var option in opt)
             txt += option.Name + ": " + option.Selections[option.Selection] + Environment.NewLine;

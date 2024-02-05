@@ -60,6 +60,8 @@ public class LanguageConfig : Config
         AddonsSetting = GetString("menu.addons.name");
 
         SaveGameConfigs = GetString("menu.general.save-game-configs");
+        LoadPreset = GetString("menu.general.load-preset");
+        SavePreset = GetString("menu.general.save-preset");
         DebugMode = GetString("menu.general.debug-mode");
 
         // Unknown
@@ -139,6 +141,8 @@ public class LanguageConfig : Config
     public string AddonsSetting { get; private set; } = null!;
 
     public string SaveGameConfigs { get; private set; } = null!;
+    public string SavePreset { get; private set; } = null!;
+    public string LoadPreset { get; private set; } = null!;
     public string DebugMode { get; private set; } = null!;
 
     // Unknown

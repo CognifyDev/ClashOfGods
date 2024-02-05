@@ -35,6 +35,7 @@ using System.IO;
 using COG.Config;
 using COG.Plugin.Manager;
 using UnityEngine.SceneManagement;
+using Mode = COG.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG;
 
@@ -178,6 +179,7 @@ public partial class Main : BasePlugin
                 {
                     var p = OpenFileDialogue.Open(filter:"*", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
                     if(p.FilePath is null or "") return false;
+
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     SceneManager.LoadScene("MainMenu");

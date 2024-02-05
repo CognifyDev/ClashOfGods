@@ -34,7 +34,7 @@ public class GameListener : IListener
 
     public void OnRPCReceived(byte callId, MessageReader reader)
     {
-        if (AmongUsClient.Instance.AmHost) return; //不是房主就返回
+        if (AmongUsClient.Instance.AmHost) return; //是房主就返回
         var knownRpc = (KnownRpc)callId;
 
         switch (knownRpc)

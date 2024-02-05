@@ -6,8 +6,17 @@ namespace COG.WinAPI
 {
     public static class OpenFileDialogue
     {
+        public enum OpenFileMode
+        {
+            Open,
+            Save
+        }
+
         [DllImport("Comdlg32.dll", CharSet = CharSet.Unicode, ThrowOnUnmappableChar = true, SetLastError = true)]
         private static extern bool GetOpenFileName([In, Out] OPENFILENAME ofn);
+
+        [DllImport("Comdlg32.dll", CharSet = CharSet.Unicode, ThrowOnUnmappableChar = true, SetLastError = true)]
+        private static extern bool GetSaveFileName([In, Out] OPENFILENAME ofn);
 
         /// <summary>
         /// 更加灵活的打开对话框方法，但运用困难
@@ -15,14 +24,19 @@ namespace COG.WinAPI
         public static void Open(OPENFILENAME ofn) => GetOpenFileName(ofn);
 
         /// <summary>
-        /// 更加易用的打开对话框方法，但有一定限制
+        /// 更加灵活的保存对话框方法，但运用困难
+        /// </summary>
+        public static void Save(OPENFILENAME ofn) => GetSaveFileName(ofn);
+
+        /// <summary>
+        /// 更加易用的打开/保存对话框方法，但有一定限制
         /// </summary>
         /// <param name="filter">文件筛选器</param>
         /// <param name="title">对话框标题</param>
         /// <param name="defaultDir">打开对话框后默认所在目录</param>
         /// <param name="defaultFilterIdx">默认文件筛选编号</param>
         /// <returns>文件名称与路径</returns>
-        public static OpenedFileInfo Open(string filter = "", string title = "", string defaultDir = "", int? defaultFilterIdx = null) 
+        public static OpenedFileInfo Open(OpenFileMode mode, string filter = "", string title = "", string defaultDir = "", int? defaultFilterIdx = null) 
         {
             var ofn = new OPENFILENAME();
             ofn.lStructSize = Marshal.SizeOf(ofn);
@@ -33,7 +47,11 @@ namespace COG.WinAPI
             {
                 ofn.nFilterIndex = defaultFilterIdx.Value;
             }
-            Open(ofn);
+
+            if (mode == OpenFileMode.Open) 
+                Open(ofn);
+            else 
+                Save(ofn);
             Main.Logger.LogInfo($"Opened file: {(ofn.stringFile.Equals("") || ofn.stringFile == null ? "None" : ofn.stringFile)}");
             return new(ofn.stringFile, ofn.stringFileTitle);
         }
