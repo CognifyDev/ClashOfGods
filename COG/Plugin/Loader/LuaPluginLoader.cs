@@ -100,7 +100,7 @@ public class LuaPluginLoader : IPlugin
         
     }
 
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     private sealed class FunctionRegisterAttribute : Attribute
     {
         public string FunctionName { get; }
@@ -114,6 +114,7 @@ public class LuaPluginLoader : IPlugin
     private class Functions
     {
         [FunctionRegister("logInfo")]
+
         public static void Info(string param) 
             => Main.Logger.LogInfo(param);
 
