@@ -33,6 +33,7 @@ using UnityEngine;
 using COG.WinAPI;
 using System.IO;
 using COG.Config;
+using COG.Plugin.Manager;
 using UnityEngine.SceneManagement;
 
 namespace COG;
@@ -82,10 +83,22 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
-
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/NLua.dll",
+            "COG.Resources.InDLL.Depends.NLua.dll");
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/KeraLua.dll",
+            "COG.Resources.InDLL.Depends.KeraLua.dll");
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/KeraLua.xml",
+            "COG.Resources.InDLL.Depends.KeraLua.xml");
+        ResourceUtils.WriteToFileFromResource(
+            "BepInEx/core/lua54.dll",
+            "COG.Resources.InDLL.Depends.lua54.dll");
+        
         var disabledVersion = WebUtils
             .GetWeb(
-                "https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
+                "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
             .Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
@@ -98,7 +111,7 @@ public partial class Main : BasePlugin
         {
             // 开始验证
             const string url =
-                "https://github.moeyy.xyz/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
+                "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
             var hwids = WebUtils.GetWeb(url).Split("|");
             RegisteredBetaUsers = new List<string>(hwids);
             var hostHwid = SystemUtils.GetHwid();
@@ -112,7 +125,7 @@ public partial class Main : BasePlugin
         }
 
         // Register listeners
-        ListenerManager.GetManager().RegisterListeners(new IListener[]
+        ListenerManager.GetManager().RegisterListeners(new[]
         {
             new CommandListener(),
             new GameListener(),
@@ -203,6 +216,14 @@ public partial class Main : BasePlugin
         GlobalCustomOption.Init();
 
         Harmony.PatchAll();
+        
+        // Load plugins
+        PluginManager.LoadPlugins();
+        
+        foreach (var plugin in PluginManager.GetPlugins())
+        {
+            plugin.OnEnable();
+        }
     }
 
     public override bool Unload()
@@ -220,6 +241,11 @@ public partial class Main : BasePlugin
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
         MainMenuPatch.CustomBG?.Destroy();
         PluginSingleton<ReactorPlugin>.Instance.Unload();
+        
+        foreach (var plugin in PluginManager.GetPlugins())
+        {
+            plugin.OnDisable();
+        }
         return false;
     }
 }

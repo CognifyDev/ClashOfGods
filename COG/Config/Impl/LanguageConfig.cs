@@ -20,7 +20,7 @@ public class LanguageConfig : Config
     {
         try
         {
-            GetTranslations();
+            SetTranslations();
         }
         catch (NullReferenceException)
         {
@@ -38,16 +38,17 @@ public class LanguageConfig : Config
     {
         try
         {
-            GetTranslations();
+            SetTranslations();
         }
         catch
         {
-            GameUtils.Popup?.Show("An error occoured when loading language from disk.");
+            // ReSharper disable once Unity.NoNullPropagation
+            GameUtils.Popup?.Show("An error occurred when loading language from the disk.");
             Instance = new LanguageConfig();
         }
     }
 
-    private void GetTranslations()
+    private void SetTranslations()
     {
         MessageForNextPage = GetString("lobby.message-for-next-page");
         MakePublicMessage = GetString("lobby.make-public-message");
