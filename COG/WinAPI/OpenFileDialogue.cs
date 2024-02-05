@@ -31,6 +31,7 @@ namespace COG.WinAPI
         /// <summary>
         /// 更加易用的打开/保存对话框方法，但有一定限制
         /// </summary>
+        /// <param name="mode">对话框模式</param>
         /// <param name="filter">文件筛选器</param>
         /// <param name="title">对话框标题</param>
         /// <param name="defaultDir">打开对话框后默认所在目录</param>
@@ -47,11 +48,12 @@ namespace COG.WinAPI
             {
                 ofn.nFilterIndex = defaultFilterIdx.Value;
             }
+
             if (mode == OpenFileMode.Open) 
                 Open(ofn);
             else 
                 Save(ofn);
-            Main.Logger.LogInfo($"Opened file: {ofn.stringFile ?? "None"}");
+            Main.Logger.LogInfo($"Opened file: {(ofn.stringFile.Equals("") || ofn.stringFile == null ? "None" : ofn.stringFile)}");
             return new(ofn.stringFile, ofn.stringFileTitle);
         }
 
