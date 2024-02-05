@@ -34,33 +34,30 @@ public class GameListener : IListener
 
     public void OnRPCReceived(byte callId, MessageReader reader)
     {
-        if (AmongUsClient.Instance.AmHost) return; //是房主就返回
+        if (AmongUsClient.Instance.AmHost) return; // 是房主就返回
         var knownRpc = (KnownRpc)callId;
 
         switch (knownRpc)
         {
             case KnownRpc.ShareRoles:
-                //清除原列表，防止干扰
+                // 清除原列表，防止干扰
                 GameUtils.PlayerRoleData.Clear();
-                //开始读入数据
-                int count = reader.ReadInt32();//读入玩家与职业的数量
-                List<PlayerRole> pr = new();
-                for(int i = 0; i > count; i++)
+                // 开始读入数据
+                var count = reader.ReadInt32(); // 读入玩家与职业的数量
+                for(var i = 0; i > count; i++)
                 {
-                    int pId = reader.ReadPackedInt32();//读取接收的玩家Id
-                    int rId = reader.ReadPackedInt32();//读取该玩家的职业特征码
+                    var pId = reader.ReadPackedInt32(); // 读取接收的玩家Id
+                    var rId = reader.ReadPackedInt32(); // 读取该玩家的职业特征码
                     var player = PlayerUtils.GetPlayerById((byte)pId);
                     var role = Role.RoleManager.GetManager().GetRoleById(rId);
                     if (!player || role == null) continue;
-                    pr.Add(new(player!, role));
+                    GameUtils.PlayerRoleData.Add(new(player!, role));
                 }
-                GameUtils.PlayerRoleData = pr;
                 break;
             case KnownRpc.ShareOptions:
                 //TODO
                 break;
         }
-
     }
 
     public void AfterPlayerFixedUpdate(PlayerControl player)
@@ -127,6 +124,8 @@ public class GameListener : IListener
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                 $" => {playerRole.Role.GetType().Name}");
         }
+        
+        // 职业分配终止
 
         foreach (var playerRole in GameUtils.PlayerRoleData) RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
     }
@@ -252,7 +251,7 @@ public class GameListener : IListener
         // 取消已经注册的Listener
         foreach (var roleListener in RoleListeners) ListenerManager.GetManager().UnregisterListener(roleListener);
         RoleListeners.Clear();
-        _sharedRoles = false;
+        SharedRoles = false;
     }
 
     public bool OnCheckGameEnd()
@@ -359,16 +358,18 @@ public class GameListener : IListener
         writer.Finish();
     }
 
-    private static bool _sharedRoles;
+    public static bool SharedRoles { get; private set; }
 
-    public void OnGameStartCountdownEnd(GameStartManager manager)
+    public void OnGameStartManagerUpdate(GameStartManager manager)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        Main.Logger.LogInfo("Select roles for players...");
-        SelectRoles();
-        Main.Logger.LogInfo("Share roles for players...");
-        ShareRoles();
-        _sharedRoles = true;
-        
+        if (manager.countDownTimer < 1f && !SharedRoles)
+        {
+            Main.Logger.LogInfo("Select roles for players...");
+            SelectRoles();
+            Main.Logger.LogInfo("Share roles for players...");
+            ShareRoles();
+            SharedRoles = true;
+        }
     }
 }

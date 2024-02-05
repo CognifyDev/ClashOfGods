@@ -10,7 +10,7 @@ namespace COG.Utils;
 
 public static class GameUtils
 {
-    public static List<PlayerRole> PlayerRoleData { get; set; } = new();
+    public static List<PlayerRole> PlayerRoleData { get; } = new();
 
     public static GenericPopup? Popup { get; set; }
 
