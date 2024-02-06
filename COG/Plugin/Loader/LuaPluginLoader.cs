@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using COG.Exception.Plugin;
-using COG.Plugin.Manager;
+using COG.Plugin.Loader.Controller.Function;
 using COG.Utils;
-using LuaFunction = NLua.LuaFunction;
+using NLua;
 
 namespace COG.Plugin.Loader;
 
@@ -34,7 +31,7 @@ public class LuaPluginLoader : IPlugin
     private string _mainClass;
     
     private string ScriptPath { get; }
-    private NLua.Lua LuaController { get; }
+    private Lua LuaController { get; }
     
     private LuaFunction OnEnableFunction { get; }
     private LuaFunction OnDisableFunction { get; }
@@ -46,7 +43,7 @@ public class LuaPluginLoader : IPlugin
         
         if (!CheckDirectory(directoryInfo))
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a legal plugin");
-        LuaController = new NLua.Lua();
+        LuaController = new Lua();
 
         var pluginYaml = Yaml.LoadFromFile(ScriptPath + "\\plugin.yml");
         try
@@ -96,80 +93,6 @@ public class LuaPluginLoader : IPlugin
             {
                 LuaController.RegisterFunction(functionRegisterAttribute.FunctionName, null, methodInfo);
             }
-        }
-        
-    }
-
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-    private sealed class FunctionRegisterAttribute : Attribute
-    {
-        public string FunctionName { get; }
-
-        public FunctionRegisterAttribute(string functionName)
-        {
-            FunctionName = functionName;
-        }
-    }
-    
-    private class Functions
-    {
-        [FunctionRegister("logInfo")]
-        public static void Info(string param) 
-            => Main.Logger.LogInfo(param);
-
-        [FunctionRegister("info")]
-        public static void Info0(string param) 
-            => Info(param);
-        
-        [FunctionRegister("logError")]
-        public static void Error(string param)
-        {
-            Main.Logger.LogError(param);
-        }
-        
-        [FunctionRegister("logWarning")]
-        public static void Warning(string param)
-        {
-            Main.Logger.LogWarning(param);
-        }
-        
-        [FunctionRegister("logDebug")]
-        public static void Debug(string param)
-        {
-            Main.Logger.LogDebug(param);
-        }
-
-        [FunctionRegister("getAuthor")]
-        public static string GetAuthor(string pluginName)
-        {
-            foreach (var plugin in PluginManager.GetPlugins().Where(plugin => plugin.GetName().Equals(pluginName)))
-            {
-                return plugin.GetAuthor();
-            }
-
-            return "null";
-        }
-        
-        [FunctionRegister("getVersion")]
-        public static string GetVersion(string pluginName)
-        {
-            foreach (var plugin in PluginManager.GetPlugins().Where(plugin => plugin.GetName().Equals(pluginName)))
-            {
-                return plugin.GetVersion();
-            }
-
-            return "null";
-        }
-        
-        [FunctionRegister("getMainClass")]
-        public static string GetMainClass(string pluginName)
-        {
-            foreach (var plugin in PluginManager.GetPlugins().Where(plugin => plugin.GetName().Equals(pluginName)))
-            {
-                return plugin.GetMainClass();
-            }
-
-            return "null";
         }
     }
     

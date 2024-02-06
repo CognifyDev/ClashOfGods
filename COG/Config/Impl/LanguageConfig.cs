@@ -218,7 +218,7 @@ public class LanguageConfig : Config
         return toReturn;
     }
 
-    internal static void LoadLanguageConfig()
+    private static void LoadLanguageConfig()
     {
         Instance.LoadConfig(true);
         Instance = new LanguageConfig();
