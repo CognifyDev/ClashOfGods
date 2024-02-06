@@ -200,14 +200,14 @@ public class CustomOption
     public static void SaveOptionWithDialogue()
     {
         var file = OpenFileDialogue.Open(Mode.Save, "Preset File(*.cog)\0*.cog\0\0");
-        if (file.FilePath is null) return;
+        if (file.FilePath is null or "") return;
         SaveCurrentOption(file.FilePath);
     }
 
     public static void OpenPresetWithDialogue()
     {
         var file = OpenFileDialogue.Open(Mode.Open, "Preset File(*.cog)\0*.cog\0\0");
-        if (file.FilePath is null) return;
+        if (file.FilePath is null or "") return;
         LoadOptionFromPreset(file.FilePath);
     }
 

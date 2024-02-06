@@ -1,4 +1,4 @@
-# ClashOfGods
+﻿# ClashOfGods
 #### A mod for Among Us
 
 > English | [简体中文](README-SChinese.md) | [繁體中文](README-TChinese.md)
@@ -12,6 +12,6 @@ This mod is not affiliated with Among Us or Innersloth LLC, and the content cont
 This mod adds many interesting roles to the vanilla game.
 
 # Development
-The MOD is still under development, and if you are good at dedveloping Among Us mod, you can join us.
+The MOD is still under development, and if you are good at developing Among Us mod, you can join us.
 
 # [Discord](https://discord.gg/uWZGh4Chde)
