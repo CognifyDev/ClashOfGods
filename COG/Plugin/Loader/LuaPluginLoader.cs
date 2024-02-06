@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using COG.Exception.Plugin;
 using COG.Plugin.Loader.Controller.Function;
