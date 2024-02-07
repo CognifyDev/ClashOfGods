@@ -130,7 +130,11 @@ public class CustomOption
 
         writer.Write(options.Length - 2); //两个预设用的选项不计算在内
 
-        foreach (var option in options) writer.Write(option);
+        foreach (var option in options)
+        {
+            writer.Write(option.Length);
+            writer.Write(option);
+        }
 
         // OK 现在进行一个结束
         writer.Finish();
@@ -163,7 +167,7 @@ public class CustomOption
         {
             if (!File.Exists(path)) return;
             using StreamReader reader = new(path, Encoding.UTF8);
-            while (reader.ReadLine()! is { } line)
+            while (reader.ReadLine() is { } line)
             {
                 var optionInfo = line.Split(" ");
                 var optionID = optionInfo[0];
@@ -186,7 +190,7 @@ public class CustomOption
         {
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
-            foreach (var option in Options.Where(o => o != null && o!.ID is not -1 or -2).OrderBy(o => o!.ID))
+            foreach (var option in Options.Where(o => o != null && (o!.ID != -1 || o!.ID != -2)).OrderBy(o => o!.ID))
                 writer.WriteLine(option!.ID + " " + option.Selection);
         }
         catch (System.Exception e)
