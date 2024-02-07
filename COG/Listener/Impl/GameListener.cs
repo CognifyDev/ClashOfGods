@@ -5,6 +5,7 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using COG.States;
+using COG.UI.CustomOption;
 using COG.UI.CustomWinner;
 using COG.Utils;
 using Il2CppSystem;
@@ -56,7 +57,17 @@ public class GameListener : IListener
 
                 break;
             case KnownRpc.ShareOptions:
-                //TODO
+                int length = reader.ReadInt32();
+                byte[][] options = new byte[length][];
+
+                for (int i = 0; i < length; i++)
+                {
+                    int arrayLength = reader.ReadInt32();
+                    byte[] option = reader.ReadBytes(arrayLength);
+                    options[i] = option;
+                }
+
+                CustomOption.LoadOptionsFromByteArray(options);
                 break;
         }
     }

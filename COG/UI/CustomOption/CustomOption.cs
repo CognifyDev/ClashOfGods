@@ -130,7 +130,11 @@ public class CustomOption
 
         writer.Write(options.Length - 2); //两个预设用的选项不计算在内
 
-        foreach (var option in options) writer.Write(option);
+        foreach (var option in options)
+        {
+            writer.Write(option.Length);
+            writer.Write(option);
+        }
 
         // OK 现在进行一个结束
         writer.Finish();
