@@ -1,7 +1,9 @@
 using System;
 using System.IO;
+using System.Net;
 using System.Text;
 using COG.Exception.Plugin;
+using COG.Plugin.Loader.Controller.ClassType.Classes.Globe;
 using COG.Plugin.Loader.Controller.Function;
 using COG.Utils;
 using NLua;
@@ -37,6 +39,7 @@ public class LuaPluginLoader : IPlugin
     private LuaFunction OnEnableFunction { get; }
     private LuaFunction OnDisableFunction { get; }
 
+    [Obsolete("Obsolete")]
     public LuaPluginLoader(string scriptPath)
     {
         ScriptPath = scriptPath;
@@ -81,8 +84,11 @@ public class LuaPluginLoader : IPlugin
         return onEnableFunction != null && onDisableFunction != null;
     }
 
+    [Obsolete("Obsolete")]
     public void MakeLanguage()
     {
+        LuaController.LoadCLRPackage();
+        
         // register global value
         LuaController["COG_VERSION"] = Main.PluginVersion;
         LuaController["COG_NAME"] = Main.PluginName;
@@ -90,6 +96,9 @@ public class LuaPluginLoader : IPlugin
         LuaController["COG_PLUGIN_GUID"] = Main.PluginGuid;
 
         LuaController["IS_BETA_VERSION"] = Main.VersionInfo.Beta;
+
+        LuaController["controller"] = new PluginController(LuaController, this);
+        LuaController["web"] = new WebClient();
 
         // register methods
         var functionsType = typeof(Functions);

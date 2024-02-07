@@ -24,13 +24,6 @@ public class Functions
         return File.ReadAllBytes(path);
     }
 
-    [FunctionRegister("unloadCOG")]
-    public static void UnloadCog()
-    {
-        DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-        Main.Instance.Unload();
-    }
-
     [FunctionRegister("logInfo")]
     public static void Info(string param)
     {
