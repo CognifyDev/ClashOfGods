@@ -360,7 +360,7 @@ public class GameListener : IListener
     public void OnGameStartManagerUpdate(GameStartManager manager)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        if (manager.countDownTimer < 1f && !SharedRoles)
+        if (manager.countDownTimer is > 0 and < 1f && !SharedRoles)
         {
             Main.Logger.LogInfo("Select roles for players...");
             SelectRoles();
