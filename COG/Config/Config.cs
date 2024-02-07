@@ -18,7 +18,7 @@ public class Config
         LoadConfig();
     }
 
-    public Config(string name, string path, ResourceFile resourceFile)
+    protected Config(string name, string path, ResourceFile resourceFile)
     {
         Name = name;
         Path = path;
@@ -38,7 +38,7 @@ public class Config
     public string Name { get; }
     public string Path { get; }
     public string Text { get; }
-    public Yaml YamlReader { get; private set; }
+    public Yaml? YamlReader { get; private set; }
 
     public void LoadConfig(bool replace = false)
     {

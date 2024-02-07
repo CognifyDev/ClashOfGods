@@ -18,7 +18,7 @@ public class PluginController
         DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
         Main.Instance.Unload();
     }
-
+    
     public string GetAuthor() => _plugin.GetAuthor();
 
     public string GetVersion() => _plugin.GetVersion();

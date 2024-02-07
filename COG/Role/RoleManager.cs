@@ -12,12 +12,7 @@ public class RoleManager
 
     public Role[] GetTypeCampRoles(CampType campType)
     {
-        var list = new List<Role>();
-        foreach (var role in _roles)
-            if (role.CampType == campType && role.MainRoleOption.GetBool())
-                list.Add(role);
-
-        return list.ToArray();
+        return _roles.Where(role => role.CampType == campType && role.MainRoleOption!.GetBool()).ToArray();
     }
 
     public void RegisterRole(Role role)

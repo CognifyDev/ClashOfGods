@@ -8,7 +8,7 @@ internal class HudManagerPatch
 {
     [HarmonyPatch(nameof(HudManager.Start))]
     [HarmonyPostfix]
-    public static void OnHudStart(HudManager __instance)
+    public static void OnHudStart(HudManager? __instance)
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
             listener.OnHudStart(__instance);

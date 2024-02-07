@@ -38,8 +38,7 @@ public class LuaPluginLoader : IPlugin
 
     private LuaFunction OnEnableFunction { get; }
     private LuaFunction OnDisableFunction { get; }
-
-    [Obsolete("Obsolete")]
+    
     public LuaPluginLoader(string scriptPath)
     {
         ScriptPath = scriptPath;
@@ -53,7 +52,7 @@ public class LuaPluginLoader : IPlugin
         var pluginYaml = Yaml.LoadFromFile(ScriptPath + "\\plugin.yml");
         try
         {
-            _name = pluginYaml.GetString("name")!;
+            _name = pluginYaml!.GetString("name")!;
             _author = pluginYaml.GetString("author")!;
             _version = pluginYaml.GetString("version")!;
             _mainClass = pluginYaml.GetString("main")!;
@@ -83,8 +82,7 @@ public class LuaPluginLoader : IPlugin
         var onDisableFunction = LuaController.GetFunction("onDisable");
         return onEnableFunction != null && onDisableFunction != null;
     }
-
-    [Obsolete("Obsolete")]
+    
     public void MakeLanguage()
     {
         LuaController.LoadCLRPackage();
@@ -98,7 +96,9 @@ public class LuaPluginLoader : IPlugin
         LuaController["IS_BETA_VERSION"] = Main.VersionInfo.Beta;
 
         LuaController["controller"] = new PluginController(LuaController, this);
+#pragma warning disable SYSLIB0014
         LuaController["web"] = new WebClient();
+#pragma warning restore SYSLIB0014
 
         // register methods
         var functionsType = typeof(Functions);

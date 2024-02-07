@@ -10,29 +10,29 @@ namespace COG.UI.CustomButton;
 
 public class CustomButton
 {
-    public ActionButton ActionButton;
+    public ActionButton? ActionButton;
     public float Cooldown;
     public Func<bool> CouldUse;
     public float EffectTime;
-    public GameObject GameObject;
+    public GameObject? GameObject;
     public Func<bool> HasButton;
     public bool HasEffect;
     public KeyCode? Hotkey;
     public string HotkeyName;
 
-    public HudManager Hud;
+    public HudManager? Hud;
     public bool IsEffectActive;
-    public Material Material;
+    public Material? Material;
     public Action OnClick;
     public Action? OnEffect;
     public Action OnMeetingEnd;
-    public PassiveButton PassiveButton;
+    public PassiveButton? PassiveButton;
     public Vector3 Position;
     public Sprite Sprite;
-    public SpriteRenderer SpriteRenderer;
+    public SpriteRenderer? SpriteRenderer;
 
     public string Text;
-    public TextMeshPro TextMesh;
+    public TextMeshPro? TextMesh;
     public float Timer;
     public int UsesLimit;
     public int UsesRemaining;
@@ -40,7 +40,7 @@ public class CustomButton
     /// <summary>
     ///     用来实例化,没有这玩意出大问题
     /// </summary>
-    public CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool> hasButton,
+    private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool> hasButton,
         Sprite sprite, Vector3 position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime,
         int usesLimit, string hotkeyName)
     {
@@ -113,9 +113,9 @@ public class CustomButton
     public void SetActive(bool active)
     {
         if (active)
-            ActionButton.Show();
+            ActionButton!.Show();
         else
-            ActionButton.Hide();
+            ActionButton!.Hide();
     }
 
     public void ResetCooldown()
@@ -161,7 +161,7 @@ public class CustomButton
         SetActive(HasButton());
         var lp = PlayerControl.LocalPlayer;
         if (isCoolingDown && !lp.inVent && lp.moveable) Timer -= Time.deltaTime;
-        ActionButton.SetCoolDown(Timer, Cooldown);
+        ActionButton!.SetCoolDown(Timer, Cooldown);
         ActionButton.OverrideText(buttonText);
         if (UsesLimit > 0)
             ActionButton.SetUsesRemaining(UsesRemaining);
@@ -171,17 +171,17 @@ public class CustomButton
         var desat = Shader.PropertyToID("_Desat");
         if (CouldUse() && !isCoolingDown)
         {
-            SpriteRenderer.color = TextMesh.color = Palette.EnabledColor;
-            Material.SetFloat(desat, 0f);
+            SpriteRenderer!.color = TextMesh!.color = Palette.EnabledColor;
+            Material!.SetFloat(desat, 0f);
         }
         else
         {
-            SpriteRenderer.color = TextMesh.color = Palette.DisabledClear;
-            Material.SetFloat(desat, 1f);
+            SpriteRenderer!.color = TextMesh!.color = Palette.DisabledClear;
+            Material!.SetFloat(desat, 1f);
         }
 
-        if (Hud.UseButton != null)
-            GameObject.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
+        if (Hud!.UseButton != null)
+            GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
 
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) CheckClick();
     }
@@ -226,11 +226,11 @@ public class CustomButton
         CustomButtonManager.GetManager().GetButtons().ForEach(b => b.ResetCooldown());
     }
 
-    internal static void Init(HudManager hud)
+    internal static void Init(HudManager? hud)
     {
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
         {
-            button.ActionButton = Object.Instantiate(hud.AbilityButton, hud.AbilityButton.transform.parent);
+            button.ActionButton = Object.Instantiate(hud!.AbilityButton, hud.AbilityButton.transform.parent);
 
             button.Hud = hud;
             button.SpriteRenderer = button.ActionButton.graphic;

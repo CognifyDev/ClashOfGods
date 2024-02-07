@@ -165,7 +165,7 @@ public interface IListener
     {
     }
 
-    void OnHudStart(HudManager hud)
+    void OnHudStart(HudManager? hud)
     {
     }
 

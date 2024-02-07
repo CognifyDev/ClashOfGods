@@ -212,7 +212,7 @@ public class LanguageConfig : Config
 
     private string GetString(string location)
     {
-        var toReturn = YamlReader.GetString(location);
+        var toReturn = YamlReader!.GetString(location);
         if (toReturn is null or "" or " ") throw new NullReferenceException();
 
         return toReturn;

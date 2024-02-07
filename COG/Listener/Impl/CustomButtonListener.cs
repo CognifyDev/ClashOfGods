@@ -5,7 +5,7 @@ namespace COG.Listener.Impl;
 
 internal class CustomButtonListener : IListener
 {
-    public void OnHudStart(HudManager hud)
+    public void OnHudStart(HudManager? hud)
     {
         CustomButton.Init(hud);
     }

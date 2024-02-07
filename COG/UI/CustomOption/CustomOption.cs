@@ -44,7 +44,7 @@ public class CustomOption
 
     [DataMember] public int Selection;
 
-    [DataMember] public OptionBehaviour OptionBehaviour;
+    [DataMember] public OptionBehaviour? OptionBehaviour;
 
     [DataMember] public readonly int DefaultSelection;
 
@@ -169,7 +169,7 @@ public class CustomOption
                 var optionID = optionInfo[0];
                 var optionSelection = optionInfo[1];
 
-                var option = Options.FirstOrDefault(o => o.ID.ToString() == optionID);
+                var option = Options.FirstOrDefault(o => o?.ID.ToString() == optionID);
                 if (option == null) continue;
                 option.UpdateSelection(int.Parse(optionSelection));
             }
@@ -400,7 +400,7 @@ public class CustomOption
                     }
                 }
 
-                option?.OptionBehaviour.gameObject.SetActive(true);
+                if (option?.OptionBehaviour != null) option.OptionBehaviour.gameObject.SetActive(true);
             }
 
             SetOptions(
@@ -518,7 +518,7 @@ public class StringOptionPatch
     [HarmonyPrefix]
     public static bool IncreasePatch(StringOption __instance)
     {
-        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
+        var option = Options.FirstOrDefault(option => option?.OptionBehaviour == __instance);
         if (option == null) return true;
 
         option.UpdateSelection(option.Selection + 1);
@@ -529,7 +529,7 @@ public class StringOptionPatch
     [HarmonyPrefix]
     public static bool DecreasePatch(StringOption __instance)
     {
-        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance);
+        var option = Options.FirstOrDefault(option => option?.OptionBehaviour == __instance);
         if (option == null) return true;
 
         option.UpdateSelection(option.Selection - 1);
@@ -601,15 +601,15 @@ internal class GameOptionsMenuUpdatePatch
         var offset = 2.75f;
         foreach (var option in Options.Where(o => o != null))
         {
-            if (GameObject.Find("COGSettings") && option.Type != CustomOptionType.General)
+            if (option != null && GameObject.Find("COGSettings") && option.Type != CustomOptionType.General)
                 continue;
-            if (GameObject.Find("ImpostorSettings") && option.Type != CustomOptionType.Impostor)
+            if (option != null && GameObject.Find("ImpostorSettings") && option.Type != CustomOptionType.Impostor)
                 continue;
-            if (GameObject.Find("NeutralSettings") && option.Type != CustomOptionType.Neutral)
+            if (option != null && GameObject.Find("NeutralSettings") && option.Type != CustomOptionType.Neutral)
                 continue;
-            if (GameObject.Find("CrewmateSettings") && option.Type != CustomOptionType.Crewmate)
+            if (option != null && GameObject.Find("CrewmateSettings") && option.Type != CustomOptionType.Crewmate)
                 continue;
-            if (GameObject.Find("AddonsSettings") && option.Type != CustomOptionType.Addons)
+            if (option != null && GameObject.Find("AddonsSettings") && option.Type != CustomOptionType.Addons)
                 continue;
             if (option?.OptionBehaviour != null && option.OptionBehaviour.gameObject != null)
             {
@@ -640,11 +640,11 @@ internal class GameOptionsMenuUpdatePatch
 
 
         //每帧更新预设选项名称与按下按钮操作
-        var load = (ToggleOption)GlobalCustomOption.LoadPreset.OptionBehaviour;
-        var save = (ToggleOption)GlobalCustomOption.SavePreset.OptionBehaviour;
+        var load = (ToggleOption)GlobalCustomOption.LoadPreset.OptionBehaviour!;
+        var save = (ToggleOption)GlobalCustomOption.SavePreset.OptionBehaviour!;
 
-        load.TitleText.text = GlobalCustomOption.LoadPreset.Name;
-        save.TitleText.text = GlobalCustomOption.SavePreset.Name;
+        load!.TitleText.text = GlobalCustomOption.LoadPreset.Name;
+        save!.TitleText.text = GlobalCustomOption.SavePreset.Name;
 
         load.OnValueChanged = new Action<OptionBehaviour>((_) => OpenPresetWithDialogue());
         save.OnValueChanged = new Action<OptionBehaviour>((_) => SaveOptionWithDialogue());
