@@ -13,17 +13,17 @@ public static class PluginManager
 
     static PluginManager()
     {
-        if (!Directory.Exists(PluginDirectoryPath))
-        {
-            Directory.CreateDirectory(PluginDirectoryPath);
-        }
+        if (!Directory.Exists(PluginDirectoryPath)) Directory.CreateDirectory(PluginDirectoryPath);
     }
 
     /// <summary>
     /// Get a new instance of plugin list
     /// </summary>
     /// <returns>The list instance after cloning</returns>
-    public static List<IPlugin> GetPlugins() => new(Plugins);
+    public static List<IPlugin> GetPlugins()
+    {
+        return new List<IPlugin>(Plugins);
+    }
 
     /// <summary>
     /// Load a plugin
@@ -53,15 +53,12 @@ public static class PluginManager
             var directoryInfo = new DirectoryInfo(file);
             var plugin = LoadPlugin(file);
             if (plugin != null)
-            {
-                Main.Logger.LogInfo($"Plugin {plugin.GetName()} v{plugin.GetVersion()} made by {plugin.GetAuthor()} was successfully loaded.");
-            }
+                Main.Logger.LogInfo(
+                    $"Plugin {plugin.GetName()} v{plugin.GetVersion()} made by {plugin.GetAuthor()} was successfully loaded.");
             else
-            {
                 Main.Logger.LogError("Directory " + directoryInfo.Name + " can not be loaded as a plugin.");
-            }
         }
-        
+
         Main.Logger.LogInfo($"{Plugins.Count} plugin{(Plugins.Count <= 1 ? " was" : "s were")} loaded.");
     }
 }

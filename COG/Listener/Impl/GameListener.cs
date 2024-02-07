@@ -25,7 +25,7 @@ public class GameListener : IListener
         // _forceStarted = false;
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
-        
+
         if (!AmongUsClient.Instance.AmHost) return;
 
         foreach (var playerRole in GameUtils.PlayerRoleData)
@@ -44,15 +44,16 @@ public class GameListener : IListener
                 GameUtils.PlayerRoleData.Clear();
                 // 开始读入数据
                 var count = reader.ReadInt32(); // 读入玩家与职业的数量
-                for(var i = 0; i > count; i++)
+                for (var i = 0; i > count; i++)
                 {
                     var pId = reader.ReadPackedInt32(); // 读取接收的玩家Id
                     var rId = reader.ReadPackedInt32(); // 读取该玩家的职业特征码
                     var player = PlayerUtils.GetPlayerById((byte)pId);
                     var role = Role.RoleManager.GetManager().GetRoleById(rId);
                     if (!player || role == null) continue;
-                    GameUtils.PlayerRoleData.Add(new(player!, role));
+                    GameUtils.PlayerRoleData.Add(new PlayerRole(player!, role));
                 }
+
                 break;
             case KnownRpc.ShareOptions:
                 //TODO
@@ -120,23 +121,19 @@ public class GameListener : IListener
 
         // 打印职业分配信息
         foreach (var playerRole in GameUtils.PlayerRoleData)
-        {
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                 $" => {playerRole.Role.GetType().Name}");
-        }
-        
+
         // 职业分配终止
 
-        foreach (var playerRole in GameUtils.PlayerRoleData) RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
+        foreach (var playerRole in GameUtils.PlayerRoleData)
+            RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
     }
 
     public void OnSelectRoles()
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        foreach (var playerRole in GameUtils.PlayerRoleData)
-        {
-            playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
-        }
+        foreach (var playerRole in GameUtils.PlayerRoleData) playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
     }
 
     public void OnGameStart(GameStartManager manager)
@@ -346,7 +343,7 @@ public class GameListener : IListener
     private static void ShareRoles()
     {
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
-        
+
         // ready for share roles
         writer.Write(GameUtils.PlayerRoleData.Count);
         foreach (var playerRole in GameUtils.PlayerRoleData)
@@ -354,7 +351,7 @@ public class GameListener : IListener
             writer.WritePacked(playerRole.Player.PlayerId);
             writer.WritePacked(playerRole.Role.Id);
         }
-        
+
         writer.Finish();
     }
 

@@ -72,14 +72,13 @@ public class RoleManager
         internal RoleGetter()
         {
             foreach (var role in GetManager().GetRoles()
-                         .Where(role => role.MainRoleOption != null && role.ShowInOptions && role.MainRoleOption.GetBool()))
-            {
+                         .Where(role =>
+                             role.MainRoleOption != null && role.ShowInOptions && role.MainRoleOption.GetBool()))
                 if (role.RoleNumberOption != null)
                 {
                     var times = (int)role.RoleNumberOption.GetFloat();
                     for (var i = 0; i < times; i++) _roles.Add(role);
                 }
-            }
 
             _roles.Disarrange();
         }

@@ -29,10 +29,8 @@ using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
-using UnityEngine;
 using COG.WinAPI;
 using System.IO;
-using COG.Config;
 using COG.Plugin.Manager;
 using UnityEngine.SceneManagement;
 using Mode = COG.WinAPI.OpenFileDialogue.OpenFileMode;
@@ -70,7 +68,8 @@ public partial class Main : BasePlugin
     {
         Instance = this;
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
-        VersionInfo = PluginVersion.Equals("Unknown") ? VersionInfo.Empty 
+        VersionInfo = PluginVersion.Equals("Unknown")
+            ? VersionInfo.Empty
             : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
 
         Logger = BepInEx.Logging.Logger.CreateLogSource($"   {DisplayName}");
@@ -96,7 +95,7 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/lua54.dll",
             "COG.Resources.InDLL.Depends.lua54.dll");
-        
+
         var disabledVersion = WebUtils
             .GetWeb(
                 "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
@@ -177,8 +176,9 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
                 {
-                    var p = OpenFileDialogue.Open(Mode.Open, filter:"*", defaultDir:@$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
-                    if(p.FilePath is null or "") return false;
+                    var p = OpenFileDialogue.Open(Mode.Open, "*",
+                        defaultDir: @$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
+                    if (p.FilePath is null or "") return false;
 
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
@@ -214,18 +214,15 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
-        
+
         GlobalCustomOption.Init();
 
         Harmony.PatchAll();
-        
+
         // Load plugins
         PluginManager.LoadPlugins();
-        
-        foreach (var plugin in PluginManager.GetPlugins())
-        {
-            plugin.OnEnable();
-        }
+
+        foreach (var plugin in PluginManager.GetPlugins()) plugin.OnEnable();
     }
 
     public override bool Unload()
@@ -243,12 +240,9 @@ public partial class Main : BasePlugin
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
         MainMenuPatch.CustomBG?.Destroy();
         PluginSingleton<ReactorPlugin>.Instance.Unload();
-        
-        foreach (var plugin in PluginManager.GetPlugins())
-        {
-            plugin.OnDisable();
-        }
-        
+
+        foreach (var plugin in PluginManager.GetPlugins()) plugin.OnDisable();
+
         return false;
     }
 }

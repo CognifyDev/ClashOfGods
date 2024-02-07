@@ -6,7 +6,7 @@ namespace COG.Plugin.Loader.Controller.ClassType.Classes;
 public class ClassRegisterAttribute : Attribute
 {
     public string ClassName { get; }
-    
+
     public ClassRegisterAttribute(string className)
     {
         ClassName = className;

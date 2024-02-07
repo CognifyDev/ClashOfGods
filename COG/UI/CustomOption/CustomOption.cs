@@ -99,7 +99,6 @@ public class CustomOption
     }
 
 
-
     public static void LoadOptionsFromByteArray(byte[][] data)
     {
         Options.Clear();
@@ -109,10 +108,10 @@ public class CustomOption
     public static byte[][] WriteOptionsToByteArray()
     {
         return (from customOption in Options
-                where customOption != null && customOption.ID != -1 && customOption.ID != -2 //非空且不是预设用选项
-                select new SerializableCustomOption(customOption)
+            where customOption != null && customOption.ID != -1 && customOption.ID != -2 //非空且不是预设用选项
+            select new SerializableCustomOption(customOption)
             into serializableCustomOption
-                select serializableCustomOption.SerializeToData()).ToArray();
+            select serializableCustomOption.SerializeToData()).ToArray();
     }
 
     public static void ShareOptionChange()
@@ -164,8 +163,7 @@ public class CustomOption
         {
             if (!File.Exists(path)) return;
             using StreamReader reader = new(path, Encoding.UTF8);
-            string line = "";
-            while ((line = reader.ReadLine()!) != null)
+            while (reader.ReadLine()! is { } line)
             {
                 var optionInfo = line.Split(" ");
                 var optionID = optionInfo[0];
@@ -542,7 +540,8 @@ public class StringOptionPatch
     [HarmonyPrefix]
     public static bool OnEnablePatch(StringOption __instance)
     {
-        var option = Options.FirstOrDefault(option => option.OptionBehaviour == __instance && option.ID != -1 && option.ID != -2);
+        var option = Options.FirstOrDefault(option =>
+            option?.OptionBehaviour == __instance && option.ID != -1 && option.ID != -2);
         if (option == null) return true;
 
         __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
@@ -580,8 +579,8 @@ public abstract class SyncSettingPatch
 [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Update))]
 internal class GameOptionsMenuUpdatePatch
 {
-    private static float timer = 1f;
-    private static readonly float timerForBugFix = 1f;
+    private static float _timer = 1f;
+    private const float TimerForBugFix = 1f;
 
     public static void Postfix(GameOptionsMenu __instance)
     {
@@ -591,13 +590,13 @@ internal class GameOptionsMenuUpdatePatch
                                         gameSettingMenu.RolesSettings.gameObject.active)) return;
 
         __instance.GetComponentInParent<Scroller>().ContentYBounds.max = -0.5F + __instance.Children.Length * 0.55F;
-        timer += Time.deltaTime;
-        timer += Time.deltaTime;
-        if (timer < 0.1f) return;
+        _timer += Time.deltaTime;
+        _timer += Time.deltaTime;
+        if (_timer < 0.1f) return;
 
-        timer = 0f;
+        _timer = 0f;
 
-        if (timerForBugFix < 3.0f) FirstOpen = false;
+        if (TimerForBugFix < 3.0f) FirstOpen = false;
 
         var offset = 2.75f;
         foreach (var option in Options.Where(o => o != null))
@@ -638,8 +637,6 @@ internal class GameOptionsMenuUpdatePatch
                 }
             }
         }
-
-        
 
 
         //每帧更新预设选项名称与按下按钮操作

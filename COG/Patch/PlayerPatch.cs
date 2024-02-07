@@ -70,11 +70,9 @@ internal class HostStartPatch
     public static void Prefix(GameStartManager __instance)
     {
         if (GlobalCustomOption.DebugMode.GetBool())
-        {
             // start with no limit
             GameStartManager.Instance.MinPlayers = 1;
-        }
-        
+
         {
             // showtime
             if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||

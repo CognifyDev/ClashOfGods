@@ -53,7 +53,8 @@ public static class GameUtils
     public static Role.Role? GetLocalPlayerRole()
     {
         var player = PlayerControl.LocalPlayer;
-        return (from playerRole in PlayerRoleData where playerRole.Player.Equals(player) select playerRole.Role).FirstOrDefault();
+        return (from playerRole in PlayerRoleData where playerRole.Player.Equals(player) select playerRole.Role)
+            .FirstOrDefault();
     }
 
     /// <summary>

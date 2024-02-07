@@ -269,7 +269,7 @@ public class PlayerRole
         PlayerName = player.name;
         PlayerId = player.PlayerId;
     }
-    
+
     public PlayerControl Player { get; }
     public Role.Role Role { get; }
     public string PlayerName { get; }
@@ -277,8 +277,10 @@ public class PlayerRole
 
     public static Role.Role GetRole(string? playerName = null, byte? playerId = null)
     {
-        return GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) != null
-            ? GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!.Role
+        return GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) !=
+               null
+            ? GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!
+                .Role
             : COG.Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 }

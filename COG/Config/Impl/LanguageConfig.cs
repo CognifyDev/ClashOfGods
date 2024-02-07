@@ -32,8 +32,8 @@ public class LanguageConfig : Config
     }
 
     private LanguageConfig(string path) : base(
-       "Language",
-       path
+        "Language",
+        path
     )
     {
         try

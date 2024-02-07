@@ -39,7 +39,7 @@ public abstract class Role
                 LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, MainRoleOption);
         }
     }
-    
+
     /// <summary>
     ///     角色特征码
     /// </summary>

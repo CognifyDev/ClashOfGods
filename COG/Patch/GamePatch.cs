@@ -170,9 +170,7 @@ public class GameStartManagerUpdatePatch
     public static void Prefix(GameStartManager __instance)
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
             listener.OnGameStartManagerUpdate(__instance);
-        }
     }
 }
 
@@ -183,8 +181,6 @@ public class GameStartManagerBeginGamePatch
     public static void Postfix(GameStartManager __instance)
     {
         foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
             listener.OnGameStartCountdownEnd(__instance);
-        }
     }
 }

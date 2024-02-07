@@ -30,10 +30,10 @@ public class LuaPluginLoader : IPlugin
     /// 插件的主类
     /// </summary>
     private string _mainClass;
-    
+
     private string ScriptPath { get; }
     private Lua LuaController { get; }
-    
+
     private LuaFunction OnEnableFunction { get; }
     private LuaFunction OnDisableFunction { get; }
 
@@ -41,7 +41,7 @@ public class LuaPluginLoader : IPlugin
     {
         ScriptPath = scriptPath;
         var directoryInfo = new DirectoryInfo(ScriptPath);
-        
+
         if (!CheckDirectory(directoryInfo))
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a legal plugin");
         LuaController = new Lua();
@@ -59,9 +59,9 @@ public class LuaPluginLoader : IPlugin
         {
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a legal plugin");
         }
-        
+
         LuaController.DoFile(ScriptPath + "\\" + _mainClass);
-        if (!CheckPlugin()) 
+        if (!CheckPlugin())
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a correct plugin with functions");
 
         OnEnableFunction = LuaController.GetFunction("onEnable");
@@ -69,8 +69,10 @@ public class LuaPluginLoader : IPlugin
         MakeLanguage();
     }
 
-    private static bool CheckDirectory(FileSystemInfo directoryInfo) =>
-        directoryInfo.Exists && File.Exists(directoryInfo.FullName + "\\plugin.yml");
+    private static bool CheckDirectory(FileSystemInfo directoryInfo)
+    {
+        return directoryInfo.Exists && File.Exists(directoryInfo.FullName + "\\plugin.yml");
+    }
 
     private bool CheckPlugin()
     {
@@ -81,28 +83,31 @@ public class LuaPluginLoader : IPlugin
 
     public void MakeLanguage()
     {
+        // register global value
+        LuaController["COG_VERSION"] = Main.PluginVersion;
+        LuaController["COG_NAME"] = Main.PluginName;
+        LuaController["COG_DISPLAY_NAME"] = Main.DisplayName;
+        LuaController["COG_PLUGIN_GUID"] = Main.PluginGuid;
+
+        LuaController["IS_BETA_VERSION"] = Main.VersionInfo.Beta;
+
         // register methods
         var functionsType = typeof(Functions);
         foreach (var methodInfo in functionsType.GetMethods())
         {
             var attributes = methodInfo.GetCustomAttributes(typeof(FunctionRegisterAttribute), false);
-            if (attributes.Length != 1)
-            {
-                continue;
-            }
+            if (attributes.Length != 1) continue;
 
             if (attributes[0] is FunctionRegisterAttribute functionRegisterAttribute)
-            {
                 LuaController.RegisterFunction(functionRegisterAttribute.FunctionName, null, methodInfo);
-            }
         }
         /*
         // register class types
         var assembly = Assembly.Load("ClashOfGods");
         var types = assembly.GetTypes().Where(
-            type => type.Namespace != null 
-                    && type.Namespace.ToLower().StartsWith("COG.Plugin.Loader.Controller.ClassType") 
-                    && type.GetCustomAttributes(typeof(ClassRegisterAttribute), false).Length > 0 
+            type => type.Namespace != null
+                    && type.Namespace.ToLower().StartsWith("COG.Plugin.Loader.Controller.ClassType")
+                    && type.GetCustomAttributes(typeof(ClassRegisterAttribute), false).Length > 0
                     && type.IsClass
             )
             .ToArray();
@@ -117,7 +122,7 @@ public class LuaPluginLoader : IPlugin
         }
         */
     }
-    
+
     public void OnEnable()
     {
         OnEnableFunction.Call();
@@ -127,12 +132,24 @@ public class LuaPluginLoader : IPlugin
     {
         OnDisableFunction.Call();
     }
-    
-    public string GetName() => _name;
 
-    public string GetAuthor() => _author;
+    public string GetName()
+    {
+        return _name;
+    }
 
-    public string GetVersion() => _version;
+    public string GetAuthor()
+    {
+        return _author;
+    }
 
-    public string GetMainClass() => _mainClass;
+    public string GetVersion()
+    {
+        return _version;
+    }
+
+    public string GetMainClass()
+    {
+        return _mainClass;
+    }
 }
