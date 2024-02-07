@@ -6,6 +6,10 @@ namespace COG.Plugin.Loader.Controller.Function;
 
 public class Functions
 {
+    [FunctionRegister("writeFileByBytes")]
+    public static void WriteFileByBytes(string path, string bytes) 
+        => File.WriteAllBytes(path, bytes.Split(",").Select(byte.Parse).ToArray());
+
     [FunctionRegister("getFileNames")]
     public static string[] GetFileNames() => Directory.GetFiles("./");
     
@@ -26,19 +30,19 @@ public class Functions
     [FunctionRegister("info")]
     public static void Info0(string param) 
         => Info(param);
-            
+    
     [FunctionRegister("logError")]
     public static void Error(string param)
     {
         Main.Logger.LogError(param);
     }
-            
+    
     [FunctionRegister("logWarning")]
     public static void Warning(string param)
     {
         Main.Logger.LogWarning(param);
     }
-            
+    
     [FunctionRegister("logDebug")]
     public static void Debug(string param)
     {
@@ -55,7 +59,7 @@ public class Functions
     
         return "null";
     }
-            
+    
     [FunctionRegister("getVersion")]
     public static string GetVersion(string pluginName)
     {
@@ -66,7 +70,7 @@ public class Functions
     
         return "null";
     }
-            
+    
     [FunctionRegister("getMainClass")]
     public static string GetMainClass(string pluginName)
     {

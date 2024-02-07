@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using COG.Exception.Plugin;
 using COG.Plugin.Loader.Controller.Function;
 using COG.Utils;
@@ -44,6 +45,7 @@ public class LuaPluginLoader : IPlugin
         if (!CheckDirectory(directoryInfo))
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a legal plugin");
         LuaController = new Lua();
+        LuaController.State.Encoding = Encoding.UTF8;
 
         var pluginYaml = Yaml.LoadFromFile(ScriptPath + "\\plugin.yml");
         try
@@ -94,6 +96,26 @@ public class LuaPluginLoader : IPlugin
                 LuaController.RegisterFunction(functionRegisterAttribute.FunctionName, null, methodInfo);
             }
         }
+        /*
+        // register class types
+        var assembly = Assembly.Load("ClashOfGods");
+        var types = assembly.GetTypes().Where(
+            type => type.Namespace != null 
+                    && type.Namespace.ToLower().StartsWith("COG.Plugin.Loader.Controller.ClassType") 
+                    && type.GetCustomAttributes(typeof(ClassRegisterAttribute), false).Length > 0 
+                    && type.IsClass
+            )
+            .ToArray();
+        Main.Logger.LogInfo($"{types.Length} were found to register");
+        foreach (var type in types)
+        {
+            var attributes = type.GetCustomAttributes(typeof(ClassRegisterAttribute), false);
+            if (attributes[0] is ClassRegisterAttribute classRegisterAttribute)
+            {
+                LuaController[classRegisterAttribute.ClassName] = ;
+            }
+        }
+        */
     }
     
     public void OnEnable()
