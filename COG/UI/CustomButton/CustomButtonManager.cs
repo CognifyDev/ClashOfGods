@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace COG.UI.CustomButtons;
+namespace COG.UI.CustomButton;
 
 public class CustomButtonManager
 {
