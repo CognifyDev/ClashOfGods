@@ -98,7 +98,7 @@ public partial class Main : BasePlugin
 
         var disabledVersion = WebUtils
             .GetWeb(
-                "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/disabledVersions")
+                "https://raw.kkgithub.com/CognifyDev/.github/main/disabledVersions")
             .Split("|");
         if (disabledVersion.Any(s => PluginVersion.Equals(s)))
         {
@@ -111,8 +111,8 @@ public partial class Main : BasePlugin
         {
             // 开始验证
             const string url =
-                "https://ghproxy.net/https://raw.githubusercontent.com/CognifyDev/.github/main/hwids";
-            var hwids = WebUtils.GetWeb(url).Split("|");
+                "https://raw.kkgithub.com/CognifyDev/.github/main/hwids";
+            var hwids = WebUtils.GetWeb(url).Split('|');
             RegisteredBetaUsers = new List<string>(hwids);
             var hostHwid = SystemUtils.GetHwid();
             var success = hwids.Any(hwid => hwid.Equals(hostHwid));

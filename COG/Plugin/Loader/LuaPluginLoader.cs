@@ -38,7 +38,7 @@ public class LuaPluginLoader : IPlugin
 
     private LuaFunction OnEnableFunction { get; }
     private LuaFunction OnDisableFunction { get; }
-    
+
     public LuaPluginLoader(string scriptPath)
     {
         ScriptPath = scriptPath;
@@ -82,11 +82,11 @@ public class LuaPluginLoader : IPlugin
         var onDisableFunction = LuaController.GetFunction("onDisable");
         return onEnableFunction != null && onDisableFunction != null;
     }
-    
+
     public void MakeLanguage()
     {
         LuaController.LoadCLRPackage();
-        
+
         // register global value
         LuaController["COG_VERSION"] = Main.PluginVersion;
         LuaController["COG_NAME"] = Main.PluginName;

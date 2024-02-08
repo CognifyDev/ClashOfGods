@@ -57,12 +57,12 @@ public class GameListener : IListener
 
                 break;
             case KnownRpc.ShareOptions:
-                int length = reader.ReadInt32();
-                byte[][] options = new byte[length][];
+                var length = reader.ReadInt32();
+                var options = new byte[length][];
 
-                for (int i = 0; i < length; i++)
+                for (var i = 0; i < length; i++)
                 {
-                    int arrayLength = reader.ReadInt32();
+                    var arrayLength = reader.ReadInt32();
                     byte[] option = reader.ReadBytes(arrayLength);
                     options[i] = option;
                 }
@@ -366,7 +366,7 @@ public class GameListener : IListener
         writer.Finish();
     }
 
-    public static bool SharedRoles { get; private set; }
+    private static bool SharedRoles { get; set; }
 
     public void OnGameStartManagerUpdate(GameStartManager manager)
     {
