@@ -338,7 +338,7 @@ public class CustomButton
         }
     }
 
-    internal void ArrangePosition()
+    internal void ArrangePosition() // TODO：修复在有1个以上自定义按钮的情况下按钮重叠的问题
     {
         if (!IsCustomPosition) return;
         var y = 2 - Row;
