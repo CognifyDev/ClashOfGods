@@ -77,10 +77,14 @@ public class LanguageConfig : Config
 
         SheriffName = GetString("role.crewmate.sheriff.name");
         SheriffDescription = GetString("role.crewmate.sheriff.description");
+        SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");                                          
 
         // Impostor
         ImpostorName = GetString("role.impostor.impostor.name");
         ImpostorDescription = GetString("role.impostor.impostor.description");
+        CleanerName = GetString("role.impostor.cleaner.name");
+        CleanerDescription = GetString("role.impostor.cleaner.description");
+        CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
 
         // Neutral
         JesterName = GetString("role.neutral.jester.name");
@@ -117,6 +121,7 @@ public class LanguageConfig : Config
         CrewmateCampDescription = GetString("camp.crewmate.description");
 
         KillAction = GetString("action.kill");
+        CleanAction = GetString("action.clean");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 
@@ -161,10 +166,14 @@ public class LanguageConfig : Config
 
     public string SheriffName { get; private set; } = null!;
     public string SheriffDescription { get; private set; } = null!;
+    public string SheriffKillCooldown { get; private set; } = null!;
 
     // Impostor
     public string ImpostorName { get; private set; } = null!;
     public string ImpostorDescription { get; private set; } = null!;
+    public string CleanerName { get; private set; } = null!;
+    public string CleanerDescription { get; private set; } = null!;
+    public string CleanBodyCooldown { get; private set; } = null!;
 
     // Neutral
     public string JesterName { get; private set; } = null!;
@@ -201,6 +210,7 @@ public class LanguageConfig : Config
     public string CrewmateCampDescription { get; private set; } = null!;
 
     public string KillAction { get; private set; } = null!;
+    public string CleanAction { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 

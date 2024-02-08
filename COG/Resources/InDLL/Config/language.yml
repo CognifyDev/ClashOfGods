@@ -13,6 +13,10 @@ role:
     impostor:
       name: "伪装者"
       description: "击杀船员，造成破坏"
+    cleaner:
+      name: "清洁工"
+      description: "协助队友，清理尸体"
+      clean-cd: "清理尸体冷却"
   crewmate:
     crewmate:
       name: "船员"
@@ -23,6 +27,7 @@ role:
     sheriff:
       name: "警长"
       description: "你可以击杀所有非船员玩家，但是错杀船员的后果是致命的"
+      kill-cd: "击杀冷却"
   neutral:
     jester:
       name: "小丑"
@@ -81,6 +86,7 @@ sidebar-text:
   crewmate: "<color=#9AFF00>船员设置</color>"
 action:
   kill: "击杀"
+  clean: "清理"
 game:
   end:
     show-players-roles-message: "玩家职业: "

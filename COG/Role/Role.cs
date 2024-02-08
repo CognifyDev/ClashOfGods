@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
@@ -105,18 +107,27 @@ public abstract class Role
     /// </summary>
     public CustomOption? RoleNumberOption { get; }
 
+    public List<PlayerControl> Players => GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList();
+
+    public bool Debug { get; init; } = false;
+
     /// <summary>
     ///     添加一个按钮
     /// </summary>
     /// <param name="button">要添加的按钮</param>
     protected void AddButton(CustomButton button)
     {
-        button.HasButton = () =>
-        {
-            var player = PlayerControl.LocalPlayer;
-            var role = player.GetRoleInstance();
-            return role != null && role.Name.Equals(Name);
-        };
+        if (button.HasButton == null || Debug) button.HasButton = () => true;
+
+        if (Debug)
+            button.Cooldown = () => 0f;
+        else
+            button.HasButton += () =>
+            {
+                var player = PlayerControl.LocalPlayer;
+                var role = player.GetRoleInstance();
+                return role != null && role.Name.Equals(Name);
+            };
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 

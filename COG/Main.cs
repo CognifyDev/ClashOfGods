@@ -190,6 +190,7 @@ public partial class Main : BasePlugin
 
             // Impostor
             new Impostor(),
+            new Cleaner(),
 
             // Neutral
             new Jester()
