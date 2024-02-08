@@ -6,28 +6,46 @@ public class PluginController
 {
     private Lua? Lua { get; }
     private readonly IPlugin _plugin;
-    
+
     internal PluginController(Lua lua, IPlugin plugin)
     {
         Lua = lua;
         _plugin = plugin;
     }
-    
+
     public void UnloadCog()
     {
         DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
         Main.Instance.Unload();
     }
-    
-    public string GetAuthor() => _plugin.GetAuthor();
 
-    public string GetVersion() => _plugin.GetVersion();
+    public string GetAuthor()
+    {
+        return _plugin.GetAuthor();
+    }
 
-    public string GetName() => _plugin.GetName();
+    public string GetVersion()
+    {
+        return _plugin.GetVersion();
+    }
 
-    public string GetMainClass() => _plugin.GetMainClass();
+    public string GetName()
+    {
+        return _plugin.GetName();
+    }
 
-    public void OnEnable() => _plugin.OnEnable();
+    public string GetMainClass()
+    {
+        return _plugin.GetMainClass();
+    }
 
-    public void OnDisable() => _plugin.OnDisable();
+    public void OnEnable()
+    {
+        _plugin.OnEnable();
+    }
+
+    public void OnDisable()
+    {
+        _plugin.OnDisable();
+    }
 }

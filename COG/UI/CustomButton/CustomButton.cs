@@ -40,7 +40,8 @@ public class CustomButton
     /// <summary>
     ///     用来实例化,没有这玩意出大问题
     /// </summary>
-    private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool> hasButton,
+    private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
+        Func<bool> hasButton,
         Sprite sprite, Vector3 position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime,
         int usesLimit, string hotkeyName)
     {
