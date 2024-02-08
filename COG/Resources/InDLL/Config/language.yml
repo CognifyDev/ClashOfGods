@@ -27,6 +27,7 @@ role:
     sheriff:
       name: "警长"
       description: "你可以击杀所有非船员玩家，但是错杀船员的后果是致命的"
+      kill-cd: "击杀冷却"
   neutral:
     jester:
       name: "小丑"
