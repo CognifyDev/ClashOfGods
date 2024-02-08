@@ -12,12 +12,6 @@ public class Functions
         File.WriteAllBytes(path, bytes.Split(",").Select(byte.Parse).ToArray());
     }
 
-    [FunctionRegister("getFileNames")]
-    public static string[] GetFileNames()
-    {
-        return Directory.GetFiles("./");
-    }
-
     [FunctionRegister("readFileAsBytes")]
     public static byte[] ReadFileAsBytes(string path)
     {

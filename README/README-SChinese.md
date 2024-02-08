@@ -11,6 +11,11 @@ Clash Of Gods是一个Among Us模组。<br />
 # 介绍
 该模组在原版游戏的基础上添加了许多有趣的职业。
 
+# 插件系统
+我们内置了插件系统，开发者可以通过简单的编程来制作属于自己的职业、监听器等
+<br>
+[文档](Plugin/About.md)
+
 # 开发进度
 该模组仍在开发中，如果您有能力可以参与进来。
 # [QQ群](https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R63D8foTESsZ9TmGFbkaSPix0q9WGwtq&authKey=1rfvioSJhdni%2BpFvBqS5rFXkZKXNDeeFO50ZKGPzwtlLKwmJqftlDcolx%2FkJ3jLC&noverify=0&group_code=607761127)

@@ -11,6 +11,11 @@ This mod is not affiliated with Among Us or Innersloth LLC, and the content cont
 # About it
 This mod adds many interesting roles to the vanilla game.
 
+# Plugin System
+We have made a plugin system for developers, which helps you make your roles, listeners, etc.
+<br>
+[Document](Plugin/About.md)
+
 # Development
 The MOD is still under development, and if you are good at developing Among Us mod, you can join us.
 
