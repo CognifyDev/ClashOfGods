@@ -47,7 +47,7 @@ public static class MainMenuPatch
             Color.gray);
         
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
-            LanguageConfig.Instance.UpdateButtonString, async () =>
+            LanguageConfig.Instance.UpdateButtonString, () =>
             {
                 if (Main.LatestVersion.Equals(VersionInfo.Empty))
                 {
