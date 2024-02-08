@@ -1,10 +1,10 @@
-﻿using COG.Config.Impl;
+﻿using AmongUs.GameOptions;
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
-using Reactor.Utilities.Extensions;
 using System.Linq;
 using UnityEngine;
 
@@ -17,6 +17,7 @@ namespace COG.Role.Impl.Impostor
         public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
         {
             Description = LanguageConfig.Instance.CleanerDescription;
+            BaseRoleType = RoleTypes.Impostor;
 
             CleanBodyButton = CustomButton.Create(
                 () =>
