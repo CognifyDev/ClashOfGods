@@ -41,7 +41,7 @@ public class Sheriff : Role, IListener
             },
             () => false,
             ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
-            CustomButton.ButtonPositions.UpperRowRight,
+            2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             SheriffKillCD.GetFloat,

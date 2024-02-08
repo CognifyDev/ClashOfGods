@@ -231,6 +231,10 @@ public interface IListener
     {
     }
 
+    void OnHudDestroy(HudManager hud)
+    {
+    }
+
     private class EmptyListener : IListener
     {
     }

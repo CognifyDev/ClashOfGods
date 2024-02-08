@@ -13,7 +13,6 @@ using COG.Utils.Resolver;
 using COG.WinAPI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
 using Object = UnityEngine.Object;
@@ -69,6 +68,7 @@ public class CustomOption
         Selections = selections;
         var index = Array.IndexOf(selections, defaultValue);
         DefaultSelection = index >= 0 ? index : 0;
+        Selection = DefaultSelection;
         Parent = parent;
         IsHeader = isHeader;
         Type = type;
@@ -553,9 +553,9 @@ public class StringOptionPatch
         __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
         __instance.TitleText.text = option.Name;
 
-        if (FirstOpen)
-            __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
-        else
+        //if (FirstOpen)
+        //    __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
+        //else
             __instance.Value = __instance.oldValue = option.Selection;
 
         __instance.ValueText.text = option.Selections[option.Selection].ToString();

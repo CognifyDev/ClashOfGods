@@ -21,4 +21,12 @@ internal class HudManagerPatch
         foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
             listener.OnHudUpdate(__instance);
     }
+
+    [HarmonyPatch(nameof(HudManager.OnDestroy))]
+    [HarmonyPostfix]
+    public static void OnHudDestroy(HudManager __instance)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
+            listener.OnHudDestroy(__instance);
+    }
 }
