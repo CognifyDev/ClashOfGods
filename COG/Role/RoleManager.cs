@@ -37,7 +37,7 @@ public class RoleManager
 
     public Role? GetRoleByClassName(string name)
     {
-        return _roles.FirstOrDefault(role => role.GetType().Name.ToLower().Equals(name));
+        return _roles.FirstOrDefault(r => r.GetType().Name == name);
     }
 
     public Role? GetRoleById(int id)

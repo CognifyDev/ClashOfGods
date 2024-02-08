@@ -134,7 +134,7 @@ public static class PlayerUtils
         return player.GetRoleInstance() == role;
     }
 
-    public static DeadBody? GetClosestBody(List<DeadBody> untargetable)
+    public static DeadBody? GetClosestBody(List<DeadBody>? untargetable = null)
     {
         DeadBody? result = null;
 
@@ -142,7 +142,7 @@ public static class PlayerUtils
         if (!ShipStatus.Instance) return null;
         var position = PlayerControl.LocalPlayer.GetTruePosition();
 
-        foreach (var body in Object.FindObjectsOfType<DeadBody>().Where(b => !untargetable.Contains(b)))
+        foreach (var body in Object.FindObjectsOfType<DeadBody>().Where(b => untargetable != null ? untargetable.Contains(b) : true))
         {
             var vector = body.TruePosition - position;
             var magnitude = vector.magnitude;
