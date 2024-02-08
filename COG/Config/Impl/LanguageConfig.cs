@@ -93,7 +93,7 @@ public class LanguageConfig : Config
         Github = GetString("option.main.github");
         QQ = GetString("option.main.qq");
         Discord = GetString("option.main.discord");
-        BetaVersionRegisteredUserDisplay = GetString("option.main.beta-version-registered-user-display");
+        UpdateButtonString = GetString("option.main.update-button-string");
 
         MaxNumMessage = GetString("role.global.max-num");
         AllowStartMeeting = GetString("role.global.allow-start-meeting");
@@ -128,6 +128,9 @@ public class LanguageConfig : Config
         UnloadModButtonName = GetString("option.main.unload-mod.name");
         UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
         UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
+
+        UpToDate = GetString("option.main.update.up-to-date");
+        NonCheck = GetString("option.main.update.non-check");
     }
 
     public static LanguageConfig Instance { get; private set; }
@@ -172,7 +175,7 @@ public class LanguageConfig : Config
     public string CogOptions { get; private set; } = null!;
     public string LoadCustomLanguage { get; private set; } = null!;
     public string Github { get; private set; } = null!;
-    public string BetaVersionRegisteredUserDisplay { get; private set; } = null!;
+    public string UpdateButtonString { get; private set; } = null!;
 
     public string MaxNumMessage { get; private set; } = null!;
     public string AllowStartMeeting { get; private set; } = null!;
@@ -209,6 +212,10 @@ public class LanguageConfig : Config
     public string UnloadModButtonName { get; private set; } = null!;
     public string UnloadModSuccessfulMessage { get; private set; } = null!;
     public string UnloadModInGameErrorMsg { get; private set; } = null!;
+    
+    // Update
+    public string UpToDate { get; private set; } = null!;
+    public string NonCheck { get; private set; } = null!;
 
     private string GetString(string location)
     {

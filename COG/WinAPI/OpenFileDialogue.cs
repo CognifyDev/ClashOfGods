@@ -1,5 +1,4 @@
-﻿using COG.Utils;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace COG.WinAPI;

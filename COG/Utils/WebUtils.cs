@@ -2,7 +2,7 @@
 
 namespace COG.Utils;
 
-public class WebUtils
+public static class WebUtils
 {
     public static string GetWeb(string url)
     {

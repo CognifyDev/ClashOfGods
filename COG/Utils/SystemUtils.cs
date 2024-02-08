@@ -1,6 +1,7 @@
+using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
-using Il2CppSystem;
 using Microsoft.Win32;
 
 namespace COG.Utils;
@@ -47,5 +48,13 @@ public class SystemUtils
         }
 
         return value;
+    }
+
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
+
+    public static void OpenMessageBox(string text, string title)
+    {
+        MessageBox(IntPtr.Zero, text, title, 0x00000000 | 0x00000040);
     }
 }

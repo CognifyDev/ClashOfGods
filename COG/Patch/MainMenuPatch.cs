@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using COG.Config.Impl;
 using COG.Utils;
-using InnerNet;
+using COG.Utils.Version;
+using Il2CppSystem.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -42,11 +45,40 @@ public static class MainMenuPatch
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f),
             LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); },
             Color.gray);
+        
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
+            LanguageConfig.Instance.UpdateButtonString, async () =>
+            {
+                if (Main.LatestVersion.Equals(VersionInfo.Empty))
+                {
+                    SystemUtils.OpenMessageBox(LanguageConfig.Instance.NonCheck, "WARNING");
+                    return;
+                }
 
+                if (!Main.LatestVersion.IsNewerThan(Main.VersionInfo))
+                {
+                    SystemUtils.OpenMessageBox(LanguageConfig.Instance.UpToDate, "WARNING");
+                    return;
+                }
+
+#pragma warning disable SYSLIB0014
+                using var client = new WebClient();
+                client.DownloadFile(
+                    $"https://download.yzuu.cf/CognifyDev/ClashOfGods/releases/download/{Main.LatestVersion}/ClashOfGods.dll",
+                    "BepInEx/plugins/ClashOfGods.dll.new"
+                );
+                
+                File.WriteAllText("BepInEx/plugins/do.vbs", 
+                    "strFileToDelete = \"ClashOfGods.dll\"\nstrFileToRename = \"ClashOfGods.dll.new\"\nstrScriptToDelete = WScript.ScriptFullName\n\nSet fs = CreateObject(\"Scripting.FileSystemObject\")\n\nIf fs.FileExists(strFileToDelete) Then\n    fs.DeleteFile strFileToDelete\nEnd If\n\nIf fs.FileExists(strFileToRename) Then\n    fs.MoveFile strFileToRename, strFileToDelete\nEnd If\n\nIf fs.FileExists(strScriptToDelete) Then\n    fs.DeleteFile strScriptToDelete\nEnd If\n");
+
+                Process.Start("BepInEx/plugins/do.vbs");
+                Environment.Exit(0);
+            }, Color.yellow);
+/*
         if (Main.BetaVersion)
             CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
                 LanguageConfig.Instance.BetaVersionRegisteredUserDisplay.CustomFormat(Main.RegisteredBetaUsers.Count),
-                () => { }, Color.yellow);
+                () => { }, Color.yellow);*/
     }
 
     /// <summary>

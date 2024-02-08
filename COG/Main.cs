@@ -1,6 +1,5 @@
 ﻿global using Hazel;
 global using HarmonyLib;
-using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
@@ -32,6 +31,7 @@ using Reactor.Utilities.Extensions;
 using COG.WinAPI;
 using System.IO;
 using COG.Plugin.Manager;
+using Newtonsoft.Json.Linq;
 using UnityEngine.SceneManagement;
 using Mode = COG.WinAPI.OpenFileDialogue.OpenFileMode;
 
@@ -52,11 +52,13 @@ public partial class Main : BasePlugin
     public const string PluginGuid = "top.cog.clashofgods";
     public const string DisplayName = "ClashOfGods";
     public static VersionInfo VersionInfo { get; private set; } = null!;
+    public static VersionInfo LatestVersion { get; private set; } = null!;
+    
     public static ManualLogSource Logger = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
     public Harmony Harmony { get; } = new(PluginGuid);
 
-    public static List<string> RegisteredBetaUsers { get; private set; } = new();
+    // public static List<string> RegisteredBetaUsers { get; private set; } = new();
     public static bool BetaVersion { get; private set; }
 
     public static Main Instance { get; private set; } = null!;
@@ -106,7 +108,29 @@ public partial class Main : BasePlugin
             return;
         }
 
-        BetaVersion = PluginVersion.ToLower().Contains("beta") || PluginVersion.ToLower().Contains("dev");
+        string latestVersionString = null!;
+
+        try
+        {
+            var jsonObject =
+                JObject.Parse(WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest"));
+            var tagNameToken = jsonObject["tag_name"];
+            
+            if (tagNameToken is { Type: JTokenType.String })
+            {
+                latestVersionString = tagNameToken.ToString();
+            }
+        }
+        catch
+        {
+            // ignored
+        }
+
+        LatestVersion = latestVersionString == null ? VersionInfo.Empty : VersionInfo.NewVersionInfoInstanceByString(latestVersionString);
+
+        BetaVersion = PluginVersion.ToLower().Contains("beta") || PluginVersion.ToLower().Contains("dev"); 
+        
+        /*
         if (BetaVersion)
         {
             // 开始验证
@@ -123,7 +147,8 @@ public partial class Main : BasePlugin
                 return;
             }
         }
-
+*/
+        
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new[]
         {
@@ -191,12 +216,12 @@ public partial class Main : BasePlugin
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     if (AmongUsClient.Instance.GameState != InnerNetClient.GameStates.NotJoined)
                     {
-                        GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
+                        GameUtils.Popup!.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
                         return false;
                     }
 
                     Unload();
-                    GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
+                    GameUtils.Popup!.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }, false)
         });
@@ -238,7 +263,7 @@ public partial class Main : BasePlugin
         PlayerUtils.Players.Clear();
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
-        MainMenuPatch.CustomBG?.Destroy();
+        MainMenuPatch.CustomBG!.Destroy();
         PluginSingleton<ReactorPlugin>.Instance.Unload();
 
         foreach (var plugin in PluginManager.GetPlugins()) plugin.OnDisable();
