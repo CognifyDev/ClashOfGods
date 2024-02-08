@@ -2,7 +2,7 @@
 using COG.Utils;
 using NLua;
 
-namespace COG.Plugin.Loader.Controller.ClassType.Classes.Globe;
+namespace COG.Plugin.Loader.Controller.Classes.Globe;
 
 public class PluginController
 {

@@ -1,7 +1,7 @@
 ﻿using COG.Listener;
 using NLua;
 
-namespace COG.Plugin.Loader.Controller.ClassType.Classes.Listener;
+namespace COG.Plugin.Loader.Controller.Classes.Listener;
 
 public class ListenerController
 {
@@ -16,18 +16,18 @@ public class ListenerController
 
     public void RegisterListener(string functionName, int listenerType)
     {
-        ListenerManager.GetManager().RegisterListener(new Classes.Listener.Listener(Lua, _plugin, functionName, listenerType));
+        ListenerManager.GetManager().RegisterListener(new Controller.Classes.Listener.Listener(Lua, _plugin, functionName, listenerType));
     }
 
     public void UnRegisterListener(string functionName, int listenerType)
     {
-        var listener = Classes.Listener.Listener.GetListener(_plugin, functionName, listenerType);
+        var listener = Controller.Classes.Listener.Listener.GetListener(_plugin, functionName, listenerType);
         if (listener == null)
         {
             return;
         }
 
-        Classes.Listener.Listener.Listeners.Remove(listener);
+        Controller.Classes.Listener.Listener.Listeners.Remove(listener);
         ListenerManager.GetManager().UnregisterListener(listener);
     }
 }

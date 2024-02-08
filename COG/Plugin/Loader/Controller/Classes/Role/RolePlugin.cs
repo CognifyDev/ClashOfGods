@@ -2,7 +2,7 @@
 using COG.Role;
 using UnityEngine;
 
-namespace COG.Plugin.Loader.Controller.ClassType.Classes.Role;
+namespace COG.Plugin.Loader.Controller.Classes.Role;
 
 public class RolePlugin : COG.Role.Role
 {

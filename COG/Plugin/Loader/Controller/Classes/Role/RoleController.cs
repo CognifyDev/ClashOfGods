@@ -2,7 +2,7 @@
 using COG.Utils;
 using NLua;
 
-namespace COG.Plugin.Loader.Controller.ClassType.Classes.Role;
+namespace COG.Plugin.Loader.Controller.Classes.Role;
 
 public class RoleController
 {

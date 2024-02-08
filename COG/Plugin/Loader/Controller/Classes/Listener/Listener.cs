@@ -5,7 +5,7 @@ using COG.Listener;
 using InnerNet;
 using NLua;
 
-namespace COG.Plugin.Loader.Controller.ClassType.Classes.Listener;
+namespace COG.Plugin.Loader.Controller.Classes.Listener;
 
 public class Listener : IListener
 {

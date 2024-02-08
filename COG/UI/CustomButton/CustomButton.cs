@@ -301,8 +301,8 @@ public class CustomButton
         if (IsCustomPosition)
             if(Hud!.UseButton)
                 GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
-        else
-            ArrangePosition();
+            else
+                ArrangePosition();
     }
 
     public void OnMeetingEndSpawn()
@@ -395,9 +395,9 @@ public class CustomButton
         var buttons = GameObject.Find("Main Camera/Hud/BottomRight/Buttons");
         if (!buttons) return;
         AllButtons.Clear();
-        buttons.ForEachChild((Il2CppSystem.Action<GameObject>)((go) =>
+        buttons.ForEachChild(new Action<GameObject>(gameObject =>
         {
-            AllButtons.Add(go.GetComponent<ActionButton>());
+            AllButtons.Add(gameObject.GetComponent<ActionButton>());
         }));
     }
 
