@@ -76,6 +76,8 @@ public class CustomOption
         Options.Add(this);
     }
 
+    public CustomOption() { }
+
     public static CustomOption Create(int id, CustomOptionType type, string name, string[] selections,
         CustomOption? parent = null, bool isHeader = false)
     {

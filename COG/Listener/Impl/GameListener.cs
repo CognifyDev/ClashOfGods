@@ -264,7 +264,7 @@ public class GameListener : IListener
 
     public bool OnCheckGameEnd()
     {
-        return !GlobalCustomOption.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
+        return !GlobalCustomOption.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners() && !DestroyableSingleton<TutorialManager>.InstanceExists;
     }
 
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,
