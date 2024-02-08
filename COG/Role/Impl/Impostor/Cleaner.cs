@@ -5,8 +5,10 @@ using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
+using System;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace COG.Role.Impl.Impostor
 {
@@ -30,10 +32,10 @@ namespace COG.Role.Impl.Impostor
                 null,
                 null,
                 ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
-                CustomButton.ButtonPositions.LowerRowRight,
+                2,
                 KeyCode.C,
                 LanguageConfig.Instance.CleanAction,
-                CleanBodyCD != null ? CleanBodyCD.GetFloat : () => 30f,
+                CleanBodyCD.GetFloat,
                 0
             );
 
