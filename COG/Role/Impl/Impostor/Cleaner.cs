@@ -53,7 +53,7 @@ namespace COG.Role.Impl.Impostor
             CleanDeadBody(body);
         }
 
-        public void CleanDeadBody(DeadBody body) => body.gameObject.SetActive(false);
+        public void CleanDeadBody(DeadBody body) => body.gameObject.SetActive(false); // idk why it make PlayerControl.FixedUpdate() throw System.NullReferenceException when i destroy the body
 
         public void OnRPCReceived(byte callId, MessageReader reader)
         {
