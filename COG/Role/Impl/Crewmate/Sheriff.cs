@@ -10,11 +10,18 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Sheriff : Role, IListener
 {
-    public CustomOption SheriffKillCD = new();
+    public CustomOption SheriffKillCD { get; private set; } = new();
     public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate, true)
     {
         BaseRoleType = RoleTypes.Crewmate;
         Description = LanguageConfig.Instance.SheriffDescription;
+
+        if (ShowInOptions)
+        {
+            var parentID = MainRoleOption!.ID;
+            SheriffKillCD = CustomOption.Create(parentID + 1, CustomOption.CustomOptionType.Crewmate, LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
+        }
+
         var killButton = CustomButton.Create(
             () =>
             {
@@ -37,16 +44,11 @@ public class Sheriff : Role, IListener
             CustomButton.ButtonPositions.UpperRowRight,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            15f,
+            SheriffKillCD.GetFloat,
             -1
         );
-        AddButton(killButton);
 
-        if (ShowInOptions)
-        {
-            var parentID = MainRoleOption!.ID;
-            SheriffKillCD = CustomOption.Create(parentID+1,CustomOption.CustomOptionType.Crewmate,)
-        }
+        AddButton(killButton);
     }
 
     public bool OnPlayerMurder(PlayerControl killer, PlayerControl target)
