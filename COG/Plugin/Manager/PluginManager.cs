@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using COG.Exception.Plugin;
 using COG.Plugin.Loader;

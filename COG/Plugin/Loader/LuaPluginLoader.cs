@@ -1,9 +1,11 @@
+#pragma warning disable SYSLIB0014
 using System;
 using System.IO;
 using System.Net;
 using System.Text;
 using COG.Exception.Plugin;
 using COG.Plugin.Loader.Controller.ClassType.Classes.Globe;
+using COG.Plugin.Loader.Controller.ClassType.Classes.Listener;
 using COG.Plugin.Loader.Controller.Function;
 using COG.Utils;
 using NLua;
@@ -96,9 +98,8 @@ public class LuaPluginLoader : IPlugin
         LuaController["IS_BETA_VERSION"] = Main.VersionInfo.Beta;
 
         LuaController["controller"] = new PluginController(LuaController, this);
-#pragma warning disable SYSLIB0014
         LuaController["web"] = new WebClient();
-#pragma warning restore SYSLIB0014
+        LuaController["listenerController"] = new ListenerController(LuaController, this);
 
         // register methods
         var functionsType = typeof(Functions);
@@ -110,26 +111,9 @@ public class LuaPluginLoader : IPlugin
             if (attributes[0] is FunctionRegisterAttribute functionRegisterAttribute)
                 LuaController.RegisterFunction(functionRegisterAttribute.FunctionName, null, methodInfo);
         }
-        /*
+        
         // register class types
-        var assembly = Assembly.Load("ClashOfGods");
-        var types = assembly.GetTypes().Where(
-            type => type.Namespace != null
-                    && type.Namespace.ToLower().StartsWith("COG.Plugin.Loader.Controller.ClassType")
-                    && type.GetCustomAttributes(typeof(ClassRegisterAttribute), false).Length > 0
-                    && type.IsClass
-            )
-            .ToArray();
-        Main.Logger.LogInfo($"{types.Length} were found to register");
-        foreach (var type in types)
-        {
-            var attributes = type.GetCustomAttributes(typeof(ClassRegisterAttribute), false);
-            if (attributes[0] is ClassRegisterAttribute classRegisterAttribute)
-            {
-                LuaController[classRegisterAttribute.ClassName] = ;
-            }
-        }
-        */
+        // LuaController.RegisterLuaClassType();
     }
 
     public void OnEnable()

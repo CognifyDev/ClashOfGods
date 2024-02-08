@@ -51,7 +51,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Plugin\Loader\Controller\ClassType\Classes\Listener\"/>
+      <Folder Include="Plugin\Loader\Controller\ClassType\Classes\Role\" />
     </ItemGroup>
 
 

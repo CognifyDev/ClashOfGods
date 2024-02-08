@@ -173,7 +173,7 @@ public class GameListener : IListener
 
     public bool OnSetUpRoleText(IntroCutscene intro, ref IEnumerator roles)
     {
-        Main.Logger.LogInfo("Setup role text for players...");
+        Main.Logger.LogInfo("Setup role text for the player...");
 
         var myRole = GameUtils.GetLocalPlayerRole();
         if (myRole == null) return true;

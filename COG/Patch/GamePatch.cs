@@ -159,7 +159,7 @@ internal class GameStartPatch
 {
     public static void Postfix(GameManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameStart(__instance);
+        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameStartWithMovement(__instance);
     }
 }
 
