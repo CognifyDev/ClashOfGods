@@ -1,4 +1,5 @@
-﻿using COG.Listener;
+﻿using COG.Config.Impl;
+using COG.Listener;
 using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
@@ -13,11 +14,9 @@ namespace COG.Role.Impl.Impostor
     {
         public CustomOption CleanBodyCD { get; init; } = new();
         public CustomButton CleanBodyButton { get; init; } = new();
-        public Cleaner() : base("Cleaner", Palette.ImpostorRed, CampType.Impostor, true)
+        public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
         {
-            Description = "Clean the dead bodies";
-
-            Debug = true;
+            Description = LanguageConfig.Instance.CleanerDescription;
 
             CleanBodyButton = CustomButton.Create(
                 () =>
@@ -29,10 +28,10 @@ namespace COG.Role.Impl.Impostor
                 CleanBodyButton.ResetCooldown,
                 null,
                 null,
-                ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 90f)!,
+                ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
                 CustomButton.ButtonPositions.LowerRowRight,
                 KeyCode.C,
-                "Clean",
+                LanguageConfig.Instance.CleanAction,
                 CleanBodyCD != null ? CleanBodyCD.GetFloat : () => 30f,
                 0
             );
@@ -42,15 +41,15 @@ namespace COG.Role.Impl.Impostor
             if (ShowInOptions)
             {
                 var headerID = MainRoleOption!.ID;
-                CleanBodyCD = CustomOption.Create(headerID + 1, CustomOption.CustomOptionType.Impostor, "Cleaning Cooldown", 30f, 30f, 60f, 5f, MainRoleOption);
+                CleanBodyCD = CustomOption.Create(headerID + 1, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
             }
         }
 
         public void RpcCleanDeadBody(DeadBody body)
         {
-            //var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.CleanDeadBody);
-            //writer.Write(body.ParentId);
-            //writer.Finish();
+            var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.CleanDeadBody);
+            writer.Write(body.ParentId);
+            writer.Finish();
             CleanDeadBody(body);
         }
 
