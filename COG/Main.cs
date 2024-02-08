@@ -149,6 +149,9 @@ public partial class Main : BasePlugin
         }
 */
         
+        // Load plugins
+        PluginManager.LoadPlugins();
+        
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new[]
         {
@@ -244,9 +247,6 @@ public partial class Main : BasePlugin
         GlobalCustomOption.Init();
 
         Harmony.PatchAll();
-
-        // Load plugins
-        PluginManager.LoadPlugins();
 
         foreach (var plugin in PluginManager.GetPlugins()) plugin.OnEnable();
     }

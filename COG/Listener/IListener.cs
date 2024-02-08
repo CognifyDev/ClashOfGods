@@ -79,7 +79,7 @@ public interface IListener
     ///     游戏真正开始（玩家可移动）时触发
     /// </summary>
     /// <param name="manager"></param>
-    void OnGameStart(GameManager manager)
+    void OnGameStartWithMovement(GameManager manager)
     {
     }
 
@@ -235,7 +235,5 @@ public interface IListener
     {
     }
 
-    private class EmptyListener : IListener
-    {
-    }
+    private class EmptyListener : IListener { }
 }
