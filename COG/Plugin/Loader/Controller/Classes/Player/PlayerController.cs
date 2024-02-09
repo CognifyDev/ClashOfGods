@@ -18,7 +18,7 @@ public class PlayerController
     public COG.Role.Role GetRoleByPlayer(PlayerControl playerControl) => playerControl.GetRoleInstance()!;
 
     public void KillPlayer(PlayerControl playerControl) =>
-        playerControl.MurderPlayer(playerControl, MurderResultFlags.Succeeded);
+        playerControl.MurderPlayer(playerControl, GameUtils.DefaultFlag);
 
     public PlayerControl GetRandomPlayer()
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using COG.UI.CustomButton;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static UnityEngine.UI.GridLayoutGroup;
 using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomButton;
@@ -40,6 +40,7 @@ public class CustomButton
     public int UsesRemaining;
     public bool IsCustomPosition;
     public int Row;
+    public int Order;
 
     public static bool Inited = false;
     private static List<ActionButton> AllButtons = new();
@@ -125,10 +126,11 @@ public class CustomButton
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool>? couldUse,
         Func<bool>? hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, float cooldown,
-        float effectTime, int usesLimit, string hotkeyName = "")
+        float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
-            true, cooldown, effectTime, usesLimit, hotkeyName);
+            true, cooldown, effectTime, usesLimit, hotkeyName)
+        { Order = order };
     }
 
     /// <summary>
@@ -161,10 +163,11 @@ public class CustomButton
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool>? couldUse, Func<bool>? hasButton,
         Sprite sprite, Vector3 position, KeyCode? hotkey, string text, float cooldown, int usesLimit,
-        string hotkeyName = "")
+        string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text,
-            false, cooldown, -1f, usesLimit, hotkeyName);
+            false, cooldown, -1f, usesLimit, hotkeyName)
+        { Order = order };
     }
 
     /// <summary>
@@ -184,45 +187,59 @@ public class CustomButton
     ///     在游戏中创建一个按钮 (Non-effect)
     /// </summary>
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
+    /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool>? couldUse, Func<bool>? hasButton,
         Sprite sprite, int row, KeyCode? hotkey, string text, float cooldown, int usesLimit,
-        string hotkeyName = "")
+        string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, null, hotkey, text,
-            false, cooldown, -1f, usesLimit, hotkeyName) 
-        { Row = row };
+            false, cooldown, -1f, usesLimit, hotkeyName)
+        {
+            Row = row,
+            Order = order
+        };
     }
 
     /// <summary>
     ///     在游戏中创建一个按钮 (Effect)
     /// </summary>
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
+    /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool>? couldUse,
         Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, float cooldown,
-        float effectTime, int usesLimit, string hotkeyName = "")
+        float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
             true, cooldown, effectTime, usesLimit, hotkeyName)
-        { Row = row };
+        {
+            Row = row,
+            Order = order
+        };
     }
 
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool>? couldUse, Func<bool>? hasButton,
         Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit,
-        string hotkeyName = "")
+        string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, null, hotkey, text,
             false, cooldown, -1f, usesLimit, hotkeyName)
-        { Row = row };
+        { 
+            Row = row, 
+            Order = order
+        };
     }
 
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool>? couldUse,
         Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown,
-        float effectTime, int usesLimit, string hotkeyName = "")
+        float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
             true, cooldown, effectTime, usesLimit, hotkeyName)
-        { Row = row };
+        { 
+            Row = row ,
+            Order = order
+        };
     }
 
     public void SetActive(bool active)
@@ -298,17 +315,8 @@ public class CustomButton
 
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) CheckClick();
 
-        if (IsCustomPosition)
-        {
-            if (Hud!.UseButton)
-            {
+        if (IsCustomPosition && Hud!.UseButton)
                 GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
-            }
-        }
-        else
-        {
-            ArrangePosition();
-        }
     }
 
     public void OnMeetingEndSpawn()
@@ -344,16 +352,24 @@ public class CustomButton
         }
     }
 
-    internal void ArrangePosition() // TODO：修复在有1个以上自定义按钮的情况下按钮重叠的问题
+    internal static void ArrangePosition()
     {
-        if (!IsCustomPosition) return;
-        var y = 2 - Row;
-        var rowBtnPos = AllButtons.Where(b => b.isActiveAndEnabled).Select(b => b.transform.localPosition).Where(p => p.y == y).OrderBy(p => p.x).ToList();
+        var vectors = AllButtons.Where(b => b.isActiveAndEnabled).Select(b => b.transform.localPosition);
+        int idx = 0;
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons().Where(b => b.ActionButton.isActiveAndEnabled).OrderBy(b => b.Order))
+        {
+            idx++;
+            if (!btn.IsCustomPosition) return;
+            var row = btn.Row;
+            if (row != 1 && row != 2) btn.Row = 2;
+            var y = 2 - btn.Row;
+            var rowBtnPos = vectors.Where(p => p.y == y).OrderBy(p => p.x).ToList();
 
-        var x = rowBtnPos.FirstOrDefault().x;
-        var z = rowBtnPos.FirstOrDefault().z;
-        var pos = new Vector3(x - 1, y, z);
-        GameObject.transform.localPosition = Position = pos;
+            var x = rowBtnPos.FirstOrDefault().x;
+            var z = rowBtnPos.FirstOrDefault().z;
+            var pos = new Vector3(x - idx, y, z);
+            btn.GameObject.transform.localPosition = btn.Position = pos;
+        }
     }
 
 #nullable enable
@@ -392,7 +408,6 @@ public class CustomButton
 
             button.PassiveButton.OnClick.AddListener((UnityAction)button.CheckClick);
             button.SetActive(false);
-            button.ArrangePosition();
         }
         Inited = true;
     }
@@ -411,7 +426,7 @@ public class CustomButton
 
     // Position from The Other Roles
     // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Objects/CustomButton.cs#L40
-    [Obsolete("Recommend to use CustomButton.ArrangePosition() to set button positions.")]
+    [Obsolete("Recommend to use CustomButton.ArrangePosition() to set button positions automatically.")]
     public static class ButtonPositions
     {
         public static readonly Vector3

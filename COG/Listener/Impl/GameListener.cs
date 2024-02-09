@@ -208,7 +208,7 @@ public class GameListener : IListener
             intro.ourCrewmate.ToggleName(false);
         }
 
-        list.Add(Effects.Action((Action)(System.Action?)SetupRoles));
+        list.Add(Effects.Action((Action)SetupRoles));
         list.Add(Effects.Wait(2.5f));
 
         void Action()
@@ -219,7 +219,7 @@ public class GameListener : IListener
             intro.ourCrewmate.gameObject.SetActive(false);
         }
 
-        list.Add(Effects.Action((Action)(System.Action?)Action));
+        list.Add(Effects.Action((Action)Action));
 
         roles = Effects.Sequence(list.ToArray());
         return false;
@@ -264,7 +264,7 @@ public class GameListener : IListener
 
     public bool OnCheckGameEnd()
     {
-        return !GlobalCustomOption.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners() && AmongUsClient.Instance.NetworkMode != NetworkModes.FreePlay;
+        return !GlobalCustomOption.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,

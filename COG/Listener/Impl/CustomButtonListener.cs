@@ -1,5 +1,4 @@
 ﻿using COG.UI.CustomButton;
-using COG.UI.CustomButton;
 
 namespace COG.Listener.Impl;
 
@@ -15,6 +14,7 @@ internal class CustomButtonListener : IListener
     {
         if (!CustomButton.Inited) return;
         CustomButton.GetAllButtons();
+        CustomButton.ArrangePosition();
         foreach (var button in CustomButtonManager.GetManager().GetButtons()) button.Update();
     }
 
