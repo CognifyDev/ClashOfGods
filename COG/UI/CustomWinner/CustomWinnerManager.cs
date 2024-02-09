@@ -50,6 +50,7 @@ public static class CustomWinnerManager
 
     internal static bool CheckEndForCustomWinners()
     {
+        if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay) return false;
         // 按照权重从大到小排序
         CustomWinners.Sort((first, second) => second.GetWeight().CompareTo(first.GetWeight()));
         return CustomWinners.All(customWinner => !customWinner.CanWin());
