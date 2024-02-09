@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using COG.UI.CustomButtons;
+using COG.UI.CustomButton;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -299,10 +299,16 @@ public class CustomButton
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) CheckClick();
 
         if (IsCustomPosition)
-            if(Hud!.UseButton)
+        {
+            if (Hud!.UseButton)
+            {
                 GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
-            else
-                ArrangePosition();
+            }
+        }
+        else
+        {
+            ArrangePosition();
+        }
     }
 
     public void OnMeetingEndSpawn()
@@ -342,7 +348,8 @@ public class CustomButton
     {
         if (!IsCustomPosition) return;
         var y = 2 - Row;
-        var rowBtnPos = AllButtons.Where(b=>b.isActiveAndEnabled).Select(b => b.transform.localPosition).Where(p => p.y == y).OrderBy(p => p.x).ToList();
+        var rowBtnPos = AllButtons.Where(b => b.isActiveAndEnabled).Select(b => b.transform.localPosition).Where(p => p.y == y).OrderBy(p => p.x).ToList();
+
         var x = rowBtnPos.FirstOrDefault().x;
         var z = rowBtnPos.FirstOrDefault().z;
         var pos = new Vector3(x - 1, y, z);

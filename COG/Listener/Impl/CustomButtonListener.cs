@@ -1,5 +1,5 @@
 ﻿using COG.UI.CustomButton;
-using COG.UI.CustomButtons;
+using COG.UI.CustomButton;
 
 namespace COG.Listener.Impl;
 

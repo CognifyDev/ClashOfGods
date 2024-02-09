@@ -1,7 +1,7 @@
 using System.Linq;
 using COG.Listener;
 using COG.States;
-using COG.UI.CustomButtons;
+using COG.UI.CustomButton;
 using InnerNet;
 using UnityEngine;
 
