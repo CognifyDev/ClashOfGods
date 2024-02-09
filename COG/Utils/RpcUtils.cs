@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using COG.Rpc;
 using InnerNet;
 
@@ -12,10 +13,13 @@ public abstract class RpcUtils
         PlayerControl[]? targets = null)
     {
         var writers = new List<MessageWriter>();
-        targets ??= PlayerUtils.GetAllPlayers().ToArray();
+        targets ??= PlayerUtils.GetAllPlayers().Where(p => p != PlayerControl.LocalPlayer).ToArray();
         foreach (var control in targets)
+        {
             writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable,
                 control.GetClientID()));
+            Main.Logger.LogInfo($"Rpc {callId} sent to {control.name}({control.PlayerId})");
+        }
 
         return new RpcWriter(writers.ToArray());
     }

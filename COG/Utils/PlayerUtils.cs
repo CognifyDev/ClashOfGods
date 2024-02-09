@@ -21,8 +21,6 @@ public enum ColorType
 
 public static class PlayerUtils
 {
-    internal static readonly List<PlayerControl> Players = new();
-
     public static List<PlayerRole> AllImpostors =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor).ToListCustom();
 
@@ -31,11 +29,6 @@ public static class PlayerUtils
 
     public static List<PlayerRole> AllNeutrals =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Neutral).ToListCustom();
-
-    public static List<PlayerControl> GetAllPlayers()
-    {
-        return Players.ToArray().Where(player => player != null).ToListCustom();
-    }
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家
@@ -66,10 +59,11 @@ public static class PlayerUtils
         return closestPlayer;
     }
 
+    public static List<PlayerControl> GetAllPlayers() => new(PlayerControl.AllPlayerControls.ToArray());
 
     public static List<PlayerControl> GetAllAlivePlayers()
     {
-        return Players.ToArray().Where(player => player != null && player.IsAlive()).ToListCustom();
+        return GetAllPlayers().ToArray().Where(player => player != null && player.IsAlive()).ToListCustom();
     }
 
     public static bool IsSamePlayer(this GameData.PlayerInfo info, GameData.PlayerInfo target)

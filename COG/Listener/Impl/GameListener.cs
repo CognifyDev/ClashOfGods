@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Role;
@@ -11,6 +12,7 @@ using COG.Utils;
 using Il2CppSystem;
 using Il2CppSystem.Collections;
 using UnityEngine;
+using Convert = System.Convert;
 
 namespace COG.Listener.Impl;
 
@@ -28,6 +30,11 @@ public class GameListener : IListener
         Main.Logger.LogInfo("Game started!");
 
         if (!AmongUsClient.Instance.AmHost) return;
+        
+        Main.Logger.LogInfo("Select roles for players...");
+        SelectRoles();
+        Main.Logger.LogInfo("Share roles for players...");
+        ShareRoles();
 
         foreach (var playerRole in GameUtils.PlayerRoleData)
             RoleManager.Instance.SetRole(playerRole.Player, playerRole.Role.BaseRoleType);
@@ -44,18 +51,16 @@ public class GameListener : IListener
                 // 清除原列表，防止干扰
                 GameUtils.PlayerRoleData.Clear();
                 // 开始读入数据
-                var count = reader.ReadInt32(); // 读入玩家与职业的数量
-                for (var i = 0; i > count; i++)
-                {
-                    var pId = reader.ReadPackedInt32(); // 读取接收的玩家Id
-                    var rId = reader.ReadPackedInt32(); // 读取该玩家的职业特征码
-                    var player = PlayerUtils.GetPlayerById((byte)pId);
-                    var role = Role.RoleManager.GetManager().GetRoleById(rId);
-                    if (!player || role == null) continue;
-                    GameUtils.PlayerRoleData.Add(new PlayerRole(player!, role));
-                }
-                
                 Main.Logger.LogInfo("The role data from the host was received by us.");
+
+                var originalText = reader.ReadString()!;
+                foreach (var s in originalText.Split(","))
+                {
+                    var texts = s.Split("|");
+                    var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
+                    var role = Role.RoleManager.GetManager().GetRoleByClassName(texts[1]);
+                    GameUtils.PlayerRoleData.Add(new PlayerRole(player!, role!));
+                }
                 
                 foreach (var playerRole in GameUtils.PlayerRoleData)
                 {
@@ -198,11 +203,6 @@ public class GameListener : IListener
         // 改变按钮颜色
         manager.MakePublicButton.color = Palette.DisabledClear;
         manager.privatePublicText.color = Palette.DisabledClear;
-
-        PlayerUtils.Players.Clear();
-        foreach (var player in PlayerControl.AllPlayerControls)
-            if (player != null)
-                PlayerUtils.Players.Add(player);
     }
 
     public bool OnMakePublic(GameStartManager manager)
@@ -301,7 +301,6 @@ public class GameListener : IListener
         // 取消已经注册的Listener
         foreach (var roleListener in RoleListeners) ListenerManager.GetManager().UnregisterListener(roleListener);
         RoleListeners.Clear();
-        SharedRoles = false;
     }
 
     public bool OnCheckGameEnd()
@@ -397,29 +396,35 @@ public class GameListener : IListener
     {
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
 
-        // ready for share roles
-        writer.Write(GameUtils.PlayerRoleData.Count);
-        foreach (var playerRole in GameUtils.PlayerRoleData)
+        var sb = new StringBuilder();
+        
+        for (var i = 0; i < GameUtils.PlayerRoleData.Count; i++)
         {
-            writer.WritePacked(playerRole.Player.PlayerId);
-            writer.WritePacked(playerRole.Role.Id);
+            var playerRole = GameUtils.PlayerRoleData[i];
+            sb.Append(playerRole.Player.PlayerId + "|" + playerRole.Role.GetType().Name);
+
+            if (i + 1 < GameUtils.PlayerRoleData.Count)
+            {
+                sb.Append(',');
+            }
         }
+        
+        writer.Write(sb.ToString());
+        
+        // 职业格式应该是
+        // playerId1|roleId1,playerId2|roleId2 
 
         writer.Finish();
     }
-
-    private static bool SharedRoles { get; set; }
-
+    
+/*
     public void OnGameStartManagerUpdate(GameStartManager manager)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        if (manager.countDownTimer is > 0 and < 1f && !SharedRoles)
+        if (manager.countDownTimer is > 0 and < 1f)
         {
-            Main.Logger.LogInfo("Select roles for players...");
-            SelectRoles();
-            Main.Logger.LogInfo("Share roles for players...");
-            ShareRoles();
-            SharedRoles = true;
+            
         }
     }
+    */
 }

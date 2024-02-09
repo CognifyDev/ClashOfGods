@@ -42,7 +42,7 @@ public class RoleManager
 
     public Role? GetRoleById(int id)
     {
-        return _roles.FirstOrDefault(role => role.Id.Equals(id));
+        return _roles.FirstOrDefault(role => role.Id == id);
     }
 
     /// <summary>

@@ -126,6 +126,7 @@ public sealed class CustomOption
     // TODO 要重写
     public static void ShareOptionChange()
     {
+        return;
         if (PlayerControl.AllPlayerControls.Count <= 1 || PlayerControl.LocalPlayer == null ||
             !AmongUsClient.Instance.AmHost) return;
 

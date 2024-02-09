@@ -268,7 +268,6 @@ public partial class Main : BasePlugin
         SidebarTextManager.GetManager().GetSidebarTexts().Clear();
         CustomWinnerManager.AllWinners.Clear();
         CustomWinnerManager.CustomWinners.Clear();
-        PlayerUtils.Players.Clear();
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
         MainMenuPatch.CustomBG!.Destroy();
