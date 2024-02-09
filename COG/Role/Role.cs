@@ -20,6 +20,7 @@ public abstract class Role
     protected Role(string name, Color color, CampType campType, bool showInOptions)
     {
         Name = name;
+        BaseRole = false;
         Description = "";
         Color = color;
         CampType = campType;
@@ -55,6 +56,11 @@ public abstract class Role
     ///     角色名称
     /// </summary>
     public string Name { get; }
+    
+    /// <summary>
+    ///     是否是基本职业
+    /// </summary>
+    public bool BaseRole { get; protected init; }
 
     /// <summary>
     ///     角色介绍
