@@ -150,7 +150,14 @@ public partial class Main : BasePlugin
 */
         
         // Load plugins
-        PluginManager.LoadPlugins();
+        try
+        {
+            PluginManager.LoadPlugins();
+        }
+        catch (System.Exception e)
+        {
+            Logger.LogError(e.Message);
+        }
         
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new[]

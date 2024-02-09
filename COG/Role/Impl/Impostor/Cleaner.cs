@@ -5,7 +5,6 @@ using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
-using System;
 using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -14,8 +13,8 @@ namespace COG.Role.Impl.Impostor
 {
     public class Cleaner : Role, IListener
     {
-        public CustomOption CleanBodyCD { get; init; } = new();
-        public CustomButton CleanBodyButton { get; init; } = new();
+        public CustomOption CleanBodyCD { get; } = new();
+        public CustomButton CleanBodyButton { get; } = new();
         public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
         {
             Description = LanguageConfig.Instance.CleanerDescription;

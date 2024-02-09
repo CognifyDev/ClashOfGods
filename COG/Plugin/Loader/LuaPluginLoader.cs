@@ -65,6 +65,11 @@ public class LuaPluginLoader : IPlugin
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a legal plugin");
         }
 
+        LuaController.DoString("""
+                               
+                               		import = function () end
+                               	
+                               """);
         LuaController.DoFile(ScriptPath + "\\" + _mainClass);
         if (!CheckPlugin())
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a correct plugin with functions");

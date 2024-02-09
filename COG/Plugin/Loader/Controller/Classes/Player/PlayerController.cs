@@ -1,4 +1,5 @@
-﻿using COG.Utils;
+﻿using System;
+using COG.Utils;
 using NLua;
 
 namespace COG.Plugin.Loader.Controller.Classes.Player;
@@ -18,4 +19,11 @@ public class PlayerController
 
     public void KillPlayer(PlayerControl playerControl) =>
         playerControl.MurderPlayer(playerControl, MurderResultFlags.Succeeded);
+
+    public PlayerControl GetRandomPlayer()
+    {
+        var random = new Random();
+        var players = PlayerUtils.GetAllPlayers();
+        return players[random.Next(0, players.Count - 1)];
+    }
 }
