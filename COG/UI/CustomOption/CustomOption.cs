@@ -25,7 +25,7 @@ namespace COG.UI.CustomOption;
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
 [Serializable]
 [DataContract]
-public class CustomOption
+public sealed class CustomOption
 {
     [Serializable]
     public enum CustomOptionType
@@ -59,6 +59,11 @@ public class CustomOption
 
     [DataMember] public readonly CustomOptionType Type;
 
+    public readonly int CharacteristicCode;
+
+    public static CustomOption? GetCustomOptionByCharacteristicCode(int characteristicCode)
+        => Options.FirstOrDefault(customOption => customOption != null && customOption.CharacteristicCode == characteristicCode);
+
     // Option creation
     public CustomOption(int id, CustomOptionType type, string name, object[] selections,
         object defaultValue, CustomOption? parent, bool isHeader)
@@ -74,6 +79,8 @@ public class CustomOption
         Type = type;
         Selection = 0;
         Options.Add(this);
+
+        CharacteristicCode = GetHashCode();
     }
 
     public CustomOption() { }
@@ -130,7 +137,7 @@ public class CustomOption
 
         var options = WriteOptionsToByteArray();
 
-        writer.Write(options.Length - 2); //两个预设用的选项不计算在内
+        writer.Write(options.Length - 2); // 两个预设用的选项不计算在内
 
         foreach (var option in options)
         {
