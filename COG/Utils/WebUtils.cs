@@ -23,8 +23,9 @@ public static class WebUtils
             // 返回网页源代码
             return responseBody;
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException e)
         {
+            Main.Logger.LogError(e.Message);
         }
 
         // 请求失败时返回空字符串
