@@ -7,7 +7,14 @@ internal class CustomButtonListener : IListener
     public void OnHudStart(HudManager? hud)
     {
         CustomButton.Inited = false;
-        CustomButton.Init(hud);
+        try
+        {
+            CustomButton.Init(hud);
+        }
+        catch
+        {
+            // ignored
+        }
     }
 
     public void OnHudUpdate(HudManager manager)

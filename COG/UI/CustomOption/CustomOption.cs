@@ -123,6 +123,7 @@ public sealed class CustomOption
             select serializableCustomOption.SerializeToData()).ToArray();
     }
 
+    // TODO 要重写
     public static void ShareOptionChange()
     {
         if (PlayerControl.AllPlayerControls.Count <= 1 || PlayerControl.LocalPlayer == null ||

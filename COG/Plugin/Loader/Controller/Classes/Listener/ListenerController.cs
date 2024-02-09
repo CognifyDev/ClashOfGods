@@ -16,7 +16,7 @@ public class ListenerController
 
     public void RegisterListener(string functionName, int listenerType)
     {
-        ListenerManager.GetManager().RegisterListener(new Controller.Classes.Listener.Listener(Lua, _plugin, functionName, listenerType));
+        ListenerManager.GetManager().RegisterListener(new Listener(Lua, _plugin, functionName, listenerType));
     }
 
     public void UnRegisterListener(string functionName, int listenerType)

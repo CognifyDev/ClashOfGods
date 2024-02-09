@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using COG.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using static UnityEngine.UI.GridLayoutGroup;
 using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomButton;
@@ -13,7 +13,7 @@ namespace COG.UI.CustomButton;
 public class CustomButton
 {
     public ActionButton? ActionButton;
-    public Func<float> Cooldown;
+    public Func<float> Cooldown = () => GameUtils.GetGameOptions().KillCooldown;
     public Func<bool>? CouldUse;
     public float EffectTime;
     public GameObject? GameObject;
