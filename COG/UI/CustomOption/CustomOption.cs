@@ -106,27 +106,9 @@ public sealed class CustomOption
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
             defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
-
-
-    public static void LoadOptionsFromByteArray(byte[][] data)
+    
+    public static void ShareConfigs(PlayerControl target)
     {
-        Options.Clear();
-        foreach (var bytes in data) Options.Add(bytes.DeserializeToData<SerializableCustomOption>().ToCustomOption());
-    }
-
-    public static byte[][] WriteOptionsToByteArray()
-    {
-        return (from customOption in Options
-            where customOption != null && customOption.ID != -1 && customOption.ID != -2 //非空且不是预设用选项
-            select new SerializableCustomOption(customOption)
-            into serializableCustomOption
-            select serializableCustomOption.SerializeToData()).ToArray();
-    }
-
-    // TODO 要重写
-    public static void ShareOptionChange()
-    {
-        return;
         if (PlayerControl.AllPlayerControls.Count <= 1 || PlayerControl.LocalPlayer == null ||
             !AmongUsClient.Instance.AmHost) return;
 
@@ -135,41 +117,31 @@ public sealed class CustomOption
         var localPlayer = PlayerControl.LocalPlayer;
 
         // 新建写入器
-        var writer = RpcUtils.StartRpcImmediately(localPlayer, (byte)KnownRpc.ShareOptions);
+        var writer = RpcUtils.StartRpcImmediately(localPlayer, (byte)KnownRpc.ShareOptions, new []{target});
+        
 
-        var options = WriteOptionsToByteArray();
+        var sb = new StringBuilder();
+ 
+        int[] unusedOptionIdList = {-1, -2};
 
-        writer.Write(options.Length - 2); // 两个预设用的选项不计算在内
-
-        foreach (var option in options)
+        for (var i = 0; i < Options.Count; i++)
         {
-            writer.Write(option.Length);
-            writer.Write(option);
+            var option = Options[i];
+            if (option == null) continue;
+            if (option.Selection == option.DefaultSelection) continue;
+            if (unusedOptionIdList.Contains(option.ID)) continue;
+
+            sb.Append(option.ID + "|" + option.Selection);
+            if (i + 1 < Options.Count)
+            {
+                sb.Append(',');
+            }
         }
+        
+        // id|selection,id|selection
 
         // OK 现在进行一个结束
         writer.Finish();
-
-        /*
-        return;
-        var option = Options.FirstOrDefault(x => x.ID == optionId);
-        if (option == null) return;
-        var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)KnownRpc.ShareOptions, SendOption.Reliable);
-        writer.Write((byte)1);
-        writer.WritePacked((uint)option.ID);
-        writer.WritePacked(Convert.ToUInt32(option.Selection));
-        AmongUsClient.Instance.FinishRpcImmediately(writer);*/
-    }
-
-    public static void ShareOptionSelections()
-    {
-        // 开局共享的游戏设置
-        ShareOptionChange();
-        /*
-        return;
-        if (PlayerControl.AllPlayerControls.Count <= 1 || AmongUsClient.Instance!.AmHost == false && PlayerControl.LocalPlayer == null) return;
-        Main.Logger.LogInfo("Start to share CustomOptions for online players...");
-        */
     }
 
     public static void LoadOptionFromPreset(string path)
@@ -253,8 +225,14 @@ public sealed class CustomOption
             stringOption.oldValue = stringOption.Value = Selection;
             stringOption.ValueText.text = Selections[Selection].ToString();
 
-            ShareOptionChange();
+            ShareOptionChange(newSelection);
         }
+    }
+
+    public void ShareOptionChange(int newSelection)
+    {
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.UpdateOption);
+        writer.Write(ID + "|" + newSelection);
     }
 
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
@@ -572,7 +550,7 @@ public class StringOptionPatch
         return false;
     }
 }
-
+/*
 [HarmonyPatch]
 public abstract class SyncSettingPatch
 {
@@ -580,17 +558,18 @@ public abstract class SyncSettingPatch
     [HarmonyPostfix]
     public static void SyncSetting()
     {
-        ShareOptionSelections();
+        // ShareConfigs();
+        // Main.Logger.LogError("1");
     }
 
     [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoSpawnPlayer))]
     [HarmonyPostfix]
     public static void SyncOnSpawnPlayer()
     {
-        if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost) ShareOptionSelections();
+        if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost) ShareConfigs();
     }
 }
-
+*/
 [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Update))]
 internal class GameOptionsMenuUpdatePatch
 {

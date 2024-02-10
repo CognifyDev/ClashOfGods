@@ -6,7 +6,6 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using COG.States;
-using COG.UI.CustomOption;
 using COG.UI.CustomWinner;
 using COG.Utils;
 using Il2CppSystem;
@@ -69,19 +68,6 @@ public class GameListener : IListener
                 }
 
                 break;
-            case KnownRpc.ShareOptions:
-                var length = reader.ReadInt32();
-                var options = new byte[length][];
-
-                for (var i = 0; i < length; i++)
-                {
-                    var arrayLength = reader.ReadInt32();
-                    byte[] option = reader.ReadBytes(arrayLength);
-                    options[i] = option;
-                }
-
-                CustomOption.LoadOptionsFromByteArray(options);
-                break;
         }
     }
 
@@ -95,44 +81,8 @@ public class GameListener : IListener
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
         }
     }
-
-    // TODO 这个要重写
     private static void SelectRoles()
     {
-        /*
-         *var rolesToAdd = new List<Role.Role>(); // 新建一个集合，这个集合包含所有设置启动的职业
-        
-        foreach (var role in Role.RoleManager.GetManager().GetRoles())
-        {
-            if (role.BaseRole) // 如果这个职业是基本职业，就直接添加上去
-            {
-                rolesToAdd.Add(role);
-                continue;
-            }
-            
-            if (role.MainRoleOption == null || !role.MainRoleOption.GetBool()) // 如果这个职业没有被启用，则跳过
-            {
-                continue;
-            }
-
-            rolesToAdd.Add(role);
-        }
-        
-        // 获取启用的内鬼数量
-        var impostorsNum = GameUtils.GetImpostorsNum();
-
-        var roleAsList = new List<Role.Role>(); // 这个集合会与玩家数量一一对应
-        
-        // 第一步设置内鬼
-        
-        foreach (var playerControl in PlayerUtils.GetAllPlayers())
-        {
-            // GameUtils.PlayerRoleData.Add(new PlayerRole());
-            
-        }
-         * 
-         */
-        
         GameUtils.PlayerRoleData.Clear(); // 首先清除 防止干扰
 
         if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
@@ -416,15 +366,4 @@ public class GameListener : IListener
 
         writer.Finish();
     }
-    
-/*
-    public void OnGameStartManagerUpdate(GameStartManager manager)
-    {
-        if (!AmongUsClient.Instance.AmHost) return;
-        if (manager.countDownTimer is > 0 and < 1f)
-        {
-            
-        }
-    }
-    */
 }

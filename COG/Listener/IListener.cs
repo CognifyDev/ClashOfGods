@@ -152,6 +152,10 @@ public interface IListener
     {
     }
 
+    void OnLobbyRPCReceived(byte callId, MessageReader reader)
+    {
+    }
+
     bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)
     {
         return true;

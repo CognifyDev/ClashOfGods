@@ -13,7 +13,7 @@ public abstract class RpcUtils
         PlayerControl[]? targets = null)
     {
         var writers = new List<MessageWriter>();
-        targets ??= PlayerUtils.GetAllPlayers().Where(p => p != PlayerControl.LocalPlayer).ToArray();
+        targets ??= PlayerUtils.GetAllPlayers().Where(p => p != playerControl).ToArray();
         foreach (var control in targets)
         {
             writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable,

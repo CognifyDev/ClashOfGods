@@ -33,23 +33,6 @@ public class OptionListener : IListener
         result = text;
     }
 
-    public void AfterRPCReceived(byte callId, MessageReader reader)
-    {
-        if (AmongUsClient.Instance.AmHost) return;
-        var knownRpc = (KnownRpc)callId;
-        if (knownRpc != KnownRpc.ShareOptions) return;
-
-        var num = reader.ReadInt32(); // 读取CustomOption个数
-
-        List<byte[]> dataList = new();
-
-        for (var i = 0; i < num; i++) dataList.Add(reader.ReadBytesAndSize());
-
-        CustomOption.LoadOptionsFromByteArray(dataList.ToArray());
-
-        Main.Logger.LogInfo($"Loaded options from Host({num}).");
-    }
-
     public void OnKeyboardJoystickUpdate(KeyboardJoystick keyboardJoystick)
     {
         if (Input.GetKeyDown(KeyCode.Tab)) _typePage += 1;

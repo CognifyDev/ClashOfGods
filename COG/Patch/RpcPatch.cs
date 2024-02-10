@@ -3,6 +3,20 @@ using COG.Listener;
 
 namespace COG.Patch;
 
+[HarmonyPatch(typeof(LobbyBehaviour), nameof(LobbyBehaviour.HandleRpc))]
+internal class LobbyBehaviourHandleRpcPatch
+{
+    private static void Prefix([HarmonyArgument(0)] byte callId, 
+        [HarmonyArgument(1)] MessageReader reader)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+        {
+            Main.Logger.LogInfo($"Rpc {callId} received, rpc length => {reader.Length}");
+            listener.OnLobbyRPCReceived(callId, reader);
+        }
+    }
+}
+
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
 internal class RPCHandlerPatch
 {
