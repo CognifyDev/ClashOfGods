@@ -13,8 +13,8 @@ namespace COG.Role.Impl.Impostor
 {
     public class Cleaner : Role, IListener
     {
-        public CustomOption CleanBodyCD { get; } = new();
-        public CustomButton CleanBodyButton { get; } = new();
+        private CustomOption CleanBodyCd { get; } = new();
+        private CustomButton CleanBodyButton { get; } = new();
         public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
         {
             Description = LanguageConfig.Instance.CleanerDescription;
@@ -29,12 +29,12 @@ namespace COG.Role.Impl.Impostor
                 },
                 CleanBodyButton.ResetCooldown,
                 null,
-                null,
+                () => true,
                 ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
                 2,
                 KeyCode.C,
                 LanguageConfig.Instance.CleanAction,
-                CleanBodyCD.GetFloat,
+                CleanBodyCd.GetFloat,
                 0
             );
 
@@ -43,7 +43,7 @@ namespace COG.Role.Impl.Impostor
             if (ShowInOptions)
             {
                 var headerID = MainRoleOption!.ID;
-                CleanBodyCD = CustomOption.Create(headerID + 1, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
+                CleanBodyCd = CustomOption.Create(headerID + 1, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
             }
         }
 

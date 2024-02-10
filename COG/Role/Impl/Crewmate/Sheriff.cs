@@ -10,8 +10,8 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Sheriff : Role, IListener
 {
-    public CustomOption SheriffKillCD { get; private set; } = new();
-    public CustomButton SheriffKillButton { get; private set; } = new();
+    private CustomOption SheriffKillCd { get; } = new();
+    private CustomButton SheriffKillButton { get; } = new();
     public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate, true)
     {
         BaseRoleType = RoleTypes.Crewmate;
@@ -20,7 +20,7 @@ public class Sheriff : Role, IListener
         if (ShowInOptions)
         {
             var parentID = MainRoleOption!.ID;
-            SheriffKillCD = CustomOption.Create(parentID + 1, CustomOption.CustomOptionType.Crewmate, LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
+            SheriffKillCd = CustomOption.Create(parentID + 1, CustomOption.CustomOptionType.Crewmate, LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
         }
 
         SheriffKillButton = CustomButton.Create(
@@ -41,12 +41,12 @@ public class Sheriff : Role, IListener
                 var distance = Vector2.Distance(localLocation, targetLocation);
                 return GameUtils.GetGameOptions().KillDistance >= distance;
             },
-            () => false,
+            () => true,
             ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
             2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            SheriffKillCD.GetFloat,
+            SheriffKillCd.GetFloat,
             -1
         );
 
@@ -65,8 +65,5 @@ public class Sheriff : Role, IListener
         return true;
     }
 
-    public override IListener GetListener(PlayerControl player)
-    {
-        return this;
-    }
+    public override IListener GetListener(PlayerControl player) => this;
 }
