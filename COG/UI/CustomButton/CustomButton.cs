@@ -43,7 +43,7 @@ public class CustomButton
     public int Order;
 
     public static bool Inited = false;
-    private static List<ActionButton> AllButtons = new();
+    internal static List<ActionButton> AllVanillaButtons = new();
 
     private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool>? couldUse, Func<bool>? hasButton,
         Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime,
@@ -285,7 +285,7 @@ public class CustomButton
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 
-        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn())
+        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn() || MapBehaviour.Instance.IsOpen)
         {
             SetActive(false);
             return;
@@ -315,7 +315,7 @@ public class CustomButton
 
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) CheckClick();
 
-        if (IsCustomPosition && Hud!.UseButton)
+        if (!IsCustomPosition && Hud!.UseButton)
                 GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
     }
 
@@ -352,31 +352,16 @@ public class CustomButton
         }
     }
 
-    internal static void ArrangePosition()
-    {
-        var vectors = AllButtons.Where(b => b.isActiveAndEnabled).Select(b => b.transform.localPosition);
-        int idx = 0;
-        foreach (var btn in CustomButtonManager.GetManager().GetButtons().Where(b => b.ActionButton.isActiveAndEnabled).OrderBy(b => b.Order))
-        {
-            idx++;
-            if (!btn.IsCustomPosition) return;
-            var row = btn.Row;
-            if (row != 1 && row != 2) btn.Row = 2;
-            var y = 2 - btn.Row;
-            var rowBtnPos = vectors.Where(p => p.y == y).OrderBy(p => p.x).ToList();
-
-            var x = rowBtnPos.FirstOrDefault().x;
-            var z = rowBtnPos.FirstOrDefault().z;
-            var pos = new Vector3(x - idx, y, z);
-            btn.GameObject.transform.localPosition = btn.Position = pos;
-        }
-    }
-
 #nullable enable
     // Static methods
     public static void ResetAllCooldown()
     {
         CustomButtonManager.GetManager().GetButtons().ForEach(b => b.ResetCooldown());
+    }
+
+    public static void SetAllActive(bool active)
+    {
+        CustomButtonManager.GetManager().GetButtons().ForEach(b => b.SetActive(active));
     }
 
     internal static void Init(HudManager? hud)
@@ -414,13 +399,36 @@ public class CustomButton
 
     internal static void GetAllButtons()
     {
-        var buttons = GameObject.Find("Main Camera/Hud/BottomRight/Buttons");
+        var buttons = GameObject.Find("Main Camera/Hud/Buttons/BottomRight/");
         if (!buttons) return;
-        AllButtons.Clear();
+        AllVanillaButtons.Clear();
         buttons.ForEachChild(new Action<GameObject>(gameObject =>
         {
-            AllButtons.Add(gameObject.GetComponent<ActionButton>());
+            if (CustomButtonManager.GetManager().GetButtons().FirstOrDefault(b => b.GameObject!.name == gameObject.name) is null) AllVanillaButtons.Add(gameObject.GetComponent<ActionButton>());
         }));
+    }
+
+    internal static void ArrangePosition()
+    {
+        var vectors = AllVanillaButtons.Where(b => b.isActiveAndEnabled).Select(b => b.transform.localPosition);
+        int idx1 = 0;
+        int idx2 = 0;
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons().Where(b => b.ActionButton!.isActiveAndEnabled && b.IsCustomPosition).OrderBy(b => b.Order))
+        {
+            var row = btn.Row;
+            if (row != 1 && row != 2) btn.Row = 2;
+            var y = 2 - btn.Row;
+            int now = 1;
+            if (y == 1) now = ++idx1;
+            if (y == 0) now = ++idx2;
+            var rowBtnPos = vectors.Where(p => p.y == y).OrderBy(p => p.x).ToList();
+
+            var x = rowBtnPos.FirstOrDefault().x;
+            var z = rowBtnPos.FirstOrDefault().z;
+
+            var pos = new Vector3(x - now, y, z);
+            btn.GameObject!.transform.localPosition = btn.Position = pos;
+        }
     }
 
 

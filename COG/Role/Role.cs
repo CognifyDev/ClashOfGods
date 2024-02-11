@@ -114,7 +114,7 @@ public abstract class Role
 
     public List<PlayerControl> Players => GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList();
 
-    public bool Debug { get; init; } = false;
+    public bool Debug { get; init; } = true;
 
     /// <summary>
     ///     添加一个按钮
