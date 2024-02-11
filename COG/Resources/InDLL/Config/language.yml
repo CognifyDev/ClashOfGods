@@ -71,10 +71,11 @@ option:
     github: "Github"
     qq: "QQ"
     discord: "Discord"
-    update-button-string: "更新模组"
+    update-button-string: "检查更新"
     update:
       up-to-date: "你已经更新到最新版本"
       non-check: "未能找到最新版本"
+      fetched: "搜索到最新版：%version%\r\n%description%\r\n是否安装？"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 sidebar-text:

@@ -136,6 +136,7 @@ public class LanguageConfig : Config
 
         UpToDate = GetString("option.main.update.up-to-date");
         NonCheck = GetString("option.main.update.non-check");
+        FetchedString = GetString("option.main.update.fetched");
     }
 
     public static LanguageConfig Instance { get; private set; }
@@ -226,6 +227,7 @@ public class LanguageConfig : Config
     // Update
     public string UpToDate { get; private set; } = null!;
     public string NonCheck { get; private set; } = null!;
+    public string FetchedString { get; private set; } = null!;
 
     private string GetString(string location)
     {
