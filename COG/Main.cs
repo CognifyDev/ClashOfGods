@@ -51,9 +51,6 @@ public partial class Main : BasePlugin
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string DisplayName = "ClashOfGods";
-    public static VersionInfo VersionInfo { get; private set; } = null!;
-    public static VersionInfo LatestVersion { get; private set; } = null!;
-    public static string LatestDescription { get; set; } = "";
 
     public static ManualLogSource Logger = null!;
     public static string PluginVersion { get; private set; } = "Unknown";

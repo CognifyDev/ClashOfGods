@@ -50,13 +50,13 @@ public static class MainMenuPatch
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
             LanguageConfig.Instance.UpdateButtonString, () =>
             {
-                if (Main.LatestVersion.Equals(VersionInfo.Empty))
+                if (ModUpdater.LatestVersion.Equals(VersionInfo.Empty))
                 {
                     SystemUtils.OpenMessageBox(LanguageConfig.Instance.NonCheck, "WARNING");
                     return;
                 }
 
-                if (!Main.LatestVersion.IsNewerThan(Main.VersionInfo))
+                if (!ModUpdater.LatestVersion.IsNewerThan(ModUpdater.VersionInfo))
                 {
                     SystemUtils.OpenMessageBox(LanguageConfig.Instance.UpToDate, "WARNING");
                     return;
