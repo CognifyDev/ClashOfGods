@@ -34,7 +34,7 @@ namespace COG.Role.Impl.Impostor
                     RpcCleanDeadBody(body!);
                 },
                 () => CleanBodyButton?.ResetCooldown(),
-                null,
+                () => true,
                 () => true,
                 ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
                 2,
