@@ -305,27 +305,26 @@ public class CustomButton
 #nullable disable
     public void CheckClick()
     {
-        var button = this;
-        if (button.Timer <= 0f)
+        if (Timer <= 0f && CouldUse())
         {
-            if (button.HasEffect && button.IsEffectActive)
+            if (HasEffect && IsEffectActive)
             {
-                button.IsEffectActive = false;
-                button.ActionButton.cooldownTimerText.color = Palette.EnabledColor;
-                button.OnEffect?.Invoke();
-                button.ResetCooldown();
+                IsEffectActive = false;
+                ActionButton.cooldownTimerText.color = Palette.EnabledColor;
+                OnEffect?.Invoke();
+                ResetCooldown();
             }
             else
             {
-                if (button.UsesRemaining <= 0 && button.UsesLimit > 0) return;
-                button.OnClick();
-                if (button.HasEffect && !button.IsEffectActive)
+                if (UsesRemaining <= 0 && UsesLimit > 0) return;
+                OnClick();
+                if (HasEffect && !IsEffectActive)
                 {
-                    button.IsEffectActive = true;
-                    button.ResetEffectTime();
+                    IsEffectActive = true;
+                    ResetEffectTime();
                 }
 
-                if (button.UsesLimit > 0) button.UsesRemaining--;
+                if (UsesLimit > 0) UsesRemaining--;
             }
         }
     }
