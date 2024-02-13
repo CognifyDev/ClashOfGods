@@ -23,7 +23,7 @@ public class CustomWinnerListener : IListener
 
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
-        manager.transform.GetComponentsInChildren<PoolablePlayer>().ToListCustom()
+        manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList()
             .ForEach(pb => pb.gameObject.Destroy());
 
         var num = 0;

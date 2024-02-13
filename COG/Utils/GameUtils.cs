@@ -83,4 +83,11 @@ public static class GameUtils
     {
         return GameOptionsManager.Instance.currentNormalGameOptions;
     }
+
+    public static void SetCustomRole(this PlayerControl pc, Role.Role role)
+    {
+        int idx = PlayerRoleData.Select(pr => pr.Player).ToList().IndexOf(pc);
+        if (idx != -1) PlayerRoleData.RemoveAt(idx);
+        PlayerRoleData.Add(new(pc, role));
+    }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
@@ -58,7 +59,7 @@ public class GameListener : IListener
                     var texts = s.Split("|");
                     var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
                     var role = Role.RoleManager.GetManager().GetRoleByClassName(texts[1]);
-                    GameUtils.PlayerRoleData.Add(new PlayerRole(player!, role!));
+                    player!.SetCustomRole(role!);
                 }
                 
                 foreach (var playerRole in GameUtils.PlayerRoleData)
@@ -88,7 +89,7 @@ public class GameListener : IListener
         if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
 
         // 开始分配职业
-        var players = PlayerUtils.GetAllPlayers().ToListCustom().Disarrange(); // 打乱玩家顺序
+        var players = PlayerUtils.GetAllPlayers().ToList().Disarrange(); // 打乱玩家顺序
 
         var rolesToAdd = new List<Role.Role>(); // 新建集合，用来存储可用的职业
 
@@ -125,7 +126,7 @@ public class GameListener : IListener
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
             }
 
-            GameUtils.PlayerRoleData.Add(new PlayerRole(player, role));
+            player!.SetCustomRole(role!);
         }
 
         // 打印职业分配信息
