@@ -7,6 +7,7 @@ using COG.Config.Impl;
 using COG.Utils;
 using COG.Utils.Version;
 using Il2CppSystem.IO;
+using COG.WinAPI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,28 +50,23 @@ public static class MainMenuPatch
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
             LanguageConfig.Instance.UpdateButtonString, () =>
             {
-                if (Main.LatestVersion.Equals(VersionInfo.Empty))
+                if (ModUpdater.LatestVersion.Equals(VersionInfo.Empty))
                 {
                     SystemUtils.OpenMessageBox(LanguageConfig.Instance.NonCheck, "WARNING");
                     return;
                 }
 
-                if (!Main.LatestVersion.IsNewerThan(Main.VersionInfo))
+                if (!ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo))
                 {
                     SystemUtils.OpenMessageBox(LanguageConfig.Instance.UpToDate, "WARNING");
                     return;
                 }
+                    
+                var result = SystemUtils.OpenMessageBox(LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion.ToString(), ModUpdater.LatestDescription), "Update COG", MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
 
-#pragma warning disable SYSLIB0014
-                using var client = new WebClient();
-                client.DownloadFile(
-                    $"https://download.yzuu.cf/CognifyDev/ClashOfGods/releases/download/{Main.LatestVersion}/ClashOfGods.dll",
-                    "BepInEx/plugins/ClashOfGods.dll.new"
-                );
-                
-                File.WriteAllText("BepInEx/plugins/do.vbs", "WScript.Sleep 1000\n\nstrFileToDelete = \"ClashOfGods.dll\"\nstrFileToRename = \"ClashOfGods.dll.new\"\nstrScriptToDelete = WScript.ScriptFullName\n\nSet fs = CreateObject(\"Scripting.FileSystemObject\")\n\nIf fs.FileExists(strFileToDelete) Then\n    fs.DeleteFile strFileToDelete\nEnd If\n\nIf fs.FileExists(strFileToRename) Then\n    fs.MoveFile strFileToRename, strFileToDelete\nEnd If\n\nIf fs.FileExists(strScriptToDelete) Then\n    fs.DeleteFile strScriptToDelete\nEnd If");
+                if (result is MessageBoxDialogue.ClickedButton.IDNO) return;
 
-                Process.Start("BepInEx/plugins/do.vbs");
+                ModUpdater.DownloadUpdate();
                 Application.Quit();
             }, Color.yellow);
 /*
@@ -127,9 +123,11 @@ public static class MainMenuPatch
         var popup = Object.Instantiate(DiscordManager.Instance.discordPopup, Camera.main.transform);
         var bg = popup.transform.Find("Background").GetComponent<SpriteRenderer>();
         var size = bg.size;
+        popup.name = "COGPopup";
         size.x *= 2.5f;
         bg.size = size;
         popup.TextAreaTMP.fontSizeMin = popup.TextAreaTMP.fontSizeMax = popup.TextAreaTMP.fontSize;
+        Object.DontDestroyOnLoad(popup);
         GameUtils.Popup = popup;
         PopupCreated = true;
     }

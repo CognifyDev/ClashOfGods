@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Microsoft.Win32;
+using COG.WinAPI;
 
 namespace COG.Utils;
 
@@ -50,11 +51,8 @@ public class SystemUtils
         return value;
     }
 
-    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
-
-    public static void OpenMessageBox(string text, string title)
+    public static MessageBoxDialogue.ClickedButton OpenMessageBox(string text, string title, MessageBoxDialogue.OpenTypes type = MessageBoxDialogue.OpenTypes.MB_DEFBUTTON1 | MessageBoxDialogue.OpenTypes.MB_ICONINFORMATION)
     {
-        MessageBox(IntPtr.Zero, text, title, 0x00000000 | 0x00000040);
+        return MessageBoxDialogue.OpenMessageBox(text, title, type);
     }
 }

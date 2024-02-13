@@ -51,15 +51,13 @@ public partial class Main : BasePlugin
     public const string PluginName = "Clash Of Gods";
     public const string PluginGuid = "top.cog.clashofgods";
     public const string DisplayName = "ClashOfGods";
-    public static VersionInfo VersionInfo { get; private set; } = null!;
-    public static VersionInfo LatestVersion { get; private set; } = null!;
-    
+
     public static ManualLogSource Logger = null!;
+    public static VersionInfo VersionInfo { get; set; } = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
     public Harmony Harmony { get; } = new(PluginGuid);
 
     // public static List<string> RegisteredBetaUsers { get; private set; } = new();
-    public static bool BetaVersion { get; private set; }
 
     public static Main Instance { get; private set; } = null!;
 
@@ -70,7 +68,7 @@ public partial class Main : BasePlugin
     {
         Instance = this;
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
-        VersionInfo = PluginVersion.Equals("Unknown")
+        Main.VersionInfo = PluginVersion.Equals("Unknown")
             ? VersionInfo.Empty
             : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
 
@@ -108,27 +106,7 @@ public partial class Main : BasePlugin
             return;
         }
 
-        string latestVersionString = null!;
-
-        try
-        {
-            var jsonObject =
-                JObject.Parse(WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest"));
-            var tagNameToken = jsonObject["tag_name"];
-            
-            if (tagNameToken is { Type: JTokenType.String })
-            {
-                latestVersionString = tagNameToken.ToString();
-            }
-        }
-        catch
-        {
-            // ignored
-        }
-
-        LatestVersion = latestVersionString == null ? VersionInfo.Empty : VersionInfo.NewVersionInfoInstanceByString(latestVersionString);
-
-        BetaVersion = PluginVersion.ToLower().Contains("beta") || PluginVersion.ToLower().Contains("dev"); 
+        ModUpdater.FetchUpdate();
         
         /*
         if (BetaVersion)
