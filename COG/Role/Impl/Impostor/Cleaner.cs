@@ -20,6 +20,12 @@ namespace COG.Role.Impl.Impostor
             Description = LanguageConfig.Instance.CleanerDescription;
             BaseRoleType = RoleTypes.Impostor;
 
+            if (ShowInOptions)
+            {
+                var headerID = MainRoleOption!.ID;
+                CleanBodyCd = CustomOption.Create(headerID + 1, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
+            }
+
             CleanBodyButton = CustomButton.Create(
                 () =>
                 {
@@ -39,12 +45,6 @@ namespace COG.Role.Impl.Impostor
             );
 
             AddButton(CleanBodyButton);
-
-            if (ShowInOptions)
-            {
-                var headerID = MainRoleOption!.ID;
-                CleanBodyCd = CustomOption.Create(headerID + 1, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
-            }
         }
 
         public void RpcCleanDeadBody(DeadBody body)
