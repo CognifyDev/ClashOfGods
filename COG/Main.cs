@@ -53,6 +53,7 @@ public partial class Main : BasePlugin
     public const string DisplayName = "ClashOfGods";
 
     public static ManualLogSource Logger = null!;
+    public static VersionInfo VersionInfo { get; set; } = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
     public Harmony Harmony { get; } = new(PluginGuid);
 
@@ -67,7 +68,7 @@ public partial class Main : BasePlugin
     {
         Instance = this;
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
-        VersionInfo = PluginVersion.Equals("Unknown")
+        Main.VersionInfo = PluginVersion.Equals("Unknown")
             ? VersionInfo.Empty
             : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
 

@@ -56,13 +56,13 @@ public static class MainMenuPatch
                     return;
                 }
 
-                if (!ModUpdater.LatestVersion.IsNewerThan(ModUpdater.VersionInfo))
+                if (!ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo))
                 {
                     SystemUtils.OpenMessageBox(LanguageConfig.Instance.UpToDate, "WARNING");
                     return;
                 }
-
-                var result = SystemUtils.OpenMessageBox(LanguageConfig.Instance.FetchedString.CustomFormat(Main.LatestVersion.ToString(), Main.LatestDescription), "Update COG", MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
+                    
+                var result = SystemUtils.OpenMessageBox(LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion.ToString(), ModUpdater.LatestDescription), "Update COG", MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
 
                 if (result is MessageBoxDialogue.ClickedButton.IDNO) return;
 
