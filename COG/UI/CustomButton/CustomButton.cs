@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.Utils;
@@ -42,7 +42,7 @@ public class CustomButton
     public int Row;
     public int Order;
 
-    public static bool Inited = false;
+    public static bool Inited;
     internal static List<ActionButton> AllVanillaButtons = new();
 
     private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool>? couldUse, Func<bool>? hasButton,
@@ -86,25 +86,7 @@ public class CustomButton
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
     }
-
-    public CustomButton() { } // 在真正实例化调用自己时避免异常，如：
-    /*
-        CustomButton btn;
-        btn = CustomButton.Create(......, () => 
-        {
-            btn.ResetCooldown();
-        }, ......); // 抛异常
-        
-        CustomButton btn = new();
-        btn = CustomButton.Create(......, () => 
-        {
-            btn.ResetCooldown();
-        }, ......); // 正常运行
-        
-     */
-
-
-
+    
     /// <summary>
     ///     在游戏中创建一个按钮 (Effect)
     /// </summary>
@@ -277,15 +259,11 @@ public class CustomButton
         var hasBtn = HasButton ?? (() => true);
         var isCoolingDown = Timer > 0f;
         var hotkeyText = "";
-        if (HotkeyName == "")
-            if (Hotkey.HasValue)
-                hotkeyText = Hotkey.Value.ToString();
-            else
-                hotkeyText = HotkeyName;
+        if (HotkeyName == "") hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
-
-        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn() || MapBehaviour.Instance.IsOpen)
+        
+        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn() || (MapBehaviour.Instance && MapBehaviour.Instance.IsOpen))
         {
             SetActive(false);
             return;
@@ -429,27 +407,5 @@ public class CustomButton
             var pos = new Vector3(x - now, y, z);
             btn.GameObject!.transform.localPosition = btn.Position = pos;
         }
-    }
-
-
-    // Position from The Other Roles
-    // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Objects/CustomButton.cs#L40
-    [Obsolete("Recommend to use CustomButton.ArrangePosition() to set button positions automatically.")]
-    public static class ButtonPositions
-    {
-        public static readonly Vector3
-            LowerRowRight = new(-2f, -0.06f, 0);
-
-        public static readonly Vector3 LowerRowCenter = new(-3f, -0.06f, 0);
-        public static readonly Vector3 LowerRowLeft = new(-4f, -0.06f, 0);
-
-        public static readonly Vector3
-            UpperRowRight = new(0f, 1f, 0f);
-
-        public static readonly Vector3
-            UpperRowCenter = new(-1f, 1f, 0f);
-
-        public static readonly Vector3 UpperRowLeft = new(-2f, 1f, 0f);
-        public static readonly Vector3 UpperRowFarLeft = new(-3f, 1f, 0f);
     }
 }
