@@ -305,8 +305,6 @@ public class CustomButton
 #nullable disable
     public void CheckClick()
     {
-        Main.Logger.LogInfo(PassiveButton.OnMouseOut is null);
-        Main.Logger.LogInfo(PassiveButton.OnMouseOver is null);
         if (Timer <= 0f && CouldUse())
         {
             if (HasEffect && IsEffectActive)
@@ -324,6 +322,10 @@ public class CustomButton
                 {
                     IsEffectActive = true;
                     ResetEffectTime();
+                }
+                else
+                {
+                    ResetCooldown();
                 }
 
                 if (UsesLimit > 0) UsesRemaining--;

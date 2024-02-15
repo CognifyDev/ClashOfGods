@@ -7,6 +7,6 @@ public class PlayerListener : IListener
 {
     public void OnPlayerJoin(AmongUsClient client, ClientData data)
     {
-        CustomOption.ShareConfigs(client.PlayerPrefab);
+        CustomOption.ShareConfigs(data.Character);
     }
 }

@@ -22,13 +22,13 @@ public enum ColorType
 public static class PlayerUtils
 {
     public static List<PlayerRole> AllImpostors =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor).ToListCustom();
+        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor).ToList();
 
     public static List<PlayerRole> AllCremates =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Crewmate).ToListCustom();
+        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Crewmate).ToList();
 
     public static List<PlayerRole> AllNeutrals =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Neutral).ToListCustom();
+        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Neutral).ToList();
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家
@@ -63,17 +63,17 @@ public static class PlayerUtils
 
     public static List<PlayerControl> GetAllAlivePlayers()
     {
-        return GetAllPlayers().ToArray().Where(player => player != null && player.IsAlive()).ToListCustom();
+        return GetAllPlayers().ToArray().Where(player => player != null && player.IsAlive()).ToList();
     }
 
     public static bool IsSamePlayer(this GameData.PlayerInfo info, GameData.PlayerInfo target)
     {
-        return info.FriendCode.Equals(target.FriendCode) && info.PlayerName.Equals(target.PlayerName);
+        return IsSamePlayer(info.Object, target.Object);
     }
 
     public static bool IsSamePlayer(this PlayerControl player, PlayerControl target)
     {
-        return player.name.Equals(target.name) && player.FriendCode.Equals(target.FriendCode);
+        return player.PlayerId == target.PlayerId;
     }
 
     public static Role.Role? GetRoleInstance(this PlayerControl player)

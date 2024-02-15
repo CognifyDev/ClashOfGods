@@ -1,5 +1,6 @@
 ﻿using COG.Listener;
 using COG.Utils;
+using System.Linq;
 
 namespace COG.Patch;
 
@@ -10,7 +11,7 @@ internal class HudManagerPatch
     [HarmonyPostfix]
     public static void OnHudStart(HudManager? __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
             listener.OnHudStart(__instance);
     }
 
@@ -18,7 +19,7 @@ internal class HudManagerPatch
     [HarmonyPostfix]
     public static void OnHudUpdate(HudManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
             listener.OnHudUpdate(__instance);
     }
 
@@ -26,7 +27,7 @@ internal class HudManagerPatch
     [HarmonyPostfix]
     public static void OnHudDestroy(HudManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
             listener.OnHudDestroy(__instance);
     }
 }

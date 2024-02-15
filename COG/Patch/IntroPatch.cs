@@ -2,6 +2,7 @@
 using COG.Utils;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
+using System.Linq;
 
 namespace COG.Patch;
 
@@ -27,7 +28,7 @@ public static class BeginCrewmatePatch
         IntroCutscene __instance,
         ref List<PlayerControl> teamToDisplay)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
             listener.OnSetUpTeamText(__instance, ref teamToDisplay);
     }
 
@@ -45,7 +46,7 @@ public static class IntroCutsceneBeginImpostorPatch
         IntroCutscene __instance,
         ref List<PlayerControl> yourTeam)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToListCustom())
+        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
             listener.OnSetUpTeamText(__instance, ref yourTeam);
     }
 

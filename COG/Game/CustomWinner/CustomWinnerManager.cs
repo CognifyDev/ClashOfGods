@@ -20,7 +20,7 @@ public static class CustomWinnerManager
 
     public static void RegisterCustomWinners(IEnumerable<PlayerControl> winners)
     {
-        winners.ToList().ForEach(w => AllWinners.Add(new WinningPlayerData(w.Data)));
+        Enumerable.ToList(winners).ForEach(w => AllWinners.Add(new WinningPlayerData(w.Data)));
     }
 
     public static void ResetCustomWinners()
@@ -45,7 +45,7 @@ public static class CustomWinnerManager
 
     public static void RegisterCustomWinnersInstances(IEnumerable<IWinnable> customWinners)
     {
-        customWinners.ToListCustom().ForEach(RegisterCustomWinnerInstance);
+        customWinners.ToList().ForEach(RegisterCustomWinnerInstance);
     }
 
     internal static bool CheckEndForCustomWinners()
