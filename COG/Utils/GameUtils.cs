@@ -86,8 +86,8 @@ public static class GameUtils
 
     public static void SetCustomRole(this PlayerControl pc, Role.Role role)
     {
-        int idx = PlayerRoleData.Select(pr => pr.Player).ToList().IndexOf(pc);
-        if (idx != -1) PlayerRoleData.RemoveAt(idx);
+        var playerRole = PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
+        if (playerRole is not null) PlayerRoleData.Remove(playerRole);
         PlayerRoleData.Add(new(pc, role));
         pc.SetRole(role.BaseRoleType);
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
