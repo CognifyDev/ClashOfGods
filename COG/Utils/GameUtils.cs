@@ -4,6 +4,7 @@ using System.Linq;
 using AmongUs.GameOptions;
 using COG.Listener;
 using COG.Listener.Impl;
+using COG.Rpc;
 using COG.States;
 
 namespace COG.Utils;
@@ -22,8 +23,8 @@ public static class GameUtils
     /// <param name="text">信息内容</param>
     public static void SendGameMessage(string text)
     {
-        if (DestroyableSingleton<HudManager>._instance)
-            DestroyableSingleton<HudManager>.Instance.Notifier.AddItem(text);
+        if (DestroyableSingleton<HudManager>.Instance is HudManager hud)
+            hud.Notifier.AddItem(text);
     }
 
     public static int GetImpostorsNum()
@@ -82,5 +83,25 @@ public static class GameUtils
     public static NormalGameOptionsV07 GetGameOptions()
     {
         return GameOptionsManager.Instance.currentNormalGameOptions;
+    }
+
+    public static void SetCustomRole(this PlayerControl pc, Role.Role role)
+    {
+        if (!pc || role is null) return;
+        var playerRole = PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
+        if (playerRole is not null) PlayerRoleData.Remove(playerRole);
+        PlayerRoleData.Add(new(pc, role));
+        pc.SetRole(role.BaseRoleType);
+        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
+    }
+
+    public static void RpcSetCustomRole(this PlayerControl pc, Role.Role role)
+    {
+        if (!pc || role is null) return;
+        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
+        writer.Write(pc.PlayerId);
+        writer.WritePacked(role.Id);
+        writer.Finish();
+        SetCustomRole(pc, role);
     }
 }

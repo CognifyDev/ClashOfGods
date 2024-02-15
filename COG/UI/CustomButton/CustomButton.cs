@@ -1,4 +1,4 @@
-﻿﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.Utils;
@@ -306,8 +306,7 @@ public class CustomButton
 #nullable disable
     private void CheckClick()
     {
-        if (!(Timer <= 0f) || !CouldUse()) return;
-        if (HasEffect && IsEffectActive)
+        if (Timer <= 0f && CouldUse())
         {
             IsEffectActive = false;
             ActionButton!.cooldownTimerText.color = Palette.EnabledColor;
@@ -321,8 +320,19 @@ public class CustomButton
             OnClick();
             if (HasEffect && !IsEffectActive)
             {
-                IsEffectActive = true;
-                ResetEffectTime();
+                if (UsesRemaining <= 0 && UsesLimit > 0) return;
+                OnClick();
+                if (HasEffect && !IsEffectActive)
+                {
+                    IsEffectActive = true;
+                    ResetEffectTime();
+                }
+                else
+                {
+                    ResetCooldown();
+                }
+
+                if (UsesLimit > 0) UsesRemaining--;
             }
 
             if (UsesLimit > 0) UsesRemaining--;

@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using COG.UI.CustomOption;
 using COG.Utils;
 using InnerNet;
@@ -9,6 +9,7 @@ public class PlayerListener : IListener
 {
     public void OnCreatePlayer(AmongUsClient amongUsClient, ClientData client)
     {
+
         var thread = new Thread(() =>
         {
             Thread.Sleep(500);

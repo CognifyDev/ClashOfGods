@@ -6,11 +6,6 @@ namespace COG.Utils;
 
 public static class ListUtils
 {
-    public static List<T> ToListCustom<T>(this IEnumerable<T> enumerable)
-    {
-        return new List<T>(enumerable);
-    }
-
     /// <summary>
     ///     打乱一个List
     /// </summary>
@@ -20,7 +15,7 @@ public static class ListUtils
     public static List<T> Disarrange<T>(this List<T> list)
     {
         var random = new Random();
-        return list.OrderBy(_ => random.Next()).ToListCustom();
+        return list.OrderBy(_ => random.Next()).ToList();
     }
 
     public static T GetOneAndDelete<T>(this List<T> list)

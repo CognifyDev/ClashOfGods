@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
@@ -34,9 +35,6 @@ public class GameListener : IListener
         SelectRoles();
         Main.Logger.LogInfo("Share roles for players...");
         ShareRoles();
-
-        foreach (var playerRole in GameUtils.PlayerRoleData)
-            RoleManager.Instance.SetRole(playerRole.Player, playerRole.Role.BaseRoleType);
     }
 
     public void OnRPCReceived(byte callId, MessageReader reader)
@@ -58,7 +56,7 @@ public class GameListener : IListener
                     var texts = s.Split("|");
                     var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
                     var role = Role.RoleManager.GetManager().GetRoleByClassName(texts[1]);
-                    GameUtils.PlayerRoleData.Add(new PlayerRole(player!, role!));
+                    player!.SetCustomRole(role!);
                 }
                 
                 foreach (var playerRole in GameUtils.PlayerRoleData)
@@ -80,6 +78,14 @@ public class GameListener : IListener
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
         }
+        if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+        {
+            var role = player.GetRoleInstance();
+            if (role is null) return;
+            var text = player.cosmetics.nameText;
+            text.color = role.Color;
+            text.text = new StringBuilder().Append(role.Name).Append("\n").Append(player.Data.PlayerName).ToString();
+        }
     }
     private static void SelectRoles()
     {
@@ -88,7 +94,7 @@ public class GameListener : IListener
         if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
 
         // 开始分配职业
-        var players = PlayerUtils.GetAllPlayers().ToListCustom().Disarrange(); // 打乱玩家顺序
+        var players = PlayerUtils.GetAllPlayers().ToList().Disarrange(); // 打乱玩家顺序
 
         var rolesToAdd = new List<Role.Role>(); // 新建集合，用来存储可用的职业
 
@@ -125,7 +131,7 @@ public class GameListener : IListener
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
             }
 
-            GameUtils.PlayerRoleData.Add(new PlayerRole(player, role));
+            player!.SetCustomRole(role!);
         }
 
         // 打印职业分配信息

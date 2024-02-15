@@ -1,7 +1,8 @@
-﻿namespace COG.Rpc;
+namespace COG.Rpc;
 
 public enum KnownRpc : uint
 {
+
     ShareRoles = 60,
     ShareOptions = 61,
     CleanDeadBody = 62,

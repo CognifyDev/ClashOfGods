@@ -1,6 +1,8 @@
-﻿using System.Linq;
+using System.Linq;
+using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption;
+using COG.Utils;
 
 namespace COG.Listener.Impl;
 
@@ -51,6 +53,13 @@ public class RpcListener : IListener
                         option.Selection = selection;
                         CustomOption.Options[i] = option;
                     }
+                }
+                break;
+            case KnownRpc.SetRole:
+                {
+                    var playerId = reader.ReadByte();
+                    var roleId = reader.ReadPackedUInt32();
+                    GameUtils.SetCustomRole(PlayerUtils.GetPlayerById(playerId)!, Role.RoleManager.GetManager().GetRoleById(roleId)!);
                 }
                 break;
         }

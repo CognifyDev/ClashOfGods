@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
@@ -31,7 +31,6 @@ public abstract class Role
         CanSabotage = false;
         Id = _typeId;
         _typeId ++;
-
         ShowInOptions = showInOptions;
 
         if (ShowInOptions)
@@ -48,7 +47,7 @@ public abstract class Role
     /// <summary>
     ///     角色特征码
     /// </summary>
-    public int Id { get; }
+    public uint Id { get; }
 
     /// <summary>
     ///     角色颜色

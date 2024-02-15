@@ -239,6 +239,7 @@ public interface IListener
     {
     }
 
+
     void OnCoSpawnPlayer(PlayerPhysics playerPhysics, LobbyBehaviour lobbyBehaviour)
     {
     }
@@ -247,5 +248,21 @@ public interface IListener
     {
     }
 
+    void OnTaskAdderShowFolder(TaskAdderGame taskAdderGame, TaskFolder folder)
+    {
+    }
+
+    void AfterTaskAdderShowFolder(TaskAdderGame taskAdderGame, TaskFolder folder)
+    {
+    }
+
+    void OnTaskButtonUpdate(TaskAddButton button)
+    {
+    }
+
+    bool OnTaskButtonAddTask(TaskAddButton button)
+    {
+        return true;
+    }
     private class EmptyListener : IListener { }
 }
