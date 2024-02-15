@@ -6,7 +6,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
+ using Debug = System.Diagnostics.Debug;
+ using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomButton;
 
@@ -303,31 +304,28 @@ public class CustomButton
     }
 
 #nullable disable
-    public void CheckClick()
+    private void CheckClick()
     {
-        Main.Logger.LogInfo(PassiveButton.OnMouseOut is null);
-        Main.Logger.LogInfo(PassiveButton.OnMouseOver is null);
-        if (Timer <= 0f && CouldUse())
+        if (!(Timer <= 0f) || !CouldUse()) return;
+        if (HasEffect && IsEffectActive)
         {
-            if (HasEffect && IsEffectActive)
+            IsEffectActive = false;
+            ActionButton!.cooldownTimerText.color = Palette.EnabledColor;
+            Debug.Assert(OnEffect != null, nameof(OnEffect) + " != null");
+            OnEffect();
+            ResetCooldown();
+        }
+        else
+        {
+            if (UsesRemaining <= 0 && UsesLimit > 0) return;
+            OnClick();
+            if (HasEffect && !IsEffectActive)
             {
-                IsEffectActive = false;
-                ActionButton.cooldownTimerText.color = Palette.EnabledColor;
-                OnEffect();
-                ResetCooldown();
+                IsEffectActive = true;
+                ResetEffectTime();
             }
-            else
-            {
-                if (UsesRemaining <= 0 && UsesLimit > 0) return;
-                OnClick();
-                if (HasEffect && !IsEffectActive)
-                {
-                    IsEffectActive = true;
-                    ResetEffectTime();
-                }
 
-                if (UsesLimit > 0) UsesRemaining--;
-            }
+            if (UsesLimit > 0) UsesRemaining--;
         }
     }
 

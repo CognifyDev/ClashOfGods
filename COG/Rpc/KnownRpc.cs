@@ -2,8 +2,8 @@
 
 public enum KnownRpc : uint
 {
-    ShareRoles = 51,
-    ShareOptions = 52,
-    CleanDeadBody = 53,
-    UpdateOption = 54
+    ShareRoles = 60,
+    ShareOptions = 61,
+    CleanDeadBody = 62,
+    UpdateOption = 63
 }

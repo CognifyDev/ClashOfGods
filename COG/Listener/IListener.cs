@@ -239,5 +239,13 @@ public interface IListener
     {
     }
 
+    void OnCoSpawnPlayer(PlayerPhysics playerPhysics, LobbyBehaviour lobbyBehaviour)
+    {
+    }
+
+    void OnCreatePlayer(AmongUsClient amongUsClient, ClientData client)
+    {
+    }
+
     private class EmptyListener : IListener { }
 }

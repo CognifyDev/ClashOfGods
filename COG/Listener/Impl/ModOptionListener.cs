@@ -12,14 +12,10 @@ namespace COG.Listener.Impl;
 
 internal class ModOptionListener : IListener
 {
-    private static readonly List<Transform> Vanilla = new();
+    private static readonly List<Transform> Vanillas = new();
 
-    private static CustomOption _saveGameConfigsOptions = CustomOption.Create(0,
-        CustomOption.CustomOptionType.General,
-        LanguageConfig.Instance.SaveGameConfigs,
-        false, null, true
-    );
-
+    public List<Transform> GetVanillas() => new(Vanillas);
+    
     public void OnSettingInit(OptionsMenuBehaviour menu)
     {
         var transform1 = menu.CensorChatButton.transform;
@@ -61,7 +57,7 @@ internal class ModOptionListener : IListener
 
     public void HideVanillaButtons(OptionsMenuBehaviour menu)
     {
-        Vanilla.Clear();
+        Vanillas.Clear();
         for (var i = 0; i < menu.transform.childCount; i++)
         {
             var child = menu.transform.GetChild(i);
@@ -72,7 +68,7 @@ internal class ModOptionListener : IListener
                 child.name == "GeneralButton" ||
                 child.name == "GraphicsButton" ||
                 !child.gameObject.active) continue;
-            Vanilla.Add(child);
+            Vanillas.Add(child);
             child.gameObject.SetActive(false);
         }
     }

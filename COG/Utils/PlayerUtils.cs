@@ -21,13 +21,13 @@ public enum ColorType
 
 public static class PlayerUtils
 {
-    public static List<PlayerRole> AllImpostors =>
+    public static IEnumerable<PlayerRole> AllImpostors =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor).ToListCustom();
 
-    public static List<PlayerRole> AllCremates =>
+    public static IEnumerable<PlayerRole> AllCremates =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Crewmate).ToListCustom();
 
-    public static List<PlayerRole> AllNeutrals =>
+    public static IEnumerable<PlayerRole> AllNeutrals =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Neutral).ToListCustom();
 
     /// <summary>

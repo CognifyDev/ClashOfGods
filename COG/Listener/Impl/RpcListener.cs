@@ -35,16 +35,21 @@ public class RpcListener : IListener
                 break;
             case KnownRpc.ShareOptions:
                 var originalString = reader.ReadString();
+                Main.Logger.LogInfo("Received options string => " + originalString);
                 foreach (var s in originalString.Split(","))
                 {
                     var contexts = s.Split("|");
                     var id = int.Parse(contexts[0]);
                     var selection = int.Parse(contexts[1]);
-
-                    var customOption = CustomOption.Options.FirstOrDefault(option => option?.ID == id);
-                    if (customOption != null)
+                    
+                    for (var i = 0; i < CustomOption.Options.Count; i++)
                     {
-                        customOption.Selection = selection;
+                        var option = CustomOption.Options[i];
+                        if (option == null) continue;
+                        if (option.ID != id) continue;
+                        Main.Logger.LogInfo($"Changed {option.Name}({option.ID})'s selection to {selection}(before: {option.Selection})");
+                        option.Selection = selection;
+                        CustomOption.Options[i] = option;
                     }
                 }
                 break;
