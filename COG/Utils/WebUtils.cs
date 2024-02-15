@@ -4,6 +4,21 @@ namespace COG.Utils;
 
 public static class WebUtils
 {
+    public static string GetWebByAPIMethod(string url, string apiKey)
+    {
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("User-Agent", "your-app-name"); // Add a User-Agent header
+        if (!string.IsNullOrEmpty(apiKey))
+        {
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("token", apiKey); // Add the API key for authentication
+        }
+
+        var response = client.GetAsync(url).Result;
+        response.EnsureSuccessStatusCode();
+        var responseBody = response.Content.ReadAsStringAsync().Result;
+        return responseBody;
+    }
+    
     public static string GetWeb(string url)
     {
         // 创建 HttpClient 实例

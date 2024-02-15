@@ -16,13 +16,7 @@ public static class ModUpdater
     public static VersionInfo LatestVersion { get; private set; } = null!;
     public static string LatestDescription { get; set; } = "";
     public static bool BetaVersion { get; private set; }
-
-    /*
-     * FIXME
-     * 此处无法正常运行：
-     * WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest")
-     * 获取时候GitHub返回403
-     */
+    
     public static void FetchUpdate()
     {
         string latestVersionString = null!;
@@ -31,7 +25,8 @@ public static class ModUpdater
         try
         {
             var jsonObject =
-                JObject.Parse(WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest"));
+                JObject.Parse(WebUtils.GetWebByAPIMethod("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest", 
+                    "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"));
             var tagNameToken = jsonObject["tag_name"];
             var tagBodyToken = jsonObject["body"];
 
