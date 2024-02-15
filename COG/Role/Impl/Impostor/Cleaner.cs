@@ -28,27 +28,20 @@ public class Cleaner : Role, IListener
         CleanBodyButton = CustomButton.Create(
             () =>
             {
-                var headerID = MainRoleOption!.ID;
-                CleanBodyCd = CustomOption.Create(headerID + 1, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
-            }
-
-            CleanBodyButton = CustomButton.Create(
-                () =>
-                {
-                    var body = PlayerUtils.GetClosestBody();
-                    if (!body) return;
-                    RpcCleanDeadBody(body!);
-                },
-                () => CleanBodyButton?.ResetCooldown(),
-                couldUse: () => true,
-                () => true,
-                ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
-                row: 2,
-                KeyCode.C,
-                LanguageConfig.Instance.CleanAction,
-                (Cooldown)CleanBodyCd!.GetFloat,
-                0
-            );
+                var body = PlayerUtils.GetClosestBody();
+                if (!body) return;
+                RpcCleanDeadBody(body!);
+            },
+            () => CleanBodyButton?.ResetCooldown(),
+            couldUse: () => true,
+            () => true,
+            ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
+            row: 2,
+            KeyCode.C,
+            LanguageConfig.Instance.CleanAction,
+            (Cooldown)CleanBodyCd!.GetFloat,
+            0
+        );
 
         AddButton(CleanBodyButton);
     }
