@@ -47,7 +47,7 @@ public class CustomButton
     internal static List<ActionButton> AllVanillaButtons = new();
 
     private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, float cooldown, float effectTime,
+        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Cooldown cooldown, float effectTime,
         int usesLimit, string hotkeyName)
     {
         OnClick = onClick;
@@ -62,27 +62,6 @@ public class CustomButton
         Text = text;
         HasEffect = hasEffect;
         Cooldown = () => cooldown;
-        EffectTime = effectTime;
-        UsesLimit = UsesRemaining = usesLimit;
-        HotkeyName = hotkeyName;
-    }
-
-    private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Func<float> cooldown, float effectTime,
-        int usesLimit, string hotkeyName)
-    {
-        OnClick = onClick;
-        OnMeetingEnd = onMeetingEnd;
-        OnEffect = onEffect;
-        CouldUse = couldUse;
-        HasButton = hasButton;
-        Sprite = sprite;
-        Position = position ?? Vector3.zero;
-        if (position is null) IsCustomPosition = true;
-        Hotkey = hotkey;
-        Text = text;
-        HasEffect = hasEffect;
-        Cooldown = cooldown;
         EffectTime = effectTime;
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
@@ -108,25 +87,12 @@ public class CustomButton
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, float cooldown,
+        Func<bool>? hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Cooldown cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
             true, cooldown, effectTime, usesLimit, hotkeyName)
         { Order = order };
-    }
-
-    /// <summary>
-    ///     在游戏中创建一个按钮 (Effect)
-    /// </summary>
-    /// <param name="cooldown">按钮的冷却（表达式）</param>
-    /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown,
-        float effectTime, int usesLimit, string hotkeyName = "")
-    {
-        return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
-            true, cooldown, effectTime, usesLimit, hotkeyName);
     }
 
     /// <summary>
@@ -145,7 +111,7 @@ public class CustomButton
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, Vector3 position, KeyCode? hotkey, string text, float cooldown, int usesLimit,
+        Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Cooldown cooldown, int usesLimit,
         string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text,
@@ -156,24 +122,11 @@ public class CustomButton
     /// <summary>
     ///     在游戏中创建一个按钮 (Non-effect)
     /// </summary>
-    /// <param name="cooldown">按钮的冷却（表达式）</param>
-    /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit,
-        string hotkeyName = "")
-    {
-        return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text,
-            false, cooldown, -1f, usesLimit, hotkeyName);
-    }
-
-    /// <summary>
-    ///     在游戏中创建一个按钮 (Non-effect)
-    /// </summary>
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, int row, KeyCode? hotkey, string text, float cooldown, int usesLimit,
+        Sprite sprite, int row, KeyCode? hotkey, string text, Cooldown cooldown, int usesLimit,
         string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, null, hotkey, text,
@@ -190,7 +143,7 @@ public class CustomButton
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, float cooldown,
+        Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Cooldown cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
@@ -201,29 +154,29 @@ public class CustomButton
         };
     }
 
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit,
-        string hotkeyName = "", int order = -1)
-    {
-        return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, null, hotkey, text,
-            false, cooldown, -1f, usesLimit, hotkeyName)
-        { 
-            Row = row, 
-            Order = order
-        };
-    }
+    //public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool>? hasButton,
+    //    Sprite sprite, int row, KeyCode? hotkey, string text, Cooldown cooldown, int usesLimit,
+    //    string hotkeyName = "", int order = -1)
+    //{
+    //    return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, null, hotkey, text,
+    //        false, cooldown, -1f, usesLimit, hotkeyName)
+    //    { 
+    //        Row = row, 
+    //        Order = order
+    //    };
+    //}
 
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown,
-        float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
-    {
-        return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
-            true, cooldown, effectTime, usesLimit, hotkeyName)
-        { 
-            Row = row ,
-            Order = order
-        };
-    }
+    //public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
+    //    Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Cooldown cooldown,
+    //    float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
+    //{
+    //    return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
+    //        true, cooldown, effectTime, usesLimit, hotkeyName)
+    //    { 
+    //        Row = row ,
+    //        Order = order
+    //    };
+    //}
 
     public void SetActive(bool active)
     {
@@ -417,4 +370,16 @@ public class CustomButton
             btn.GameObject!.transform.localPosition = btn.Position = pos;
         }
     }
+}
+
+public class Cooldown
+{
+    private float? Number;
+    private Func<float>? Expression;
+    public Cooldown(float num) => Number = num;
+    public Cooldown(Func<float> exp) => Expression = exp;
+    public static implicit operator float(Cooldown cd) => cd.Number ?? float.PositiveInfinity;
+    public static implicit operator Func<float>(Cooldown cd) => cd.Expression ?? (() => float.PositiveInfinity);
+    public static implicit operator Cooldown(float cd) => new(cd);
+    public static implicit operator Cooldown(Func<float> cd) => new(cd);
 }

@@ -30,7 +30,7 @@ public class Sheriff : Role, IListener
                 PlayerControl.LocalPlayer.CmdCheckMurder(target);
             },
             () => SheriffKillButton?.ResetCooldown(),
-            () =>
+            couldUse: () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
                 if (target == null) return false;
@@ -42,10 +42,10 @@ public class Sheriff : Role, IListener
             },
             () => true,
             ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
-            2,
+            row: 2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            SheriffKillCd.GetFloat,
+            (Cooldown)SheriffKillCd.GetFloat,
             -1
         );
 
