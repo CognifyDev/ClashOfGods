@@ -69,7 +69,7 @@ public class TaskAdderListener : IListener
     {
         var role = button.Role;
         int type = 99;
-        if (!role && !((type = (ushort)role.Role) > 100)) return true;0
+        if (!role && !((type = (ushort)role.Role) > 100)) return true;
         if (type is not <= 7 and not 99)
         {
             PlayerControl.LocalPlayer.SetCustomRole(COG.Role.RoleManager.GetManager().GetRoles()[type - 100]);
