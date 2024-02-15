@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -18,6 +19,8 @@ public static class StringUtils
 
         return sb.ToString();
     }
+
+    public static string RemoveLast(this string input) => new(input.Take(input.Length - 1).ToArray());
 
     public static string CustomFormat(this string text, params object[] args)
     {

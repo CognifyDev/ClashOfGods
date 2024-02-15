@@ -122,21 +122,13 @@ public sealed class CustomOption
 
         var sb = new StringBuilder();
 
-        for (var i = 0; i < Options.Count; i++)
+        foreach (var option in from option in Options where option != null where !option.Ignore where option.Selection != option.DefaultSelection select option)
         {
-            var option = Options[i];
-            if (option == null) continue;
-            if (option.Ignore) continue;
-            if (option.Selection == option.DefaultSelection) continue;
-
             sb.Append(option.ID + "|" + option.Selection);
-            if (i + 1 < Options.Count)
-            {
-                sb.Append(',');
-            }
+            sb.Append(',');
         }
         
-        writer.Write(sb.ToString());
+        writer.Write(sb.ToString().RemoveLast());
         
         // id|selection,id|selection
 
