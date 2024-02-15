@@ -90,6 +90,10 @@ action:
 game:
   end:
     show-players-roles-message: "玩家职业: "
+    wins:
+      impostor: "伪装者胜利"
+      crewmate: "船员胜利"
+      neutral: "%player% 胜利"
   survival-data:
     alive: "存活"
     disconnected: "掉线"

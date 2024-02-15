@@ -137,6 +137,10 @@ public class LanguageConfig : Config
         UpToDate = GetString("option.main.update.up-to-date");
         NonCheck = GetString("option.main.update.non-check");
         FetchedString = GetString("option.main.update.fetched");
+
+        ImpostorsWinText = GetString("game.end.wins.impostor");
+        CrewmatesWinText = GetString("game.end.wins.crewmate");
+        NeutralsWinText = GetString("game.end.wins.neutral");
     }
 
     public static LanguageConfig Instance { get; private set; }
@@ -226,6 +230,11 @@ public class LanguageConfig : Config
     public string UpToDate { get; private set; } = null!;
     public string NonCheck { get; private set; } = null!;
     public string FetchedString { get; private set; } = null!;
+
+    public string ImpostorsWinText { get; private set; } = null!;
+    public string CrewmatesWinText { get; private set; } = null!;
+    public string NeutralsWinText { get; private set; } = null!;
+
 
     private string GetString(string location)
     {

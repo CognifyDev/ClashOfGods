@@ -1,6 +1,6 @@
 ﻿using System.Linq;
+using COG.Config.Impl;
 using COG.Utils;
-using UnityEngine;
 
 namespace COG.Game.CustomWinner.Impl;
 
@@ -12,14 +12,11 @@ public class LastPlayerCustomWinner : IWinnable
         var lastPlayer = PlayerUtils.GetAllAlivePlayers().FirstOrDefault();
         if (!lastPlayer) return false;
         CustomWinnerManager.RegisterCustomWinners(PlayerUtils.GetAllAlivePlayers());
-        CustomWinnerManager.SetWinText($"{lastPlayer!.Data.PlayerName} win");
-        CustomWinnerManager.SetWinColor(Color.white);
+        CustomWinnerManager.SetWinText(LanguageConfig.Instance.NeutralsWinText.Replace("%player%", lastPlayer!.Data.PlayerName));
+        CustomWinnerManager.SetWinColor(lastPlayer.GetRoleInstance()!.Color);
         GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
         return true;
     }
 
-    public ulong GetWeight()
-    {
-        return IWinnable.GetOrder(3);
-    }
+    public ulong GetWeight() => IWinnable.GetOrder(4);
 }

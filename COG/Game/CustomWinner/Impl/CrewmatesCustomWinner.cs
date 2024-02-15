@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using COG.Config.Impl;
 using COG.Utils;
 
 namespace COG.Game.CustomWinner.Impl;
@@ -15,7 +16,7 @@ public class CrewmatesCustomWinner : IWinnable
                     .Select(pair => pair.Player).ToList().Count == 0)
             {
                 CustomWinnerManager.RegisterCustomWinners(PlayerUtils.AllCremates.Select(p => p.Player));
-                CustomWinnerManager.SetWinText("Crewmates win");
+                CustomWinnerManager.SetWinText(LanguageConfig.Instance.CrewmatesWinText);
                 CustomWinnerManager.SetWinColor(Palette.CrewmateBlue);
                 GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);
                 return true;
@@ -24,7 +25,7 @@ public class CrewmatesCustomWinner : IWinnable
         else
         {
             CustomWinnerManager.RegisterCustomWinners(PlayerUtils.AllCremates.Select(p => p.Player));
-            CustomWinnerManager.SetWinText("Crewmates win");
+            CustomWinnerManager.SetWinText(LanguageConfig.Instance.CrewmatesWinText);
             CustomWinnerManager.SetWinColor(Palette.CrewmateBlue);
             GameManager.Instance.RpcEndGame(GameOverReason.HumansByTask, false);
         }
@@ -32,8 +33,5 @@ public class CrewmatesCustomWinner : IWinnable
         return false;
     }
 
-    public ulong GetWeight()
-    {
-        return IWinnable.GetOrder(2);
-    }
+    public ulong GetWeight() => IWinnable.GetOrder(2);
 }
