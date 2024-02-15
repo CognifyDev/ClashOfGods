@@ -17,6 +17,12 @@ role:
       name: "清洁工"
       description: "协助队友，清理尸体"
       clean-cd: "清理尸体冷却"
+    troublemaker:
+      name: "扰乱者"
+      description: "扰乱船员！"
+      menu:
+        cd: "冷却时间"
+        duration: "持续时间"
   crewmate:
     crewmate:
       name: "船员"
@@ -87,6 +93,7 @@ sidebar-text:
 action:
   kill: "击杀"
   clean: "清理"
+  make-trouble: "干扰"
 game:
   end:
     show-players-roles-message: "玩家职业: "

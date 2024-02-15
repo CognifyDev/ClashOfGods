@@ -15,15 +15,14 @@ public class Cleaner : Role, IListener
 {
     private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
+    
     public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         Description = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
 
-        if (ShowInOptions)
-        {
-            CleanBodyCd = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
-        }
+        CleanBodyCd = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor, 
+            LanguageConfig.Instance.CleanBodyCooldown, 30f, 1f, 60f, 1f, MainRoleOption);
 
         CleanBodyButton = CustomButton.Create(
             () =>

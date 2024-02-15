@@ -6,6 +6,7 @@ using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Role;
 using COG.Role.Impl;
+using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
 using COG.Utils;
@@ -21,11 +22,9 @@ public class GameListener : IListener
     private static readonly List<IListener> RoleListeners = new();
 
     private static bool HasStartedRoom { get; set; }
-    // private static bool _forceStarted;
 
     public void OnCoBegin()
     {
-        // _forceStarted = false;
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
 
@@ -128,7 +127,7 @@ public class GameListener : IListener
             }
             catch
             {
-                role = Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
+                role = Role.RoleManager.GetManager().GetTypeRoleInstance<Crewmate>(); // 无法分配默认职业为Crewmate
             }
 
             player!.SetCustomRole(role!);

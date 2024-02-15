@@ -59,7 +59,6 @@ public class LanguageConfig : Config
         CrewmateRolesSetting = GetString("menu.crewmate.name");
         AddonsSetting = GetString("menu.addons.name");
 
-        // SaveGameConfigs = GetString("menu.general.save-game-configs");
         LoadPreset = GetString("menu.general.load-preset");
         SavePreset = GetString("menu.general.save-preset");
         DebugMode = GetString("menu.general.debug-mode");
@@ -79,12 +78,18 @@ public class LanguageConfig : Config
         SheriffDescription = GetString("role.crewmate.sheriff.description");
         SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");                                          
 
-        // Impostor
+        // Impostors
         ImpostorName = GetString("role.impostor.impostor.name");
         ImpostorDescription = GetString("role.impostor.impostor.description");
+        
         CleanerName = GetString("role.impostor.cleaner.name");
         CleanerDescription = GetString("role.impostor.cleaner.description");
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
+
+        TroublemakerName = GetString("role.impostor.troublemaker.name");
+        TroublemakerDescription = GetString("role.impostor.troublemaker.description");
+        TroublemakerDuration = GetString("role.impostor.troublemaker.menu.duration");
+        TroublemakerCooldown = GetString("role.impostor.troublemaker.menu.cd");
 
         // Neutral
         JesterName = GetString("role.neutral.jester.name");
@@ -122,6 +127,7 @@ public class LanguageConfig : Config
 
         KillAction = GetString("action.kill");
         CleanAction = GetString("action.clean");
+        MakeTrouble = GetString("action.make-trouble");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 
@@ -174,9 +180,15 @@ public class LanguageConfig : Config
     // Impostor
     public string ImpostorName { get; private set; } = null!;
     public string ImpostorDescription { get; private set; } = null!;
+    
     public string CleanerName { get; private set; } = null!;
     public string CleanerDescription { get; private set; } = null!;
     public string CleanBodyCooldown { get; private set; } = null!;
+
+    public string TroublemakerName { get; private set; } = null!;
+    public string TroublemakerDescription { get; private set; } = null!;
+    public string TroublemakerDuration { get; private set; } = null!;
+    public string TroublemakerCooldown { get; private set; } = null!;
 
     // Neutral
     public string JesterName { get; private set; } = null!;
@@ -214,6 +226,7 @@ public class LanguageConfig : Config
 
     public string KillAction { get; private set; } = null!;
     public string CleanAction { get; private set; } = null!;
+    public string MakeTrouble { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 

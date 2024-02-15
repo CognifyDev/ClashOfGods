@@ -158,6 +158,8 @@ public partial class Main : BasePlugin
             // Impostor
             new Impostor(),
             new Cleaner(),
+            // new Troublemaker(),
+            // 此职业暂时未完成
 
             // Neutral
             new Jester()
