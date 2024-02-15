@@ -89,5 +89,7 @@ public static class GameUtils
         int idx = PlayerRoleData.Select(pr => pr.Player).ToList().IndexOf(pc);
         if (idx != -1) PlayerRoleData.RemoveAt(idx);
         PlayerRoleData.Add(new(pc, role));
+        pc.SetRole(role.BaseRoleType);
+        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
     }
 }

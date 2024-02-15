@@ -35,9 +35,6 @@ public class GameListener : IListener
         SelectRoles();
         Main.Logger.LogInfo("Share roles for players...");
         ShareRoles();
-
-        foreach (var playerRole in GameUtils.PlayerRoleData)
-            RoleManager.Instance.SetRole(playerRole.Player, playerRole.Role.BaseRoleType);
     }
 
     public void OnRPCReceived(byte callId, MessageReader reader)
@@ -80,6 +77,14 @@ public class GameListener : IListener
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Engineer, 0, 0);
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
+        }
+        if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+        {
+            var role = player.GetRoleInstance();
+            if (role is null) return;
+            var text = player.cosmetics.nameText;
+            text.color = role.Color;
+            text.text = new StringBuilder().Append(role.Name).Append("\n").Append(player.Data.PlayerName).ToString();
         }
     }
     private static void SelectRoles()
