@@ -22,13 +22,13 @@ public enum ColorType
 public static class PlayerUtils
 {
     public static IEnumerable<PlayerRole> AllImpostors =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor).ToListCustom();
+        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor);
 
     public static IEnumerable<PlayerRole> AllCremates =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Crewmate).ToListCustom();
+        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Crewmate);
 
     public static IEnumerable<PlayerRole> AllNeutrals =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Neutral).ToListCustom();
+        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Neutral);
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家

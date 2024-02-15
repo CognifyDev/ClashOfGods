@@ -10,7 +10,7 @@ public class RoleManager
 
     private readonly List<Role> _roles = new();
 
-    private uint _nextId = 0;
+    private uint _nextId;
 
     public Role[] GetTypeCampRoles(CampType campType)
     {
@@ -47,7 +47,7 @@ public class RoleManager
         return _roles.FirstOrDefault(role => role.Id == id);
     }
 
-    public uint GetAvailableRoleId() => _nextId++;
+    public uint GetAvailableRoleId() => _nextId ++;
 
     /// <summary>
     ///     获取一个新的获取器
