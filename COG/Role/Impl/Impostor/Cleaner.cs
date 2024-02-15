@@ -34,13 +34,13 @@ namespace COG.Role.Impl.Impostor
                     RpcCleanDeadBody(body!);
                 },
                 () => CleanBodyButton?.ResetCooldown(),
-                () => true,
+                couldUse: () => true,
                 () => true,
                 ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
-                2,
+                row: 2,
                 KeyCode.C,
                 LanguageConfig.Instance.CleanAction,
-                CleanBodyCd.GetFloat,
+                (Cooldown)CleanBodyCd.GetFloat,
                 0
             );
 
