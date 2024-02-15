@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption;
+using COG.Utils;
 
 namespace COG.Listener.Impl;
 
@@ -34,18 +36,27 @@ public class RpcListener : IListener
                 }
                 break;
             case KnownRpc.ShareOptions:
-                var originalString = reader.ReadString();
-                foreach (var s in originalString.Split(","))
                 {
-                    var contexts = s.Split("|");
-                    var id = int.Parse(contexts[0]);
-                    var selection = int.Parse(contexts[1]);
-
-                    var customOption = CustomOption.Options.FirstOrDefault(option => option?.ID == id);
-                    if (customOption != null)
+                    var originalString = reader.ReadString();
+                    foreach (var s in originalString.Split(","))
                     {
-                        customOption.Selection = selection;
+                        var contexts = s.Split("|");
+                        var id = int.Parse(contexts[0]);
+                        var selection = int.Parse(contexts[1]);
+
+                        var customOption = CustomOption.Options.FirstOrDefault(option => option?.ID == id);
+                        if (customOption != null)
+                        {
+                            customOption.Selection = selection;
+                        }
                     }
+                }
+                break;
+            case KnownRpc.SetRole:
+                {
+                    var playerId = reader.ReadByte();
+                    var roleId = reader.ReadPackedUInt32();
+                    GameUtils.SetCustomRole(PlayerUtils.GetPlayerById(playerId)!, Role.RoleManager.GetManager().GetRoleById(roleId)!);
                 }
                 break;
         }
