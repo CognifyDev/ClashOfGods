@@ -10,6 +10,8 @@ public class RoleManager
 
     private readonly List<Role> _roles = new();
 
+    private uint _nextId = 0;
+
     public Role[] GetTypeCampRoles(CampType campType)
     {
         return _roles.Where(role => role.CampType == campType && role.MainRoleOption!.GetBool()).ToArray();
@@ -40,10 +42,12 @@ public class RoleManager
         return _roles.FirstOrDefault(r => r.GetType().Name == name);
     }
 
-    public Role? GetRoleById(int id)
+    public Role? GetRoleById(uint id)
     {
         return _roles.FirstOrDefault(role => role.Id == id);
     }
+
+    public uint GetAvailableRoleId() => _nextId++;
 
     /// <summary>
     ///     获取一个新的获取器

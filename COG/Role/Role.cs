@@ -29,7 +29,7 @@ public abstract class Role
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
         CanSabotage = false;
-        Id = GetType().GetHashCode();
+        Id = RoleManager.GetManager().GetAvailableRoleId();
 
         ShowInOptions = showInOptions;
 
@@ -45,7 +45,7 @@ public abstract class Role
     /// <summary>
     ///     角色特征码
     /// </summary>
-    public int Id { get; }
+    public uint Id { get; }
 
     /// <summary>
     ///     角色颜色
