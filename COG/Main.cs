@@ -15,8 +15,6 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.States;
-using COG.UI.CustomWinner;
-using COG.UI.CustomWinner.Impl;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -28,12 +26,13 @@ using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
-using COG.WinAPI;
 using System.IO;
+using COG.Game.CustomWinner;
+using COG.Game.CustomWinner.Impl;
 using COG.Plugin.Manager;
-using Newtonsoft.Json.Linq;
+using COG.Utils.WinAPI;
 using UnityEngine.SceneManagement;
-using Mode = COG.WinAPI.OpenFileDialogue.OpenFileMode;
+using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG;
 
@@ -55,9 +54,7 @@ public partial class Main : BasePlugin
     public static ManualLogSource Logger = null!;
     public static VersionInfo VersionInfo { get; set; } = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
-    public Harmony Harmony { get; } = new(PluginGuid);
-
-    // public static List<string> RegisteredBetaUsers { get; private set; } = new();
+    private Harmony Harmony { get; } = new(PluginGuid);
 
     public static Main Instance { get; private set; } = null!;
 
@@ -68,7 +65,7 @@ public partial class Main : BasePlugin
     {
         Instance = this;
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
-        Main.VersionInfo = PluginVersion.Equals("Unknown")
+        VersionInfo = PluginVersion.Equals("Unknown")
             ? VersionInfo.Empty
             : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
 
@@ -107,25 +104,6 @@ public partial class Main : BasePlugin
         }
 
         ModUpdater.FetchUpdate();
-        
-        /*
-        if (BetaVersion)
-        {
-            // 开始验证
-            const string url =
-                "https://raw.kkgithub.com/CognifyDev/.github/main/hwids";
-            var hwids = WebUtils.GetWeb(url).Split('|');
-            RegisteredBetaUsers = new List<string>(hwids);
-            var hostHwid = SystemUtils.GetHwid();
-            var success = hwids.Any(hwid => hwid.Equals(hostHwid));
-            Logger.LogInfo("Local HWID => " + hostHwid);
-            if (!success)
-            {
-                Logger.LogError("Can not verify, please check!");
-                return;
-            }
-        }
-*/
         
         // Load plugins
         try

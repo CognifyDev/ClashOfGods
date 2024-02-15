@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using COG.Utils;
 
-namespace COG.UI.CustomWinner.Impl;
+namespace COG.Game.CustomWinner.Impl;
 
 public class CrewmatesCustomWinner : IWinnable
 {

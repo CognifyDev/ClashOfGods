@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using COG.Config.Impl;
+using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.UI.CustomOption;
-using COG.UI.CustomWinner;
 using COG.Utils;
 using UnityEngine;
 

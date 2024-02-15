@@ -8,7 +8,7 @@ public abstract class Command
     ///     构造一个Command
     /// </summary>
     /// <param name="name">命令名称</param>
-    public Command(string name)
+    protected Command(string name)
     {
         Name = name;
     }

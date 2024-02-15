@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace COG.WinAPI;
+namespace COG.Utils.WinAPI;
 
 public static class OpenFileDialogue
 {

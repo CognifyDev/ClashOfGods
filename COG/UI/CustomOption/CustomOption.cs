@@ -9,21 +9,19 @@ using COG.Config.Impl;
 using COG.Listener;
 using COG.Rpc;
 using COG.Utils;
-using COG.Utils.Resolver;
-using COG.WinAPI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
 using Object = UnityEngine.Object;
-using Mode = COG.WinAPI.OpenFileDialogue.OpenFileMode;
+using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using COG.States;
+using COG.Utils.WinAPI;
 
 namespace COG.UI.CustomOption;
 
 // Code base from
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
-[Serializable]
 [DataContract]
 public sealed class CustomOption
 {
@@ -41,23 +39,23 @@ public sealed class CustomOption
 
     public static readonly List<CustomOption?> Options = new();
 
-    [DataMember] public int Selection;
+    public int Selection;
 
-    [DataMember] public OptionBehaviour? OptionBehaviour;
+    public OptionBehaviour? OptionBehaviour;
 
-    [DataMember] public readonly int DefaultSelection;
+    public readonly int DefaultSelection;
 
-    [DataMember] public readonly int ID;
+    public readonly int ID;
 
-    [DataMember] public readonly bool IsHeader;
+    public readonly bool IsHeader;
 
-    [DataMember] public readonly string Name;
+    public readonly string Name;
 
-    [DataMember] public readonly CustomOption? Parent;
+    public readonly CustomOption? Parent;
 
-    [DataMember] public readonly object[] Selections;
+    public readonly object[] Selections;
 
-    [DataMember] public readonly CustomOptionType Type;
+    public readonly CustomOptionType Type;
 
     public readonly int CharacteristicCode;
 
@@ -82,8 +80,6 @@ public sealed class CustomOption
 
         CharacteristicCode = GetHashCode();
     }
-
-    public CustomOption() { }
 
     public static CustomOption Create(int id, CustomOptionType type, string name, string[] selections,
         CustomOption? parent = null, bool isHeader = false)

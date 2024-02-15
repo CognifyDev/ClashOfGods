@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using COG.Config.Impl;
-using COG.UI.CustomWinner;
+using COG.Game.CustomWinner;
 using COG.Utils;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
