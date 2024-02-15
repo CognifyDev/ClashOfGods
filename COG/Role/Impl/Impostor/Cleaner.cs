@@ -9,18 +9,24 @@ using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace COG.Role.Impl.Impostor
-{
-    public class Cleaner : Role, IListener
-    {
-        private CustomOption CleanBodyCd { get; }
-        private CustomButton CleanBodyButton { get; }
-        public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
-        {
-            Description = LanguageConfig.Instance.CleanerDescription;
-            BaseRoleType = RoleTypes.Impostor;
+namespace COG.Role.Impl.Impostor;
 
-            if (ShowInOptions)
+public class Cleaner : Role, IListener
+{
+    private CustomOption CleanBodyCd { get; }
+    private CustomButton CleanBodyButton { get; }
+    public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
+    {
+        Description = LanguageConfig.Instance.CleanerDescription;
+        BaseRoleType = RoleTypes.Impostor;
+
+        if (ShowInOptions)
+        {
+            CleanBodyCd = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
+        }
+
+        CleanBodyButton = CustomButton.Create(
+            () =>
             {
                 var headerID = MainRoleOption!.ID;
                 CleanBodyCd = CustomOption.Create(headerID + 1, CustomOption.CustomOptionType.Impostor, LanguageConfig.Instance.CleanBodyCooldown, 30f, 30f, 60f, 5f, MainRoleOption);
@@ -40,37 +46,36 @@ namespace COG.Role.Impl.Impostor
                 row: 2,
                 KeyCode.C,
                 LanguageConfig.Instance.CleanAction,
-                (Cooldown)CleanBodyCd.GetFloat,
+                (Cooldown)CleanBodyCd!.GetFloat,
                 0
             );
 
-            AddButton(CleanBodyButton);
-        }
+        AddButton(CleanBodyButton);
+    }
 
-        public void RpcCleanDeadBody(DeadBody body)
+    public void RpcCleanDeadBody(DeadBody body)
+    {
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.CleanDeadBody);
+        writer.Write(body.ParentId);
+        writer.Finish();
+        CleanDeadBody(body);
+    }
+
+    public void CleanDeadBody(DeadBody body) => body.gameObject.SetActive(false); // idk why it make PlayerControl.FixedUpdate() throw System.NullReferenceException when i destroy the body
+
+    public void OnRPCReceived(byte callId, MessageReader reader)
+    {
+        if (callId == (byte)KnownRpc.CleanDeadBody)
         {
-            var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.CleanDeadBody);
-            writer.Write(body.ParentId);
-            writer.Finish();
-            CleanDeadBody(body);
+            byte pid = reader.ReadByte();
+            var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
+            if (!body) return;
+            CleanDeadBody(body!);
         }
+    }
 
-        public void CleanDeadBody(DeadBody body) => body.gameObject.SetActive(false); // idk why it make PlayerControl.FixedUpdate() throw System.NullReferenceException when i destroy the body
-
-        public void OnRPCReceived(byte callId, MessageReader reader)
-        {
-            if (callId == (byte)KnownRpc.CleanDeadBody)
-            {
-                byte pid = reader.ReadByte();
-                var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
-                if (!body) return;
-                CleanDeadBody(body!);
-            }
-        }
-
-        public override IListener GetListener(PlayerControl player)
-        {
-            return this;
-        }
+    public override IListener GetListener(PlayerControl player)
+    {
+        return this;
     }
 }

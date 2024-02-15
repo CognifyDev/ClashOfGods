@@ -17,10 +17,10 @@ public class Jester : Role, IListener, IWinnable
     {
         Description = LanguageConfig.Instance.JesterDescription;
         _allowStartMeeting = CustomOption.Create(
-            MainRoleOption!.ID + 1, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true,
+            false, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true,
             MainRoleOption);
         _allowReportDeadBody = CustomOption.Create(
-            MainRoleOption.ID + 2, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true,
+            false, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true,
             MainRoleOption);
 
         CustomWinnerManager.RegisterCustomWinnerInstance(this);
