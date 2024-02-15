@@ -3,7 +3,7 @@ using System.Linq;
 using COG.Utils;
 using UnityEngine;
 
-namespace COG.UI.CustomWinner;
+namespace COG.Game.CustomWinner;
 
 public static class CustomWinnerManager
 {

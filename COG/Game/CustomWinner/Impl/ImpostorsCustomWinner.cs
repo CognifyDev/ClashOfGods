@@ -2,7 +2,7 @@
 using COG.Role;
 using COG.Utils;
 
-namespace COG.UI.CustomWinner.Impl;
+namespace COG.Game.CustomWinner.Impl;
 
 public class ImpostorsCustomWinner : IWinnable
 {

@@ -2,7 +2,7 @@
 using COG.Utils;
 using UnityEngine;
 
-namespace COG.UI.CustomWinner.Impl;
+namespace COG.Game.CustomWinner.Impl;
 
 public class LastPlayerCustomWinner : IWinnable
 {

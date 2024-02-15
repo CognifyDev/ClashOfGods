@@ -6,8 +6,8 @@ using System.Net;
 using COG.Config.Impl;
 using COG.Utils;
 using COG.Utils.Version;
+using COG.Utils.WinAPI;
 using Il2CppSystem.IO;
-using COG.WinAPI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -66,14 +66,9 @@ public static class MainMenuPatch
 
                 if (result is MessageBoxDialogue.ClickedButton.IDNO) return;
 
-                ModUpdater.DownloadUpdate();
+                ModUpdater.DoUpdate();
                 Application.Quit();
             }, Color.yellow);
-/*
-        if (Main.BetaVersion)
-            CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
-                LanguageConfig.Instance.BetaVersionRegisteredUserDisplay.CustomFormat(Main.RegisteredBetaUsers.Count),
-                () => { }, Color.yellow);*/
     }
 
     /// <summary>

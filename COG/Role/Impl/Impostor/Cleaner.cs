@@ -13,7 +13,7 @@ namespace COG.Role.Impl.Impostor
 {
     public class Cleaner : Role, IListener
     {
-        private CustomOption CleanBodyCd { get; } = new();
+        private CustomOption CleanBodyCd { get; }
         private CustomButton CleanBodyButton { get; }
         public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
         {

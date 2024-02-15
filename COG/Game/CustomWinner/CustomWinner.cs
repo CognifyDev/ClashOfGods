@@ -1,4 +1,4 @@
-﻿namespace COG.UI.CustomWinner;
+﻿namespace COG.Game.CustomWinner;
 
 public interface IWinnable
 {

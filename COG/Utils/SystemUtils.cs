@@ -2,8 +2,8 @@ using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using COG.Utils.WinAPI;
 using Microsoft.Win32;
-using COG.WinAPI;
 
 namespace COG.Utils;
 

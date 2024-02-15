@@ -1,60 +1,65 @@
-﻿using COG.Utils;
+﻿#pragma warning disable SYSLIB0014
+using COG.Utils;
 using COG.Utils.Version;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 
-namespace COG
+namespace COG;
+
+/// <summary>
+/// 模组更新类
+/// </summary>
+public static class ModUpdater
 {
-    public static class ModUpdater
+    public static VersionInfo LatestVersion { get; private set; } = null!;
+    public static string LatestDescription { get; set; } = "";
+    public static bool BetaVersion { get; private set; }
+
+    /*
+     * FIXME
+     * 此处无法正常运行：
+     * WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest")
+     * 获取时候GitHub返回403
+     */
+    public static void FetchUpdate()
     {
-        public static VersionInfo LatestVersion { get; private set; } = null!;
-        public static string LatestDescription { get; set; } = "";
-        public static bool BetaVersion { get; private set; }
+        string latestVersionString = null!;
+        var description = "";
 
-        public static void FetchUpdate()
+        try
         {
-            string latestVersionString = null!;
-            string description = "";
+            var jsonObject =
+                JObject.Parse(WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest"));
+            var tagNameToken = jsonObject["tag_name"];
+            var tagBodyToken = jsonObject["body"];
 
-            try
-            {
-                var jsonObject =
-                    JObject.Parse(WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest"));
-                var tagNameToken = jsonObject["tag_name"];
-                var tagBodyToken = jsonObject["body"];
-
-                if (tagNameToken is { Type: JTokenType.String }) latestVersionString = tagNameToken.ToString();
-                if (tagBodyToken is { Type: JTokenType.String }) description = tagBodyToken.ToString();
-            }
-            catch
-            {
-                // ignored
-            }
-
-            LatestVersion = latestVersionString == null ? VersionInfo.Empty : VersionInfo.NewVersionInfoInstanceByString(latestVersionString);
-
-            BetaVersion = Main.PluginVersion.ToLower().Contains("beta") || Main.PluginVersion.ToLower().Contains("dev");
-
-            LatestDescription = description;
+            if (tagNameToken is { Type: JTokenType.String }) latestVersionString = tagNameToken.ToString();
+            if (tagBodyToken is { Type: JTokenType.String }) description = tagBodyToken.ToString();
+        }
+        catch
+        {
+            // ignored
         }
 
-#pragma warning disable SYSLIB0014
-        public static void DownloadUpdate()
-        {
-            using var client = new WebClient();
-            client.DownloadFile(
-                $"https://download.yzuu.cf/CognifyDev/ClashOfGods/releases/download/{ModUpdater.LatestVersion}/ClashOfGods.dll",
-                "BepInEx/plugins/ClashOfGods.dll.new"
-            );
+        LatestVersion = latestVersionString == null ? VersionInfo.Empty : VersionInfo.NewVersionInfoInstanceByString(latestVersionString);
 
-            File.WriteAllText("BepInEx/plugins/do.vbs", "WScript.Sleep 1000\n\nstrFileToDelete = \"ClashOfGods.dll\"\nstrFileToRename = \"ClashOfGods.dll.new\"\nstrScriptToDelete = WScript.ScriptFullName\n\nSet fs = CreateObject(\"Scripting.FileSystemObject\")\n\nIf fs.FileExists(strFileToDelete) Then\n    fs.DeleteFile strFileToDelete\nEnd If\n\nIf fs.FileExists(strFileToRename) Then\n    fs.MoveFile strFileToRename, strFileToDelete\nEnd If\n\nIf fs.FileExists(strScriptToDelete) Then\n    fs.DeleteFile strScriptToDelete\nEnd If");
+        BetaVersion = Main.PluginVersion.ToLower().Contains("beta") || Main.PluginVersion.ToLower().Contains("dev");
 
-            Process.Start("BepInEx/plugins/do.vbs");
-        }
+        LatestDescription = description;
+    }
+    
+    public static void DoUpdate()
+    {
+        using var client = new WebClient();
+        client.DownloadFile(
+            $"https://download.yzuu.cf/CognifyDev/ClashOfGods/releases/download/{LatestVersion}/ClashOfGods.dll",
+            "BepInEx/plugins/ClashOfGods.dll.new"
+        );
+
+        File.WriteAllText("BepInEx/plugins/do.vbs", "WScript.Sleep 1000\n\nstrFileToDelete = \"ClashOfGods.dll\"\nstrFileToRename = \"ClashOfGods.dll.new\"\nstrScriptToDelete = WScript.ScriptFullName\n\nSet fs = CreateObject(\"Scripting.FileSystemObject\")\n\nIf fs.FileExists(strFileToDelete) Then\n    fs.DeleteFile strFileToDelete\nEnd If\n\nIf fs.FileExists(strFileToRename) Then\n    fs.MoveFile strFileToRename, strFileToDelete\nEnd If\n\nIf fs.FileExists(strScriptToDelete) Then\n    fs.DeleteFile strScriptToDelete\nEnd If");
+
+        Process.Start("BepInEx/plugins/do.vbs");
     }
 }
