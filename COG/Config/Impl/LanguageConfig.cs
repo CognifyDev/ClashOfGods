@@ -59,7 +59,7 @@ public class LanguageConfig : Config
         CrewmateRolesSetting = GetString("menu.crewmate.name");
         AddonsSetting = GetString("menu.addons.name");
 
-        SaveGameConfigs = GetString("menu.general.save-game-configs");
+        // SaveGameConfigs = GetString("menu.general.save-game-configs");
         LoadPreset = GetString("menu.general.load-preset");
         SavePreset = GetString("menu.general.save-preset");
         DebugMode = GetString("menu.general.debug-mode");
@@ -148,8 +148,6 @@ public class LanguageConfig : Config
     public string NeutralRolesSetting { get; private set; } = null!;
     public string CrewmateRolesSetting { get; private set; } = null!;
     public string AddonsSetting { get; private set; } = null!;
-
-    public string SaveGameConfigs { get; private set; } = null!;
     public string SavePreset { get; private set; } = null!;
     public string LoadPreset { get; private set; } = null!;
     public string DebugMode { get; private set; } = null!;

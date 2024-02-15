@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
@@ -29,18 +29,20 @@ public abstract class Role
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
         CanSabotage = false;
-        Id = RoleManager.GetManager().GetAvailableRoleId();
-
+        Id = _typeId;
+        _typeId ++;
         ShowInOptions = showInOptions;
 
         if (ShowInOptions)
         {
-            MainRoleOption = CustomOption.Create(Name.GetHashCode(), ToCustomOption(this),
+            MainRoleOption = CustomOption.Create(false, ToCustomOption(this),
                 ColorUtils.ToColorString(Color, Name), false, null, true);
-            RoleNumberOption = CustomOption.Create(Name.GetHashCode() * Name.GetHashCode(), ToCustomOption(this),
+            RoleNumberOption = CustomOption.Create(false, ToCustomOption(this),
                 LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, MainRoleOption);
         }
     }
+
+    private static int _typeId;
 
     /// <summary>
     ///     角色特征码

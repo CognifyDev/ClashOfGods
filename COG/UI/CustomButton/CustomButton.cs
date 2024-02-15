@@ -1,4 +1,4 @@
-﻿﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.Utils;
@@ -6,7 +6,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
+ using Debug = System.Diagnostics.Debug;
+ using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomButton;
 
@@ -303,18 +304,21 @@ public class CustomButton
     }
 
 #nullable disable
-    public void CheckClick()
+    private void CheckClick()
     {
         if (Timer <= 0f && CouldUse())
         {
-            if (HasEffect && IsEffectActive)
-            {
-                IsEffectActive = false;
-                ActionButton.cooldownTimerText.color = Palette.EnabledColor;
-                OnEffect();
-                ResetCooldown();
-            }
-            else
+            IsEffectActive = false;
+            ActionButton!.cooldownTimerText.color = Palette.EnabledColor;
+            Debug.Assert(OnEffect != null, nameof(OnEffect) + " != null");
+            OnEffect();
+            ResetCooldown();
+        }
+        else
+        {
+            if (UsesRemaining <= 0 && UsesLimit > 0) return;
+            OnClick();
+            if (HasEffect && !IsEffectActive)
             {
                 if (UsesRemaining <= 0 && UsesLimit > 0) return;
                 OnClick();
@@ -330,6 +334,8 @@ public class CustomButton
 
                 if (UsesLimit > 0) UsesRemaining--;
             }
+
+            if (UsesLimit > 0) UsesRemaining--;
         }
     }
 

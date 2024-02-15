@@ -239,6 +239,15 @@ public interface IListener
     {
     }
 
+
+    void OnCoSpawnPlayer(PlayerPhysics playerPhysics, LobbyBehaviour lobbyBehaviour)
+    {
+    }
+
+    void OnCreatePlayer(AmongUsClient amongUsClient, ClientData client)
+    {
+    }
+
     void OnTaskAdderShowFolder(TaskAdderGame taskAdderGame, TaskFolder folder)
     {
     }
@@ -255,6 +264,5 @@ public interface IListener
     {
         return true;
     }
-
     private class EmptyListener : IListener { }
 }

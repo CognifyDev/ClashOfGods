@@ -11,11 +11,11 @@ public static class GlobalCustomOption
 
     internal static void Init()
     {
-        LoadPreset = CustomOption.Create(-2, CustomOption.CustomOptionType.General,
+        LoadPreset = CustomOption.Create(true, CustomOption.CustomOptionType.General,
             LanguageConfig.Instance.LoadPreset, false, null, true);
-        SavePreset = CustomOption.Create(-1, CustomOption.CustomOptionType.General,
+        SavePreset = CustomOption.Create(true, CustomOption.CustomOptionType.General,
             LanguageConfig.Instance.SavePreset, false, null, true);
-        DebugMode = CustomOption.Create(1, CustomOption.CustomOptionType.General,
+        DebugMode = CustomOption.Create(true, CustomOption.CustomOptionType.General,
             LanguageConfig.Instance.DebugMode, false, null, true);
     }
 }

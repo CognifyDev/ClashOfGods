@@ -59,14 +59,20 @@ public sealed class CustomOption
 
     public readonly int CharacteristicCode;
 
+    public bool Ignore;
+
+    private static int _typeId;
+
     public static CustomOption? GetCustomOptionByCharacteristicCode(int characteristicCode)
         => Options.FirstOrDefault(customOption => customOption != null && customOption.CharacteristicCode == characteristicCode);
 
     // Option creation
-    public CustomOption(int id, CustomOptionType type, string name, object[] selections,
+    public CustomOption(bool ignore, CustomOptionType type, string name, object[] selections,
         object defaultValue, CustomOption? parent, bool isHeader)
     {
-        ID = id;
+        Ignore = ignore;
+        ID = _typeId;
+        _typeId++;
         Name = parent == null ? name : ColorUtils.ToColorString(Color.gray, "→ ") + name;
         Selections = selections;
         var index = Array.IndexOf(selections, defaultValue);
@@ -81,63 +87,53 @@ public sealed class CustomOption
         CharacteristicCode = GetHashCode();
     }
 
-    public static CustomOption Create(int id, CustomOptionType type, string name, string[] selections,
+    public static CustomOption Create(bool ignore, CustomOptionType type, string name, string[] selections,
         CustomOption? parent = null, bool isHeader = false)
     {
-        return new CustomOption(id, type, name, selections, "", parent, isHeader);
+        return new CustomOption(ignore, type, name, selections, "", parent, isHeader);
     }
 
-    public static CustomOption Create(int id, CustomOptionType type, string name, float defaultValue, float min,
+    public static CustomOption Create(bool ignore, CustomOptionType type, string name, float defaultValue, float min,
         float max, float step, CustomOption? parent = null, bool isHeader = false)
     {
         List<object> selections = new();
         for (var s = min; s <= max; s += step) selections.Add(s);
-        return new CustomOption(id, type, name, selections.ToArray(), defaultValue, parent, isHeader);
+        return new CustomOption(ignore, type, name, selections.ToArray(), defaultValue, parent, isHeader);
     }
 
-    public static CustomOption Create(int id, CustomOptionType type, string name, bool defaultValue,
+    public static CustomOption Create(bool ignore, CustomOptionType type, string name, bool defaultValue,
         CustomOption? parent = null, bool isHeader = false)
     {
-        return new CustomOption(id, type, name,
+        return new CustomOption(ignore, type, name,
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
             defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
     
     public static void ShareConfigs(PlayerControl target)
     {
-        if (PlayerControl.AllPlayerControls.Count <= 1 || PlayerControl.LocalPlayer == null ||
-            !AmongUsClient.Instance.AmHost) return;
+        if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
 
         // 当游戏选项更改的时候调用
 
         var localPlayer = PlayerControl.LocalPlayer;
 
         // 新建写入器
-        var writer = RpcUtils.StartRpcImmediately(localPlayer, (byte)KnownRpc.ShareOptions, new []{target});
-        
+        var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions, SendOption.Reliable, target.GetClientID());
 
         var sb = new StringBuilder();
- 
-        int[] unusedOptionIdList = {-1, -2};
 
-        for (var i = 0; i < Options.Count; i++)
+        foreach (var option in from option in Options where option != null where !option.Ignore where option.Selection != option.DefaultSelection select option)
         {
-            var option = Options[i];
-            if (option == null) continue;
-            if (option.Selection == option.DefaultSelection) continue;
-            if (unusedOptionIdList.Contains(option.ID)) continue;
-
             sb.Append(option.ID + "|" + option.Selection);
-            if (i + 1 < Options.Count)
-            {
-                sb.Append(',');
-            }
+            sb.Append(',');
         }
+        
+        writer.Write(sb.ToString().RemoveLast());
         
         // id|selection,id|selection
 
         // OK 现在进行一个结束
-        writer.Finish();
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
 
     public static void LoadOptionFromPreset(string path)
@@ -169,7 +165,7 @@ public sealed class CustomOption
         {
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
-            foreach (var option in Options.Where(o => o != null && (o!.ID != -1 || o!.ID != -2)).OrderBy(o => o!.ID))
+            foreach (var option in Options.Where(o => o is { Ignore: false }).OrderBy(o => o!.ID))
                 writer.WriteLine(option!.ID + " " + option.Selection);
         }
         catch (System.Exception e)
@@ -227,8 +223,10 @@ public sealed class CustomOption
 
     public void ShareOptionChange(int newSelection)
     {
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.UpdateOption);
+        var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId,
+            (byte)KnownRpc.UpdateOption, SendOption.Reliable);
         writer.Write(ID + "|" + newSelection);
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
 
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
@@ -360,7 +358,7 @@ public sealed class CustomOption
             {
                 if (option?.OptionBehaviour == null && option != null)
                 {
-                    if (option.ID != -1 && option.ID != -2)
+                    if (!option.Ignore)
                     {
                         var stringOption = Object.Instantiate(template, menus[(int)option.Type]);
                         optionBehaviours[(int)option.Type].Add(stringOption);
@@ -530,7 +528,7 @@ public class StringOptionPatch
     public static bool OnEnablePatch(StringOption __instance)
     {
         var option = Options.FirstOrDefault(option =>
-            option?.OptionBehaviour == __instance && option.ID != -1 && option.ID != -2);
+            option?.OptionBehaviour == __instance && !option.Ignore);
         if (option == null) return true;
 
         __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
@@ -546,26 +544,7 @@ public class StringOptionPatch
         return false;
     }
 }
-/*
-[HarmonyPatch]
-public abstract class SyncSettingPatch
-{
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
-    [HarmonyPostfix]
-    public static void SyncSetting()
-    {
-        // ShareConfigs();
-        // Main.Logger.LogError("1");
-    }
 
-    [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoSpawnPlayer))]
-    [HarmonyPostfix]
-    public static void SyncOnSpawnPlayer()
-    {
-        if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost) ShareConfigs();
-    }
-}
-*/
 [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Update))]
 internal class GameOptionsMenuUpdatePatch
 {
@@ -659,11 +638,23 @@ internal class HudStringPatch
         var txt = "";
         List<CustomOption> opt = new();
         foreach (var option in Options)
-            if (option != null && option.Type == type && option.ID != -1 && option.ID != -2)
+            if (option != null && option.Type == type && !option.Ignore)
                 opt.Add(option);
         foreach (var option in opt)
             txt += option.Name + ": " + option.Selections[option.Selection] + Environment.NewLine;
         return txt;
+        /*
+         * FIXME
+         * 房主设置更新，然后如果将已经选择打开的职业关闭，就会抛这个错误
+         * [Error  :Il2CppInterop] During invoking native->managed trampoline
+         * Exception: System.IndexOutOfRangeException: Index was outside the bounds of the array.
+         * at COG.UI.CustomOption.HudStringPatch.GetOptByType(CustomOptionType type) in D:\RiderProjects\ClashOfGods\COG\UI\CustomOption\CustomOption.cs:line 652
+         * at COG.UI.SidebarText.Impl.CrewmateSettings.ForResult(String& result) in D:\RiderProjects\ClashOfGods\COG\UI\SidebarText\Impl\CrewmateSettings.cs:line 15
+         * at COG.Listener.Impl.OptionListener.OnIGameOptionsExtensionsDisplay(String& result) in D:\RiderProjects\ClashOfGods\COG\Listener\Impl\OptionListener.cs:line 30
+         * at COG.UI.CustomOption.HudStringPatch.Postfix(String& __result) in D:\RiderProjects\ClashOfGods\COG\UI\CustomOption\CustomOption.cs:line 641
+         * at DMD<IGameOptionsExtensions::ToHudString>(IGameOptions gameOptions, Int32 numPlayers)
+         * at (il2cpp -> managed) ToHudString(IntPtr , Int32 , Il2CppMethodInfo* )
+         */
     }
 }
 

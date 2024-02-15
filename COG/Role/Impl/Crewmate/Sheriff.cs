@@ -19,8 +19,7 @@ public class Sheriff : Role, IListener
 
         if (ShowInOptions)
         {
-            var parentID = MainRoleOption!.ID;
-            SheriffKillCd = CustomOption.Create(parentID + 1, CustomOption.CustomOptionType.Crewmate, LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
+            SheriffKillCd = CustomOption.Create(false, CustomOption.CustomOptionType.Crewmate, LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
         }
 
         SheriffKillButton = CustomButton.Create(

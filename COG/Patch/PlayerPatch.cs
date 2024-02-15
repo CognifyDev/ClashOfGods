@@ -147,6 +147,26 @@ internal class OnPlayerJoinedPatch
     }
 }
 
+[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.CreatePlayer))]
+internal class CreatePlayerPatch
+{
+    public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData client)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+            listener.OnCreatePlayer(__instance, client);
+    }
+}
+
+[HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoSpawnPlayer))]
+internal class OnSpawnPlayerPatch
+{
+    public static void Postfix(PlayerPhysics __instance, [HarmonyArgument(0)] LobbyBehaviour lobbyBehaviour)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners()) 
+            listener.OnCoSpawnPlayer(__instance, lobbyBehaviour);
+    }
+}
+
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ReportDeadBody))]
 internal class ReportDeadBodyPatch
 {
