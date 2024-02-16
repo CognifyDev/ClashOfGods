@@ -568,43 +568,46 @@ internal class GameOptionsMenuUpdatePatch
         if (TimerForBugFix < 3.0f) FirstOpen = false;
 
         var offset = 2.75f;
+        var objType = new Dictionary<string, CustomOptionType>
+        {
+            { "COGSettings",CustomOptionType.General },
+            {"ImpostorSettings", CustomOptionType.Impostor},
+            {"NeutralSettings", CustomOptionType.Neutral},
+            {"CrewmateSettings", CustomOptionType.Crewmate},
+            {"AddonsSettings", CustomOptionType.Addons}
+        };
+
         foreach (var option in Options.Where(o => o != null))
         {
-            if (option != null && GameObject.Find("COGSettings") && option.Type != CustomOptionType.General)
-                continue;
-            if (option != null && GameObject.Find("ImpostorSettings") && option.Type != CustomOptionType.Impostor)
-                continue;
-            if (option != null && GameObject.Find("NeutralSettings") && option.Type != CustomOptionType.Neutral)
-                continue;
-            if (option != null && GameObject.Find("CrewmateSettings") && option.Type != CustomOptionType.Crewmate)
-                continue;
-            if (option != null && GameObject.Find("AddonsSettings") && option.Type != CustomOptionType.Addons)
-                continue;
-            if (option?.OptionBehaviour != null && option.OptionBehaviour.gameObject != null)
-            {
-                var enabled = true;
-                var parent = option.Parent;
-                while (enabled)
-                    if (parent != null)
-                    {
-                        enabled = parent.Selection != 0;
-                        parent = parent.Parent;
-                    }
-                    else
-                    {
-                        break;
-                    }
+            if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Type != kvp.Value)) continue;
+            if (!(option?.OptionBehaviour && option.OptionBehaviour.gameObject)) return;
+            var enabled = true;
+            var parent = option.Parent;
 
-                option.OptionBehaviour.gameObject.SetActive(enabled);
-                if (enabled)
+            do
+            {
+                if (parent != null)
                 {
-                    offset -= option.IsHeader ? 0.75f : 0.5f;
-                    var transform = option.OptionBehaviour.transform;
-                    var localPosition = transform.localPosition;
-                    localPosition = new Vector3(localPosition.x, offset, localPosition.z);
-                    transform.localPosition = localPosition;
+                    enabled = parent.Selection != 0;
+                    parent = parent.Parent;
+                }
+                else
+                {
+                    break;
                 }
             }
+            while (enabled);
+
+            option.OptionBehaviour.gameObject.SetActive(enabled);
+            if (enabled)
+            {
+                offset -= option.IsHeader ? 0.75f : 0.5f;
+                var transform = option.OptionBehaviour.transform;
+                var localPosition = transform.localPosition;
+                localPosition = new Vector3(localPosition.x, offset, localPosition.z);
+                transform.localPosition = localPosition;
+            }
+
         }
 
 

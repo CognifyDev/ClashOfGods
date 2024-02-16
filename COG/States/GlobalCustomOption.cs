@@ -15,7 +15,7 @@ public static class GlobalCustomOption
             LanguageConfig.Instance.LoadPreset, false, null, true);
         SavePreset = CustomOption.Create(true, CustomOption.CustomOptionType.General,
             LanguageConfig.Instance.SavePreset, false, null, true);
-        DebugMode = CustomOption.Create(true, CustomOption.CustomOptionType.General,
+        DebugMode = CustomOption.Create(false, CustomOption.CustomOptionType.General,
             LanguageConfig.Instance.DebugMode, false, null, true);
     }
 }
