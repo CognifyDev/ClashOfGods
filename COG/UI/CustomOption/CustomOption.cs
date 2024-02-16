@@ -641,11 +641,20 @@ internal class HudStringPatch
             if (option != null && option.Type == type && !option.Ignore)
                 opt.Add(option);
         foreach (var option in opt)
-            txt += option.Name + ": " + option.Selections[option.Selection] + Environment.NewLine;
+        {
+            // 临时解决方案
+            try
+            {
+                txt += option.Name + ": " + option.Selections[option.Selection] + Environment.NewLine;
+            }
+            catch (IndexOutOfRangeException)
+            {
+            }
+        }
         return txt;
         /*
          * FIXME
-         * 房主设置更新，然后如果将已经选择打开的职业关闭，就会抛这个错误
+         * 房主设置更新，然后如果将已经选择打开的职业关闭，那么成员客户端就会抛这个错误
          * [Error  :Il2CppInterop] During invoking native->managed trampoline
          * Exception: System.IndexOutOfRangeException: Index was outside the bounds of the array.
          * at COG.UI.CustomOption.HudStringPatch.GetOptByType(CustomOptionType type) in D:\RiderProjects\ClashOfGods\COG\UI\CustomOption\CustomOption.cs:line 652

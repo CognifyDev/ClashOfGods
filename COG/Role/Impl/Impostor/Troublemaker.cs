@@ -1,4 +1,6 @@
-﻿using AmongUs.GameOptions;
+﻿using System;
+using System.Threading;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.UI.CustomButton;
@@ -10,7 +12,7 @@ namespace COG.Role.Impl.Impostor;
 
 /*
  * TODO
- * 完成制造麻烦
+ * 完成 干扰
  */
 public class Troublemaker : Role
 {
@@ -20,6 +22,11 @@ public class Troublemaker : Role
     private CustomOption MakeTroubleDuration { get; }
     
     private CustomButton MakeTroubleButton { get; }
+
+    private static bool _makeTrouble = false;
+
+    private static Thread? _task;
+    private static long? _startTime;
     
     public Troublemaker() : base(LanguageConfig.Instance.TroublemakerName, Palette.ImpostorRed, CampType.Impostor, true)
     {
@@ -35,7 +42,25 @@ public class Troublemaker : Role
         MakeTroubleButton = CustomButton.Create(
             () =>
             {
-                
+                /*
+                if (_task != null)
+                {
+                    _startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+                }
+                _task = new Thread(() =>
+                {
+                    while (true)
+                    {
+                        _startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+                        var now = DateTimeOffset.Now.ToUnixTimeSeconds();
+                        if (now - MakeTroubleDuration.GetFloat() >= _startTime)
+                        {
+                            return;
+                        }
+                    }
+                });
+                _task.Start();
+                */
             },
             () => MakeTroubleButton?.ResetCooldown(),
             couldUse: () => true,
