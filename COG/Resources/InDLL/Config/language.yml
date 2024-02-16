@@ -6,9 +6,10 @@ role:
     name: "未知"
     description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
   global:
-    max-num: "<color=#808080>最大职业数量</color>"
-    allow-start-meeting: "<color=#CEC7C7>允许启动会议</color>"
-    allow-report-body: "<color=#CEC7C7>允许报告尸体</color>"
+    max-num: "最大职业数量"
+    allow-start-meeting: "允许启动会议"
+    allow-report-body: "允许报告尸体"
+    kill-cooldown: "击杀冷却时间"
   impostor:
     impostor:
       name: "伪装者"
@@ -38,6 +39,9 @@ role:
     jester:
       name: "小丑"
       description: "你会在被驱逐后获胜"
+    opportunist:
+      name: "投机主义者"
+      description: "活到最后！"
 camp:
   unknown:
     name: "未知阵营"

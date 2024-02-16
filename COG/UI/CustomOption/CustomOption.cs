@@ -93,7 +93,7 @@ public sealed class CustomOption
         return new CustomOption(ignore, type, name, selections, "", parent, isHeader);
     }
 
-    public static CustomOption Create(bool ignore, CustomOptionType type, string name, float defaultValue, float min,
+    public static CustomOption? Create(bool ignore, CustomOptionType type, string name, float defaultValue, float min,
         float max, float step, CustomOption? parent = null, bool isHeader = false)
     {
         List<object> selections = new();

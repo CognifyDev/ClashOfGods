@@ -95,6 +95,9 @@ public class LanguageConfig : Config
         JesterName = GetString("role.neutral.jester.name");
         JesterDescription = GetString("role.neutral.jester.description");
 
+        OpportunistName = GetString("role.neutral.opportunist.name");
+        OpportunistDescription = GetString("role.neutral.opportunist.description");
+
         Enable = GetString("option.enable");
         Disable = GetString("option.disable");
         CogOptions = GetString("option.main.cog-options");
@@ -107,6 +110,7 @@ public class LanguageConfig : Config
         MaxNumMessage = GetString("role.global.max-num");
         AllowStartMeeting = GetString("role.global.allow-start-meeting");
         AllowReportDeadBody = GetString("role.global.allow-report-body");
+        KillCooldown = GetString("role.global.");
 
         SidebarTextOriginal = GetString("sidebar-text.original");
         SidebarTextNeutral = GetString("sidebar-text.neutral");
@@ -194,6 +198,9 @@ public class LanguageConfig : Config
     public string JesterName { get; private set; } = null!;
     public string JesterDescription { get; private set; } = null!;
 
+    public string OpportunistName { get; private set; } = null!;
+    public string OpportunistDescription { get; private set; } = null!;
+
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;
@@ -204,6 +211,7 @@ public class LanguageConfig : Config
     public string MaxNumMessage { get; private set; } = null!;
     public string AllowStartMeeting { get; private set; } = null!;
     public string AllowReportDeadBody { get; private set; } = null!;
+    public string KillCooldown { get; private set; } = null!;
 
     public string SidebarTextOriginal { get; private set; } = null!;
     public string SidebarTextNeutral { get; private set; } = null!;

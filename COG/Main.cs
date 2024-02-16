@@ -162,7 +162,8 @@ public partial class Main : BasePlugin
             // 此职业暂时未完成
 
             // Neutral
-            new Jester()
+            new Jester(),
+            new Opportunist()
         });
 
         // Register mod options
