@@ -10,7 +10,7 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Sheriff : Role, IListener
 {
-    private CustomOption SheriffKillCd { get; }
+    private CustomOption? SheriffKillCd { get; }
     private CustomButton SheriffKillButton { get; }
     public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate, true)
     {

@@ -10,20 +10,22 @@ namespace COG.Role.Impl.Neutral;
 
 public class Jester : Role, IListener, IWinnable
 {
-    private readonly CustomOption _allowStartMeeting, _allowReportDeadBody;
-    private PlayerControl? _player;
+    public readonly CustomOption AllowStartMeeting, AllowReportDeadBody;
+
+    public static Jester JesterInstance { get; private set; } = null!;
 
     public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral, true)
     {
         Description = LanguageConfig.Instance.JesterDescription;
-        _allowStartMeeting = CustomOption.Create(
+        AllowStartMeeting = CustomOption.Create(
             false, ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true,
             MainRoleOption);
-        _allowReportDeadBody = CustomOption.Create(
+        AllowReportDeadBody = CustomOption.Create(
             false, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true,
             MainRoleOption);
 
         CustomWinnerManager.RegisterCustomWinnerInstance(this);
+        JesterInstance = this;
     }
 
     public bool CanWin()
@@ -39,27 +41,26 @@ public class Jester : Role, IListener, IWinnable
 
     public ulong GetWeight()
     {
-        return IWinnable.GetOrder(4);
+        return IWinnable.GetOrder(5);
     }
 
+    public override IListener GetListener(PlayerControl player) => new JesterListener(player);
+}
+
+public class JesterListener : IListener
+{
+    private readonly PlayerControl _player;
+    public JesterListener(PlayerControl playerControl)
+    {
+        _player = playerControl;
+    }
+    
     public bool OnPlayerReportDeadBody(PlayerControl playerControl, GameData.PlayerInfo? target)
     {
-        if (!CheckNull()) return true;
-        var result1 = _allowStartMeeting.GetBool();
-        var result2 = _allowReportDeadBody.GetBool();
-        if (!result1 && playerControl.IsSamePlayer(_player!) && target == null) return false;
+        var result1 = Jester.JesterInstance.AllowStartMeeting.GetBool();
+        var result2 = Jester.JesterInstance.AllowReportDeadBody.GetBool();
+        if (!result1 && playerControl.IsSamePlayer(_player) && target == null) return false;
 
-        return result2 || playerControl.IsSamePlayer(_player!) || target == null;
-    }
-
-    private bool CheckNull()
-    {
-        return _player != null;
-    }
-
-    public override IListener GetListener(PlayerControl player)
-    {
-        _player = player;
-        return this;
+        return result2 || playerControl.IsSamePlayer(_player) || target == null;
     }
 }

@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using COG.Utils;
 using UnityEngine;
 
 namespace COG.Game.CustomWinner;
 
 public static class CustomWinnerManager
 {
-    public static readonly List<IWinnable> CustomWinners = new();
+    internal static readonly List<IWinnable> CustomWinners = new();
     public static Il2CppSystem.Collections.Generic.List<WinningPlayerData> AllWinners { get; } = new();
 
     public static string WinText { get; private set; } = "";
@@ -16,6 +15,15 @@ public static class CustomWinnerManager
     public static void RegisterCustomWinner(PlayerControl winner)
     {
         AllWinners.Add(new WinningPlayerData(winner.Data));
+    }
+
+    public static void UnRegisterCustomWinner(PlayerControl playerControl)
+    {
+        foreach (var winningPlayerData in AllWinners)
+        {
+            if (playerControl.Data.PlayerName.Equals(winningPlayerData.PlayerName))
+                AllWinners.Remove(winningPlayerData);
+        }
     }
 
     public static void RegisterCustomWinners(IEnumerable<PlayerControl> winners)

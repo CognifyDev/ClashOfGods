@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
@@ -16,10 +15,8 @@ namespace COG.Role.Impl.Impostor;
  */
 public class Troublemaker : Role
 {
-    private PlayerControl? _player;
-    
-    private CustomOption MakeTroubleCd { get; }
-    private CustomOption MakeTroubleDuration { get; }
+    private CustomOption? MakeTroubleCd { get; }
+    private CustomOption? MakeTroubleDuration { get; }
     
     private CustomButton MakeTroubleButton { get; }
 
