@@ -214,6 +214,29 @@ public interface IListener
         return true;
     }
 
+    /// <summary>
+    ///     当一个玩家向房主发送变形请求的时候，触发该监听器
+    /// </summary>
+    /// <param name="player">发出变形请求的玩家</param>
+    /// <param name="target">变形的目标</param>
+    /// <param name="shouldAnimate">是否显示变形动画</param>
+    /// <returns>是否取消事件[false为取消]</returns>
+    ///     如果通过return false取消本次请求，应该向player发出RejectShapeshift
+    bool OnCheckShapeshift(PlayerControl player, PlayerControl target, bool shouldAnimate)
+    {
+        return true;
+    }
+
+    /// <summary>
+    ///     当变形请求被执行时，触发该监听器
+    /// </summary>
+    /// <param name="player">变形者</param>
+    /// <param name="target">变形的目标</param>
+    /// <param name="shouldAnimate">是否显示变形动画</param>
+    void OnShapeshift(PlayerControl player, PlayerControl target, bool shouldAnimate)
+    {
+    }
+
     void AfterRPCReceived(byte callId, MessageReader reader)
     {
     }

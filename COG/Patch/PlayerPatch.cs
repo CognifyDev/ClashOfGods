@@ -50,6 +50,35 @@ internal class PlayerKillPatch
     }
 }
 
+[HarmonyPatch(typeof(PlayerControl))]
+internal class PlayerShapeshiftPatch
+{
+    [HarmonyPatch(nameof(PlayerControl.CheckShapeshift))]
+    [HarmonyPrefix]
+    public static bool CheckShapeshiftPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
+    {
+        if (!AmongUsClient.Instance.AmHost) return false;
+
+        var returnAble = false;
+        foreach (var unused in ListenerManager.GetManager().GetListeners()
+                    .Where(listener => !listener.OnCheckShapeshift(__instance, target, shouldAnimate) && !returnAble)) returnAble = true;
+
+        if (returnAble)
+            __instance.RpcRejectShapeshift();
+        //  如果房主决定取消玩家的变形请求，房主需要向玩家发送RejectShapeshift以结束玩家的等待状态
+
+        return !returnAble;
+    }
+
+    [HarmonyPatch(nameof(PlayerControl.Shapeshift))]
+    [HarmonyPostfix]
+    public static void ShapeshiftPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
+    {
+        foreach (var listener in ListenerManager.GetManager().GetListeners())
+            listener.OnShapeshift(__instance, target, shouldAnimate);
+    }
+}
+
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
 internal class ChatUpdatePatch
 {
