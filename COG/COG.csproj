@@ -53,6 +53,7 @@
 
     <ItemGroup>
       <Folder Include="Game\" />
+      <Folder Include="NewListener\Event\Impl\Player\" />
     </ItemGroup>
 
 
