@@ -287,5 +287,43 @@ public interface IListener
     {
         return true;
     }
+
+    void OnMeetingStart(MeetingHud meetingHud)
+    {
+    }
+
+    /// <summary>
+    /// 当一个玩家向房主发送投票请求时触发此监听器
+    /// return false会撤销这个投票请求，并且会触发RpcClearVote清除玩家方的已投票状态
+    /// </summary>
+    /// <param name="meetingHud"></param>
+    /// <param name="voter">投票玩家的PlayerControl</param>
+    /// <param name="target">被投目标的PlayerControl</param>
+    /// <returns></returns>
+    bool OnCastVote(MeetingHud meetingHud, PlayerControl voter, PlayerControl target)
+    {
+        return true;
+    }
+
+    /// <summary>
+    /// 当房主确认并执行了玩家的投票时触发该监听器
+    /// </summary>
+    /// <param name="meetingHud"></param>
+    /// <param name="voter">投票玩家的PlayerControl</param>
+    /// <param name="target">被投目标的PlayerControl</param>
+    void OnVoted(MeetingHud meetingHud, PlayerControl voter, PlayerControl target)
+    {
+    }
+
+    /// <summary>
+    /// 这是meetingHud发生更新时的监听器
+    /// Update函数每秒钟执行30次，而这个监听器每10次运行一次，以防止卡顿
+    /// 如果这造成了卡顿，应该考虑调整buffertime为更大值，10次是参考的TOH的处理
+    /// 应用此监听器进行会议上技能按钮的更新和结束会议的行为
+    /// </summary>
+    /// <param name="meetingHud"></param>
+    void OnMeetingHudUpdate(MeetingHud meetingHud)
+    {
+    }
     private class EmptyListener : IListener { }
 }
