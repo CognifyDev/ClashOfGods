@@ -316,14 +316,52 @@ public interface IListener
     }
 
     /// <summary>
-    /// 这是meetingHud发生更新时的监听器
-    /// Update函数每秒钟执行30次，而这个监听器每10次运行一次，以防止卡顿
-    /// 如果这造成了卡顿，应该考虑调整buffertime为更大值，10次是参考的TOH的处理
-    /// 应用此监听器进行会议上技能按钮的更新和结束会议的行为
+    /// 这是meetingHud发生更新时的实时监听器
+    /// Update函数每秒钟执行30次，所以这个监听器每秒也是30次
+    /// 大部分对meetinghud的监听应该由OnMeetingHudLateUpdate处理
+    /// 只有实时且必要的监听器应该使用该listener
     /// </summary>
     /// <param name="meetingHud"></param>
     void OnMeetingHudUpdate(MeetingHud meetingHud)
     {
     }
+    /// <summary>
+    /// 这是meetingHud发生更新时的延时监听器
+    /// Update函数每秒钟执行30次，而这个监听器每10次运行一次，以防止卡顿
+    /// 如果这造成了卡顿，应该考虑调整buffertime为更大值，10次是参考的TOH的处理
+    /// 应用此监听器进行会议上技能按钮的更新和结束会议的行为
+    /// </summary>
+    /// <param name="meetingHud"></param>
+    void OnMeetingHudLateUpdate(MeetingHud meetingHud)
+    {
+    }
+
+    /// <summary>
+    /// 当会议讨论终止，向玩家展示投票结果动画开始时触发此监听器
+    /// 应用此监听器移除会议技能按钮
+    /// </summary>
+    /// <param name="meetingHud"></param>
+    void OnVoteResultsShown(MeetingHud meetingHud)
+    {
+    }
+
+    /// <summary>
+    /// 就在播放驱逐动画前那么一小会，运行这个监听器
+    /// 这个监听器的主要作用估计就是修改被驱逐玩家的名字，来展示自定义的驱逐文字
+    /// 不对，非H系模组可以直接patch ExileController里面显示的文字，我是笨蛋
+    /// </summary>
+    /// <param name="meetingHud"></param>
+    void BeforeExileThePlayer(MeetingHud meetingHud, GameData.PlayerInfo exiled, bool tie)
+    {
+    }
+
+    /// <summary>
+    /// 当MeetingHud被摧毁，也就是会议完全结束回到正常游戏时，运行此监听器
+    /// </summary>
+    /// <param name="meetingHud"></param>
+    void OnMeetingFinished(MeetingHud meetingHud)
+    {
+    }
+
     private class EmptyListener : IListener { }
 }
