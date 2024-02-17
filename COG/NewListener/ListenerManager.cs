@@ -32,8 +32,7 @@ public class ListenerManager
         {
             var attributes = methodInfo.GetCustomAttributes(typeof(EventHandlerAttribute), false);
             if (attributes.Length < 1) continue;
-            var attribute = attributes[0] as EventHandlerAttribute;
-            _handlers.Add(new Handler(listener, methodInfo, attribute!.EventHandlerType));
+            _handlers.Add(new Handler(listener, methodInfo));
         }
     }
 
@@ -62,6 +61,7 @@ public class ListenerManager
     public bool ExecuteHandlers(Event.Event @event)
     {
         // TODO 监听器执行
+        
         return true;
     }
 }

@@ -2,7 +2,10 @@
 
 public class PlayerEvent : Event
 {
-    protected PlayerEvent(EventHandlerType type) : base(type)
+    public PlayerControl Player;
+    
+    protected PlayerEvent(PlayerControl player)
     {
+        Player = player;
     }
 }

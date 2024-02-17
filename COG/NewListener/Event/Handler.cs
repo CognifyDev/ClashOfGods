@@ -13,10 +13,8 @@ public class Handler
     public readonly IListener Listener;
 
     public readonly MethodInfo Method;
-
-    public readonly EventHandlerType EventHandlerType;
     
-    public Handler(IListener listener, MethodInfo method, EventHandlerType eventHandlerType)
+    public Handler(IListener listener, MethodInfo method)
     {
         Listener = listener;
         var parameterInfos = method.GetParameters();
@@ -26,6 +24,5 @@ public class Handler
         if (!EventType.IsAssignableFrom(typeof(Event))) throw new System.Exception("the input type is not a Event type");
 
         Method = method;
-        EventHandlerType = eventHandlerType;
     }
 }
