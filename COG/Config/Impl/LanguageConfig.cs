@@ -18,17 +18,7 @@ public class LanguageConfig : Config
         new ResourceFile("COG.Resources.InDLL.Config.language.yml")
     )
     {
-        try
-        {
-            SetTranslations();
-        }
-        catch (NullReferenceException)
-        {
-            // 找不到项，说明配置文件版本过低
-            // 重新加载
-            LoadConfig(true);
-            Instance = new LanguageConfig();
-        }
+        SetTranslations();
     }
 
     private LanguageConfig(string path) : base(
@@ -110,7 +100,7 @@ public class LanguageConfig : Config
         MaxNumMessage = GetString("role.global.max-num");
         AllowStartMeeting = GetString("role.global.allow-start-meeting");
         AllowReportDeadBody = GetString("role.global.allow-report-body");
-        KillCooldown = GetString("role.global.");
+        KillCooldown = GetString("role.global.kill-cooldown");
 
         SidebarTextOriginal = GetString("sidebar-text.original");
         SidebarTextNeutral = GetString("sidebar-text.neutral");
@@ -260,7 +250,7 @@ public class LanguageConfig : Config
     private string GetString(string location)
     {
         var toReturn = YamlReader!.GetString(location);
-        if (toReturn is null or "" or " ") throw new NullReferenceException();
+        if (toReturn is null or "" or " ") Main.Logger.LogInfo($"Error getting string (location: {location})")
 
         return toReturn;
     }
