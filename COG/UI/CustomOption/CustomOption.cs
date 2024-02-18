@@ -16,6 +16,7 @@ using static COG.UI.CustomOption.CustomOption;
 using Object = UnityEngine.Object;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using COG.States;
+using COG.UI.SidebarText;
 using COG.Utils.WinAPI;
 
 namespace COG.UI.CustomOption;
@@ -592,8 +593,22 @@ internal class HudStringPatch
         if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek)
             return; // Allow Vanilla Hide N Seek
 
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnIGameOptionsExtensionsDisplay(ref __result);
+        var pages = SidebarTextManager.GetManager().GetSidebarTexts().Count;
+
+        if (pages <= 0) return;
+
+        var sidebars = SidebarTextManager.GetManager().GetSidebarTexts();
+        if (GameOptionsNextPagePatch.TypePage > sidebars.Count || GameOptionsNextPagePatch.TypePage == 0) GameOptionsNextPagePatch.TypePage = 1;
+
+        if (sidebars.Count <= 0) return;
+
+        var sidebar = sidebars[GameOptionsNextPagePatch.TypePage - 1];
+        var text = sidebar.Title + Environment.NewLine;
+
+        sidebar.ForResult(ref __result);
+        foreach (var sidebarObject in sidebar.Objects) text += sidebarObject + Environment.NewLine;
+        text += LanguageConfig.Instance.MessageForNextPage.CustomFormat(GameOptionsNextPagePatch.TypePage, pages);
+        __result = text;
     }
 
     public static string GetOptByType(CustomOptionType type)
@@ -633,9 +648,26 @@ internal class HudStringPatch
 [HarmonyPatch(typeof(KeyboardJoystick), nameof(KeyboardJoystick.Update))]
 public static class GameOptionsNextPagePatch
 {
+    internal static int TypePage = 1;
+    
     public static void Postfix(KeyboardJoystick __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnKeyboardJoystickUpdate(__instance);
+        if (Input.GetKeyDown(KeyCode.Tab)) TypePage += 1;
+
+        // from Alpha1 to Alpha9
+        for (var num = (int)KeyCode.Alpha1; num <= (int)KeyCode.Alpha9; num++)
+        {
+            var page = num - ((int)KeyCode.Alpha1 - 1); // 指代的page
+            var keycode = (KeyCode)num;
+            if (Input.GetKeyDown(keycode)) TypePage = page;
+        }
+
+        // from Keypad1 to Keypad9
+        for (var num = (int)KeyCode.Keypad1; num <= (int)KeyCode.Keypad9; num++)
+        {
+            var page = num - ((int)KeyCode.Keypad1 - 1);
+            var keycode = (KeyCode)num;
+            if (Input.GetKeyDown(keycode)) TypePage = page;
+        }
     }
 }

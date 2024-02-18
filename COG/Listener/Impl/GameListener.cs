@@ -4,6 +4,14 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
+using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.GSManager;
+using COG.Listener.Event.Impl.ICutscene;
+using COG.Listener.Event.Impl.Player;
+using COG.Listener.Event.Impl.RManager;
+using COG.Listener.Event.Impl.VentImpl;
+using COG.NewListener.Event.Impl.Game;
+using COG.Patch;
 using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
@@ -22,7 +30,8 @@ public class GameListener : IListener
 
     private static bool HasStartedRoom { get; set; }
 
-    public void OnCoBegin()
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
     {
         GameStates.InGame = true;
         Main.Logger.LogInfo("Game started!");
@@ -35,8 +44,11 @@ public class GameListener : IListener
         ShareRoles();
     }
 
-    public void OnRPCReceived(byte callId, MessageReader reader)
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnRPCReceived(PlayerHandleRpcEvent @event)
     {
+        var callId = @event.CallId;
+        var reader = @event.MessageReader;
         if (AmongUsClient.Instance.AmHost) return; // 是房主就返回
         var knownRpc = (KnownRpc)callId;
 
@@ -67,8 +79,10 @@ public class GameListener : IListener
         }
     }
 
-    public void AfterPlayerFixedUpdate(PlayerControl player)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void AfterPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
+        var player = @event.Player;
         if (GameStates.IsLobby && AmongUsClient.Instance.AmHost)
         {
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
@@ -82,9 +96,10 @@ public class GameListener : IListener
             if (role is null) return;
             var text = player.cosmetics.nameText;
             text.color = role.Color;
-            text.text = new StringBuilder().Append(role.Name).Append("\n").Append(player.Data.PlayerName).ToString();
+            text.text = new StringBuilder().Append(role.Name).Append('\n').Append(player.Data.PlayerName).ToString();
         }
     }
+    
     private static void SelectRoles()
     {
         GameUtils.PlayerRoleData.Clear(); // 首先清除 防止干扰
@@ -142,14 +157,17 @@ public class GameListener : IListener
             RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
     }
 
-    public void OnSelectRoles()
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
         if (!AmongUsClient.Instance.AmHost) return;
         foreach (var playerRole in GameUtils.PlayerRoleData) playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
     }
 
-    public void OnGameStart(GameStartManager manager)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameStart(GameStartManagerStartEvent @event)
     {
+        var manager = @event.GameStartManager;
         if (HasStartedRoom)
             GameUtils.ForceClearGameData();
         else
@@ -159,7 +177,8 @@ public class GameListener : IListener
         manager.privatePublicText.color = Palette.DisabledClear;
     }
 
-    public bool OnMakePublic(GameStartManager manager)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnMakePublic(GameStartManagerMakePublicEvent @event)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         GameUtils.SendGameMessage(LanguageConfig.Instance.MakePublicMessage);
@@ -167,8 +186,10 @@ public class GameListener : IListener
         return false;
     }
 
-    public bool OnSetUpRoleText(IntroCutscene intro, ref IEnumerator roles)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnSetUpRoleText(IntroCutsceneShowRoleEvent @event)
     {
+        var intro = @event.IntroCutscene;
         Main.Logger.LogInfo("Setup role text for the player...");
 
         var myRole = GameUtils.GetLocalPlayerRole();
@@ -216,28 +237,28 @@ public class GameListener : IListener
         }
 
         list.Add(Effects.Action((Action)Action));
-
-        roles = Effects.Sequence(list.ToArray());
+        
+        @event.SetResult(Effects.Sequence(list.ToArray()));
         return false;
     }
 
-    public void OnSetUpTeamText(IntroCutscene intro,
-        ref Il2CppSystem.Collections.Generic.List<PlayerControl> teamToDisplay)
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnSetUpTeamText(IntroCutsceneBeginCrewmateEvent @event)
     {
         var role = GameUtils.GetLocalPlayerRole();
         var player = PlayerControl.LocalPlayer;
 
         var camp = role?.CampType;
-        if (camp is CampType.Neutral or CampType.Unknown)
-        {
-            var soloTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
-            soloTeam.Add(player);
-            teamToDisplay = soloTeam;
-        }
+        if (camp is not (CampType.Neutral or CampType.Unknown)) return;
+        var soloTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
+        soloTeam.Add(player);
+        @event.SetTeamToDisplay(soloTeam);
     }
 
-    public void AfterSetUpTeamText(IntroCutscene intro)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void AfterSetUpTeamText(IntroCutsceneBeginCrewmateEvent @event)
     {
+        var intro = @event.IntroCutscene;
         var role = GameUtils.GetLocalPlayerRole();
 
         if (role == null) return;
@@ -250,45 +271,35 @@ public class GameListener : IListener
         intro.ImpostorText.text = camp.GetDescription();
     }
 
-    public void OnGameEndSetEverythingUp(EndGameManager manager)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
         // 取消已经注册的Listener
-        foreach (var roleListener in RoleListeners) ListenerManager.GetManager().UnregisterListener(roleListener);
+        foreach (var roleListener in RoleListeners) ListenerManager.GetManager().UnRegisterHandlers(ListenerManager.GetManager().GetHandlers(roleListener));
         RoleListeners.Clear();
     }
 
-    public bool OnCheckGameEnd()
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnCheckGameEnd(GameCheckEndEvent @event)
     {
         return !GlobalCustomOption.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
     }
 
-    public bool OnPlayerVent(Vent vent, GameData.PlayerInfo playerInfo, ref bool canUse, ref bool couldUse,
-        ref float cooldown)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnPlayerVent(VentCheckEvent @event)
     {
+        var playerInfo = @event.PlayerInfo;
         foreach (var playerRole in GameUtils.PlayerRoleData)
         {
             if (!playerRole.Player.Data.IsSamePlayer(playerInfo)) continue;
             var ventAble = playerRole.Role.CanVent;
-            canUse = ventAble;
-            couldUse = ventAble;
-            cooldown = float.MaxValue;
+            @event.SetCanUse(ventAble);
+            @event.SetCouldUse(ventAble);
+            @event.SetResult(float.MaxValue);
             return false;
         }
 
         return true;
-    }
-
-    public void OnKeyboardPass()
-    {
-        // 有BUG 暂时不用
-        /*
-        if (GameStates.InGame || !GameStates.IsLobby || GameStates.IsMeeting || GameStates.IsVoting || GameStates.IsInTask) return;
-        if (GameStartManager.Instance.startState != GameStartManager.StartingStates.Countdown) return;
-        if (_forceStarted) return;
-        if ((!Input.GetKey(KeyCode.RightShift) && !Input.GetKey(KeyCode.LeftShift)) || _forceStarted) return;
-        _forceStarted = true;
-        GameStartManager.Instance.countDownTimer = 1f;
-        */
     }
 
     public void OnHudUpdate(HudManager manager)

@@ -1,18 +1,23 @@
-﻿using System.Linq;
-using COG.Listener;
+﻿using COG.Listener;
+using COG.Listener.Event.Impl.DBody;
+using COG.NewListener;
 
 namespace COG.Patch;
 
 [HarmonyPatch(typeof(DeadBody), nameof(DeadBody.OnClick))]
 internal class DeadBodyClickPatch
 {
+    [HarmonyPrefix]
     public static bool Prefix(DeadBody __instance)
     {
-        var returnAble = true;
-        foreach (var unused in ListenerManager.GetManager().GetListeners()
-                     .Where(listener => !listener.OnDeadBodyClick(__instance)))
-            returnAble = false;
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new DeadBodyClickEvent(__instance), EventHandlerType.Prefix);
+    }
 
-        return returnAble;
+    [HarmonyPostfix]
+    public static void Postfix(DeadBody __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new DeadBodyClickEvent(__instance), EventHandlerType.Postfix);
     }
 }

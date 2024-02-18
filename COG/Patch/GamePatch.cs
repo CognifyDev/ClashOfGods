@@ -1,10 +1,15 @@
+using COG.Listener;
+using COG.Listener.Event.Impl.AuClient;
+using COG.Listener.Event.Impl.Controller;
+using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.GSManager;
+using COG.Listener.Event.Impl.ICutscene;
+using COG.Listener.Event.Impl.Player;
+using COG.Listener.Event.Impl.RManager;
+using COG.Listener.Event.Impl.VentImpl;
 using Il2CppSystem.Collections.Generic;
 using COG.NewListener;
-using COG.NewListener.Event.Impl;
-using COG.NewListener.Event.Impl.AUClient;
-using COG.NewListener.Event.Impl.GSManager;
-using COG.NewListener.Event.Impl.ICutscene;
-using COG.NewListener.Event.Impl.RManager;
+using COG.NewListener.Event.Impl.Game;
 
 namespace COG.Patch;
 
@@ -27,12 +32,16 @@ internal class EndGamePatch
 {
     public static bool Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientGameEndEvent(__instance, endGameResult), EventHandlerType.Prefix);
+        var @event = new AmongUsClientGameEndEvent(__instance, endGameResult);
+        var result = ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Prefix);
+        endGameResult = @event.GetEndGameResult();
+        return result;
     }
 
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientGameEndEvent(__instance, endGameResult), EventHandlerType.Postfix);
+        var @event = new AmongUsClientGameEndEvent(__instance, endGameResult);
+        endGameResult = @event.GetEndGameResult();
     }
 }
 
@@ -83,19 +92,28 @@ internal class SelectRolesPatch
 [HarmonyPatch(typeof(EndGameManager), nameof(EndGameManager.SetEverythingUp))]
 internal class SetEverythingUpPatch
 {
+    public static bool Prefix(EndGameManager __instance)
+    {
+        return ListenerManager.GetManager().ExecuteHandlers(new GameSetEverythingUpEvent(__instance), EventHandlerType.Prefix);
+    }
+    
     public static void Postfix(EndGameManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnGameEndSetEverythingUp(__instance);
+        ListenerManager.GetManager().ExecuteHandlers(new GameSetEverythingUpEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
 [HarmonyPatch(typeof(ControllerManager), nameof(ControllerManager.Update))]
-internal class KeyboardPatch
+internal class ControllerManagerPatch
 {
-    public static void Postfix()
+    public static bool Prefix(ControllerManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnKeyboardPass();
+        return ListenerManager.GetManager().ExecuteHandlers(new ControllerManagerUpdateEvent(__instance), EventHandlerType.Prefix);
+    }
+    
+    public static void Postfix(ControllerManager __instance)
+    {
+        ListenerManager.GetManager().ExecuteHandlers(new ControllerManagerUpdateEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -109,11 +127,28 @@ public static class PlayerVentPatch
         [HarmonyArgument(2)] ref bool couldUse,
         ref float __result)
     {
-        var returnAble = true;
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            if (!listener.OnPlayerVent(__instance, playerInfo, ref canUse, ref couldUse, ref __result))
-                returnAble = false;
-        return returnAble;
+        var @event = new VentCheckEvent(__instance, playerInfo, canUse, couldUse, __result);
+        var result = ListenerManager.GetManager()
+            .ExecuteHandlers(@event, EventHandlerType.Prefix);
+        canUse = @event.GetCanUse();
+        couldUse = @event.GetCouldUse();
+        __result = @event.GetResult();
+        return result;
+    }
+    
+    [HarmonyPostfix]
+    public static void Postfix(Vent __instance,
+        [HarmonyArgument(0)] GameData.PlayerInfo playerInfo,
+        [HarmonyArgument(1)] ref bool canUse,
+        [HarmonyArgument(2)] ref bool couldUse,
+        ref float __result)
+    {
+        var @event = new VentCheckEvent(__instance, playerInfo, canUse, couldUse, __result);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(@event, EventHandlerType.Postfix);
+        canUse = @event.GetCanUse();
+        couldUse = @event.GetCouldUse();
+        __result = @event.GetResult();
     }
 }
 
@@ -121,28 +156,36 @@ public static class PlayerVentPatch
 internal class GameEndChecker
 {
     [HarmonyPrefix]
-    public static bool Prefix()
+    public static bool Prefix(LogicGameFlowNormal __instance)
     {
-        var returnAble = true;
-        foreach (var unused in
-                 ListenerManager.GetManager().GetListeners().Where(listener => !listener.OnCheckGameEnd()))
-            returnAble = false;
-
-        return returnAble;
+        return ListenerManager.GetManager().ExecuteHandlers(new GameCheckEndEvent(__instance), EventHandlerType.Prefix);
+    }
+    
+    [HarmonyPostfix]
+    public static void Postfix(LogicGameFlowNormal __instance)
+    {
+        ListenerManager.GetManager().ExecuteHandlers(new GameCheckEndEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
 [HarmonyPatch(typeof(GameManager), nameof(GameManager.CheckTaskCompletion))]
 internal class CheckTaskCompletionPatch
 {
-    public static bool Prefix(ref bool __result)
+    public static bool Prefix(GameManager __instance, ref bool __result)
     {
-        var returnAble = true;
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            if (!listener.OnCheckTaskCompletion(ref __result))
-                returnAble = false;
-
-        return returnAble;
+        var @event = new GameCheckTaskCompletionEvent(__instance, __result);
+        var result = ListenerManager.GetManager().ExecuteHandlers(@event,
+            EventHandlerType.Prefix);
+        __result = @event.GetResult();
+        return result;
+    }
+    
+    public static void Postfix(GameManager __instance, ref bool __result)
+    {
+        var @event = new GameCheckTaskCompletionEvent(__instance, __result);
+        ListenerManager.GetManager().ExecuteHandlers(@event,
+            EventHandlerType.Postfix);
+        __result = @event.GetResult();
     }
 }
 
@@ -151,29 +194,42 @@ internal class SabotageMapOpen
 {
     private static bool Prefix(MapBehaviour __instance)
     {
-        var returnAble = true;
-        foreach (var unused in ListenerManager.GetManager().GetListeners()
-                     .Where(listener => !listener.OnShowSabotageMap(__instance))) returnAble = false;
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new GameShowSabotageMapEvent(__instance), EventHandlerType.Prefix);
+    }
 
-        return returnAble;
+    private static void Postfix(MapBehaviour __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new GameShowSabotageMapEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CoSetTasks))]
 internal class TaskPatch
 {
-    public static void Prefix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
+    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnCoSetTasks(__instance, tasks);
+        return ListenerManager.GetManager().ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, tasks), EventHandlerType.Prefix);
+    }
+
+    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
+    {
+        ListenerManager.GetManager().ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, tasks), EventHandlerType.Postfix);
     }
 }
 
 [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartGame))]
 internal class GameStartPatch
 {
+    public static bool Prefix(GameManager __instance)
+    {
+        return ListenerManager.GetManager().ExecuteHandlers(new GameStartEvent(__instance), EventHandlerType.Prefix);
+    }
+    
     public static void Postfix(GameManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameStartWithMovement(__instance);
+        ListenerManager.GetManager().ExecuteHandlers(new GameStartEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -181,20 +237,30 @@ internal class GameStartPatch
 public class GameStartManagerUpdatePatch
 {
     [HarmonyPrefix]
-    public static void Prefix(GameStartManager __instance)
+    public static bool Prefix(GameStartManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnGameStartManagerUpdate(__instance);
+        return ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerUpdateEvent(__instance), EventHandlerType.Prefix);
+    }
+
+    [HarmonyPostfix]
+    public static void Postfix(GameStartManager __instance)
+    {
+        ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerUpdateEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.BeginGame))]
 public class GameStartManagerBeginGamePatch
 {
+    [HarmonyPrefix]
+    public static bool Prefix(GameStartManager __instance)
+    {
+        return ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerBeginGameEvent(__instance), EventHandlerType.Prefix);
+    }
+    
     [HarmonyPostfix]
     public static void Postfix(GameStartManager __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnGameStartCountdownEnd(__instance);
+        ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerBeginGameEvent(__instance), EventHandlerType.Postfix);
     }
 }

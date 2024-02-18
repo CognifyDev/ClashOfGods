@@ -1,10 +1,11 @@
 ﻿using COG.Config.Impl;
 using COG.Listener;
+using COG.NewListener;
 using COG.Utils;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Bait : Role, IListener
+public class Bait : Role
 {
     public Bait() : base(LanguageConfig.Instance.BaitName, ColorUtils.AsColor("#00F7FF"), CampType.Crewmate, true)
     {
@@ -18,5 +19,5 @@ public class Bait : Role, IListener
         if (role != null && role.Name.Equals(Name)) killer.CmdReportDeadBody(target.Data);
     }
 
-    public override IListener GetListener(PlayerControl player) => this;
+    public override IListener GetListener(PlayerControl player) => IListener.EmptyListener;
 }

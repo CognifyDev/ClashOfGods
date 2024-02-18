@@ -5,8 +5,6 @@ using System.Net;
 using System.Text;
 using COG.Exception.Plugin;
 using COG.Plugin.Loader.Controller.Classes.Globe;
-using COG.Plugin.Loader.Controller.Classes.Listener;
-using COG.Plugin.Loader.Controller.Classes.Role;
 using COG.Plugin.Loader.Controller.Function;
 using COG.Utils;
 using NLua;
@@ -105,8 +103,6 @@ public class LuaPluginLoader : IPlugin
 
         LuaController["controller"] = new PluginController(LuaController, this);
         LuaController["web"] = new WebClient();
-        LuaController["listenerController"] = new ListenerController(LuaController, this);
-        LuaController["roleController"] = new RoleController(LuaController, this);
         LuaController["playerController"] = new Controller.Classes.Player.PlayerController(LuaController, this);
 
         // register methods

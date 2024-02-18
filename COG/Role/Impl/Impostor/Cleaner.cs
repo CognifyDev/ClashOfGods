@@ -1,11 +1,13 @@
 ﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Listener;
 using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
 using System.Linq;
+using COG.Listener;
+using COG.Listener.Event.Impl.Player;
+using COG.NewListener;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -55,19 +57,17 @@ public class Cleaner : Role, IListener
 
     public void CleanDeadBody(DeadBody body) => body.gameObject.SetActive(false); // idk why it make PlayerControl.FixedUpdate() throw System.NullReferenceException when i destroy the body
 
-    public void OnRPCReceived(byte callId, MessageReader reader)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnRPCReceived(PlayerHandleRpcEvent @event)
     {
-        if (callId == (byte)KnownRpc.CleanDeadBody)
-        {
-            byte pid = reader.ReadByte();
-            var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
-            if (!body) return;
-            CleanDeadBody(body!);
-        }
+        var callId = @event.CallId;
+        var reader = @event.MessageReader;
+        if (callId != (byte)KnownRpc.CleanDeadBody) return;
+        var pid = reader.ReadByte();
+        var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
+        if (!body) return;
+        CleanDeadBody(body!);
     }
 
-    public override IListener GetListener(PlayerControl player)
-    {
-        return this;
-    }
+    public override IListener GetListener(PlayerControl player) => this;
 }

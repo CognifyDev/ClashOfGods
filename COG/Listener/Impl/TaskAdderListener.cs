@@ -4,7 +4,6 @@ using COG.Listener;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl;
-using COG.Role;
 using COG.Utils;
 
 public class TaskAdderListener : IListener

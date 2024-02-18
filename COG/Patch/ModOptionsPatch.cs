@@ -1,4 +1,7 @@
 ﻿using COG.Listener;
+using COG.Listener.Event.Impl.Game;
+using COG.NewListener;
+using COG.NewListener.Event.Impl.Game;
 using COG.UI.ModOption;
 
 namespace COG.Patch;
@@ -8,9 +11,10 @@ internal class ModOptionsPatch
 {
     [HarmonyPatch(nameof(OptionsMenuBehaviour.Start))]
     [HarmonyPostfix]
-    public static void OptionMenuBehaviour_StartPostfix(OptionsMenuBehaviour __instance)
+    public static void OptionMenuBehaviourStartPostfix(OptionsMenuBehaviour __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnSettingInit(__instance);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new OptionsMenuBehaviourStartEvent(__instance), EventHandlerType.Postfix);
     }
 
     [HarmonyPatch(nameof(OptionsMenuBehaviour.Close))]

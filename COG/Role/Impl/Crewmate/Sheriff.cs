@@ -1,6 +1,8 @@
 ﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
+using COG.Listener.Event.Impl.Player;
+using COG.NewListener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -52,16 +54,16 @@ public class Sheriff : Role, IListener
         AddButton(SheriffKillButton);
     }
 
-    public bool OnPlayerMurder(PlayerControl killer, PlayerControl target)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnPlayerMurder(PlayerMurderEvent @event)
     {
+        var killer = @event.Player;
+        var target = @event.Target;
         if (killer == null || target == null) return true;
         if (!killer.IsRole(this)) return true;
-        if (target.GetRoleInstance()!.CampType == CampType.Crewmate)
-        {
-            killer.MurderPlayer(killer, GameUtils.DefaultFlag);
-            return false;
-        }
-        return true;
+        if (target.GetRoleInstance()!.CampType != CampType.Crewmate) return true;
+        killer.MurderPlayer(killer, GameUtils.DefaultFlag);
+        return false;
     }
 
     public override IListener GetListener(PlayerControl player) => this;

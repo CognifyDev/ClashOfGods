@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using COG.Config.Impl;
-using COG.UI.CustomOption;
 using COG.UI.ModOption;
 using UnityEngine;
 using UnityEngine.Events;

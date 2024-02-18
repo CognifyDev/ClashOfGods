@@ -30,7 +30,6 @@ using System.IO;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Impl;
 using COG.NewListener;
-using COG.NewListener.Impl;
 using COG.Plugin.Manager;
 using COG.Utils.WinAPI;
 using UnityEngine.SceneManagement;
@@ -139,7 +138,10 @@ public partial class Main : BasePlugin
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
-            new PlayerListener()
+            new PlayerListener(),
+            new DeadPlayerManager(),
+            new CustomButtonListener(),
+            new CustomWinnerListener()
         });
         
 

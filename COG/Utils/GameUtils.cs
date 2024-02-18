@@ -87,7 +87,7 @@ public static class GameUtils
 
     public static void SetCustomRole(this PlayerControl pc, Role.Role role)
     {
-        if (!pc || role is null) return;
+        if (!pc) return;
         var playerRole = PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
         if (playerRole is not null) PlayerRoleData.Remove(playerRole);
         PlayerRoleData.Add(new(pc, role));
@@ -97,7 +97,7 @@ public static class GameUtils
 
     public static void RpcSetCustomRole(this PlayerControl pc, Role.Role role)
     {
-        if (!pc || role is null) return;
+        if (!pc) return;
         var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
         writer.Write(pc.PlayerId);
         writer.WritePacked(role.Id);

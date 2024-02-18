@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Listener;
+using COG.Listener.Event.Impl.AuClient;
+using COG.Listener.Event.Impl.ICutscene;
+using COG.Listener.Event.Impl.Player;
+using COG.NewListener;
 using COG.Role;
 using COG.Role.Impl;
 using InnerNet;
@@ -184,37 +188,46 @@ public class DeadPlayerManager : IListener
 {
     public static List<DeadPlayer> DeadPlayers { get; } = new();
 
-    public void OnMurderPlayer(PlayerControl killer, PlayerControl target)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnMurderPlayer(PlayerMurderEvent @event)
     {
+        var target = @event.Target;
+        var killer = @event.Player;
         if (!(target.Data.IsDead && killer && target)) return;
 
         var reason = GetDeathReason(killer, target);
         _ = new DeadPlayer(DateTime.Now, reason, target, killer);
     }
 
-    public void OnPlayerLeft(AmongUsClient client, ClientData data, DisconnectReasons reason)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerLeft(AmongUsClientLeaveEvent @event)
     {
+        var data = @event.ClientData;
         if (DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
         _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
     }
 
-    public void OnCoBegin()
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
     {
         DeadPlayers.Clear();
     }
 
-    public void OnPlayerExile(ExileController controller)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerExile(PlayerExileEvent @event)
     {
+        var controller = @event.ExileController;
         if (controller.exiled == null) return;
         _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, controller.exiled.Object, null);
     }
 
-    public void OnAirshipPlayerExile(AirshipExileController controller)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnAirshipPlayerExile(PlayerExileOnAirshipEvent @event)
     {
-        OnPlayerExile(controller);
+        OnPlayerExile(new PlayerExileEvent(@event.Player, @event.Controller));
     }
 
-    public static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
+    private static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
     {
         try
         {
@@ -225,32 +238,32 @@ public class DeadPlayerManager : IListener
             return DeathReason.Unknown;
         }
     }
+}
 
-    public class DeadPlayer
+public class DeadPlayer
+{
+    public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl? killer)
     {
-        public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl? killer)
-        {
-            DeadTime = deadTime;
-            DeathReason = deathReason;
-            Player = player;
-            Killer = killer;
-            Role = player.GetRoleInstance();
-            PlayerId = player.PlayerId;
-            DeadPlayers.Add(this);
-        }
+        DeadTime = deadTime;
+        DeathReason = deathReason;
+        Player = player;
+        Killer = killer;
+        Role = player.GetRoleInstance();
+        PlayerId = player.PlayerId;
+        DeadPlayerManager.DeadPlayers.Add(this);
+    }
 
-        public DateTime DeadTime { get; private set; }
-        public DeathReason? DeathReason { get; }
-        public PlayerControl Player { get; }
-        public PlayerControl? Killer { get; }
-        public Role.Role? Role { get; private set; }
-        public byte PlayerId { get; }
+    public DateTime DeadTime { get; private set; }
+    public DeathReason? DeathReason { get; }
+    public PlayerControl Player { get; }
+    public PlayerControl? Killer { get; }
+    public Role.Role? Role { get; private set; }
+    public byte PlayerId { get; }
 
-        //先这样，以后再改，反正暂时用不着
-        public override string ToString()
-        {
-            return Player + " was killed by " + Killer;
-        }
+    // 先这样，以后再改，反正暂时用不着
+    public override string ToString()
+    {
+        return Player + " was killed by " + Killer;
     }
 }
 
@@ -278,7 +291,7 @@ public class PlayerRole
             : COG.Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 }
-
+/*
 public class CachedPlayer : IListener
 {
     public CachedPlayer(PlayerControl player)
@@ -321,19 +334,22 @@ public class CachedPlayer : IListener
     public bool IsDead => DeadStatus == null;
     public bool PlayerIsNull => Player == null;
 
-    public void OnPlayerJoin(AmongUsClient amongUsClient, ClientData data)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerJoin(AmongUsClientJoinEvent @event)
     {
-        _ = new CachedPlayer(data.Character);
+        _ = new CachedPlayer(@event.ClientData.Character);
     }
 
-    public void OnCoBegin()
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
     {
         AllPlayers.RemoveAll(cp =>
-            cp.IsDead && /* Will not continue if cp.IsDead is true */
+            cp.IsDead && // Will not continue if cp.IsDead is true 
             cp.DeadStatus!.DeathReason == DeathReason.Disconnected);
     }
 
-    public void OnGameJoined(AmongUsClient amongUsClient, string gameIdString)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameJoined(LocalAmongUsClientJoinEvent @event)
     {
         AllPlayers.Clear();
         // Reset
@@ -358,3 +374,4 @@ public class CachedPlayer : IListener
         return player != null;
     }
 }
+*/

@@ -1,5 +1,6 @@
 ﻿using COG.Config.Impl;
 using COG.Listener;
+using COG.NewListener;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -12,5 +13,5 @@ public class Crewmate : Role
         Description = LanguageConfig.Instance.CrewmateDescription;
     }
 
-    public override IListener GetListener(PlayerControl player) => IListener.Empty;
+    public override IListener GetListener(PlayerControl player) => IListener.EmptyListener;
 }

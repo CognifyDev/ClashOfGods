@@ -1,8 +1,8 @@
-using System.Linq;
+using COG.Listener;
+using COG.Listener.Event.Impl.AuClient;
+using COG.Listener.Event.Impl.Player;
+using COG.Listener.Event.Impl.PPhysics;
 using COG.NewListener;
-using COG.NewListener.Event.Impl.AUClient;
-using COG.NewListener.Event.Impl.Player;
-using COG.NewListener.Event.Impl.PPhysics;
 using COG.States;
 using COG.UI.CustomButton;
 using COG.Utils;
@@ -229,12 +229,12 @@ internal class OnSpawnPlayerPatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ReportDeadBody))]
 internal class ReportDeadBodyPatch
 {
-    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo target)
+    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo? target)
     {
         return ListenerManager.GetManager().ExecuteHandlers(new PlayerReportDeadBodyEvent(__instance, target), EventHandlerType.Prefix);
     }
 
-    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo target)
+    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo? target)
     {
         ListenerManager.GetManager().ExecuteHandlers(new PlayerReportDeadBodyEvent(__instance, target), EventHandlerType.Postfix);
     }

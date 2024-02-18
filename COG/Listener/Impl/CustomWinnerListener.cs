@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
+using COG.Listener.Event.Impl.Game;
 using COG.Utils;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
@@ -14,13 +15,15 @@ public class CustomWinnerListener : IListener
 {
     private static readonly int Color1 = Shader.PropertyToID("_Color");
 
-    public void OnGameEndSetEverythingUp(EndGameManager manager)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
+        var manager = @event.Object;
         SetUpWinnerPlayers(manager);
         SetUpWinText(manager);
         SetUpRoleSummary(manager);
     }
-
+    
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
         manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList()
