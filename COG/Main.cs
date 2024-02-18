@@ -29,6 +29,8 @@ using Reactor.Utilities.Extensions;
 using System.IO;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Impl;
+using COG.NewListener;
+using COG.NewListener.Impl;
 using COG.Plugin.Manager;
 using COG.Utils.WinAPI;
 using UnityEngine.SceneManagement;
@@ -114,7 +116,7 @@ public partial class Main : BasePlugin
         {
             Logger.LogError(e.Message);
         }
-        
+        /*
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new[]
         {
@@ -132,6 +134,14 @@ public partial class Main : BasePlugin
             CachedPlayer.GetCachedPlayerListener(),
             new TaskAdderListener()
         });
+        */
+        
+        ListenerManager.GetManager().RegisterListeners(new IListener[]
+        {
+            new CommandListener(),
+            new PlayerListener()
+        });
+        
 
         // Register sidebar texts
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
@@ -224,7 +234,7 @@ public partial class Main : BasePlugin
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
         Role.RoleManager.GetManager().GetRoles().Clear();
-        ListenerManager.GetManager().GetListeners().Clear();
+        ListenerManager.GetManager().UnRegisterHandlers();
         SidebarTextManager.GetManager().GetSidebarTexts().Clear();
         CustomWinnerManager.AllWinners.Clear();
         CustomWinnerManager.CustomWinners.Clear();

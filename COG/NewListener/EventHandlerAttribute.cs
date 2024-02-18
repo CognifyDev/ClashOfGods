@@ -8,4 +8,10 @@ namespace COG.NewListener;
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public sealed class EventHandlerAttribute : Attribute
 {
+    public EventHandlerType EventHandlerType { get; }
+    
+    public EventHandlerAttribute(EventHandlerType type)
+    {
+        EventHandlerType = type;
+    }
 }

@@ -5,7 +5,6 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Role;
-using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;

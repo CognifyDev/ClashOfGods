@@ -1,42 +1,54 @@
-using COG.Listener;
 using Il2CppSystem.Collections.Generic;
-using System.Linq;
+using COG.NewListener;
+using COG.NewListener.Event.Impl;
+using COG.NewListener.Event.Impl.AUClient;
+using COG.NewListener.Event.Impl.GSManager;
+using COG.NewListener.Event.Impl.ICutscene;
+using COG.NewListener.Event.Impl.RManager;
 
 namespace COG.Patch;
 
 [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
 internal class CoBeginPatch
 {
-    public static void Prefix()
+    public static bool Prefix(IntroCutscene __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnCoBegin();
+        return ListenerManager.GetManager().ExecuteHandlers(new IntroCutsceneCoBeginEvent(__instance), EventHandlerType.Prefix);
+    }
+
+    public static void Postfix(IntroCutscene __instance)
+    {
+        ListenerManager.GetManager().ExecuteHandlers(new IntroCutsceneCoBeginEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameEnd))]
 internal class EndGamePatch
 {
-    public static void Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
+    public static bool Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
-        var list = ListenerManager.GetManager().GetListeners().ToList();
-        foreach (var listener in list) listener.OnGameEnd(__instance, ref endGameResult);
+        return ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientGameEndEvent(__instance, endGameResult), EventHandlerType.Prefix);
     }
 
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
-        var list = ListenerManager.GetManager().GetListeners().ToList();
-        foreach (var listener in list) listener.AfterGameEnd(__instance, ref endGameResult);
+        ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientGameEndEvent(__instance, endGameResult), EventHandlerType.Postfix);
     }
 }
 
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Start))]
 internal class GameStartManagerStartPatch
 {
+    public static bool Prefix(GameStartManager __instance)
+    {
+        return ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerStartEvent(__instance), EventHandlerType.Prefix);
+    }
+    
     public static void Postfix(GameStartManager __instance)
     {
         HostStartPatch.Timer = 600f;
 
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnGameStart(__instance);
+        ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerStartEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -45,24 +57,26 @@ internal class MakePublicPatch
 {
     public static bool Prefix(GameStartManager __instance)
     {
-        var returnAble = false;
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            if (!listener.OnMakePublic(__instance) && !returnAble)
-                returnAble = true;
+        return ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerMakePublicEvent(__instance), EventHandlerType.Prefix);
+    }
 
-        if (returnAble) return false;
-
-        return true;
+    public static void Postfix(GameStartManager __instance)
+    {
+        ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerMakePublicEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
 [HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SelectRoles))]
 internal class SelectRolesPatch
 {
-    public static void Prefix()
+    public static bool Prefix(RoleManager __instance)
     {
-        var listeners = ListenerManager.GetManager().GetListeners().ToList();
-        foreach (var listener in listeners) listener.OnSelectRoles();
+        return ListenerManager.GetManager().ExecuteHandlers(new RoleManagerSelectRolesEvent(__instance), EventHandlerType.Prefix);
+    }
+
+    public static void Postfix(RoleManager __instance)
+    {
+        ListenerManager.GetManager().ExecuteHandlers(new RoleManagerSelectRolesEvent(__instance), EventHandlerType.Postfix);
     }
 }
 

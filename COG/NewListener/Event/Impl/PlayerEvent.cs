@@ -2,9 +2,12 @@
 
 public class PlayerEvent : Event
 {
+    /// <summary>
+    /// 动作执行的玩家
+    /// </summary>
     public PlayerControl Player;
     
-    protected PlayerEvent(PlayerControl player)
+    public PlayerEvent(PlayerControl player)
     {
         Player = player;
     }
