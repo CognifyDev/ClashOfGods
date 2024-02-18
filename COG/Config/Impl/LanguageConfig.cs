@@ -250,7 +250,7 @@ public class LanguageConfig : Config
     private string GetString(string location)
     {
         var toReturn = YamlReader!.GetString(location);
-        if (toReturn is null or "" or " ") Main.Logger.LogInfo($"Error getting string (location: {location})")
+        if (toReturn is null or "" or " ") Main.Logger.LogInfo($"Error getting string (location: {location})")；
 
         return toReturn;
     }
