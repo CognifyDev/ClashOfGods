@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
-using COG.Listener;
 using COG.Listener.Impl;
 using COG.Rpc;
 using COG.States;
@@ -23,7 +22,7 @@ public static class GameUtils
     /// <param name="text">信息内容</param>
     public static void SendGameMessage(string text)
     {
-        if (DestroyableSingleton<HudManager>.Instance is HudManager hud)
+        if (DestroyableSingleton<HudManager>.Instance is { } hud)
             hud.Notifier.AddItem(text);
     }
 
@@ -68,16 +67,7 @@ public static class GameUtils
         var gameManager = GameManager.Instance;
         if (gameManager != null) gameManager.EndGame();
 
-        var gameListener = ListenerManager.GetManager().GetTypeListener<GameListener>()!;
-
-        try
-        {
-            gameListener.OnGameEndSetEverythingUp(null!);
-        }
-        catch
-        {
-            // ignored
-        }
+        GameListener.ClearRoleListeners();
     }
 
     public static NormalGameOptionsV07 GetGameOptions()
@@ -87,7 +77,7 @@ public static class GameUtils
 
     public static void SetCustomRole(this PlayerControl pc, Role.Role role)
     {
-        if (!pc || role is null) return;
+        if (!pc) return;
         var playerRole = PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
         if (playerRole is not null) PlayerRoleData.Remove(playerRole);
         PlayerRoleData.Add(new(pc, role));
@@ -97,7 +87,7 @@ public static class GameUtils
 
     public static void RpcSetCustomRole(this PlayerControl pc, Role.Role role)
     {
-        if (!pc || role is null) return;
+        if (!pc) return;
         var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
         writer.Write(pc.PlayerId);
         writer.WritePacked(role.Id);

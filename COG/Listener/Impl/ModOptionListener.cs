@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using COG.Config.Impl;
-using COG.UI.CustomOption;
+using COG.Listener.Event.Impl.Game;
 using COG.UI.ModOption;
 using UnityEngine;
 using UnityEngine.Events;
@@ -16,8 +16,10 @@ internal class ModOptionListener : IListener
 
     public List<Transform> GetVanillas() => new(Vanillas);
     
-    public void OnSettingInit(OptionsMenuBehaviour menu)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnSettingInit(OptionsMenuBehaviourStartEvent @event)
     {
+        var menu = @event.Object;
         var transform1 = menu.CensorChatButton.transform;
         Vector3? position = transform1.localPosition;
         var button = menu.EnableFriendInvitesButton;
@@ -55,7 +57,7 @@ internal class ModOptionListener : IListener
         }));
     }
 
-    public void HideVanillaButtons(OptionsMenuBehaviour menu)
+    private void HideVanillaButtons(OptionsMenuBehaviour menu)
     {
         Vanillas.Clear();
         for (var i = 0; i < menu.transform.childCount; i++)
@@ -73,7 +75,7 @@ internal class ModOptionListener : IListener
         }
     }
 
-    public void LoadButtons(OptionsMenuBehaviour menu)
+    private void LoadButtons(OptionsMenuBehaviour menu)
     {
         ModOption.Buttons.Clear();
         foreach (var modOption in ModOptionManager.GetManager().GetOptions()) modOption.Register();
@@ -91,7 +93,7 @@ internal class ModOptionListener : IListener
     /// <param name="menu">OptionMenuBehaviour 的实例</param>
     /// <param name="idx">（从0开始）加入按钮的序号</param>
     /// <param name="option">对应的 ModOption</param>
-    public void CreateButton(OptionsMenuBehaviour menu, int idx, ModOption option)
+    private void CreateButton(OptionsMenuBehaviour menu, int idx, ModOption option)
     {
         var template = menu.CensorChatButton;
         var button = Object.Instantiate(template, menu.transform);

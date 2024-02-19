@@ -3,6 +3,8 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
+using COG.Listener.Event.Impl.GSManager;
+using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -52,15 +54,18 @@ public class Opportunist : Role, IListener
 
     public override IListener GetListener(PlayerControl player) => this;
     
-    public void OnMurderPlayer(PlayerControl killer, PlayerControl target)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnMurderPlayer(PlayerMurderEvent @event)
     {
+        var target = @event.Target;
         if (target.GetRoleInstance()!.Id == Id)
         {
             CustomWinnerManager.UnRegisterCustomWinner(target);
         }
     }
 
-    public void OnGameStartWithMovement(GameManager manager)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameStartWithMovement(GameStartManagerStartEvent @event)
     {
         CustomWinnerManager.RegisterCustomWinners(PlayerUtils.GetAllPlayers().Where(p => p.GetRoleInstance()!.Id == Id));
     }

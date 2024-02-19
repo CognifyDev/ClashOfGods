@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
@@ -14,10 +13,9 @@ namespace COG.Role;
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
-[Serializable]
 public abstract class Role
 {
-    protected Role(string name, Color color, CampType campType, bool showInOptions)
+    public Role(string name, Color color, CampType campType, bool showInOptions)
     {
         Name = name;
         BaseRole = false;
@@ -113,29 +111,24 @@ public abstract class Role
 
     public List<PlayerControl> Players => GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList();
 
-    public bool Debug { get; init; } = false;
-
     /// <summary>
     ///     添加一个按钮
     /// </summary>
     /// <param name="button">要添加的按钮</param>
-    protected void AddButton(CustomButton button)
+    public void AddButton(CustomButton button)
     {
-        if (button.HasButton == null || Debug) button.HasButton = () => true;
+        button.HasButton ??= () => true;
 
-        if (Debug)
-            button.Cooldown = () => 0f;
-        else
-            button.HasButton += () =>
-            {
-                var player = PlayerControl.LocalPlayer;
-                var role = player.GetRoleInstance();
-                return role != null && role.Name.Equals(Name);
-            };
+        button.HasButton += () =>
+        {
+            var player = PlayerControl.LocalPlayer;
+            var role = player.GetRoleInstance();
+            return role != null && role.Name.Equals(Name);
+        };
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
-    protected static CustomOption.CustomOptionType ToCustomOption(Role role)
+    public static CustomOption.CustomOptionType ToCustomOption(Role role)
     {
         if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.CustomOptionType.Addons;
         return (CustomOption.CustomOptionType)role.CampType;

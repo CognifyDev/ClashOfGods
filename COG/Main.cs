@@ -114,7 +114,7 @@ public partial class Main : BasePlugin
         {
             Logger.LogError(e.Message);
         }
-        
+        /*
         // Register listeners
         ListenerManager.GetManager().RegisterListeners(new[]
         {
@@ -132,6 +132,22 @@ public partial class Main : BasePlugin
             CachedPlayer.GetCachedPlayerListener(),
             new TaskAdderListener()
         });
+        */
+        
+        ListenerManager.GetManager().RegisterListeners(new IListener[]
+        {
+            new CommandListener(),
+            new PlayerListener(),
+            new DeadPlayerListener(),
+            new CustomButtonListener(),
+            new CustomWinnerListener(),
+            new GameListener(),
+            new ModOptionListener(),
+            new RpcListener(),
+            new TaskAdderListener(),
+            new VersionShowerListener()
+        });
+        
 
         // Register sidebar texts
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
@@ -224,7 +240,7 @@ public partial class Main : BasePlugin
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
         Role.RoleManager.GetManager().GetRoles().Clear();
-        ListenerManager.GetManager().GetListeners().Clear();
+        ListenerManager.GetManager().UnRegisterHandlers();
         SidebarTextManager.GetManager().GetSidebarTexts().Clear();
         CustomWinnerManager.AllWinners.Clear();
         CustomWinnerManager.CustomWinners.Clear();

@@ -1,4 +1,5 @@
 ﻿using COG.Listener;
+using COG.Listener.Event.Impl.Game;
 
 namespace COG.Patch;
 
@@ -9,8 +10,8 @@ public static class PingTrackerUpdate
     {
         private static void Postfix(PingTracker __instance)
         {
-            foreach (var listener in ListenerManager.GetManager().GetListeners())
-                listener.OnPingTrackerUpdate(__instance);
+            ListenerManager.GetManager()
+                .ExecuteHandlers(new PingTrackerUpdateEvent(__instance), EventHandlerType.Postfix);
         }
     }
 }

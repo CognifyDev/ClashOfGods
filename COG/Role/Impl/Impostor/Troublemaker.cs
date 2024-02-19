@@ -1,7 +1,8 @@
-﻿using System.Threading;
+﻿/*
+using System.Threading;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Listener;
+using COG.NewListener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -9,10 +10,10 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
-/*
+*
  * TODO
  * 完成 干扰
- */
+ *
 public class Troublemaker : Role
 {
     private CustomOption? MakeTroubleCd { get; }
@@ -39,7 +40,7 @@ public class Troublemaker : Role
         MakeTroubleButton = CustomButton.Create(
             () =>
             {
-                /*
+                
                 if (_task != null)
                 {
                     _startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
@@ -57,7 +58,7 @@ public class Troublemaker : Role
                     }
                 });
                 _task.Start();
-                */
+                
             },
             () => MakeTroubleButton?.ResetCooldown(),
             couldUse: () => true,
@@ -73,5 +74,6 @@ public class Troublemaker : Role
         AddButton(MakeTroubleButton);
     }
 
-    public override IListener GetListener(PlayerControl player) => IListener.Empty;
+    public override IListener GetListener(PlayerControl player) => IListener.EmptyListener;
 }
+*/
