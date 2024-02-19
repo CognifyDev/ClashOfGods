@@ -114,25 +114,6 @@ public partial class Main : BasePlugin
         {
             Logger.LogError(e.Message);
         }
-        /*
-        // Register listeners
-        ListenerManager.GetManager().RegisterListeners(new[]
-        {
-            new CommandListener(),
-            new GameListener(),
-            new VersionShowerListener(),
-            new PlayerListener(),
-            new OptionListener(),
-            new ModOptionListener(),
-            new CustomButtonListener(),
-            new RpcListener(),
-            new GameObjectListener(),
-            new DeadPlayerManager(),
-            new CustomWinnerListener(),
-            CachedPlayer.GetCachedPlayerListener(),
-            new TaskAdderListener()
-        });
-        */
         
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {

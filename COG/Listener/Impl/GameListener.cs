@@ -143,7 +143,7 @@ public class GameListener : IListener
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Crewmate>(); // 无法分配默认职业为Crewmate
             }
 
-            player!.SetCustomRole(role);
+            player.SetCustomRole(role);
         }
 
         // 打印职业分配信息

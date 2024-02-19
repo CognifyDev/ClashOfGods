@@ -534,17 +534,17 @@ internal class GameOptionsMenuUpdatePatch
         var offset = 2.75f;
         var objType = new Dictionary<string, CustomOptionType>
         {
-            { "COGSettings",CustomOptionType.General },
-            {"ImpostorSettings", CustomOptionType.Impostor},
-            {"NeutralSettings", CustomOptionType.Neutral},
-            {"CrewmateSettings", CustomOptionType.Crewmate},
-            {"AddonsSettings", CustomOptionType.Addons}
+            { "GeneralSettings",CustomOptionType.General },
+            { "ImpostorSettings", CustomOptionType.Impostor },
+            { "NeutralSettings", CustomOptionType.Neutral },
+            { "CrewmateSettings", CustomOptionType.Crewmate },
+            { "AddonsSettings", CustomOptionType.Addons }
         };
 
         foreach (var option in Options.Where(o => o != null))
         {
             if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Type != kvp.Value)) continue;
-            if (!(option?.OptionBehaviour && option?.OptionBehaviour?.gameObject)) return;
+            if (!(option != null && option?.OptionBehaviour && option.OptionBehaviour != null && option.OptionBehaviour!.gameObject)) return;
             var enabled = true;
             var parent = option!.Parent;
 
