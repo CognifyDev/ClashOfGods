@@ -39,7 +39,7 @@ public class TaskAdderListener : IListener
             float yCursor = 0f;
             float maxHeight = 0f;
 
-            foreach (var role in COG.Role.RoleManager.GetManager().GetRoles())
+            foreach (var role in Role.RoleManager.GetManager().GetRoles())
             {
                 if (role is Unknown or Crewmate or Impostor) continue;
                 var button = UnityEngine.Object.Instantiate(taskAdderGame.RoleButton);
@@ -48,7 +48,7 @@ public class TaskAdderListener : IListener
 
                 RoleBehaviour roleBehaviour = new()
                 {
-                    Role = (RoleTypes)COG.Role.RoleManager.GetManager().GetRoles().IndexOf(role) + 100
+                    Role = (RoleTypes)Role.RoleManager.GetManager().GetRoles().IndexOf(role) + 100
                 };
                 button.Role = roleBehaviour;
 
@@ -64,6 +64,7 @@ public class TaskAdderListener : IListener
         var button = @event.TaskAddButton;
         try
         {
+            if (button.Text.text.StartsWith("Be_")) return;
             var role = button.Role;
             int type = 99;
             if (!role && !((type = (ushort)role.Role) > 100)) return;
@@ -82,6 +83,7 @@ public class TaskAdderListener : IListener
         var button = @event.TaskAddButton;
         var role = button.Role;
         int type = 99;
+        if (button.Text.text.StartsWith("Be_")) return true;
         if (!role && !((type = (ushort)role.Role) > 100)) return true;
         if (type is > 7 and not 99)
         {

@@ -26,7 +26,7 @@ public class Role
         SubRole = false;
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
-        CanSabotage = false;
+        CanSabotage = campType == CampType.Impostor;
         Id = RoleManager.GetManager().GetAvailableRoleId();
         ShowInOptions = showInOptions;
 
