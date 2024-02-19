@@ -6,7 +6,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Listener;
 using COG.Rpc;
 using COG.Utils;
 using TMPro;
@@ -243,8 +242,7 @@ public sealed class CustomOption
          * 常规设置的两个预设用选项位置错误
          * 
          */
-
-        private static void CreateClassicTabs(GameOptionsMenu __instance)
+        private static void CreateClassicTabs(GameOptionsMenu instance)
         {
             var allTypes = Enum.GetValues<CustomOptionType>();
             var typeNameDictionary = new Dictionary<CustomOptionType, string>();
@@ -342,7 +340,7 @@ public sealed class CustomOption
             DestroyOptions(typeOptions.Select(kvp=>kvp.Value).ToList());
 
             var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.transform);
-
+            
             foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {
                 if (option?.OptionBehaviour == null && option != null)
