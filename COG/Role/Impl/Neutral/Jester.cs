@@ -55,5 +55,5 @@ public class Jester : Role, IListener, IWinnable
         return result2 || reportedPlayer == null;
     }
 
-    public override IListener GetListener(PlayerControl player) => this;
+    public override IListener GetListener() => this;
 }

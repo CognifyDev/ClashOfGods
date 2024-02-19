@@ -2,7 +2,7 @@
 
 public class ControllerEvent : Event
 {
-    public ControllerManager Manager;
+    public ControllerManager Manager { get; }
 
     public ControllerEvent(ControllerManager manager)
     {

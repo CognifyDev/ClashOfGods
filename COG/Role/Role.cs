@@ -13,7 +13,7 @@ namespace COG.Role;
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
-public abstract class Role
+public class Role
 {
     public Role(string name, Color color, CampType campType, bool showInOptions)
     {
@@ -134,5 +134,5 @@ public abstract class Role
         return (CustomOption.CustomOptionType)role.CampType;
     }
 
-    public abstract IListener GetListener(PlayerControl player);
+    public virtual IListener GetListener() => IListener.EmptyListener;
 }

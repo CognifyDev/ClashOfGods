@@ -2,7 +2,7 @@
 
 public class GameEvent<T> : Event
 {
-    public T Object;
+    public T Object { get; }
 
     public GameEvent(T obj)
     {

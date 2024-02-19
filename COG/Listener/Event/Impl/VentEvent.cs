@@ -2,7 +2,7 @@
 
 public class VentEvent : Event
 {
-    public Vent Vent;
+    public Vent Vent { get; }
 
     public VentEvent(Vent vent)
     {

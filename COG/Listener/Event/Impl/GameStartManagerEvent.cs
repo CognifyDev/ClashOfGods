@@ -2,7 +2,7 @@
 
 public class GameStartManagerEvent : Event
 {
-    public GameStartManager GameStartManager;
+    public GameStartManager GameStartManager { get; }
 
     public GameStartManagerEvent(GameStartManager manager)
     {

@@ -16,5 +16,5 @@ public class Impostor : Role
         Description = LanguageConfig.Instance.ImpostorDescription;
     }
 
-    public override IListener GetListener(PlayerControl player) => IListener.EmptyListener;
+    public override IListener GetListener() => IListener.EmptyListener;
 }

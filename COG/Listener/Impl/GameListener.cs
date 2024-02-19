@@ -153,7 +153,7 @@ public class GameListener : IListener
 
         // 职业分配终止
         foreach (var playerRole in GameUtils.PlayerRoleData)
-            RoleListeners.Add(playerRole.Role.GetListener(playerRole.Player));
+            RoleListeners.Add(playerRole.Role.GetListener());
     }
 
     [EventHandler(EventHandlerType.Prefix)]

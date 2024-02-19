@@ -18,5 +18,5 @@ public class Bait : Role
         if (role != null && role.Name.Equals(Name)) killer.CmdReportDeadBody(target.Data);
     }
 
-    public override IListener GetListener(PlayerControl player) => IListener.EmptyListener;
+    public override IListener GetListener() => IListener.EmptyListener;
 }

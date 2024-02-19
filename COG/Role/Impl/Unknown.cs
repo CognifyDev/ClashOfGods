@@ -13,5 +13,5 @@ public class Unknown : Role
         Description = LanguageConfig.Instance.UnknownDescription;
     }
 
-    public override IListener GetListener(PlayerControl player) => IListener.EmptyListener;
+    public override IListener GetListener() => IListener.EmptyListener;
 }

@@ -68,5 +68,5 @@ public class Cleaner : Role, IListener
         CleanDeadBody(body!);
     }
 
-    public override IListener GetListener(PlayerControl player) => this;
+    public override IListener GetListener() => this;
 }

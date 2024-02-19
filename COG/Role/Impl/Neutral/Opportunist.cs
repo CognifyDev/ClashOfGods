@@ -52,7 +52,7 @@ public class Opportunist : Role, IListener
         BaseRoleType = RoleTypes.Crewmate;
     }
 
-    public override IListener GetListener(PlayerControl player) => this;
+    public override IListener GetListener() => this;
     
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMurderPlayer(PlayerMurderEvent @event)

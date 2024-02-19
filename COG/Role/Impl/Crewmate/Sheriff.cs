@@ -65,5 +65,5 @@ public class Sheriff : Role, IListener
         return false;
     }
 
-    public override IListener GetListener(PlayerControl player) => this;
+    public override IListener GetListener() => this;
 }
