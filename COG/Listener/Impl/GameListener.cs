@@ -80,6 +80,7 @@ public class GameListener : IListener
     public void AfterPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
         var player = @event.Player;
+        if (player == null! || !PlayerControl.LocalPlayer) return;
         if (GameStates.IsLobby && AmongUsClient.Instance.AmHost)
         {
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
