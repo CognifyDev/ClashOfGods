@@ -238,9 +238,7 @@ public sealed class CustomOption
         }
 
         /* FIXME
-         * 
          * 常规设置的两个预设用选项位置错误
-         * 
          */
         private static void CreateClassicTabs(GameOptionsMenu instance)
         {
@@ -334,8 +332,7 @@ public sealed class CustomOption
                     a++;
                 }
             }
-
-            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.GetComponentsInChildren<OptionBehaviour>().ToList());
+            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2.GetComponentsInChildren<OptionBehaviour>().ToList());
 
             DestroyOptions(typeOptions.Select(kvp=>kvp.Value).ToList());
 
