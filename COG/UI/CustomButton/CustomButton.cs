@@ -363,8 +363,13 @@ public class CustomButton
             if (y == 0) now = ++idx2;
             var rowBtnPos = vectors.Where(p => p.y == y).OrderBy(p => p.x).ToList();
 
-            var x = rowBtnPos.FirstOrDefault().x;
-            var z = rowBtnPos.FirstOrDefault().z;
+            float x = 0, z = 0;
+
+            if (rowBtnPos.Count != 0)
+            {
+                x = rowBtnPos.FirstOrDefault().x;
+                z = rowBtnPos.FirstOrDefault().z;
+            }
 
             var pos = new Vector3(x - now, y, z);
             btn.GameObject!.transform.localPosition = btn.Position = pos;
