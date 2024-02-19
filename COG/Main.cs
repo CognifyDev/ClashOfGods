@@ -29,7 +29,6 @@ using Reactor.Utilities.Extensions;
 using System.IO;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Impl;
-using COG.NewListener;
 using COG.Plugin.Manager;
 using COG.Utils.WinAPI;
 using UnityEngine.SceneManagement;
@@ -141,7 +140,12 @@ public partial class Main : BasePlugin
             new PlayerListener(),
             new DeadPlayerManager(),
             new CustomButtonListener(),
-            new CustomWinnerListener()
+            new CustomWinnerListener(),
+            new GameListener(),
+            new ModOptionListener(),
+            new RpcListener(),
+            new TaskAdderListener(),
+            new VersionShowerListener()
         });
         
 

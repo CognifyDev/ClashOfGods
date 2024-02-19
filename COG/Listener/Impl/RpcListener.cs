@@ -1,5 +1,4 @@
-using System.Linq;
-using COG.Role;
+using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -8,16 +7,11 @@ namespace COG.Listener.Impl;
 
 public class RpcListener : IListener
 {
-    public void OnRPCReceived(byte callId, MessageReader reader)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void AfterRPCReceived(PlayerHandleRpcEvent @event)
     {
-    }
-
-    public void OnLobbyRPCReceived(byte callId, MessageReader reader)
-    {
-    }
-
-    public void AfterRPCReceived(byte callId, MessageReader reader)
-    {
+        var callId = @event.CallId;
+        var reader = @event.MessageReader;
         if (AmongUsClient.Instance.AmHost) return; // 是房主就返回
         var knownRpc = (KnownRpc)callId;
 
@@ -59,7 +53,7 @@ public class RpcListener : IListener
                 {
                     var playerId = reader.ReadByte();
                     var roleId = reader.ReadPackedUInt32();
-                    GameUtils.SetCustomRole(PlayerUtils.GetPlayerById(playerId)!, Role.RoleManager.GetManager().GetRoleById(roleId)!);
+                    PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(Role.RoleManager.GetManager().GetRoleById(roleId)!);
                 }
                 break;
         }

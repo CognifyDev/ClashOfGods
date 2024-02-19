@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
-using COG.Listener;
 using COG.Listener.Impl;
 using COG.Rpc;
 using COG.States;
@@ -23,7 +22,7 @@ public static class GameUtils
     /// <param name="text">信息内容</param>
     public static void SendGameMessage(string text)
     {
-        if (DestroyableSingleton<HudManager>.Instance is HudManager hud)
+        if (DestroyableSingleton<HudManager>.Instance is { } hud)
             hud.Notifier.AddItem(text);
     }
 
@@ -68,16 +67,7 @@ public static class GameUtils
         var gameManager = GameManager.Instance;
         if (gameManager != null) gameManager.EndGame();
 
-        var gameListener = ListenerManager.GetManager().GetTypeListener<GameListener>()!;
-
-        try
-        {
-            gameListener.OnGameEndSetEverythingUp(null!);
-        }
-        catch
-        {
-            // ignored
-        }
+        GameListener.ClearRoleListeners();
     }
 
     public static NormalGameOptionsV07 GetGameOptions()

@@ -1,17 +1,23 @@
 using AmongUs.GameOptions;
-using COG;
-using COG.Listener;
+using COG.Listener.Event.Impl.TAButton;
+using COG.Listener.Event.Impl.TAGame;
+using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
-using COG.Role.Impl;
 using COG.Utils;
+
+namespace COG.Listener.Impl;
 
 public class TaskAdderListener : IListener
 {
     public static TaskFolder? RoleFolder;
-    public static TaskAddButton? LastClicked = null;
-    public void OnTaskAdderShowFolder(TaskAdderGame taskAdderGame, TaskFolder folder)
+    public static TaskAddButton? LastClicked;
+    
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnTaskAdderShowFolder(TaskAdderGameShowFolderEvent @event)
     {
+        var taskAdderGame = @event.TaskAdderGame;
+        var folder = @event.GetTaskFolder();
         if (taskAdderGame.Root == folder && RoleFolder == null)
         {
             RoleFolder = UnityEngine.Object.Instantiate(taskAdderGame.RootFolderPrefab, taskAdderGame.transform);
@@ -22,8 +28,11 @@ public class TaskAdderListener : IListener
         }
     }
 
-    public void AfterTaskAdderShowFolder(TaskAdderGame taskAdderGame, TaskFolder folder)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void AfterTaskAdderShowFolder(TaskAdderGameShowFolderEvent @event)
     {
+        var taskAdderGame = @event.TaskAdderGame;
+        var folder = @event.GetTaskFolder();
         if (RoleFolder != null && RoleFolder.FolderName == folder.FolderName)
         {
             float xCursor = 0f;
@@ -49,14 +58,17 @@ public class TaskAdderListener : IListener
         }
     }
 
-    public void OnTaskButtonUpdate(TaskAddButton button)
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnTaskButtonUpdate(TaskAddButtonUpdateEvent @event)
     {
+        var button = @event.TaskAddButton;
         try
         {
             var role = button.Role;
             int type = 99;
             if (!role && !((type = (ushort)role.Role) > 100)) return;
-            if (type is not <= 7 and not 99) button.Overlay.gameObject.SetActive(LastClicked?.Role.Role == button.Role.Role);
+            if (type is > 7 and not 99)
+                button.Overlay.gameObject.SetActive(LastClicked!.Role.Role == button.Role.Role);
         }
         catch
         {
@@ -64,12 +76,14 @@ public class TaskAdderListener : IListener
         }
     }
 
-    public bool OnTaskButtonAddTask(TaskAddButton button)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnTaskButtonAddTask(TaskAddButtonAddTaskEvent @event)
     {
+        var button = @event.TaskAddButton;
         var role = button.Role;
         int type = 99;
         if (!role && !((type = (ushort)role.Role) > 100)) return true;
-        if (type is not <= 7 and not 99)
+        if (type is > 7 and not 99)
         {
             PlayerControl.LocalPlayer.SetCustomRole(COG.Role.RoleManager.GetManager().GetRoles()[type - 100]);
             LastClicked = button;

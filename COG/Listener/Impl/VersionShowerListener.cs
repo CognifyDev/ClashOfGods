@@ -1,4 +1,5 @@
-﻿using InnerNet;
+﻿using COG.Listener.Event.Impl.Game;
+using InnerNet;
 using TMPro;
 using UnityEngine;
 
@@ -10,8 +11,10 @@ public class VersionShowerListener : IListener
         $@"<color=#DD1717>Clash</color> <color=#690B0B>Of</color> <color=#12EC3D>Gods</color> {Main.PluginVersion}";
 
     // The method of show version from SNR(Super New Roles)
-    public void OnPingTrackerUpdate(PingTracker tracker)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPingTrackerUpdate(PingTrackerUpdateEvent @event)
     {
+        var tracker = @event.Object;
         tracker.text.alignment = TextAlignmentOptions.TopRight;
         if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started)
         {

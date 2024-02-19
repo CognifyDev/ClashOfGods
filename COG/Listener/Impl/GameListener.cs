@@ -6,12 +6,11 @@ using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.GSManager;
+using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
 using COG.Listener.Event.Impl.VentImpl;
-using COG.NewListener.Event.Impl.Game;
-using COG.Patch;
 using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
@@ -144,7 +143,7 @@ public class GameListener : IListener
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Crewmate>(); // 无法分配默认职业为Crewmate
             }
 
-            player!.SetCustomRole(role!);
+            player!.SetCustomRole(role);
         }
 
         // 打印职业分配信息
@@ -275,6 +274,11 @@ public class GameListener : IListener
     public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
         // 取消已经注册的Listener
+        ClearRoleListeners();
+    }
+
+    internal static void ClearRoleListeners()
+    {
         foreach (var roleListener in RoleListeners) ListenerManager.GetManager().UnRegisterHandlers(ListenerManager.GetManager().GetHandlers(roleListener));
         RoleListeners.Clear();
     }
@@ -302,8 +306,10 @@ public class GameListener : IListener
         return true;
     }
 
-    public void OnHudUpdate(HudManager manager)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
+        var manager = @event.Manager;
         var player = PlayerControl.LocalPlayer;
         if (player == null) return;
         Role.Role? role;

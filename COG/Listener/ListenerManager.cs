@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using COG.Listener.Event;
-using COG.NewListener;
-using COG.NewListener.Event;
 
 namespace COG.Listener;
 

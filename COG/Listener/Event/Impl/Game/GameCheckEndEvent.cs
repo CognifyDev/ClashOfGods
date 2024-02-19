@@ -1,6 +1,4 @@
-﻿using COG.Listener.Event.Impl;
-
-namespace COG.NewListener.Event.Impl.Game;
+﻿namespace COG.Listener.Event.Impl.Game;
 
 public class GameCheckEndEvent : GameEvent<LogicGameFlowNormal>
 {

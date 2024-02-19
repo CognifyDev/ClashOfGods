@@ -1,7 +1,5 @@
 ﻿using COG.Listener;
 using COG.Listener.Event.Impl.Game;
-using COG.NewListener;
-using COG.NewListener.Event.Impl.Game;
 using COG.UI.ModOption;
 
 namespace COG.Patch;

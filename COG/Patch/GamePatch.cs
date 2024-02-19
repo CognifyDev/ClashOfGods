@@ -8,8 +8,6 @@ using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
 using COG.Listener.Event.Impl.VentImpl;
 using Il2CppSystem.Collections.Generic;
-using COG.NewListener;
-using COG.NewListener.Event.Impl.Game;
 
 namespace COG.Patch;
 
