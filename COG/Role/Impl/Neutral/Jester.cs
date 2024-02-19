@@ -3,7 +3,6 @@ using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
-using COG.NewListener;
 using COG.UI.CustomOption;
 using COG.Utils;
 using UnityEngine;

@@ -1,7 +1,6 @@
 ﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
-using COG.NewListener;
 using UnityEngine;
 
 namespace COG.Role.Impl;

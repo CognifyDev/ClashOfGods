@@ -1,6 +1,5 @@
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
-using COG.NewListener;
 
 namespace COG.Patch;
 

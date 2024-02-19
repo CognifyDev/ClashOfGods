@@ -2,7 +2,6 @@ using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.PPhysics;
-using COG.NewListener;
 using COG.States;
 using COG.UI.CustomButton;
 using COG.Utils;

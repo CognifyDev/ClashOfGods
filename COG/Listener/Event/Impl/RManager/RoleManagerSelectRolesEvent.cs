@@ -2,7 +2,7 @@
 
 public class RoleManagerSelectRolesEvent : RoleManagerEvent
 {
-    public RoleManager RoleManager { get; }
+    public new RoleManager RoleManager { get; }
     
     public RoleManagerSelectRolesEvent(RoleManager manager) : base(manager)
     {

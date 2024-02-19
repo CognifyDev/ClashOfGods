@@ -3,7 +3,6 @@ using System.Linq;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
-using COG.NewListener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;

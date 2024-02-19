@@ -2,7 +2,6 @@
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
-using COG.NewListener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -47,7 +46,7 @@ public class Sheriff : Role, IListener
             row: 2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            (Cooldown)SheriffKillCd.GetFloat,
+            (Cooldown)SheriffKillCd!.GetFloat,
             -1
         );
 

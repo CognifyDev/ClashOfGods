@@ -6,7 +6,6 @@ using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
-using COG.NewListener;
 using COG.Role;
 using COG.Role.Impl;
 using InnerNet;

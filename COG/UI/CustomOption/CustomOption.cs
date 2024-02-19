@@ -337,11 +337,11 @@ public sealed class CustomOption
                 }
             }
 
-            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2.GetComponentsInChildren<OptionBehaviour>().ToList());
+            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.GetComponentsInChildren<OptionBehaviour>().ToList());
 
             DestroyOptions(typeOptions.Select(kvp=>kvp.Value).ToList());
 
-            var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2.transform);
+            var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.transform);
 
             foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {

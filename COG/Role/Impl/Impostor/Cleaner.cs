@@ -7,7 +7,6 @@ using COG.Utils;
 using System.Linq;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
-using COG.NewListener;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

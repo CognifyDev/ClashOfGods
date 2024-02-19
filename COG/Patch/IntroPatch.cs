@@ -1,10 +1,7 @@
 ﻿using COG.Listener;
-using COG.Utils;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
-using System.Linq;
 using COG.Listener.Event.Impl.ICutscene;
-using COG.NewListener;
 
 namespace COG.Patch;
 

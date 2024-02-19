@@ -5,7 +5,6 @@ using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Listener.Event.Impl.GSManager;
 using COG.Listener.Event.Impl.Player;
-using COG.NewListener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
