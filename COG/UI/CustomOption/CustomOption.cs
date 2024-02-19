@@ -332,7 +332,7 @@ public sealed class CustomOption
                     a++;
                 }
             }
-            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2.GetComponentsInChildren<OptionBehaviour>().ToList());
+            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.GetComponentsInChildren<OptionBehaviour>().ToList());
 
             DestroyOptions(typeOptions.Select(kvp=>kvp.Value).ToList());
 
