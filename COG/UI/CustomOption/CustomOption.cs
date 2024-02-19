@@ -93,7 +93,7 @@ public sealed class CustomOption
         return new CustomOption(ignore, type, name, selections, "", parent, isHeader);
     }
 
-    public static CustomOption Create(bool ignore, CustomOptionType type, string name, float defaultValue, float min,
+    public static CustomOption? Create(bool ignore, CustomOptionType type, string name, float defaultValue, float min,
         float max, float step, CustomOption? parent = null, bool isHeader = false)
     {
         List<object> selections = new();
@@ -108,7 +108,7 @@ public sealed class CustomOption
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
             defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
-
+    
     public static void ShareConfigs(PlayerControl target)
     {
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
@@ -127,9 +127,9 @@ public sealed class CustomOption
             sb.Append(option.ID + "|" + option.Selection);
             sb.Append(',');
         }
-
+        
         writer.Write(sb.ToString().RemoveLast());
-
+        
         // id|selection,id|selection
 
         // OK 现在进行一个结束
@@ -237,12 +237,21 @@ public sealed class CustomOption
             CreateClassicTabs(__instance);
         }
 
+        /* FIXME
+         * 
+         * 常规设置的两个预设用选项位置错误
+         * 
+         */
+
         private static void CreateClassicTabs(GameOptionsMenu __instance)
         {
+            var allTypes = Enum.GetValues<CustomOptionType>();
+            var typeNameDictionary = new Dictionary<CustomOptionType, string>();
+            allTypes.ToList().ForEach(t => typeNameDictionary[t] = t.ToString() + "Settings");
             var isReturn = SetNames(
                 new Dictionary<string, string>
                 {
-                    ["COGSettings"] = LanguageConfig.Instance.GeneralSetting,
+                    ["GeneralSettings"] = LanguageConfig.Instance.GeneralSetting,
                     ["ImpostorSettings"] = LanguageConfig.Instance.ImpostorRolesSetting,
                     ["NeutralSettings"] = LanguageConfig.Instance.NeutralRolesSetting,
                     ["CrewmateSettings"] = LanguageConfig.Instance.CrewmateRolesSetting,
@@ -254,24 +263,17 @@ public sealed class CustomOption
             // Setup COG tab
             var template = Object.FindObjectsOfType<StringOption>().FirstOrDefault();
             if (template == null) return;
-            var gameSettings = GameObject.Find("Game Settings");
+
+            var gameSettings = GameObject.Find("Main Camera/PlayerOptionsMenu(Clone)").transform.FindChild("Game Settings");
             var gameSettingMenu = Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
 
-            var parent = gameSettings.transform.parent;
-            var torSettings = Object.Instantiate(gameSettings, parent);
-            var torMenu = GetMenu(torSettings, "COGSettings");
-
-            var impostorSettings = Object.Instantiate(gameSettings, parent);
-            var impostorMenu = GetMenu(impostorSettings, "ImpostorSettings");
-
-            var neutralSettings = Object.Instantiate(gameSettings, parent);
-            var neutralMenu = GetMenu(neutralSettings, "NeutralSettings");
-
-            var crewmateSettings = Object.Instantiate(gameSettings, parent);
-            var crewmateMenu = GetMenu(crewmateSettings, "CrewmateSettings");
-
-            var addonsSettings = Object.Instantiate(gameSettings, parent);
-            var modifierMenu = GetMenu(addonsSettings, "AddonsSettings");
+            var settingsMenu = new Dictionary<CustomOptionType, (GameObject?, GameOptionsMenu?)>();
+            foreach (var (type, name) in typeNameDictionary)
+            {
+                var setting = Object.Instantiate(gameSettings, gameSettings.transform.parent);
+                var menu = GetMenu(setting.gameObject, name);
+                settingsMenu[type] = (setting.gameObject, menu);
+            }
 
             var roleTab = GameObject.Find("RoleTab");
             var gameTab = GameObject.Find("GameTab");
@@ -311,48 +313,34 @@ public sealed class CustomOption
                 {
                     [gameSettingMenu.RegularGameSettings] = gameSettingMenu.GameSettingsHightlight,
                     [gameSettingMenu.RolesSettings.gameObject] = gameSettingMenu.RolesSettingsHightlight,
-                    [torSettings.gameObject] = cogTabHighlight,
-                    [impostorSettings.gameObject] = impostorTabHighlight,
-                    [neutralSettings.gameObject] = neutralTabHighlight,
-                    [crewmateSettings.gameObject] = crewmateTabHighlight,
-                    [addonsSettings.gameObject] = modifierTabHighlight
+                    [settingsMenu[CustomOptionType.General].Item1!.gameObject] = cogTabHighlight,
+                    [settingsMenu[CustomOptionType.Impostor].Item1!.gameObject] = impostorTabHighlight,
+                    [settingsMenu[CustomOptionType.Neutral].Item1!.gameObject] = neutralTabHighlight,
+                    [settingsMenu[CustomOptionType.Crewmate].Item1!.gameObject] = crewmateTabHighlight,
+                    [settingsMenu[CustomOptionType.Addons].Item1!.gameObject] = modifierTabHighlight
                 };
-                for (var i = 0; i < tabs.Length; i++)
+
+                int a = 0;
+                foreach (var tab in tabs)
                 {
-                    var button = tabs[i].GetComponentInChildren<PassiveButton>();
+                    var button = tab.GetComponentInChildren<PassiveButton>();
                     if (button == null) continue;
-                    var copiedIndex = i;
+                    var copiedIndex = a;
                     button.OnClick = new Button.ButtonClickedEvent();
                     button.OnClick.AddListener((Action)(() =>
                     {
                         if (settingsHighlightMap == null!) return;
                         SetListener(settingsHighlightMap, copiedIndex);
                     }));
+                    a++;
                 }
             }
 
-            DestroyOptions(new List<List<OptionBehaviour>>
-            {
-                torMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                impostorMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                neutralMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                crewmateMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
-                modifierMenu.GetComponentsInChildren<OptionBehaviour>().ToList()
-            });
+            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2.GetComponentsInChildren<OptionBehaviour>().ToList());
 
-            var torOptions = new List<OptionBehaviour>();
-            var impostorOptions = new List<OptionBehaviour>();
-            var neutralOptions = new List<OptionBehaviour>();
-            var crewmateOptions = new List<OptionBehaviour>();
-            var modifierOptions = new List<OptionBehaviour>();
+            DestroyOptions(typeOptions.Select(kvp=>kvp.Value).ToList());
 
-            var menus = new List<Transform>
-            {
-                torMenu.transform, impostorMenu.transform, neutralMenu.transform, crewmateMenu.transform,
-                modifierMenu.transform
-            };
-            var optionBehaviours = new List<List<OptionBehaviour>>
-                { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions };
+            var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2.transform);
 
             foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {
@@ -360,8 +348,8 @@ public sealed class CustomOption
                 {
                     if (!option.Ignore)
                     {
-                        var stringOption = Object.Instantiate(template, menus[(int)option.Type]);
-                        optionBehaviours[(int)option.Type].Add(stringOption);
+                        var stringOption = Object.Instantiate(template, menus[option.Type]);
+                        typeOptions[option.Type].Add(stringOption);
                         stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
                         stringOption.TitleText.text = stringOption.name = option.Name;
                         if (FirstOpen)
@@ -378,7 +366,7 @@ public sealed class CustomOption
                         var templateToggle = GameObject.Find("ResetToDefault")?.GetComponent<ToggleOption>();
                         if (!templateToggle) return;
 
-                        var strOpt = Object.Instantiate(templateToggle, menus[(int)option.Type]);
+                        var strOpt = Object.Instantiate(templateToggle, menus[option.Type]);
                         strOpt!.transform.Find("CheckBox")?.gameObject.SetActive(false);
                         strOpt.TitleText.transform.localPosition = Vector3.zero;
                         strOpt.name = option.Name;
@@ -391,14 +379,10 @@ public sealed class CustomOption
             }
 
             SetOptions(
-                new List<GameOptionsMenu> { torMenu, impostorMenu, neutralMenu, crewmateMenu, modifierMenu },
-                new List<List<OptionBehaviour>>
-                    { torOptions, impostorOptions, neutralOptions, crewmateOptions, modifierOptions },
-                new List<GameObject>
-                    { torSettings, impostorSettings, neutralSettings, crewmateSettings, addonsSettings }
+                settingsMenu.Select(kvp => kvp.Value.Item2!).ToList(),
+                typeOptions.Select(kvp => kvp.Value).ToList(),
+                settingsMenu.Select(kvp => kvp.Value.Item1!).ToList()
             );
-
-            AdaptTaskCount(__instance);
         }
 
         private static void SetListener(Dictionary<GameObject, SpriteRenderer> settingsHighlightMap, int index)
@@ -479,22 +463,6 @@ public sealed class CustomOption
                 settings[i].gameObject.SetActive(false);
             }
         }
-
-        private static void AdaptTaskCount(GameOptionsMenu __instance)
-        {
-            // Adapt task count for main options
-            var commonTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumCommonTasks")
-                ?.TryCast<NumberOption>();
-            if (commonTasksOption != null) commonTasksOption.ValidRange = new FloatRange(0f, 4f);
-
-            var shortTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumShortTasks")
-                ?.TryCast<NumberOption>();
-            if (shortTasksOption != null) shortTasksOption.ValidRange = new FloatRange(0f, 23f);
-
-            var longTasksOption = __instance.Children.FirstOrDefault(x => x.name == "NumLongTasks")
-                ?.TryCast<NumberOption>();
-            if (longTasksOption != null) longTasksOption.ValidRange = new FloatRange(0f, 15f);
-        }
     }
 }
 
@@ -537,7 +505,7 @@ public class StringOptionPatch
         //if (FirstOpen)
         //    __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
         //else
-        __instance.Value = __instance.oldValue = option.Selection;
+            __instance.Value = __instance.oldValue = option.Selection;
 
         __instance.ValueText.text = option.Selections[option.Selection].ToString();
 
@@ -559,7 +527,7 @@ internal class GameOptionsMenuUpdatePatch
                                         gameSettingMenu.RolesSettings.gameObject.active)) return;
 
         __instance.GetComponentInParent<Scroller>().ContentYBounds.max = -0.5F + __instance.Children.Length * 0.55F;
-        _timer += Time.deltaTime;
+        
         _timer += Time.deltaTime;
         if (_timer < 0.1f) return;
 
@@ -568,43 +536,38 @@ internal class GameOptionsMenuUpdatePatch
         if (TimerForBugFix < 3.0f) FirstOpen = false;
 
         var offset = 2.75f;
+        var objType = new Dictionary<string, CustomOptionType>
+        {
+            { "COGSettings",CustomOptionType.General },
+            {"ImpostorSettings", CustomOptionType.Impostor},
+            {"NeutralSettings", CustomOptionType.Neutral},
+            {"CrewmateSettings", CustomOptionType.Crewmate},
+            {"AddonsSettings", CustomOptionType.Addons}
+        };
+
         foreach (var option in Options.Where(o => o != null))
         {
-            if (option != null && GameObject.Find("COGSettings") && option.Type != CustomOptionType.General)
-                continue;
-            if (option != null && GameObject.Find("ImpostorSettings") && option.Type != CustomOptionType.Impostor)
-                continue;
-            if (option != null && GameObject.Find("NeutralSettings") && option.Type != CustomOptionType.Neutral)
-                continue;
-            if (option != null && GameObject.Find("CrewmateSettings") && option.Type != CustomOptionType.Crewmate)
-                continue;
-            if (option != null && GameObject.Find("AddonsSettings") && option.Type != CustomOptionType.Addons)
-                continue;
-            if (option?.OptionBehaviour != null && option.OptionBehaviour.gameObject != null)
-            {
-                var enabled = true;
-                var parent = option.Parent;
-                while (enabled)
-                    if (parent != null)
-                    {
-                        enabled = parent.Selection != 0;
-                        parent = parent.Parent;
-                    }
-                    else
-                    {
-                        break;
-                    }
+            if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Type != kvp.Value)) continue;
+            if (!(option?.OptionBehaviour && option?.OptionBehaviour?.gameObject)) return;
+            var enabled = true;
+            var parent = option!.Parent;
 
-                option.OptionBehaviour.gameObject.SetActive(enabled);
-                if (enabled)
-                {
-                    offset -= option.IsHeader ? 0.75f : 0.5f;
-                    var transform = option.OptionBehaviour.transform;
-                    var localPosition = transform.localPosition;
-                    localPosition = new Vector3(localPosition.x, offset, localPosition.z);
-                    transform.localPosition = localPosition;
-                }
+            while (enabled && parent != null)
+            {
+                enabled = parent!.Selection != 0;
+                parent = parent.Parent;
             }
+
+            option.OptionBehaviour!.gameObject.SetActive(enabled);
+            if (enabled)
+            {
+                offset -= option.IsHeader ? 0.75f : 0.5f;
+                var transform = option.OptionBehaviour.transform;
+                var localPosition = transform.localPosition;
+                localPosition = new Vector3(localPosition.x, offset, localPosition.z);
+                transform.localPosition = localPosition;
+            }
+
         }
 
 
