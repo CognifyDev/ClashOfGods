@@ -43,7 +43,7 @@ public class CustomButton
     public int Row;
     public int Order;
 
-    public static bool Inited;
+    public static bool Initialized { get; internal set; }
     internal static List<ActionButton> AllVanillaButtons = new();
 
     private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool>? hasButton,
@@ -334,7 +334,7 @@ public class CustomButton
             button.PassiveButton.OnClick.AddListener((UnityAction)button.CheckClick);
             button.SetActive(false);
         }
-        Inited = true;
+        Initialized = true;
     }
 
     internal static void GetAllButtons()

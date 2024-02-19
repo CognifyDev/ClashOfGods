@@ -8,14 +8,14 @@ internal class CustomButtonListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnHudStart(HudManagerStartEvent @event)
     {
-        CustomButton.Inited = false;
+        CustomButton.Initialized = false;
         CustomButton.Init(@event.Manager);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
-        if (!CustomButton.Inited) return;
+        if (!CustomButton.Initialized) return;
         CustomButton.GetAllButtons();
         CustomButton.ArrangePosition();
         foreach (var button in CustomButtonManager.GetManager().GetButtons()) button.Update();
@@ -24,6 +24,6 @@ internal class CustomButtonListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnHudDestroy(HudManagerDestroyEvent @event)
     {
-        CustomButton.Inited = false;
+        CustomButton.Initialized = false;
     }
 }
