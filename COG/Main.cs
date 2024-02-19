@@ -138,7 +138,7 @@ public partial class Main : BasePlugin
         {
             new CommandListener(),
             new PlayerListener(),
-            new DeadPlayerManager(),
+            new DeadPlayerListener(),
             new CustomButtonListener(),
             new CustomWinnerListener(),
             new GameListener(),

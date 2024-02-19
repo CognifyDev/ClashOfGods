@@ -1,6 +1,6 @@
 ﻿namespace COG.Listener.Event.Impl;
 
-public class AmongUsClientEvent : Listener.Event.Event
+public class AmongUsClientEvent : Event
 {
     public AmongUsClient AmongUsClient { get; }
 

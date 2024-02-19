@@ -183,10 +183,9 @@ public enum DeathReason
     Exiled
 }
 
-public class DeadPlayerManager : IListener
+public class DeadPlayerListener : IListener
 {
-    public static List<DeadPlayer> DeadPlayers { get; } = new();
-
+    
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMurderPlayer(PlayerMurderEvent @event)
     {
@@ -194,7 +193,7 @@ public class DeadPlayerManager : IListener
         var killer = @event.Player;
         if (!(target.Data.IsDead && killer && target)) return;
 
-        var reason = GetDeathReason(killer, target);
+        var reason = DeadPlayerManager.GetDeathReason(killer, target);
         _ = new DeadPlayer(DateTime.Now, reason, target, killer);
     }
 
@@ -202,14 +201,14 @@ public class DeadPlayerManager : IListener
     public void OnPlayerLeft(AmongUsClientLeaveEvent @event)
     {
         var data = @event.ClientData;
-        if (DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
+        if (DeadPlayerManager.DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
         _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
     }
 
     [EventHandler(EventHandlerType.Prefix)]
     public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
     {
-        DeadPlayers.Clear();
+        DeadPlayerManager.DeadPlayers.Clear();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -225,8 +224,14 @@ public class DeadPlayerManager : IListener
     {
         OnPlayerExile(new PlayerExileEvent(@event.Player, @event.Controller));
     }
+}
 
-    private static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
+public class DeadPlayerManager
+{
+    public static List<DeadPlayer> DeadPlayers { get; } = new();
+
+
+    internal static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
     {
         try
         {

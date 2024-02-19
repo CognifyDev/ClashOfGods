@@ -6,7 +6,7 @@
 public class Event
 {
     public string Name { get; }
-    
+
     protected Event()
     {
         Name = GetType().Name;

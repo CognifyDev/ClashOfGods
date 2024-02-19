@@ -15,7 +15,7 @@ public class Handler
     public readonly MethodInfo Method;
 
     public readonly EventHandlerType EventHandlerType;
-    
+
     public Handler(IListener listener, MethodInfo method, EventHandlerType type)
     {
         Listener = listener;
@@ -23,7 +23,7 @@ public class Handler
         if (parameterInfos.Length != 1) throw new System.Exception("not a event method");
         var parameter = parameterInfos[0];
         EventType = parameter.ParameterType;
-        if (!EventType.IsAssignableFrom(typeof(Listener.Event.Event))) throw new System.Exception("the input type is not a Event type");
+        if (!EventType.IsSubclassOf(typeof(Event))) throw new System.Exception("the input type is not a Event type");
 
         Method = method;
         EventHandlerType = type;

@@ -6,7 +6,7 @@ public class PlayerMurderEvent : PlayerEvent
     /// 被击杀的玩家
     /// </summary>
     public PlayerControl Target { get; }
-    
+
     public PlayerMurderEvent(PlayerControl killer, PlayerControl target) : base(killer)
     {
         Target = target;
