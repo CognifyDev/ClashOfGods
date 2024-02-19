@@ -52,7 +52,7 @@ public partial class Main : BasePlugin
     public const string DisplayName = "ClashOfGods";
 
     public static ManualLogSource Logger = null!;
-    public static VersionInfo VersionInfo { get; set; } = null!;
+    public static VersionInfo VersionInfo { get; private set; } = null!;
     public static string PluginVersion { get; private set; } = "Unknown";
     private Harmony Harmony { get; } = new(PluginGuid);
 
@@ -162,6 +162,12 @@ public partial class Main : BasePlugin
             new Jester(),
             new Opportunist()
         });
+        
+        // Register listeners from role
+        foreach (var role in Role.RoleManager.GetManager().GetRoles())
+        {
+            ListenerManager.GetManager().RegisterListener(role.GetListener());
+        }
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]

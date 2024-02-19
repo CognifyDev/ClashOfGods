@@ -66,8 +66,6 @@ public static class GameUtils
         PlayerRoleData.Clear();
         var gameManager = GameManager.Instance;
         if (gameManager != null) gameManager.EndGame();
-
-        GameListener.ClearRoleListeners();
     }
 
     public static NormalGameOptionsV07 GetGameOptions()

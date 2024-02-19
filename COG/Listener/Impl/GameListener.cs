@@ -25,8 +25,6 @@ namespace COG.Listener.Impl;
 
 public class GameListener : IListener
 {
-    private static readonly List<IListener> RoleListeners = new();
-
     private static bool HasStartedRoom { get; set; }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -152,8 +150,6 @@ public class GameListener : IListener
                                 $" => {playerRole.Role.GetType().Name}");
 
         // 职业分配终止
-        foreach (var playerRole in GameUtils.PlayerRoleData)
-            RoleListeners.Add(playerRole.Role.GetListener());
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -268,19 +264,6 @@ public class GameListener : IListener
         intro.TeamTitle.color = camp.GetColor();
 
         intro.ImpostorText.text = camp.GetDescription();
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
-    {
-        // 取消已经注册的Listener
-        ClearRoleListeners();
-    }
-
-    internal static void ClearRoleListeners()
-    {
-        foreach (var roleListener in RoleListeners) ListenerManager.GetManager().UnRegisterHandlers(ListenerManager.GetManager().GetHandlers(roleListener));
-        RoleListeners.Clear();
     }
 
     [EventHandler(EventHandlerType.Prefix)]
