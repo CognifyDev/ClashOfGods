@@ -342,7 +342,7 @@ public sealed class CustomOption
             DestroyOptions(typeOptions.Select(kvp=>kvp.Value).ToList());
 
             var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.transform);
-
+            
             foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {
                 if (option?.OptionBehaviour == null && option != null)
