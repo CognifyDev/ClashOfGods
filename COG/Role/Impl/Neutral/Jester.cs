@@ -3,6 +3,7 @@ using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
+using COG.States;
 using COG.UI.CustomOption;
 using COG.Utils;
 using UnityEngine;
@@ -46,6 +47,7 @@ public class Jester : Role, IListener, IWinnable
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerReportDeadBody(PlayerReportDeadBodyEvent @event)
     {
+        if (!GameStates.InGame) return true;
         var reportedPlayer = @event.Target;
         var player = @event.Player;
         if (!Id.Equals(player.GetRoleInstance()?.Id)) return true;

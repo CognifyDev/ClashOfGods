@@ -60,6 +60,7 @@ public class Opportunist : Role, IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMurderPlayer(PlayerMurderEvent @event)
     {
+        if (!GameStates.InGame) return;
         var target = @event.Target;
         if (target.GetRoleInstance()!.Id == Id)
         {
