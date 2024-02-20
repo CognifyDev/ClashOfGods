@@ -24,6 +24,7 @@ public class Opportunist : Role, IListener
         Description = LanguageConfig.Instance.OpportunistDescription;
         _killCooldownOption = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, 
             LanguageConfig.Instance.KillCooldown, 45f, 20f, 200f, 1f, MainRoleOption);
+        BaseRoleType = RoleTypes.Impostor;
         _killButton = CustomButton.Create(
             () =>
             {
@@ -50,7 +51,8 @@ public class Opportunist : Role, IListener
             (Cooldown)_killCooldownOption.GetFloat,
             -1
         );
-        BaseRoleType = RoleTypes.Crewmate;
+        
+        AddButton(_killButton);
     }
 
     public override IListener GetListener() => this;
