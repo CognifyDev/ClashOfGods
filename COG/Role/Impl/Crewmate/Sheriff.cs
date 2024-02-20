@@ -2,6 +2,7 @@
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
+using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -56,6 +57,7 @@ public class Sheriff : Role, IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerMurder(PlayerMurderEvent @event)
     {
+        if (!GameStates.InGame) return true;
         var killer = @event.Player;
         var target = @event.Target;
         if (killer == null || target == null) return true;

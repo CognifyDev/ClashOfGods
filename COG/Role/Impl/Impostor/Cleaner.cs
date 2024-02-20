@@ -7,6 +7,7 @@ using COG.Utils;
 using System.Linq;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
+using COG.States;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -59,6 +60,7 @@ public class Cleaner : Role, IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnRPCReceived(PlayerHandleRpcEvent @event)
     {
+        if (!GameStates.InGame) return;
         var callId = @event.CallId;
         var reader = @event.MessageReader;
         if (callId != (byte)KnownRpc.CleanDeadBody) return;
