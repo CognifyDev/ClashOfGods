@@ -51,7 +51,9 @@ public class SystemUtils
         return value;
     }
 
-    public static MessageBoxDialogue.ClickedButton OpenMessageBox(string text, string title, MessageBoxDialogue.OpenTypes type = MessageBoxDialogue.OpenTypes.MB_DEFBUTTON1 | MessageBoxDialogue.OpenTypes.MB_ICONINFORMATION)
+    public static MessageBoxDialogue.ClickedButton OpenMessageBox(string text, string title,
+        MessageBoxDialogue.OpenTypes type = MessageBoxDialogue.OpenTypes.MB_DEFBUTTON1 |
+                                            MessageBoxDialogue.OpenTypes.MB_ICONINFORMATION)
     {
         return MessageBoxDialogue.OpenMessageBox(text, title, type);
     }

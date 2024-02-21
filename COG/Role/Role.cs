@@ -53,7 +53,7 @@ public class Role
     ///     角色名称
     /// </summary>
     public string Name { get; }
-    
+
     /// <summary>
     ///     是否是基本职业
     /// </summary>
@@ -109,7 +109,8 @@ public class Role
     /// </summary>
     public CustomOption? RoleNumberOption { get; }
 
-    public List<PlayerControl> Players => GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList();
+    public List<PlayerControl> Players =>
+        GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList();
 
     /// <summary>
     ///     添加一个按钮
@@ -134,5 +135,8 @@ public class Role
         return (CustomOption.CustomOptionType)role.CampType;
     }
 
-    public virtual IListener GetListener() => IListener.EmptyListener;
+    public virtual IListener GetListener()
+    {
+        return IListener.EmptyListener;
+    }
 }

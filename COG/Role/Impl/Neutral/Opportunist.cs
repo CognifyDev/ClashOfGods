@@ -18,11 +18,11 @@ public class Opportunist : Role, IListener
 {
     private readonly CustomOption? _killCooldownOption;
     private readonly CustomButton _killButton;
-    
+
     public Opportunist() : base(LanguageConfig.Instance.OpportunistName, Color.yellow, CampType.Neutral, true)
     {
         Description = LanguageConfig.Instance.OpportunistDescription;
-        _killCooldownOption = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, 
+        _killCooldownOption = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral,
             LanguageConfig.Instance.KillCooldown, 45f, 20f, 200f, 1f, MainRoleOption);
         BaseRoleType = RoleTypes.Impostor;
         _killButton = CustomButton.Create(
@@ -33,7 +33,7 @@ public class Opportunist : Role, IListener
                 PlayerControl.LocalPlayer.CmdCheckMurder(target);
             },
             () => _killButton?.ResetCooldown(),
-            couldUse: () =>
+            () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
                 if (target == null) return false;
@@ -45,27 +45,27 @@ public class Opportunist : Role, IListener
             },
             () => true,
             ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
-            row: 2,
+            2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             (Cooldown)_killCooldownOption.GetFloat,
             -1
         );
-        
+
         AddButton(_killButton);
     }
 
-    public override IListener GetListener() => this;
-    
+    public override IListener GetListener()
+    {
+        return this;
+    }
+
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMurderPlayer(PlayerMurderEvent @event)
     {
         if (!GameStates.InGame) return;
         var target = @event.Target;
-        if (target.GetRoleInstance()!.Id == Id)
-        {
-            CustomWinnerManager.UnRegisterCustomWinner(target);
-        }
+        if (target.GetRoleInstance()!.Id == Id) CustomWinnerManager.UnRegisterCustomWinner(target);
     }
 
     [EventHandler(EventHandlerType.Postfix)]

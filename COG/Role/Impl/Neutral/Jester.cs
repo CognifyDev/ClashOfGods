@@ -43,7 +43,7 @@ public class Jester : Role, IListener, IWinnable
     {
         return IWinnable.GetOrder(5);
     }
-    
+
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerReportDeadBody(PlayerReportDeadBodyEvent @event)
     {
@@ -57,5 +57,8 @@ public class Jester : Role, IListener, IWinnable
         return result2 || reportedPlayer == null;
     }
 
-    public override IListener GetListener() => this;
+    public override IListener GetListener()
+    {
+        return this;
+    }
 }

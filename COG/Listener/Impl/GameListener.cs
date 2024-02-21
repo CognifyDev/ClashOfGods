@@ -34,7 +34,7 @@ public class GameListener : IListener
         Main.Logger.LogInfo("Game started!");
 
         if (!AmongUsClient.Instance.AmHost) return;
-        
+
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
         Main.Logger.LogInfo("Share roles for players...");
@@ -65,12 +65,10 @@ public class GameListener : IListener
                     var role = Role.RoleManager.GetManager().GetRoleByClassName(texts[1]);
                     player!.SetCustomRole(role!);
                 }
-                
+
                 foreach (var playerRole in GameUtils.PlayerRoleData)
-                {
                     Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                         $" => {playerRole.Role.GetType().Name}");
-                }
 
                 break;
         }
@@ -88,6 +86,7 @@ public class GameListener : IListener
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
             GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
         }
+
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
         {
             var role = player.GetRoleInstance();
@@ -97,7 +96,7 @@ public class GameListener : IListener
             text.text = new StringBuilder().Append(role.Name).Append('\n').Append(player.Data.PlayerName).ToString();
         }
     }
-    
+
     private static void SelectRoles()
     {
         GameUtils.PlayerRoleData.Clear(); // 首先清除 防止干扰
@@ -233,7 +232,7 @@ public class GameListener : IListener
         }
 
         list.Add(Effects.Action((Action)Action));
-        
+
         @event.SetResult(Effects.Sequence(list.ToArray()));
         return false;
     }
@@ -352,20 +351,17 @@ public class GameListener : IListener
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
 
         var sb = new StringBuilder();
-        
+
         for (var i = 0; i < GameUtils.PlayerRoleData.Count; i++)
         {
             var playerRole = GameUtils.PlayerRoleData[i];
             sb.Append(playerRole.Player.PlayerId + "|" + playerRole.Role.GetType().Name);
 
-            if (i + 1 < GameUtils.PlayerRoleData.Count)
-            {
-                sb.Append(',');
-            }
+            if (i + 1 < GameUtils.PlayerRoleData.Count) sb.Append(',');
         }
-        
+
         writer.Write(sb.ToString());
-        
+
         // 职业格式应该是
         // playerId1|roleId1,playerId2|roleId2 
 

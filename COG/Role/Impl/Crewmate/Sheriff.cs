@@ -14,15 +14,15 @@ public class Sheriff : Role, IListener
 {
     private CustomOption? SheriffKillCd { get; }
     private CustomButton SheriffKillButton { get; }
+
     public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate, true)
     {
         BaseRoleType = RoleTypes.Crewmate;
         Description = LanguageConfig.Instance.SheriffDescription;
 
         if (ShowInOptions)
-        {
-            SheriffKillCd = CustomOption.Create(false, CustomOption.CustomOptionType.Crewmate, LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
-        }
+            SheriffKillCd = CustomOption.Create(false, CustomOption.CustomOptionType.Crewmate,
+                LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
 
         SheriffKillButton = CustomButton.Create(
             () =>
@@ -32,7 +32,7 @@ public class Sheriff : Role, IListener
                 PlayerControl.LocalPlayer.CmdCheckMurder(target);
             },
             () => SheriffKillButton?.ResetCooldown(),
-            couldUse: () =>
+            () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
                 if (target == null) return false;
@@ -44,7 +44,7 @@ public class Sheriff : Role, IListener
             },
             () => true,
             ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
-            row: 2,
+            2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             (Cooldown)SheriffKillCd!.GetFloat,
@@ -67,5 +67,8 @@ public class Sheriff : Role, IListener
         return false;
     }
 
-    public override IListener GetListener() => this;
+    public override IListener GetListener()
+    {
+        return this;
+    }
 }

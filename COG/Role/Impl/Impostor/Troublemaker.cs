@@ -18,14 +18,14 @@ public class Troublemaker : Role
 {
     private CustomOption? MakeTroubleCd { get; }
     private CustomOption? MakeTroubleDuration { get; }
-    
+
     private CustomButton MakeTroubleButton { get; }
 
     private static bool _makeTrouble = false;
 
     private static Thread? _task;
     private static long? _startTime;
-    
+
     public Troublemaker() : base(LanguageConfig.Instance.TroublemakerName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         CanKill = true;
@@ -33,14 +33,14 @@ public class Troublemaker : Role
         CanSabotage = true;
         BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.TroublemakerDescription;
-        MakeTroubleCd = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor, 
+        MakeTroubleCd = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor,
             LanguageConfig.Instance.TroublemakerCooldown, 15f, 11f, 120f, 1f, MainRoleOption);
-        MakeTroubleDuration = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor, 
+        MakeTroubleDuration = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor,
             LanguageConfig.Instance.TroublemakerDuration, 10f, 1f, 10f, 1f, MainRoleOption);
         MakeTroubleButton = CustomButton.Create(
             () =>
             {
-                
+
                 if (_task != null)
                 {
                     _startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
@@ -58,7 +58,7 @@ public class Troublemaker : Role
                     }
                 });
                 _task.Start();
-                
+
             },
             () => MakeTroubleButton?.ResetCooldown(),
             couldUse: () => true,
@@ -70,10 +70,11 @@ public class Troublemaker : Role
             (Cooldown)MakeTroubleCd.GetFloat,
             0
         );
-        
+
         AddButton(MakeTroubleButton);
     }
 
     public override IListener GetListener(PlayerControl player) => IListener.EmptyListener;
 }
 */
+

@@ -62,7 +62,10 @@ public static class PlayerUtils
         return closestPlayer;
     }
 
-    public static List<PlayerControl> GetAllPlayers() => new(PlayerControl.AllPlayerControls.ToArray());
+    public static List<PlayerControl> GetAllPlayers()
+    {
+        return new List<PlayerControl>(PlayerControl.AllPlayerControls.ToArray());
+    }
 
     public static List<PlayerControl> GetAllAlivePlayers()
     {
@@ -139,7 +142,8 @@ public static class PlayerUtils
         if (!ShipStatus.Instance) return null;
         var position = PlayerControl.LocalPlayer.GetTruePosition();
 
-        foreach (var body in Object.FindObjectsOfType<DeadBody>().Where(b => untargetable != null ? untargetable.Contains(b) : true))
+        foreach (var body in Object.FindObjectsOfType<DeadBody>()
+                     .Where(b => untargetable != null ? untargetable.Contains(b) : true))
         {
             var vector = body.TruePosition - position;
             var magnitude = vector.magnitude;
@@ -185,7 +189,6 @@ public enum DeathReason
 
 public class DeadPlayerListener : IListener
 {
-    
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMurderPlayer(PlayerMurderEvent @event)
     {
@@ -348,7 +351,7 @@ public class CachedPlayer : IListener
     public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
     {
         AllPlayers.RemoveAll(cp =>
-            cp.IsDead && // Will not continue if cp.IsDead is true 
+            cp.IsDead && // Will not continue if cp.IsDead is true
             cp.DeadStatus!.DeathReason == DeathReason.Disconnected);
     }
 

@@ -8,17 +8,22 @@ public class PlayerController
 {
     public Lua Lua { get; }
     public IPlugin Plugin { get; }
-    
+
     public PlayerController(Lua lua, IPlugin plugin)
     {
         Lua = lua;
         Plugin = plugin;
     }
 
-    public COG.Role.Role GetRoleByPlayer(PlayerControl playerControl) => playerControl.GetRoleInstance()!;
+    public COG.Role.Role GetRoleByPlayer(PlayerControl playerControl)
+    {
+        return playerControl.GetRoleInstance()!;
+    }
 
-    public void KillPlayer(PlayerControl playerControl) =>
+    public void KillPlayer(PlayerControl playerControl)
+    {
         playerControl.MurderPlayer(playerControl, GameUtils.DefaultFlag);
+    }
 
     public PlayerControl GetRandomPlayer()
     {

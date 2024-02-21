@@ -47,7 +47,10 @@ public class RoleManager
         return _roles.FirstOrDefault(role => role.Id == id);
     }
 
-    public uint GetAvailableRoleId() => _nextId ++;
+    public uint GetAvailableRoleId()
+    {
+        return _nextId++;
+    }
 
     /// <summary>
     ///     获取一个新的获取器

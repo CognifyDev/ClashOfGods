@@ -23,18 +23,18 @@ public class CommandListener : IListener
 
         return !cancellable;
     }
-    
+
     [EventHandler(EventHandlerType.Postfix)]
     public void OnPlayerChat(PlayerChatEvent @event)
     {
         var text = @event.Text;
         var player = @event.Player;
         if (!text.ToLower().StartsWith("/")) return;
-        
-        foreach (var command in CommandManager.GetManager().GetCommands().Where(command => !command.HostOnly).Where(command => text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) || ContainAliases(text, command)))
-        {
+
+        foreach (var command in CommandManager.GetManager().GetCommands().Where(command => !command.HostOnly)
+                     .Where(command => text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) ||
+                                       ContainAliases(text, command)))
             command.OnExecute(player, AsCommandStringArray(text));
-        }
     }
 
     private string[] AsCommandStringArray(string text)

@@ -44,7 +44,7 @@ public static class MessageBoxDialogue
         MB_MODEMASK = 0x00003000,
         MB_MISCMASK = 0x0000C000,
         MB_NOFOCUS = 0x00008000,
-        MB_TYPEMASK = 15,
+        MB_TYPEMASK = 15
     }
 
     public enum ClickedButton : int
@@ -58,7 +58,8 @@ public static class MessageBoxDialogue
         IDNO = 7
     }
 
-    public static ClickedButton OpenMessageBox(string text, string title, OpenTypes type = OpenTypes.MB_DEFBUTTON1 | OpenTypes.MB_ICONINFORMATION)
+    public static ClickedButton OpenMessageBox(string text, string title,
+        OpenTypes type = OpenTypes.MB_DEFBUTTON1 | OpenTypes.MB_ICONINFORMATION)
     {
         return (ClickedButton)MessageBox(IntPtr.Zero, text, title, (uint)type);
     }

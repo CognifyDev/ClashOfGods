@@ -33,5 +33,8 @@ public class CrewmatesCustomWinner : IWinnable
         return false;
     }
 
-    public ulong GetWeight() => IWinnable.GetOrder(2);
+    public ulong GetWeight()
+    {
+        return IWinnable.GetOrder(2);
+    }
 }

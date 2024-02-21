@@ -78,7 +78,7 @@ public static class GameUtils
         if (!pc) return;
         var playerRole = PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
         if (playerRole is not null) PlayerRoleData.Remove(playerRole);
-        PlayerRoleData.Add(new(pc, role));
+        PlayerRoleData.Add(new PlayerRole(pc, role));
         pc.SetRole(role.BaseRoleType);
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
     }

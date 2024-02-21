@@ -104,7 +104,7 @@ public partial class Main : BasePlugin
         }
 
         ModUpdater.FetchUpdate();
-        
+
         // Load plugins
         try
         {
@@ -114,7 +114,7 @@ public partial class Main : BasePlugin
         {
             Logger.LogError(e.Message);
         }
-        
+
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
@@ -128,7 +128,7 @@ public partial class Main : BasePlugin
             new TaskAdderListener(),
             new VersionShowerListener()
         });
-        
+
 
         // Register sidebar texts
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
@@ -162,12 +162,10 @@ public partial class Main : BasePlugin
             new Jester(),
             new Opportunist()
         });
-        
+
         // Register listeners from role
         foreach (var role in Role.RoleManager.GetManager().GetRoles())
-        {
             ListenerManager.GetManager().RegisterListener(role.GetListener());
-        }
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]

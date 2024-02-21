@@ -14,9 +14,12 @@ namespace COG.Patch;
 internal class LocalPlayerChatPatch
 {
     public static bool Prefix(ChatController __instance)
-        => __instance.freeChatField.textArea.text is not (null or "")
-           && ListenerManager.GetManager().ExecuteHandlers(new LocalPlayerChatEvent(PlayerControl.LocalPlayer, __instance),
-               EventHandlerType.Prefix);
+    {
+        return __instance.freeChatField.textArea.text is not (null or "")
+               && ListenerManager.GetManager().ExecuteHandlers(
+                   new LocalPlayerChatEvent(PlayerControl.LocalPlayer, __instance),
+                   EventHandlerType.Prefix);
+    }
 
     public static void Postfix(ChatController __instance)
     {
@@ -25,7 +28,6 @@ internal class LocalPlayerChatPatch
             new LocalPlayerChatEvent(PlayerControl.LocalPlayer, __instance),
             EventHandlerType.Postfix);
     }
-    
 }
 
 [HarmonyPatch(typeof(PlayerControl))]
@@ -36,7 +38,8 @@ internal class PlayerKillPatch
     public static bool CheckMurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
         if (!AmongUsClient.Instance.AmHost) return true;
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Prefix);
     }
 
     [HarmonyPatch(nameof(PlayerControl.MurderPlayer))]
@@ -44,7 +47,8 @@ internal class PlayerKillPatch
     public static void MurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Postfix);
     }
 }
 
@@ -53,11 +57,13 @@ internal class PlayerShapeShiftPatch
 {
     [HarmonyPatch(nameof(PlayerControl.CheckShapeshift))]
     [HarmonyPrefix]
-    public static bool CheckShapeShiftPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
+    public static bool CheckShapeShiftPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target,
+        [HarmonyArgument(1)] bool shouldAnimate)
     {
         if (!AmongUsClient.Instance.AmHost) return true;
 
-        var result = ListenerManager.GetManager().ExecuteHandlers(new PlayerShapeShiftEvent(__instance, target, shouldAnimate), EventHandlerType.Prefix);
+        var result = ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerShapeShiftEvent(__instance, target, shouldAnimate), EventHandlerType.Prefix);
         if (result)
             __instance.RpcRejectShapeshift();
         return result;
@@ -65,12 +71,14 @@ internal class PlayerShapeShiftPatch
 
     [HarmonyPatch(nameof(PlayerControl.Shapeshift))]
     [HarmonyPostfix]
-    public static void ShapeShiftPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
+    public static void ShapeShiftPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target,
+        [HarmonyArgument(1)] bool shouldAnimate)
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerShapeShiftEvent(__instance, target, shouldAnimate), EventHandlerType.Postfix);
     }
 }
+
 /*
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
 internal class ChatUpdatePatch
@@ -123,12 +131,16 @@ internal class ExileControllerPatch
 {
     public static bool Prefix(ExileController __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerExileEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerExileEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance),
+                EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(ExileController __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerExileEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerExileEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance),
+                EventHandlerType.Postfix);
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
     }
 }
@@ -138,12 +150,18 @@ internal class AirshipExileControllerPatch
 {
     public static bool Prefix(AirshipExileController __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerExileOnAirshipEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(
+                new PlayerExileOnAirshipEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance),
+                EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(AirshipExileController __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerExileOnAirshipEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(
+                new PlayerExileOnAirshipEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance),
+                EventHandlerType.Postfix);
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
     }
 }
@@ -153,9 +171,10 @@ internal class OnGameJoinedPatch
 {
     public static bool Prefix(AmongUsClient __instance, [HarmonyArgument(0)] string gameIdString)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new LocalAmongUsClientJoinEvent(__instance, gameIdString), EventHandlerType.Prefix);
-    } 
-    
+        return ListenerManager.GetManager().ExecuteHandlers(new LocalAmongUsClientJoinEvent(__instance, gameIdString),
+            EventHandlerType.Prefix);
+    }
+
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] string gameIdString)
     {
         ListenerManager.GetManager()
@@ -169,13 +188,15 @@ internal class OnPlayerLeftPatch
     public static bool Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data,
         [HarmonyArgument(1)] DisconnectReasons reason)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientLeaveEvent(__instance, data, reason), EventHandlerType.Prefix);
+        return ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientLeaveEvent(__instance, data, reason),
+            EventHandlerType.Prefix);
     }
 
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data,
         [HarmonyArgument(1)] DisconnectReasons reason)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientLeaveEvent(__instance, data, reason), EventHandlerType.Postfix);
+        ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientLeaveEvent(__instance, data, reason),
+            EventHandlerType.Postfix);
     }
 }
 
@@ -184,12 +205,14 @@ internal class OnPlayerJoinedPatch
 {
     public static bool Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientJoinEvent(__instance, data), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new AmongUsClientJoinEvent(__instance, data), EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientJoinEvent(__instance, data), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new AmongUsClientJoinEvent(__instance, data), EventHandlerType.Postfix);
     }
 }
 
@@ -201,7 +224,7 @@ internal class CreatePlayerPatch
         return ListenerManager.GetManager()
             .ExecuteHandlers(new AmongUsClientCreatePlayerEvent(__instance, client), EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData client)
     {
         ListenerManager.GetManager()
@@ -217,7 +240,7 @@ internal class OnSpawnPlayerPatch
         return ListenerManager.GetManager().ExecuteHandlers(new PlayerPhysicsCoSpawnEvent(__instance, lobbyBehaviour),
             EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(PlayerPhysics __instance, [HarmonyArgument(0)] LobbyBehaviour lobbyBehaviour)
     {
         ListenerManager.GetManager().ExecuteHandlers(new PlayerPhysicsCoSpawnEvent(__instance, lobbyBehaviour),
@@ -230,12 +253,14 @@ internal class ReportDeadBodyPatch
 {
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo? target)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerReportDeadBodyEvent(__instance, target), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerReportDeadBodyEvent(__instance, target), EventHandlerType.Prefix);
     }
 
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo? target)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerReportDeadBodyEvent(__instance, target), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerReportDeadBodyEvent(__instance, target), EventHandlerType.Postfix);
     }
 }
 
@@ -244,9 +269,10 @@ internal class FixedUpdatePatch
 {
     public static bool Prefix(PlayerControl __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerFixedUpdateEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerFixedUpdateEvent(__instance), EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(PlayerControl __instance)
     {
         ListenerManager.GetManager().ExecuteHandlers(new PlayerFixedUpdateEvent(__instance), EventHandlerType.Postfix);
