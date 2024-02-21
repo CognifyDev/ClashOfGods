@@ -13,9 +13,8 @@ namespace COG;
 /// </summary>
 public static class ModUpdater
 {
-    public static VersionInfo LatestVersion { get; private set; } = null!;
-    public static string LatestDescription { get; set; } = "";
-    public static bool BetaVersion { get; private set; }
+    public static VersionInfo? LatestVersion { get; private set; } = VersionInfo.Empty;
+    public static string LatestDescription { get; private set; } = "";
 
     public static void FetchUpdate()
     {
@@ -42,8 +41,6 @@ public static class ModUpdater
         LatestVersion = latestVersionString == null
             ? VersionInfo.Empty
             : VersionInfo.NewVersionInfoInstanceByString(latestVersionString);
-
-        BetaVersion = Main.PluginVersion.ToLower().Contains("beta") || Main.PluginVersion.ToLower().Contains("dev");
 
         LatestDescription = description;
     }
