@@ -25,32 +25,33 @@ public class Opportunist : Role, IListener
         _killCooldownOption = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral,
             LanguageConfig.Instance.KillCooldown, 45f, 20f, 200f, 1f, MainRoleOption);
         BaseRoleType = RoleTypes.Impostor;
-        _killButton = CustomButton.Create(
-            () =>
-            {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (!target) return;
-                PlayerControl.LocalPlayer.CmdCheckMurder(target);
-            },
-            () => _killButton?.ResetCooldown(),
-            () =>
-            {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return false;
-                var localPlayer = PlayerControl.LocalPlayer;
-                var localLocation = localPlayer.GetTruePosition();
-                var targetLocation = target.GetTruePosition();
-                var distance = Vector2.Distance(localLocation, targetLocation);
-                return GameUtils.GetGameOptions().KillDistance >= distance;
-            },
-            () => true,
-            ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
-            2,
-            KeyCode.Q,
-            LanguageConfig.Instance.KillAction,
-            (Cooldown)_killCooldownOption.GetFloat,
-            -1
-        );
+        if (_killCooldownOption != null)
+            _killButton = CustomButton.Create(
+                () =>
+                {
+                    var target = PlayerControl.LocalPlayer.GetClosestPlayer();
+                    if (!target) return;
+                    PlayerControl.LocalPlayer.CmdCheckMurder(target);
+                },
+                () => _killButton?.ResetCooldown(),
+                () =>
+                {
+                    var target = PlayerControl.LocalPlayer.GetClosestPlayer();
+                    if (target == null) return false;
+                    var localPlayer = PlayerControl.LocalPlayer;
+                    var localLocation = localPlayer.GetTruePosition();
+                    var targetLocation = target.GetTruePosition();
+                    var distance = Vector2.Distance(localLocation, targetLocation);
+                    return GameUtils.GetGameOptions().KillDistance >= distance;
+                },
+                () => true,
+                ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
+                2,
+                KeyCode.Q,
+                LanguageConfig.Instance.KillAction,
+                (Cooldown)_killCooldownOption.GetFloat,
+                -1
+            );
 
         AddButton(_killButton);
     }

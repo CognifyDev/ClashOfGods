@@ -13,20 +13,21 @@ namespace COG;
 /// </summary>
 public static class ModUpdater
 {
-    public static VersionInfo? LatestVersion { get; private set; } = VersionInfo.Empty;
+    public static VersionInfo? LatestVersion { get; private set; }
     public static string LatestDescription { get; private set; } = "";
 
     public static void FetchUpdate()
     {
-        string latestVersionString = null!;
+        string? latestVersionString = null;
         var description = "";
 
         try
         {
+            var webText = WebUtils.GetWebByAPIMethod(
+                "https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest",
+                "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");
             var jsonObject =
-                JObject.Parse(WebUtils.GetWebByAPIMethod(
-                    "https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest",
-                    "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"));
+                JObject.Parse(webText);
             var tagNameToken = jsonObject["tag_name"];
             var tagBodyToken = jsonObject["body"];
 
@@ -39,7 +40,7 @@ public static class ModUpdater
         }
 
         LatestVersion = latestVersionString == null
-            ? VersionInfo.Empty
+            ? null
             : VersionInfo.NewVersionInfoInstanceByString(latestVersionString);
 
         LatestDescription = description;

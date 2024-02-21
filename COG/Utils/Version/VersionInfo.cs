@@ -29,8 +29,9 @@ public class VersionInfo
     /// <param name="versionInfo"></param>
     /// <returns>是否为最新版本号</returns>
     /// <exception cref="ArgumentException"></exception>
-    public bool IsNewerThan(VersionInfo versionInfo)
+    public bool IsNewerThan(VersionInfo? versionInfo)
     {
+        if (versionInfo == null) return false;
         if (Equals(versionInfo)) return false;
 
         var versionStrings = Parent.Split('.');

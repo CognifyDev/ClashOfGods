@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace COG.Utils;
 
@@ -7,10 +8,10 @@ public static class WebUtils
     public static string GetWebByAPIMethod(string url, string apiKey)
     {
         using var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("User-Agent", "your-app-name"); // Add a User-Agent header
+        client.DefaultRequestHeaders.Add("User-Agent", $"{Main.DisplayName}/{Main.PluginVersion}"); // Add a User-Agent header
         if (!string.IsNullOrEmpty(apiKey))
             client.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("token",
+                new AuthenticationHeaderValue("token",
                     apiKey); // Add the API key for authentication
 
         var response = client.GetAsync(url).Result;
