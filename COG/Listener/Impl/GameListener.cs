@@ -158,7 +158,6 @@ public class GameListener : IListener
         foreach (var playerRole in GameUtils.PlayerRoleData)
         {
             playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
-            @event.RoleManager.SetRole(playerRole.Player, playerRole.Role.BaseRoleType);
         }
     }
 
