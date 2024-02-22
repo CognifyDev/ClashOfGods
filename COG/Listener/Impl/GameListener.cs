@@ -20,6 +20,7 @@ using Il2CppSystem;
 using Il2CppSystem.Collections;
 using UnityEngine;
 using Convert = System.Convert;
+using Object = UnityEngine.Object;
 
 namespace COG.Listener.Impl;
 
@@ -234,7 +235,16 @@ public class GameListener : IListener
         list.Add(Effects.Action((Action)Action));
 
         @event.SetResult(Effects.Sequence(list.ToArray()));
+
         return false;
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnIntroDestroy(IntroCutsceneDestroyEvent @event)
+    {
+        var intro = @event.IntroCutscene;
+        PlayerUtils.PoolablePlayerPrefab = Object.Instantiate(intro.PlayerPrefab);
+        PlayerUtils.PoolablePlayerPrefab.gameObject.SetActive(false);
     }
 
     [EventHandler(EventHandlerType.Prefix)]
