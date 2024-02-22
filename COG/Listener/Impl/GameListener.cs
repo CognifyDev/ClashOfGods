@@ -236,10 +236,15 @@ public class GameListener : IListener
 
         @event.SetResult(Effects.Sequence(list.ToArray()));
 
+        return false;
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnIntroDestroy(IntroCutsceneDestroyEvent @event)
+    {
+        var intro = @event.IntroCutscene;
         PlayerUtils.PoolablePlayerPrefab = Object.Instantiate(intro.PlayerPrefab);
         PlayerUtils.PoolablePlayerPrefab.gameObject.SetActive(false);
-
-        return false;
     }
 
     [EventHandler(EventHandlerType.Prefix)]

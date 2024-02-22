@@ -27,6 +27,22 @@ internal class CoBeginPatch
     }
 }
 
+[HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
+internal class IntroDestroyPatch
+{
+    public static bool Prefix(IntroCutscene __instance)
+    {
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new IntroCutsceneDestroyEvent(__instance), EventHandlerType.Prefix);
+    }
+
+    public static void Postfix(IntroCutscene __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new IntroCutsceneDestroyEvent(__instance), EventHandlerType.Postfix);
+    }
+}
+
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameEnd))]
 internal class EndGamePatch
 {

@@ -220,7 +220,7 @@ public class CustomButton
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 
         if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn() ||
-            (MapBehaviour.Instance is MapBehaviour instance && instance.IsOpen))
+            (MapBehaviour.Instance?.IsOpen ?? true))
         {
             SetActive(false);
             return;

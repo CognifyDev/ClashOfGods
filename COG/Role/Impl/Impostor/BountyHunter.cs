@@ -11,6 +11,9 @@ using System.Linq;
 using System;
 using Object = UnityEngine.Object;
 using UnityEngine.UIElements;
+using System.Collections;
+using Reactor.Utilities;
+using COG.Listener.Event.Impl.ICutscene;
 
 namespace COG.Role.Impl.Impostor
 {
@@ -26,6 +29,7 @@ namespace COG.Role.Impl.Impostor
         public float RefreshTargetTimer { get; private set; } = float.PositiveInfinity;
         public bool TimerStarted { get; private set; } = false;
         public PlayerControl? CurrentTarget { get; set; }
+        public PlayerControl? ClosestTarget { get; set; }
         public BountyHunter() : base("BountyHunter", Palette.ImpostorRed, CampType.Impostor, true)
         {
             CanKill = false; // Disable vanilla kill button
@@ -44,9 +48,8 @@ namespace COG.Role.Impl.Impostor
             BHunterKillButton = CustomButton.Create(
                 () =>
                 {
-                    var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                    if (!target) return;
-                    PlayerControl.LocalPlayer.CmdCheckMurder(target);
+                    if (!ClosestTarget) return;
+                    PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget);
                 },
                 () => BHunterKillButton?.ResetCooldown(),
                 couldUse: () =>
@@ -77,15 +80,15 @@ namespace COG.Role.Impl.Impostor
             if (!GameStates.InGame || !TimerStarted) return;
             RefreshTargetTimer -= Time.deltaTime;
             if (RefreshTargetTimer <= 0f) RefreshTarget();
-            if (CurrentTarget) CurrentTarget!.SetOutline(Color);
+            ClosestTarget = PlayerControl.LocalPlayer.GetClosestPlayer();
+            if (ClosestTarget) ClosestTarget!.SetOutline(Color);
         }
 
         [EventHandler(EventHandlerType.Postfix)]
         public void OnGameStart(GameStartEvent @event)
         {
             if (!PlayerControl.LocalPlayer.IsRole(this)) return;
-            TargetPoolable = Object.Instantiate(PlayerUtils.PoolablePlayerPrefab!);
-            TargetPoolable.gameObject.SetActive(false);
+            CreatePoolable();
             RefreshTarget();
         }
 
@@ -114,12 +117,20 @@ namespace COG.Role.Impl.Impostor
             RefreshTarget();
         }
 
+        public void CreatePoolable()
+        {
+            TargetPoolable = Object.Instantiate(PlayerUtils.PoolablePlayerPrefab!, HudManager.Instance.transform);
+            TargetPoolable.transform.localPosition = new(-3f, -2f, 0);
+            TargetPoolable.transform.localScale = new(0.7f, 0.7f, 0);
+            TargetPoolable.gameObject.SetActive(true);
+        }
+
         public void RefreshTarget()
         {
             RefreshTargetTimer = BHunterRefreshTargetTime.GetFloat();
             TimerStarted = true;
 
-            var selectableTargets = GameUtils.PlayerRoleData.Where(pr => pr.Role.CampType != CampType.Impostor && pr.Player.IsAlive()).Select(pr => pr.Player).ToList();
+            var selectableTargets = PlayerControl.AllPlayerControls.ToArray().Where(p => p.GetRoleInstance()!.CampType != CampType.Impostor && p.IsAlive() && PlayerControl.LocalPlayer.IsSamePlayer(p)).ToList();
             var r = new System.Random(DateTime.Now.Millisecond);
 
             if (selectableTargets?.Count == 0)
@@ -132,12 +143,10 @@ namespace COG.Role.Impl.Impostor
             }
 
             CurrentTarget = selectableTargets![r.Next(0, selectableTargets.Count)];
-
-            TargetPoolable.transform.parent = HudManager.Instance.transform;
-            TargetPoolable.transform.localPosition = new(-1f, -1f, 0);
-            TargetPoolable.SetPlayer(CurrentTarget);
-            TargetPoolable.gameObject.SetActive(true);
-            TargetPoolable.transform.localPosition = Vector3.zero;
+            
+            TargetPoolable?.SetPlayer(CurrentTarget);
         }
+
+        public override IListener GetListener() => this;
     }
 }
