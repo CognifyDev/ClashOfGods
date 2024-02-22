@@ -8,7 +8,8 @@ public static class WebUtils
     public static string GetWebByAPIMethod(string url, string apiKey)
     {
         using var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("User-Agent", $"{Main.DisplayName}/{Main.PluginVersion}"); // Add a User-Agent header
+        client.DefaultRequestHeaders.Add("User-Agent",
+            $"{Main.DisplayName}/{Main.PluginVersion}"); // Add a User-Agent header
         if (!string.IsNullOrEmpty(apiKey))
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("token",

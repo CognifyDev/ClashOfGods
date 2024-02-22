@@ -1,5 +1,6 @@
 ﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
@@ -43,7 +44,7 @@ public class Sheriff : Role, IListener
                 return GameUtils.GetGameOptions().KillDistance >= distance;
             },
             () => true,
-            ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
+            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
             2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,

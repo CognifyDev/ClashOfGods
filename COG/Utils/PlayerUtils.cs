@@ -8,9 +8,9 @@ using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;
+using COG.Utils.Coding;
 using InnerNet;
 using UnityEngine;
-using static Il2CppSystem.Globalization.CultureInfo;
 using GameStates = COG.States.GameStates;
 using Object = UnityEngine.Object;
 
@@ -25,7 +25,10 @@ public enum ColorType
 
 public static class PlayerUtils
 {
+    private static readonly int Outline = Shader.PropertyToID("_Outline");
+    private static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
     public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
+
     public static IEnumerable<PlayerRole> AllImpostors =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor);
 
@@ -107,6 +110,7 @@ public static class PlayerUtils
         return GetAllPlayers().FirstOrDefault(playerControl => playerControl.PlayerId == playerId);
     }
 
+    // ReSharper disable once MemberCanBePrivate.Global
     public static ClientData? GetClient(this PlayerControl player)
     {
         var client = AmongUsClient.Instance.allClients.ToArray()
@@ -180,28 +184,44 @@ public static class PlayerUtils
         };
     }
 
-    public static void SetPlayer(this PoolablePlayer poolable, PlayerControl player)
+    /// <summary>
+    /// 设置玩家外观
+    /// </summary>
+    /// <param name="poolable"></param>
+    /// <param name="player"></param>
+    [NotTested]
+    public static void SetPlayerAppearance(this PlayerControl player, PoolablePlayer poolable)
     {
         if (!poolable || !player) return;
-        //var data = player.Data;
         var outfit = player.CurrentOutfit;
-        //poolable.SetBodyColor(player.cosmetics.ColorId);
-        //if (data.IsDead) poolable.SetBodyAsGhost();
-        //poolable.SetBodyType(player.BodyType);
-        //if (AmongUs.Data.DataManager.Settings.Accessibility.ColorBlindMode) poolable.SetColorBlindTag();
-        //poolable.SetSkin(outfit.SkinId, outfit.ColorId);
-        //poolable.SetHat(outfit.HatId, outfit.ColorId);
-        //poolable.SetName(data.PlayerName);
-        //poolable.SetFlipX(true);
-        //poolable.SetBodyCosmeticsVisible(true);
-        //poolable.SetVisor(outfit.VisorId, outfit.ColorId);
+        /*
+        var data = player.Data;
+        poolable.SetBodyColor(player.cosmetics.ColorId);
+        if (data.IsDead) poolable.SetBodyAsGhost();
+        poolable.SetBodyType(player.BodyType);
+        if (AmongUs.Data.DataManager.Settings.Accessibility.ColorBlindMode) poolable.SetColorBlindTag();
+        poolable.SetSkin(outfit.SkinId, outfit.ColorId);
+        poolable.SetHat(outfit.HatId, outfit.ColorId);
+        poolable.SetName(data.PlayerName);
+        poolable.SetFlipX(true);
+        poolable.SetBodyCosmeticsVisible(true);
+        poolable.SetVisor(outfit.VisorId, outfit.ColorId);
+        */
+        
         poolable.UpdateFromPlayerOutfit(outfit, PlayerMaterial.MaskType.ComplexUI, false, true);
     }
 
-    public static void SetOutline(this PlayerControl pc,Color color)
+    /// <summary>
+    /// 设置角色外侧的线
+    /// 比如: 击杀时候的红线
+    /// </summary>
+    /// <param name="pc">目标玩家</param>
+    /// <param name="color">颜色</param>
+    [NotTested]
+    public static void SetOutline(this PlayerControl pc, Color color)
     {
-        pc?.cosmetics.currentBodySprite.BodySprite.material.SetFloat("_Outline", 1f);
-        pc?.cosmetics.currentBodySprite.BodySprite.material.SetColor("_OutlineColor", color);
+        pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 1f);
+        pc.cosmetics.currentBodySprite.BodySprite.material.SetColor(OutlineColor, color);
     }
 }
 
@@ -216,7 +236,7 @@ public enum DeathReason
 public class DeadPlayerListener : IListener
 {
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnMurderPlayer(PlayerMurderEvent @event)
+    private void OnMurderPlayer(PlayerMurderEvent @event)
     {
         var target = @event.Target;
         var killer = @event.Player;
@@ -227,7 +247,7 @@ public class DeadPlayerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerLeft(AmongUsClientLeaveEvent @event)
+    private void OnPlayerLeft(AmongUsClientLeaveEvent @event)
     {
         var data = @event.ClientData;
         if (DeadPlayerManager.DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
@@ -235,13 +255,13 @@ public class DeadPlayerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
+    private void OnCoBegin(IntroCutsceneCoBeginEvent @event)
     {
         DeadPlayerManager.DeadPlayers.Clear();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerExile(PlayerExileEvent @event)
+    private void OnPlayerExile(PlayerExileEvent @event)
     {
         var controller = @event.ExileController;
         if (controller.exiled == null) return;
@@ -249,7 +269,7 @@ public class DeadPlayerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnAirshipPlayerExile(PlayerExileOnAirshipEvent @event)
+    private void OnAirshipPlayerExile(PlayerExileOnAirshipEvent @event)
     {
         OnPlayerExile(new PlayerExileEvent(@event.Player, @event.Controller));
     }

@@ -1,19 +1,19 @@
-﻿/*
+﻿using System;
 using System.Threading;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.NewListener;
+using COG.Constant;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
+using COG.Utils.Coding;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
-*
- * TODO
- * 完成 干扰
- *
+[Unfinished]
+[NotTested]
+// ReSharper disable All
 public class Troublemaker : Role
 {
     private CustomOption? MakeTroubleCd { get; }
@@ -21,13 +21,13 @@ public class Troublemaker : Role
 
     private CustomButton MakeTroubleButton { get; }
 
-    private static bool _makeTrouble = false;
+    // private static bool _makeTrouble = false;
 
     private static Thread? _task;
-    private static long? _startTime;
 
     public Troublemaker() : base(LanguageConfig.Instance.TroublemakerName, Palette.ImpostorRed, CampType.Impostor, true)
     {
+        long? startTime;
         CanKill = true;
         CanVent = true;
         CanSabotage = true;
@@ -43,15 +43,15 @@ public class Troublemaker : Role
 
                 if (_task != null)
                 {
-                    _startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+                    startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
                 }
                 _task = new Thread(() =>
                 {
                     while (true)
                     {
-                        _startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+                        startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
                         var now = DateTimeOffset.Now.ToUnixTimeSeconds();
-                        if (now - MakeTroubleDuration.GetFloat() >= _startTime)
+                        if (MakeTroubleDuration != null && now - MakeTroubleDuration.GetFloat() >= startTime)
                         {
                             return;
                         }
@@ -63,7 +63,7 @@ public class Troublemaker : Role
             () => MakeTroubleButton?.ResetCooldown(),
             couldUse: () => true,
             () => true,
-            ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.MakeTrouble.png", 100f)!,
+            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.MakeTroubleButton, 100f)!,
             row: 2,
             KeyCode.C,
             LanguageConfig.Instance.MakeTrouble,
@@ -73,8 +73,4 @@ public class Troublemaker : Role
 
         AddButton(MakeTroubleButton);
     }
-
-    public override IListener GetListener(PlayerControl player) => IListener.EmptyListener;
 }
-*/
-

@@ -2,6 +2,7 @@
 using System.Threading;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Listener.Event.Impl.GSManager;
@@ -45,7 +46,7 @@ public class Opportunist : Role, IListener
                     return GameUtils.GetGameOptions().KillDistance >= distance;
                 },
                 () => true,
-                ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.GeneralKill.png", 100f)!,
+                ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
                 2,
                 KeyCode.Q,
                 LanguageConfig.Instance.KillAction,

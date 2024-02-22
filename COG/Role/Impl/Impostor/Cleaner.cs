@@ -5,6 +5,7 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
 using System.Linq;
+using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
@@ -36,7 +37,7 @@ public class Cleaner : Role, IListener
             () => CleanBodyButton?.ResetCooldown(),
             () => true,
             () => true,
-            ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
+            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.CleanDeadBodyButton, 100f)!,
             2,
             KeyCode.C,
             LanguageConfig.Instance.CleanAction,

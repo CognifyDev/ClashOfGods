@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using COG.Listener.Event;
-using COG.Listener.Event.Impl.ICutscene;
 
 namespace COG.Listener;
 
