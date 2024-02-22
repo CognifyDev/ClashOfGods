@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using COG.Listener.Event;
+using COG.Utils;
 
 namespace COG.Listener;
 
@@ -40,6 +42,18 @@ public class ListenerManager
             _handlers.Add(new Handler(listener, methodInfo, type));
             Main.Logger.LogInfo(
                 $"Registered listener handler => {methodInfo.Name} from {listener.GetType().Name} by type of {type.ToString()}");
+        }
+    }
+
+    /// <summary>
+    /// Register a listener if it not exists
+    /// </summary>
+    /// <param name="listener">the listener</param>
+    public void RegisterListenerIfNotExists(IListener listener)
+    {
+        if (!GetHandlers(listener).ToList().IsEmpty())
+        {
+            RegisterListener(listener);
         }
     }
 

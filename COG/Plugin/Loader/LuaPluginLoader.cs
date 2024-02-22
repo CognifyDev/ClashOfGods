@@ -1,38 +1,37 @@
-#pragma warning disable SYSLIB0014
-using System;
 using System.IO;
 using System.Net;
 using System.Text;
 using COG.Exception.Plugin;
 using COG.Plugin.Loader.Controller.Classes.Globe;
+using COG.Plugin.Loader.Controller.Classes.Player;
 using COG.Plugin.Loader.Controller.Function;
 using COG.Utils;
 using NLua;
+#pragma warning disable SYSLIB0014
 
 namespace COG.Plugin.Loader;
 
-[Serializable]
 public class LuaPluginLoader : IPlugin
 {
     /// <summary>
     /// 插件的名字
     /// </summary>
-    private string _name;
+    private readonly string _name;
 
     /// <summary>
     /// 插件的作者
     /// </summary>
-    private string _author;
+    private readonly string _author;
 
     /// <summary>
     /// 插件的版本
     /// </summary>
-    private string _version;
+    private readonly string _version;
 
     /// <summary>
     /// 插件的主类
     /// </summary>
-    private string _mainClass;
+    private readonly string _mainClass;
 
     private string ScriptPath { get; }
     private Lua LuaController { get; }
@@ -89,7 +88,7 @@ public class LuaPluginLoader : IPlugin
         return onEnableFunction != null && onDisableFunction != null;
     }
 
-    public void MakeLanguage()
+    private void MakeLanguage()
     {
         LuaController.LoadCLRPackage();
 
@@ -103,7 +102,7 @@ public class LuaPluginLoader : IPlugin
 
         LuaController["controller"] = new PluginController(LuaController, this);
         LuaController["web"] = new WebClient();
-        LuaController["playerController"] = new Controller.Classes.Player.PlayerController(LuaController, this);
+        LuaController["playerController"] = new PlayerController(LuaController, this);
 
         // register methods
         var functionsType = typeof(Functions);
@@ -115,9 +114,6 @@ public class LuaPluginLoader : IPlugin
             if (attributes[0] is FunctionRegisterAttribute functionRegisterAttribute)
                 LuaController.RegisterFunction(functionRegisterAttribute.FunctionName, null, methodInfo);
         }
-
-        // register class types
-        // LuaController.RegisterLuaClassType();
     }
 
     public void OnEnable()
