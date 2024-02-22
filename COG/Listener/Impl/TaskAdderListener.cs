@@ -12,7 +12,7 @@ public class TaskAdderListener : IListener
 {
     public static TaskFolder? RoleFolder;
     public static TaskAddButton? LastClicked;
-    
+
     [EventHandler(EventHandlerType.Prefix)]
     public void OnTaskAdderShowFolder(TaskAdderGameShowFolderEvent @event)
     {
@@ -35,9 +35,9 @@ public class TaskAdderListener : IListener
         var folder = @event.GetTaskFolder();
         if (RoleFolder != null && RoleFolder.FolderName == folder.FolderName)
         {
-            float xCursor = 0f;
-            float yCursor = 0f;
-            float maxHeight = 0f;
+            var xCursor = 0f;
+            var yCursor = 0f;
+            var maxHeight = 0f;
 
             foreach (var role in Role.RoleManager.GetManager().GetRoles())
             {
@@ -66,7 +66,7 @@ public class TaskAdderListener : IListener
         {
             if (button.Text.text.StartsWith("Be_")) return;
             var role = button.Role;
-            int type = 99;
+            var type = 99;
             if (!role && !((type = (ushort)role.Role) > 100)) return;
             if (type is > 7 and not 99)
                 button.Overlay.gameObject.SetActive(LastClicked!.Role.Role == button.Role.Role);
@@ -82,14 +82,15 @@ public class TaskAdderListener : IListener
     {
         var button = @event.TaskAddButton;
         var role = button.Role;
-        int type = 99;
+        var type = 99;
         if (button.Text.text.StartsWith("Be_")) return true;
         if (!role && !((type = (ushort)role.Role) > 100)) return true;
         if (type is > 7 and not 99)
         {
-            PlayerControl.LocalPlayer.SetCustomRole(COG.Role.RoleManager.GetManager().GetRoles()[type - 100]);
+            PlayerControl.LocalPlayer.SetCustomRole(Role.RoleManager.GetManager().GetRoles()[type - 100]);
             LastClicked = button;
         }
+
         return false;
     }
 }

@@ -28,6 +28,7 @@ public class RpcListener : IListener
                     option.Selection = int.Parse(contextsList[1]);
                     CustomOption.Options[i] = option;
                 }
+
                 break;
             case KnownRpc.ShareOptions:
                 var originalString = reader.ReadString();
@@ -37,24 +38,26 @@ public class RpcListener : IListener
                     var contexts = s.Split("|");
                     var id = int.Parse(contexts[0]);
                     var selection = int.Parse(contexts[1]);
-                    
+
                     for (var i = 0; i < CustomOption.Options.Count; i++)
                     {
                         var option = CustomOption.Options[i];
                         if (option == null) continue;
                         if (option.ID != id) continue;
-                        Main.Logger.LogInfo($"Changed {option.Name}({option.ID})'s selection to {selection}(before: {option.Selection})");
+                        Main.Logger.LogInfo(
+                            $"Changed {option.Name}({option.ID})'s selection to {selection}(before: {option.Selection})");
                         option.Selection = selection;
                         CustomOption.Options[i] = option;
                     }
                 }
+
                 break;
             case KnownRpc.SetRole:
-                {
-                    var playerId = reader.ReadByte();
-                    var roleId = reader.ReadPackedUInt32();
-                    PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(Role.RoleManager.GetManager().GetRoleById(roleId)!);
-                }
+            {
+                var playerId = reader.ReadByte();
+                var roleId = reader.ReadPackedUInt32();
+                PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(Role.RoleManager.GetManager().GetRoleById(roleId)!);
+            }
                 break;
         }
     }

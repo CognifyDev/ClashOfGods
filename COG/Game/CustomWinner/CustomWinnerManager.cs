@@ -20,10 +20,8 @@ public static class CustomWinnerManager
     public static void UnRegisterCustomWinner(PlayerControl playerControl)
     {
         foreach (var winningPlayerData in AllWinners)
-        {
             if (playerControl.Data.PlayerName.Equals(winningPlayerData.PlayerName))
                 AllWinners.Remove(winningPlayerData);
-        }
     }
 
     public static void RegisterCustomWinners(IEnumerable<PlayerControl> winners)

@@ -115,7 +115,7 @@ public class LuaPluginLoader : IPlugin
             if (attributes[0] is FunctionRegisterAttribute functionRegisterAttribute)
                 LuaController.RegisterFunction(functionRegisterAttribute.FunctionName, null, methodInfo);
         }
-        
+
         // register class types
         // LuaController.RegisterLuaClassType();
     }

@@ -6,8 +6,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
- using Debug = System.Diagnostics.Debug;
- using Object = UnityEngine.Object;
+using Debug = System.Diagnostics.Debug;
+using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomButton;
 
@@ -46,8 +46,10 @@ public class CustomButton
     public static bool Initialized { get; internal set; }
     internal static List<ActionButton> AllVanillaButtons = new();
 
-    private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Cooldown cooldown, float effectTime,
+    private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
+        Func<bool>? hasButton,
+        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Cooldown cooldown,
+        float effectTime,
         int usesLimit, string hotkeyName)
     {
         OnClick = onClick;
@@ -66,7 +68,7 @@ public class CustomButton
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
     }
-    
+
     /// <summary>
     ///     在游戏中创建一个按钮 (Effect)
     /// </summary>
@@ -91,8 +93,8 @@ public class CustomButton
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
-            true, cooldown, effectTime, usesLimit, hotkeyName)
-        { Order = order };
+                true, cooldown, effectTime, usesLimit, hotkeyName)
+            { Order = order };
     }
 
     /// <summary>
@@ -115,8 +117,8 @@ public class CustomButton
         string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text,
-            false, cooldown, -1f, usesLimit, hotkeyName)
-        { Order = order };
+                false, cooldown, -1f, usesLimit, hotkeyName)
+            { Order = order };
     }
 
     /// <summary>
@@ -216,8 +218,9 @@ public class CustomButton
         if (HotkeyName == "") hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
-        
-        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn() || (MapBehaviour.Instance is MapBehaviour instance && instance.IsOpen))
+
+        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn() ||
+            (MapBehaviour.Instance is MapBehaviour instance && instance.IsOpen))
         {
             SetActive(false);
             return;
@@ -248,7 +251,7 @@ public class CustomButton
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) CheckClick();
 
         if (!IsCustomPosition && Hud!.UseButton)
-                GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
+            GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
     }
 
     public void OnMeetingEndSpawn()
@@ -334,6 +337,7 @@ public class CustomButton
             button.PassiveButton.OnClick.AddListener((UnityAction)button.CheckClick);
             button.SetActive(false);
         }
+
         Initialized = true;
     }
 
@@ -344,21 +348,24 @@ public class CustomButton
         AllVanillaButtons.Clear();
         buttons.ForEachChild(new Action<GameObject>(gameObject =>
         {
-            if (CustomButtonManager.GetManager().GetButtons().FirstOrDefault(b => b.GameObject!.name == gameObject.name) is null) AllVanillaButtons.Add(gameObject.GetComponent<ActionButton>());
+            if (CustomButtonManager.GetManager().GetButtons()
+                    .FirstOrDefault(b => b.GameObject!.name == gameObject.name) is null)
+                AllVanillaButtons.Add(gameObject.GetComponent<ActionButton>());
         }));
     }
 
     internal static void ArrangePosition()
     {
         var vectors = AllVanillaButtons.Where(b => b.isActiveAndEnabled).Select(b => b.transform.localPosition);
-        int idx1 = 0;
-        int idx2 = 0;
-        foreach (var btn in CustomButtonManager.GetManager().GetButtons().Where(b => b.ActionButton!.isActiveAndEnabled && b.IsCustomPosition).OrderBy(b => b.Order))
+        var idx1 = 0;
+        var idx2 = 0;
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons()
+                     .Where(b => b.ActionButton!.isActiveAndEnabled && b.IsCustomPosition).OrderBy(b => b.Order))
         {
             var row = btn.Row;
             if (row != 1 && row != 2) btn.Row = 2;
             var y = 2 - btn.Row;
-            int now = 1;
+            var now = 1;
             if (y == 1) now = ++idx1;
             if (y == 0) now = ++idx2;
             var rowBtnPos = vectors.Where(p => p.y == y).OrderBy(p => p.x).ToList();
@@ -381,10 +388,34 @@ public class Cooldown
 {
     private float? Number;
     private Func<float>? Expression;
-    public Cooldown(float num) => Number = num;
-    public Cooldown(Func<float> exp) => Expression = exp;
-    public static implicit operator float(Cooldown cd) => cd.Number ?? float.PositiveInfinity;
-    public static implicit operator Func<float>(Cooldown cd) => cd.Expression ?? (() => float.PositiveInfinity);
-    public static implicit operator Cooldown(float cd) => new(cd);
-    public static implicit operator Cooldown(Func<float> cd) => new(cd);
+
+    public Cooldown(float num)
+    {
+        Number = num;
+    }
+
+    public Cooldown(Func<float> exp)
+    {
+        Expression = exp;
+    }
+
+    public static implicit operator float(Cooldown cd)
+    {
+        return cd.Number ?? float.PositiveInfinity;
+    }
+
+    public static implicit operator Func<float>(Cooldown cd)
+    {
+        return cd.Expression ?? (() => float.PositiveInfinity);
+    }
+
+    public static implicit operator Cooldown(float cd)
+    {
+        return new Cooldown(cd);
+    }
+
+    public static implicit operator Cooldown(Func<float> cd)
+    {
+        return new Cooldown(cd);
+    }
 }

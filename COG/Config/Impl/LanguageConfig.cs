@@ -66,12 +66,12 @@ public class LanguageConfig : Config
 
         SheriffName = GetString("role.crewmate.sheriff.name");
         SheriffDescription = GetString("role.crewmate.sheriff.description");
-        SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");                                          
+        SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");
 
         // Impostors
         ImpostorName = GetString("role.impostor.impostor.name");
         ImpostorDescription = GetString("role.impostor.impostor.description");
-        
+
         CleanerName = GetString("role.impostor.cleaner.name");
         CleanerDescription = GetString("role.impostor.cleaner.description");
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
@@ -174,7 +174,7 @@ public class LanguageConfig : Config
     // Impostor
     public string ImpostorName { get; private set; } = null!;
     public string ImpostorDescription { get; private set; } = null!;
-    
+
     public string CleanerName { get; private set; } = null!;
     public string CleanerDescription { get; private set; } = null!;
     public string CleanBodyCooldown { get; private set; } = null!;
@@ -236,7 +236,7 @@ public class LanguageConfig : Config
     public string UnloadModButtonName { get; private set; } = null!;
     public string UnloadModSuccessfulMessage { get; private set; } = null!;
     public string UnloadModInGameErrorMsg { get; private set; } = null!;
-    
+
     // Update
     public string UpToDate { get; private set; } = null!;
     public string NonCheck { get; private set; } = null!;

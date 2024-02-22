@@ -20,7 +20,10 @@ public static class StringUtils
         return sb.ToString();
     }
 
-    public static string RemoveLast(this string input) => new(input.Take(input.Length - 1).ToArray());
+    public static string RemoveLast(this string input)
+    {
+        return new string(input.Take(input.Length - 1).ToArray());
+    }
 
     public static string CustomFormat(this string text, params object[] args)
     {

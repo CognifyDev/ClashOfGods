@@ -17,13 +17,13 @@ public class Cleaner : Role, IListener
 {
     private CustomOption? CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
-    
+
     public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         Description = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
 
-        CleanBodyCd = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor, 
+        CleanBodyCd = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor,
             LanguageConfig.Instance.CleanBodyCooldown, 30f, 1f, 60f, 1f, MainRoleOption);
 
         CleanBodyButton = CustomButton.Create(
@@ -34,10 +34,10 @@ public class Cleaner : Role, IListener
                 RpcCleanDeadBody(body!);
             },
             () => CleanBodyButton?.ResetCooldown(),
-            couldUse: () => true,
+            () => true,
             () => true,
             ResourceUtils.LoadSpriteFromResources("COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png", 100f)!,
-            row: 2,
+            2,
             KeyCode.C,
             LanguageConfig.Instance.CleanAction,
             (Cooldown)CleanBodyCd!.GetFloat,
@@ -55,7 +55,11 @@ public class Cleaner : Role, IListener
         CleanDeadBody(body);
     }
 
-    public void CleanDeadBody(DeadBody body) => body.gameObject.SetActive(false); // idk why it make PlayerControl.FixedUpdate() throw System.NullReferenceException when i destroy the body
+    public void CleanDeadBody(DeadBody body)
+    {
+        body.gameObject.SetActive(false);
+        // idk why it make PlayerControl.FixedUpdate() throw System.NullReferenceException when i destroy the body
+    }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnRPCReceived(PlayerHandleRpcEvent @event)
@@ -70,5 +74,8 @@ public class Cleaner : Role, IListener
         CleanDeadBody(body!);
     }
 
-    public override IListener GetListener() => this;
+    public override IListener GetListener()
+    {
+        return this;
+    }
 }

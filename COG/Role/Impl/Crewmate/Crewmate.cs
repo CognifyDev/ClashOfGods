@@ -12,5 +12,8 @@ public class Crewmate : Role
         Description = LanguageConfig.Instance.CrewmateDescription;
     }
 
-    public override IListener GetListener() => IListener.EmptyListener;
+    public override IListener GetListener()
+    {
+        return IListener.EmptyListener;
+    }
 }

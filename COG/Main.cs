@@ -53,7 +53,7 @@ public partial class Main : BasePlugin
 
     public static ManualLogSource Logger = null!;
     public static VersionInfo VersionInfo { get; private set; } = null!;
-    public static string PluginVersion { get; private set; } = "Unknown";
+    public static string PluginVersion { get; private set; } = null!;
     private Harmony Harmony { get; } = new(PluginGuid);
 
     public static Main Instance { get; private set; } = null!;
@@ -104,7 +104,9 @@ public partial class Main : BasePlugin
         }
 
         ModUpdater.FetchUpdate();
-        
+        Logger.LogInfo(
+            $"Latest Version => {(ModUpdater.LatestVersion == null ? "Unknown" : ModUpdater.LatestVersion.ToString())}");
+
         // Load plugins
         try
         {
@@ -114,7 +116,7 @@ public partial class Main : BasePlugin
         {
             Logger.LogError(e.Message);
         }
-        
+
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
@@ -128,7 +130,7 @@ public partial class Main : BasePlugin
             new TaskAdderListener(),
             new VersionShowerListener()
         });
-        
+
 
         // Register sidebar texts
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
@@ -163,12 +165,10 @@ public partial class Main : BasePlugin
             new Jester(),
             new Opportunist()
         });
-        
+
         // Register listeners from role
         foreach (var role in Role.RoleManager.GetManager().GetRoles())
-        {
             ListenerManager.GetManager().RegisterListener(role.GetListener());
-        }
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]

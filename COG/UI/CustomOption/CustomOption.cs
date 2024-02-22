@@ -64,7 +64,10 @@ public sealed class CustomOption
     private static int _typeId;
 
     public static CustomOption? GetCustomOptionByCharacteristicCode(int characteristicCode)
-        => Options.FirstOrDefault(customOption => customOption != null && customOption.CharacteristicCode == characteristicCode);
+    {
+        return Options.FirstOrDefault(customOption =>
+            customOption != null && customOption.CharacteristicCode == characteristicCode);
+    }
 
     // Option creation
     public CustomOption(bool ignore, CustomOptionType type, string name, object[] selections,
@@ -108,7 +111,7 @@ public sealed class CustomOption
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
             defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
-    
+
     public static void ShareConfigs(PlayerControl target)
     {
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
@@ -118,18 +121,23 @@ public sealed class CustomOption
         var localPlayer = PlayerControl.LocalPlayer;
 
         // 新建写入器
-        var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions, SendOption.Reliable, target.GetClientID());
+        var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions,
+            SendOption.Reliable, target.GetClientID());
 
         var sb = new StringBuilder();
 
-        foreach (var option in from option in Options where option != null where !option.Ignore where option.Selection != option.DefaultSelection select option)
+        foreach (var option in from option in Options
+                 where option != null
+                 where !option.Ignore
+                 where option.Selection != option.DefaultSelection
+                 select option)
         {
             sb.Append(option.ID + "|" + option.Selection);
             sb.Append(',');
         }
-        
+
         writer.Write(sb.ToString().RemoveLast());
-        
+
         // id|selection,id|selection
 
         // OK 现在进行一个结束
@@ -261,7 +269,8 @@ public sealed class CustomOption
             var template = Object.FindObjectsOfType<StringOption>().FirstOrDefault();
             if (template == null) return;
 
-            var gameSettings = GameObject.Find("Main Camera/PlayerOptionsMenu(Clone)").transform.FindChild("Game Settings");
+            var gameSettings = GameObject.Find("Main Camera/PlayerOptionsMenu(Clone)").transform
+                .FindChild("Game Settings");
             var gameSettingMenu = Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
 
             var settingsMenu = new Dictionary<CustomOptionType, (GameObject?, GameOptionsMenu?)>();
@@ -317,7 +326,7 @@ public sealed class CustomOption
                     [settingsMenu[CustomOptionType.Addons].Item1!.gameObject] = modifierTabHighlight
                 };
 
-                int a = 0;
+                var a = 0;
                 foreach (var tab in tabs)
                 {
                     var button = tab.GetComponentInChildren<PassiveButton>();
@@ -332,12 +341,14 @@ public sealed class CustomOption
                     a++;
                 }
             }
-            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.GetComponentsInChildren<OptionBehaviour>().ToList());
 
-            DestroyOptions(typeOptions.Select(kvp=>kvp.Value).ToList());
+            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key,
+                kvp => kvp.Value.Item2!.GetComponentsInChildren<OptionBehaviour>().ToList());
+
+            DestroyOptions(typeOptions.Select(kvp => kvp.Value).ToList());
 
             var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.transform);
-            
+
             foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {
                 if (option?.OptionBehaviour == null && option != null)
@@ -501,7 +512,7 @@ public class StringOptionPatch
         //if (FirstOpen)
         //    __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
         //else
-            __instance.Value = __instance.oldValue = option.Selection;
+        __instance.Value = __instance.oldValue = option.Selection;
 
         __instance.ValueText.text = option.Selections[option.Selection].ToString();
 
@@ -523,7 +534,7 @@ internal class GameOptionsMenuUpdatePatch
                                         gameSettingMenu.RolesSettings.gameObject.active)) return;
 
         __instance.GetComponentInParent<Scroller>().ContentYBounds.max = -0.5F + __instance.Children.Length * 0.55F;
-        
+
         _timer += Time.deltaTime;
         if (_timer < 0.1f) return;
 
@@ -534,7 +545,7 @@ internal class GameOptionsMenuUpdatePatch
         var offset = 2.75f;
         var objType = new Dictionary<string, CustomOptionType>
         {
-            { "GeneralSettings",CustomOptionType.General },
+            { "GeneralSettings", CustomOptionType.General },
             { "ImpostorSettings", CustomOptionType.Impostor },
             { "NeutralSettings", CustomOptionType.Neutral },
             { "CrewmateSettings", CustomOptionType.Crewmate },
@@ -544,7 +555,8 @@ internal class GameOptionsMenuUpdatePatch
         foreach (var option in Options.Where(o => o != null))
         {
             if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Type != kvp.Value)) continue;
-            if (!(option != null && option?.OptionBehaviour && option.OptionBehaviour != null && option.OptionBehaviour!.gameObject)) return;
+            if (!(option != null && option?.OptionBehaviour && option.OptionBehaviour != null &&
+                  option.OptionBehaviour!.gameObject)) return;
             var enabled = true;
             var parent = option!.Parent;
 
@@ -563,7 +575,6 @@ internal class GameOptionsMenuUpdatePatch
                 localPosition = new Vector3(localPosition.x, offset, localPosition.z);
                 transform.localPosition = localPosition;
             }
-
         }
 
 
@@ -593,7 +604,8 @@ internal class HudStringPatch
         if (pages <= 0) return;
 
         var sidebars = SidebarTextManager.GetManager().GetSidebarTexts();
-        if (GameOptionsNextPagePatch.TypePage > sidebars.Count || GameOptionsNextPagePatch.TypePage == 0) GameOptionsNextPagePatch.TypePage = 1;
+        if (GameOptionsNextPagePatch.TypePage > sidebars.Count || GameOptionsNextPagePatch.TypePage == 0)
+            GameOptionsNextPagePatch.TypePage = 1;
 
         if (sidebars.Count <= 0) return;
 
@@ -614,7 +626,6 @@ internal class HudStringPatch
             if (option != null && option.Type == type && !option.Ignore)
                 opt.Add(option);
         foreach (var option in opt)
-        {
             // 临时解决方案
             try
             {
@@ -623,7 +634,7 @@ internal class HudStringPatch
             catch (IndexOutOfRangeException)
             {
             }
-        }
+
         return txt;
         /*
          * FIXME
@@ -644,7 +655,7 @@ internal class HudStringPatch
 public static class GameOptionsNextPagePatch
 {
     internal static int TypePage = 1;
-    
+
     public static void Postfix(KeyboardJoystick __instance)
     {
         if (Input.GetKeyDown(KeyCode.Tab)) TypePage += 1;

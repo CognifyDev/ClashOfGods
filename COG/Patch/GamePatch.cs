@@ -16,12 +16,14 @@ internal class CoBeginPatch
 {
     public static bool Prefix(IntroCutscene __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new IntroCutsceneCoBeginEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new IntroCutsceneCoBeginEvent(__instance), EventHandlerType.Prefix);
     }
 
     public static void Postfix(IntroCutscene __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new IntroCutsceneCoBeginEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new IntroCutsceneCoBeginEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -48,14 +50,16 @@ internal class GameStartManagerStartPatch
 {
     public static bool Prefix(GameStartManager __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerStartEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new GameStartManagerStartEvent(__instance), EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(GameStartManager __instance)
     {
         HostStartPatch.Timer = 600f;
 
-        ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerStartEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new GameStartManagerStartEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -64,12 +68,14 @@ internal class MakePublicPatch
 {
     public static bool Prefix(GameStartManager __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerMakePublicEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new GameStartManagerMakePublicEvent(__instance), EventHandlerType.Prefix);
     }
 
     public static void Postfix(GameStartManager __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerMakePublicEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new GameStartManagerMakePublicEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -78,12 +84,14 @@ internal class SelectRolesPatch
 {
     public static bool Prefix(RoleManager __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new RoleManagerSelectRolesEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new RoleManagerSelectRolesEvent(__instance), EventHandlerType.Prefix);
     }
 
     public static void Postfix(RoleManager __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new RoleManagerSelectRolesEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new RoleManagerSelectRolesEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -92,12 +100,14 @@ internal class SetEverythingUpPatch
 {
     public static bool Prefix(EndGameManager __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new GameSetEverythingUpEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new GameSetEverythingUpEvent(__instance), EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(EndGameManager __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new GameSetEverythingUpEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new GameSetEverythingUpEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -106,12 +116,14 @@ internal class ControllerManagerPatch
 {
     public static bool Prefix(ControllerManager __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new ControllerManagerUpdateEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new ControllerManagerUpdateEvent(__instance), EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(ControllerManager __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new ControllerManagerUpdateEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new ControllerManagerUpdateEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -133,7 +145,7 @@ public static class PlayerVentPatch
         __result = @event.GetResult();
         return result;
     }
-    
+
     [HarmonyPostfix]
     public static void Postfix(Vent __instance,
         [HarmonyArgument(0)] GameData.PlayerInfo playerInfo,
@@ -158,7 +170,7 @@ internal class GameEndChecker
     {
         return ListenerManager.GetManager().ExecuteHandlers(new GameCheckEndEvent(__instance), EventHandlerType.Prefix);
     }
-    
+
     [HarmonyPostfix]
     public static void Postfix(LogicGameFlowNormal __instance)
     {
@@ -177,7 +189,7 @@ internal class CheckTaskCompletionPatch
         __result = @event.GetResult();
         return result;
     }
-    
+
     public static void Postfix(GameManager __instance, ref bool __result)
     {
         var @event = new GameCheckTaskCompletionEvent(__instance, __result);
@@ -208,12 +220,14 @@ internal class TaskPatch
 {
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, tasks), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, tasks), EventHandlerType.Prefix);
     }
 
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, tasks), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, tasks), EventHandlerType.Postfix);
     }
 }
 
@@ -224,7 +238,7 @@ internal class GameStartPatch
     {
         return ListenerManager.GetManager().ExecuteHandlers(new GameStartEvent(__instance), EventHandlerType.Prefix);
     }
-    
+
     public static void Postfix(GameManager __instance)
     {
         ListenerManager.GetManager().ExecuteHandlers(new GameStartEvent(__instance), EventHandlerType.Postfix);
@@ -237,13 +251,15 @@ public class GameStartManagerUpdatePatch
     [HarmonyPrefix]
     public static bool Prefix(GameStartManager __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerUpdateEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new GameStartManagerUpdateEvent(__instance), EventHandlerType.Prefix);
     }
 
     [HarmonyPostfix]
     public static void Postfix(GameStartManager __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerUpdateEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new GameStartManagerUpdateEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -253,12 +269,14 @@ public class GameStartManagerBeginGamePatch
     [HarmonyPrefix]
     public static bool Prefix(GameStartManager __instance)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerBeginGameEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new GameStartManagerBeginGameEvent(__instance), EventHandlerType.Prefix);
     }
-    
+
     [HarmonyPostfix]
     public static void Postfix(GameStartManager __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new GameStartManagerBeginGameEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new GameStartManagerBeginGameEvent(__instance), EventHandlerType.Postfix);
     }
 }

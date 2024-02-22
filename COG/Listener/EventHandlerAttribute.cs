@@ -9,7 +9,7 @@ namespace COG.Listener;
 public sealed class EventHandlerAttribute : Attribute
 {
     public EventHandlerType EventHandlerType { get; }
-    
+
     public EventHandlerAttribute(EventHandlerType type)
     {
         EventHandlerType = type;

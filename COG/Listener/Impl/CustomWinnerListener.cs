@@ -23,7 +23,7 @@ public class CustomWinnerListener : IListener
         SetUpWinText(manager);
         SetUpRoleSummary(manager);
     }
-    
+
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
         manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList()

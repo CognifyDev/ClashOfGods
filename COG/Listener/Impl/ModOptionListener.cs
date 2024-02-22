@@ -14,8 +14,11 @@ internal class ModOptionListener : IListener
 {
     private static readonly List<Transform> Vanillas = new();
 
-    public List<Transform> GetVanillas() => new(Vanillas);
-    
+    public List<Transform> GetVanillas()
+    {
+        return new List<Transform>(Vanillas);
+    }
+
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSettingInit(OptionsMenuBehaviourStartEvent @event)
     {

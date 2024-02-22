@@ -46,11 +46,11 @@ public static class MainMenuPatch
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f),
             LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); },
             Color.gray);
-        
+
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
             LanguageConfig.Instance.UpdateButtonString, () =>
             {
-                if (ModUpdater.LatestVersion.Equals(VersionInfo.Empty))
+                if (VersionInfo.Empty.Equals(ModUpdater.LatestVersion))
                 {
                     SystemUtils.OpenMessageBox(LanguageConfig.Instance.NonCheck, "WARNING");
                     return;
@@ -61,8 +61,11 @@ public static class MainMenuPatch
                     SystemUtils.OpenMessageBox(LanguageConfig.Instance.UpToDate, "WARNING");
                     return;
                 }
-                    
-                var result = SystemUtils.OpenMessageBox(LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion.ToString(), ModUpdater.LatestDescription), "Update COG", MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
+
+                var result = SystemUtils.OpenMessageBox(
+                    LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion.ToString(),
+                        ModUpdater.LatestDescription), "Update COG",
+                    MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
 
                 if (result is MessageBoxDialogue.ClickedButton.IDNO) return;
 

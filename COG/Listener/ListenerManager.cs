@@ -17,7 +17,10 @@ public class ListenerManager
     /// Get the instance of listener manager
     /// </summary>
     /// <returns>instance</returns>
-    public static ListenerManager GetManager() => _manager ??= new ListenerManager();
+    public static ListenerManager GetManager()
+    {
+        return _manager ??= new ListenerManager();
+    }
 
     /// <summary>
     /// The list of listeners
@@ -37,7 +40,8 @@ public class ListenerManager
             var attribute = attributes[0] as EventHandlerAttribute;
             var type = attribute!.EventHandlerType;
             _handlers.Add(new Handler(listener, methodInfo, type));
-            Main.Logger.LogInfo($"Registered listener handler => {methodInfo.Name} from {listener.GetType().Name} by type of {type.ToString()}");
+            Main.Logger.LogInfo(
+                $"Registered listener handler => {methodInfo.Name} from {listener.GetType().Name} by type of {type.ToString()}");
         }
     }
 
@@ -45,25 +49,38 @@ public class ListenerManager
     /// Unregister handlers
     /// </summary>
     /// <param name="handlers"></param>
-    public void UnRegisterHandlers(Handler[] handlers) => _handlers.RemoveAll(handlers.Contains);
+    public void UnRegisterHandlers(Handler[] handlers)
+    {
+        _handlers.RemoveAll(handlers.Contains);
+    }
 
     /// <summary>
     /// Unregister all handlers
     /// </summary>
-    public void UnRegisterHandlers() => _handlers.Clear();
+    public void UnRegisterHandlers()
+    {
+        _handlers.Clear();
+    }
 
     /// <summary>
     /// Register listeners
     /// </summary>
     /// <param name="listeners">listeners</param>
-    public void RegisterListeners(IListener[] listeners) => listeners.ToList().ForEach(RegisterListener);
+    public void RegisterListeners(IListener[] listeners)
+    {
+        listeners.ToList().ForEach(RegisterListener);
+    }
 
     /// <summary>
     /// Get the list of handlers
     /// </summary>
     /// <returns>handler list</returns>
     public Handler[] GetHandlers(IListener? listener = null)
-        => listener == null ? _handlers.ToArray() : _handlers.Where(handler => listener.Equals(handler.Listener)).ToArray();
+    {
+        return listener == null
+            ? _handlers.ToArray()
+            : _handlers.Where(handler => listener.Equals(handler.Listener)).ToArray();
+    }
 
     /// <summary>
     /// Execute handlers
@@ -80,10 +97,7 @@ public class ListenerManager
             var returnType = handler.Method.ReturnType;
             var result = handler.Method.Invoke(handler.Listener, new object?[] { @event });
 
-            if (type == EventHandlerType.Prefix && returnType == typeof(bool) && !(bool)result!)
-            {
-                toReturn = false;
-            }
+            if (type == EventHandlerType.Prefix && returnType == typeof(bool) && !(bool)result!) toReturn = false;
         }
 
         return toReturn;
