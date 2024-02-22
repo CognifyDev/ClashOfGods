@@ -17,7 +17,7 @@ using COG.Listener.Event.Impl.ICutscene;
 
 namespace COG.Role.Impl.Impostor
 {
-    public class BountyHunter : Role, IListener
+    public class BountyHunter : Role, IListener // 此职业未完成 
     {
         public CustomButton BHunterKillButton { get; set; }
         public CustomOption BHunterKillCd { get; set; }
@@ -130,7 +130,7 @@ namespace COG.Role.Impl.Impostor
             RefreshTargetTimer = BHunterRefreshTargetTime.GetFloat();
             TimerStarted = true;
 
-            var selectableTargets = PlayerControl.AllPlayerControls.ToArray().Where(p => p.GetRoleInstance()!.CampType != CampType.Impostor && p.IsAlive() && PlayerControl.LocalPlayer.IsSamePlayer(p)).ToList();
+            var selectableTargets = PlayerControl.AllPlayerControls.ToArray().Where(p => p.GetRoleInstance()!.CampType != CampType.Impostor && p.IsAlive() && !PlayerControl.LocalPlayer.IsSamePlayer(p)).ToList();
             var r = new System.Random(DateTime.Now.Millisecond);
 
             if (selectableTargets?.Count == 0)
