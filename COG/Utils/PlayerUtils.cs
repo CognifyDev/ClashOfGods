@@ -10,6 +10,7 @@ using COG.Role;
 using COG.Role.Impl;
 using InnerNet;
 using UnityEngine;
+using static Il2CppSystem.Globalization.CultureInfo;
 using GameStates = COG.States.GameStates;
 using Object = UnityEngine.Object;
 
@@ -24,6 +25,7 @@ public enum ColorType
 
 public static class PlayerUtils
 {
+    public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
     public static IEnumerable<PlayerRole> AllImpostors =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor);
 
@@ -172,6 +174,30 @@ public static class PlayerUtils
             DeathReason.Disconnected => LanguageConfig.Instance.Disconnected,
             _ => LanguageConfig.Instance.UnknownKillReason
         };
+    }
+
+    public static void SetPlayer(this PoolablePlayer poolable, PlayerControl player)
+    {
+        if (!poolable || !player) return;
+        //var data = player.Data;
+        var outfit = player.CurrentOutfit;
+        //poolable.SetBodyColor(player.cosmetics.ColorId);
+        //if (data.IsDead) poolable.SetBodyAsGhost();
+        //poolable.SetBodyType(player.BodyType);
+        //if (AmongUs.Data.DataManager.Settings.Accessibility.ColorBlindMode) poolable.SetColorBlindTag();
+        //poolable.SetSkin(outfit.SkinId, outfit.ColorId);
+        //poolable.SetHat(outfit.HatId, outfit.ColorId);
+        //poolable.SetName(data.PlayerName);
+        //poolable.SetFlipX(true);
+        //poolable.SetBodyCosmeticsVisible(true);
+        //poolable.SetVisor(outfit.VisorId, outfit.ColorId);
+        poolable.UpdateFromPlayerOutfit(outfit, PlayerMaterial.MaskType.ComplexUI, false, true);
+    }
+
+    public static void SetOutline(this PlayerControl pc,Color color)
+    {
+        pc?.cosmetics.currentBodySprite.BodySprite.material.SetFloat("_Outline", 1f);
+        pc?.cosmetics.currentBodySprite.BodySprite.material.SetColor("_OutlineColor", color);
     }
 }
 
