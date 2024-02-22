@@ -149,15 +149,17 @@ public class GameListener : IListener
         foreach (var playerRole in GameUtils.PlayerRoleData)
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                 $" => {playerRole.Role.GetType().Name}");
-
-        // 职业分配终止
     }
 
-    [EventHandler(EventHandlerType.Prefix)]
+    [EventHandler(EventHandlerType.Postfix)]
     public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        foreach (var playerRole in GameUtils.PlayerRoleData) playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
+        foreach (var playerRole in GameUtils.PlayerRoleData)
+        {
+            playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
+            @event.RoleManager.SetRole(playerRole.Player, playerRole.Role.BaseRoleType);
+        }
     }
 
     [EventHandler(EventHandlerType.Postfix)]

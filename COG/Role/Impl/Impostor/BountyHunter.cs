@@ -9,6 +9,7 @@ using COG.States;
 using COG.Listener.Event.Impl.Game;
 using System.Linq;
 using System;
+using AmongUs.GameOptions;
 using COG.Constant;
 using COG.Utils.Coding;
 using Debug = System.Diagnostics.Debug;
@@ -37,6 +38,7 @@ public class BountyHunter : Role, IListener
     {
         CanKill = false; // Disable vanilla kill button
         Description = "Kill target";
+        BaseRoleType = RoleTypes.Impostor;
 
         if (ShowInOptions)
         {

@@ -22,7 +22,7 @@ public class Role
         Description = "";
         Color = color;
         CampType = campType;
-        BaseRoleType = RoleTypes.Crewmate;
+        BaseRoleType = campType == CampType.Impostor ? RoleTypes.Impostor : RoleTypes.Crewmate;
         SubRole = false;
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
