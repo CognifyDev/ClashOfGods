@@ -234,16 +234,21 @@ internal class SabotageMapOpen
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CoSetTasks))]
 internal class TaskPatch
 {
-    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
+    public static bool Prefix(PlayerControl __instance, ref List<GameData.TaskInfo> tasks)
     {
-        return ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, tasks), EventHandlerType.Prefix);
+        var typeTasks = tasks;
+        var result = ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, typeTasks), EventHandlerType.Prefix);
+        tasks = typeTasks;
+        return result;
     }
 
-    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] List<GameData.TaskInfo> tasks)
+    public static void Postfix(PlayerControl __instance, ref List<GameData.TaskInfo> tasks)
     {
+        var typeTasks = tasks;
         ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, tasks), EventHandlerType.Postfix);
+            .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, typeTasks), EventHandlerType.Postfix);
+        tasks = typeTasks;
     }
 }
 
