@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.GSManager;
@@ -280,7 +281,7 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnCheckGameEnd(GameCheckEndEvent @event)
     {
-        return !GlobalCustomOption.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
+        return !GlobalCustomOptionConstant.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     [EventHandler(EventHandlerType.Prefix)]

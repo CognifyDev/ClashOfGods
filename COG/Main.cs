@@ -14,7 +14,6 @@ using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
-using COG.States;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -27,6 +26,7 @@ using Reactor.Networking.Attributes;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using System.IO;
+using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Impl;
 using COG.Plugin.Manager;
@@ -45,6 +45,8 @@ namespace COG;
 [BepInDependency(ReactorPlugin.Id)]
 [BepInProcess("Among Us.exe")]
 [ReactorModFlags(ModFlags.RequireOnAllClients)]
+
+// ReSharper disable once ClassNeverInstantiated.Global
 public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
@@ -214,8 +216,12 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
-
-        GlobalCustomOption.Init();
+        
+        // ReSharper disable once PossibleMistakenCallToGetType.2
+        // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+        
+        // 调用 GlobalCustomOptionConstant 静态构造方法来初始化
+        typeof(GlobalCustomOptionConstant).GetType();
 
         Harmony.PatchAll();
 

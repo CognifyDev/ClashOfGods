@@ -1,3 +1,4 @@
+using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Player;
@@ -99,7 +100,7 @@ internal class HostStartPatch
 
     public static void Prefix(GameStartManager __instance)
     {
-        if (GlobalCustomOption.DebugMode.GetBool())
+        if (GlobalCustomOptionConstant.DebugMode.GetBool())
             // start with no limit
             GameStartManager.Instance.MinPlayers = 1;
 

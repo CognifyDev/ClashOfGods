@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Rpc;
 using COG.Utils;
 using TMPro;
@@ -579,11 +580,11 @@ internal class GameOptionsMenuUpdatePatch
 
 
         //每帧更新预设选项名称与按下按钮操作
-        var load = (ToggleOption)GlobalCustomOption.LoadPreset.OptionBehaviour!;
-        var save = (ToggleOption)GlobalCustomOption.SavePreset.OptionBehaviour!;
+        var load = (ToggleOption)GlobalCustomOptionConstant.LoadPreset.OptionBehaviour!;
+        var save = (ToggleOption)GlobalCustomOptionConstant.SavePreset.OptionBehaviour!;
 
-        load!.TitleText.text = GlobalCustomOption.LoadPreset.Name;
-        save!.TitleText.text = GlobalCustomOption.SavePreset.Name;
+        load!.TitleText.text = GlobalCustomOptionConstant.LoadPreset.Name;
+        save!.TitleText.text = GlobalCustomOptionConstant.SavePreset.Name;
 
         load.OnValueChanged = new Action<OptionBehaviour>((_) => OpenPresetWithDialogue());
         save.OnValueChanged = new Action<OptionBehaviour>((_) => SaveOptionWithDialogue());
