@@ -137,7 +137,8 @@ public static class PlayerUtils
 
     public static bool IsRole(this PlayerControl player, Role.Role role)
     {
-        return player.GetRoleInstance() == role;
+        var targetRole = player.GetRoleInstance();
+        return targetRole != null && targetRole.Id.Equals(role.Id);
     }
 
     public static DeadBody? GetClosestBody(List<DeadBody>? untargetable = null)

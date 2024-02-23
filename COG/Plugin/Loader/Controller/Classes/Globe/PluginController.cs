@@ -6,12 +6,12 @@ namespace COG.Plugin.Loader.Controller.Classes.Globe;
 
 public class PluginController
 {
-    private Lua Lua { get; }
+    private readonly Lua _lua;
     private readonly IPlugin _plugin;
 
     internal PluginController(Lua lua, IPlugin plugin)
     {
-        Lua = lua;
+        _lua = lua;
         _plugin = plugin;
     }
 

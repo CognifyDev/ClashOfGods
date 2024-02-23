@@ -40,7 +40,7 @@ public static class WebUtils
             // 返回网页源代码
             return responseBody;
         }
-        catch (HttpRequestException e)
+        catch (System.Exception e)
         {
             Main.Logger.LogError(e.Message);
         }

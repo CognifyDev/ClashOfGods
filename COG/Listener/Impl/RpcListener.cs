@@ -55,7 +55,7 @@ public class RpcListener : IListener
             case KnownRpc.SetRole:
             {
                 var playerId = reader.ReadByte();
-                var roleId = reader.ReadPackedUInt32();
+                var roleId = reader.ReadPackedInt32();
                 PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(Role.RoleManager.GetManager().GetRoleById(roleId)!);
             }
                 break;

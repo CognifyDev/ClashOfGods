@@ -3,9 +3,10 @@ using System.Net;
 using System.Text;
 using COG.Exception.Plugin;
 using COG.Plugin.Loader.Controller.Classes.Globe;
+using COG.Plugin.Loader.Controller.Classes.Listener;
 using COG.Plugin.Loader.Controller.Classes.Player;
+using COG.Plugin.Loader.Controller.Classes.Role;
 using COG.Plugin.Loader.Controller.Function;
-using COG.Plugin.Loader.Controller.Listener;
 using COG.Utils;
 using NLua;
 #pragma warning disable SYSLIB0014
@@ -105,6 +106,7 @@ public class LuaPluginLoader : IPlugin
         LuaController["web"] = new WebClient();
         LuaController["playerController"] = new PlayerController(LuaController, this);
         LuaController["listenerController"] = new ListenerController(LuaController, this);
+        LuaController["roleController"] = new RoleController(LuaController, this);
 
         // register methods
         var functionsType = typeof(Functions);

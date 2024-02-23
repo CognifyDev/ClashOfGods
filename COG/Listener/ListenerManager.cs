@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using COG.Listener.Event;
 using COG.Utils;
 
@@ -33,7 +34,11 @@ public class ListenerManager
     /// <param name="listener">the listener</param>
     public void RegisterListener(IListener listener)
     {
-        foreach (var methodInfo in listener.GetType().GetMethods())
+        foreach (var methodInfo in listener.GetType().GetMethods(BindingFlags.Instance |
+                                                                 BindingFlags.Public |
+                                                                 BindingFlags.NonPublic | 
+                                                                 BindingFlags.Static | 
+                                                                 BindingFlags.DeclaredOnly))
         {
             var attributes = methodInfo.GetCustomAttributes(typeof(EventHandlerAttribute), false);
             if (attributes.Length < 1) continue;

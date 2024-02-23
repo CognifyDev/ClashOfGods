@@ -64,13 +64,13 @@ public class GameListener : IListener
                 {
                     var texts = s.Split("|");
                     var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
-                    var role = Role.RoleManager.GetManager().GetRoleByClassName(texts[1]);
+                    var role = Role.RoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
                     player!.SetCustomRole(role!);
                 }
 
                 foreach (var playerRole in GameUtils.PlayerRoleData)
                     Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
-                                        $" => {playerRole.Role.GetType().Name}");
+                                        $" => {playerRole.Role.Name}");
 
                 break;
         }
@@ -149,7 +149,7 @@ public class GameListener : IListener
         // 打印职业分配信息
         foreach (var playerRole in GameUtils.PlayerRoleData)
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
-                                $" => {playerRole.Role.GetType().Name}");
+                                $" => {playerRole.Role.Name}");
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -367,7 +367,7 @@ public class GameListener : IListener
         for (var i = 0; i < GameUtils.PlayerRoleData.Count; i++)
         {
             var playerRole = GameUtils.PlayerRoleData[i];
-            sb.Append(playerRole.Player.PlayerId + "|" + playerRole.Role.GetType().Name);
+            sb.Append(playerRole.Player.PlayerId + "|" + playerRole.Role.Id);
 
             if (i + 1 < GameUtils.PlayerRoleData.Count) sb.Append(',');
         }
