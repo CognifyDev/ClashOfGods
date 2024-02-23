@@ -37,7 +37,7 @@ public class BountyHunter : Role, IListener
     private bool TimerStarted { get; set; }
     private PlayerControl? CurrentTarget { get; set; }
     private PlayerControl? ClosestTarget { get; set; }
-    private TextMeshPro RefreshTimerText { get; set; }
+    private TextMeshPro? RefreshTimerText { get; set; }
 
     public BountyHunter() : base(LanguageConfig.Instance.BountyHunterName, Palette.ImpostorRed, CampType.Impostor, true)
     {
@@ -61,6 +61,11 @@ public class BountyHunter : Role, IListener
         BHunterKillButton = CustomButton.Create(
             () =>
             {
+                /*
+                 * FIXME:
+                 * 无法击杀玩家
+                 * 
+                 */
                 if (!ClosestTarget) return;
                 PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget);
             },
@@ -93,6 +98,7 @@ public class BountyHunter : Role, IListener
         if (!GameStates.InGame || !TimerStarted) return;
         RefreshTargetTimer -= Time.fixedDeltaTime;
         if (RefreshTargetTimer <= 0f) RefreshTarget();
+        if(RefreshTimerText) RefreshTimerText!.text = Math.Ceiling(RefreshTargetTimer).ToString();
 
         ClosestTarget = PlayerControl.LocalPlayer.GetClosestPlayer();
         if (ClosestTarget)
