@@ -14,6 +14,7 @@ using COG.Constant;
 using COG.Utils.Coding;
 using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
+using TMPro;
 
 namespace COG.Role.Impl.Impostor;
 
@@ -25,7 +26,10 @@ public class BountyHunter : Role, IListener
     private CustomButton BHunterKillButton { get; set; }
     private CustomOption? BHunterKillCd { get; set; }
     private CustomOption? BHunterRefreshTargetTime { get; init; }
+
+    [NotUsed]
     private CustomOption? HasArrowToTarget { get; set; }
+
     private CustomOption? CdAfterKillingTarget { get; init; }
     private CustomOption? CdAfterKillingNonTarget { get; init; }
     private PoolablePlayer? TargetPoolable { get; set; }
@@ -33,24 +37,25 @@ public class BountyHunter : Role, IListener
     private bool TimerStarted { get; set; }
     private PlayerControl? CurrentTarget { get; set; }
     private PlayerControl? ClosestTarget { get; set; }
+    private TextMeshPro RefreshTimerText { get; set; }
 
-    public BountyHunter() : base("BountyHunter", Palette.ImpostorRed, CampType.Impostor, true)
+    public BountyHunter() : base(LanguageConfig.Instance.BountyHunterName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         CanKill = false; // Disable vanilla kill button
-        Description = "Kill target";
+        Description = LanguageConfig.Instance.BountyHunterDescription;
         BaseRoleType = RoleTypes.Impostor;
 
         if (ShowInOptions)
         {
             var optionType = ToCustomOption(this);
-            BHunterKillCd = CustomOption.Create(false, optionType, "cd", 30f, 10f, 60f, 5f, MainRoleOption)!;
+            BHunterKillCd = CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterDefaultCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
             BHunterRefreshTargetTime =
-                CustomOption.Create(false, optionType, "time", 30f, 10f, 60f, 5f, MainRoleOption)!;
-            HasArrowToTarget = CustomOption.Create(false, optionType, "arrow", true, MainRoleOption);
+                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            HasArrowToTarget = CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
             CdAfterKillingTarget =
-                CustomOption.Create(false, optionType, "correct", 60f, 10f, 60f, 5f, MainRoleOption)!;
+                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 60f, 10f, 60f, 5f, MainRoleOption)!;
             CdAfterKillingNonTarget =
-                CustomOption.Create(false, optionType, "incorrect", 10f, 10f, 60f, 5f, MainRoleOption)!;
+                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterKillIncorrectCd, 10f, 10f, 60f, 5f, MainRoleOption)!;
         }
 
         BHunterKillButton = CustomButton.Create(
@@ -72,10 +77,10 @@ public class BountyHunter : Role, IListener
             },
             () => true,
             ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
-            row: 2,
+            row: 1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            (Cooldown)BHunterKillCd!.GetFloat,
+            (Cooldown)30f,
             -1
         );
 
@@ -86,16 +91,22 @@ public class BountyHunter : Role, IListener
     public void AfterPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
         if (!GameStates.InGame || !TimerStarted) return;
-        RefreshTargetTimer -= Time.deltaTime;
+        RefreshTargetTimer -= Time.fixedDeltaTime;
         if (RefreshTargetTimer <= 0f) RefreshTarget();
+
         ClosestTarget = PlayerControl.LocalPlayer.GetClosestPlayer();
-        if (ClosestTarget) ClosestTarget!.SetOutline(Color);
+        if (ClosestTarget)
+        {
+            PlayerControl.AllPlayerControls.ToArray().Where(p => !p.IsSamePlayer(PlayerControl.LocalPlayer)).ToList().ForEach(p => p.cosmetics.currentBodySprite.BodySprite.material.SetFloat(PlayerUtils.Outline, 0f));
+            ClosestTarget!.SetOutline(Color);
+        }
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent @event)
     {
         if (!PlayerControl.LocalPlayer.IsRole(this)) return;
+        BHunterKillButton.SetCooldown(BHunterKillCd?.GetFloat() ?? 30f);
         CreatePoolable();
         RefreshTarget();
     }
@@ -104,6 +115,7 @@ public class BountyHunter : Role, IListener
     public void OnGameEnd(GameSetEverythingUpEvent @event)
     {
         CurrentTarget = null;
+        RefreshTimerText = null;
         TimerStarted = false;
     }
 
@@ -130,18 +142,18 @@ public class BountyHunter : Role, IListener
     private void CreatePoolable()
     {
         TargetPoolable = Object.Instantiate(PlayerUtils.PoolablePlayerPrefab!, HudManager.Instance.transform);
+        
         var transform = TargetPoolable.transform;
         transform.localPosition = new Vector3(-3f, -2f, 0);
         transform.localScale = new Vector3(0.7f, 0.7f, 0);
         TargetPoolable.gameObject.SetActive(true);
+
+        RefreshTimerText = Object.Instantiate(HudManager.Instance.AbilityButton.cooldownTimerText, TargetPoolable.transform.FindChild("Names"));
+        RefreshTimerText.transform.localPosition = Vector3.zero;
     }
 
     private void RefreshTarget()
     {
-        Debug.Assert(BHunterRefreshTargetTime != null, nameof(BHunterRefreshTargetTime) + " != null");
-        RefreshTargetTimer = BHunterRefreshTargetTime.GetFloat();
-        TimerStarted = true;
-
         var selectableTargets = PlayerControl.AllPlayerControls.ToArray().Where(p =>
             p.GetRoleInstance()!.CampType != CampType.Impostor && p.IsAlive() &&
             !PlayerControl.LocalPlayer.IsSamePlayer(p)).ToList();
@@ -150,16 +162,28 @@ public class BountyHunter : Role, IListener
         if (selectableTargets.Count == 0)
         {
             Main.Logger.LogError("[Bounty Hunter] Couldn't select a new target.");
-            GameUtils.SendGameMessage("");
+            GameUtils.SendGameMessage(LanguageConfig.Instance.BountyHunterCantSelectTargetError);
             Debug.Assert(TargetPoolable != null, nameof(TargetPoolable) + " != null");
             TargetPoolable.gameObject.SetActive(false);
             TimerStarted = false;
             return;
         }
 
+        Debug.Assert(BHunterRefreshTargetTime != null, nameof(BHunterRefreshTargetTime) + " != null");
+        RefreshTargetTimer = BHunterRefreshTargetTime.GetFloat();
+        TimerStarted = true;
+
         CurrentTarget = selectableTargets[r.Next(0, selectableTargets.Count)];
 
         Debug.Assert(TargetPoolable != null, nameof(TargetPoolable) + " != null");
+
+        /*
+         * FIXME
+         * 
+         * 船员模型的衣服在船员的底下（不知道是不是树懒的问题）
+         * 
+         */
+
         CurrentTarget.SetPlayerAppearance(TargetPoolable);
     }
 
