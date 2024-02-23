@@ -12,7 +12,7 @@ public static class ClassUtils
     /// </summary>
     /// <param name="parentType">弗雷</param>
     /// <returns></returns>
-    public static IList<Type> GetAllSubclasses(this Type parentType)
+    public static List<Type> GetAllSubclasses(this Type parentType)
     {
         var subclassList = new List<Type>();
         foreach (var type in Assembly.GetAssembly(parentType)!.GetTypes())

@@ -107,7 +107,7 @@ public partial class Main : BasePlugin
 
         ModUpdater.FetchUpdate();
         Logger.LogInfo(
-            $"Latest Version => {(ModUpdater.LatestVersion == null ? "Unknown" : ModUpdater.LatestVersion.ToString())}");
+            $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
 
         // Load plugins
         try

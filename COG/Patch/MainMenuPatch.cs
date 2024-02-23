@@ -56,14 +56,14 @@ public static class MainMenuPatch
                     return;
                 }
 
-                if (!ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo))
+                if (ModUpdater.LatestVersion != null && !ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo))
                 {
                     SystemUtils.OpenMessageBox(LanguageConfig.Instance.UpToDate, "WARNING");
                     return;
                 }
 
                 var result = SystemUtils.OpenMessageBox(
-                    LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion.ToString(),
+                    LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion!.ToString(),
                         ModUpdater.LatestDescription), "Update COG",
                     MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
 

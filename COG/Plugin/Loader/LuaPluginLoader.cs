@@ -5,6 +5,7 @@ using COG.Exception.Plugin;
 using COG.Plugin.Loader.Controller.Classes.Globe;
 using COG.Plugin.Loader.Controller.Classes.Player;
 using COG.Plugin.Loader.Controller.Function;
+using COG.Plugin.Loader.Controller.Listener;
 using COG.Utils;
 using NLua;
 #pragma warning disable SYSLIB0014
@@ -92,7 +93,7 @@ public class LuaPluginLoader : IPlugin
     {
         LuaController.LoadCLRPackage();
 
-        // register global value
+        // register global values
         LuaController["COG_VERSION"] = Main.PluginVersion;
         LuaController["COG_NAME"] = Main.PluginName;
         LuaController["COG_DISPLAY_NAME"] = Main.DisplayName;
@@ -103,6 +104,7 @@ public class LuaPluginLoader : IPlugin
         LuaController["controller"] = new PluginController(LuaController, this);
         LuaController["web"] = new WebClient();
         LuaController["playerController"] = new PlayerController(LuaController, this);
+        LuaController["listenerController"] = new ListenerController(LuaController, this);
 
         // register methods
         var functionsType = typeof(Functions);

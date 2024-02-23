@@ -556,7 +556,7 @@ internal class GameOptionsMenuUpdatePatch
         foreach (var option in Options.Where(o => o != null))
         {
             if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Type != kvp.Value)) continue;
-            if (!(option != null && option?.OptionBehaviour && option.OptionBehaviour != null &&
+            if (!(option != null && option.OptionBehaviour && option.OptionBehaviour != null &&
                   option.OptionBehaviour!.gameObject)) return;
             var enabled = true;
             var parent = option!.Parent;
