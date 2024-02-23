@@ -7,6 +7,10 @@ using NLua;
 
 namespace COG.Plugin.Loader.Controller.Listener;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Local
 public class ListenerController
 {
     public Lua Lua { get; }
