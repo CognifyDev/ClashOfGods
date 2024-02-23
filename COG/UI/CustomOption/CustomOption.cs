@@ -15,7 +15,6 @@ using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
 using Object = UnityEngine.Object;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using COG.States;
 using COG.UI.SidebarText;
 using COG.Utils.WinAPI;
 
@@ -246,9 +245,6 @@ public sealed class CustomOption
             CreateClassicTabs(__instance);
         }
 
-        /* FIXME
-         * 常规设置的两个预设用选项位置错误
-         */
         private static void CreateClassicTabs(GameOptionsMenu instance)
         {
             var allTypes = Enum.GetValues<CustomOptionType>();

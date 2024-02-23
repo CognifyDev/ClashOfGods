@@ -24,6 +24,17 @@ role:
       menu:
         cd: "冷却时间"
         duration: "持续时间"
+    bountyhunter:
+      name: "赏金猎人"
+      description: "击杀目标可以减少冷却，但击杀非目标则会增加冷却"
+      menu:
+        cd: "初始击杀冷却"
+        target-refresh-time: "刷新目标时间"
+        has-arrow: "箭头指向目标"
+        cd-kill-target: "击杀目标冷却时间"
+        cd-kill-non-target: "击杀非目标冷却时间"
+      error:
+        select-target-error: "无法为赏金猎人选择目标。"
   crewmate:
     crewmate:
       name: "船员"

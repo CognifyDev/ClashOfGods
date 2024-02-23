@@ -25,8 +25,8 @@ public enum ColorType
 
 public static class PlayerUtils
 {
-    private static readonly int Outline = Shader.PropertyToID("_Outline");
-    private static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
+    public static readonly int Outline = Shader.PropertyToID("_Outline");
+    public static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
     public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
 
     public static IEnumerable<PlayerRole> AllImpostors =>
@@ -190,26 +190,27 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="poolable"></param>
     /// <param name="player"></param>
-    [NotTested]
     public static void SetPlayerAppearance(this PlayerControl player, PoolablePlayer poolable)
     {
         if (!poolable || !player) return;
+
         var outfit = player.CurrentOutfit;
-        /*
         var data = player.Data;
         poolable.SetBodyColor(player.cosmetics.ColorId);
         if (data.IsDead) poolable.SetBodyAsGhost();
         poolable.SetBodyType(player.BodyType);
         if (AmongUs.Data.DataManager.Settings.Accessibility.ColorBlindMode) poolable.SetColorBlindTag();
+
         poolable.SetSkin(outfit.SkinId, outfit.ColorId);
         poolable.SetHat(outfit.HatId, outfit.ColorId);
         poolable.SetName(data.PlayerName);
         poolable.SetFlipX(true);
         poolable.SetBodyCosmeticsVisible(true);
         poolable.SetVisor(outfit.VisorId, outfit.ColorId);
-        */
-        
-        poolable.UpdateFromPlayerOutfit(outfit, PlayerMaterial.MaskType.ComplexUI, false, true);
+
+        var names = poolable.transform.FindChild("Names");
+        names.localPosition = new(0, -0.75f, 0);
+        names.localScale = new(1.5f, 1.5f, 1f);
     }
 
     /// <summary>
@@ -218,7 +219,6 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="pc">目标玩家</param>
     /// <param name="color">颜色</param>
-    [NotTested]
     public static void SetOutline(this PlayerControl pc, Color color)
     {
         pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 1f);

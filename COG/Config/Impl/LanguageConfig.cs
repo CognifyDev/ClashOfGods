@@ -1,5 +1,6 @@
 using System;
 using COG.Utils;
+using Steamworks;
 
 namespace COG.Config.Impl;
 
@@ -80,6 +81,15 @@ public class LanguageConfig : Config
         TroublemakerDescription = GetString("role.impostor.troublemaker.description");
         TroublemakerDuration = GetString("role.impostor.troublemaker.menu.duration");
         TroublemakerCooldown = GetString("role.impostor.troublemaker.menu.cd");
+
+        BountyHunterName = GetString("role.impostor.bountyhunter.name");
+        BountyHunterDescription = GetString("role.impostor.bountyhunter.description");
+        BountyHunterDefaultCd = GetString("role.impostor.bountyhunter.menu.cd");
+        BountyHunterRefreshTargetTime = GetString("role.impostor.bountyhunter.menu.target-refresh-time");
+        BountyHunterHasArrowToTarget = GetString("role.impostor.bountyhunter.menu.has-arrow");
+        BountyHunterKillCorrectCd = GetString("role.impostor.bountyhunter.menu.cd-kill-target");
+        BountyHunterKillIncorrectCd = GetString("role.impostor.bountyhunter.menu.cd-kill-non-target");
+        BountyHunterCantSelectTargetError = GetString("role.impostor.bountyhunter.error.select-target-error");
 
         // Neutral
         JesterName = GetString("role.neutral.jester.name");
@@ -190,6 +200,15 @@ public class LanguageConfig : Config
 
     public string OpportunistName { get; private set; } = null!;
     public string OpportunistDescription { get; private set; } = null!;
+
+    public string BountyHunterName { get; private set; } = null!;
+    public string BountyHunterDescription { get; private set; } = null!;
+    public string BountyHunterDefaultCd { get; private set; } = null!;
+    public string BountyHunterRefreshTargetTime { get; private set; } = null!;
+    public string BountyHunterHasArrowToTarget { get; private set; } = null!;
+    public string BountyHunterKillCorrectCd { get; private set; } = null!;
+    public string BountyHunterKillIncorrectCd { get; private set; } = null!;
+    public string BountyHunterCantSelectTargetError { get; private set; } = null!;
 
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
