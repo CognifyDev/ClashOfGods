@@ -15,6 +15,7 @@ using COG.Utils.Coding;
 using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
 using TMPro;
+using COG.Listener.Event.Impl.HManager;
 
 namespace COG.Role.Impl.Impostor;
 
@@ -53,26 +54,20 @@ public class BountyHunter : Role, IListener
                 CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f, 5f, MainRoleOption)!;
             HasArrowToTarget = CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
             CdAfterKillingTarget =
-                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 60f, 10f, 60f, 5f, MainRoleOption)!;
+                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f, MainRoleOption)!;
             CdAfterKillingNonTarget =
-                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterKillIncorrectCd, 10f, 10f, 60f, 5f, MainRoleOption)!;
+                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterKillIncorrectCd, 60f, 60f, 120f, 5f, MainRoleOption)!;
         }
-
+        
         BHunterKillButton = CustomButton.Create(
             () =>
             {
-                /*
-                 * FIXME:
-                 * 无法击杀玩家
-                 * 
-                 */
-                if (!ClosestTarget) return;
                 PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget);
             },
             () => BHunterKillButton?.ResetCooldown(),
             couldUse: () =>
             {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
+                var target = ClosestTarget;
                 if (target == null) return false;
                 var localPlayer = PlayerControl.LocalPlayer;
                 var localLocation = localPlayer.GetTruePosition();
@@ -93,19 +88,16 @@ public class BountyHunter : Role, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void AfterPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
+    public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         if (!GameStates.InGame || !TimerStarted) return;
-        RefreshTargetTimer -= Time.fixedDeltaTime;
+        RefreshTargetTimer -= Time.deltaTime;
         if (RefreshTargetTimer <= 0f) RefreshTarget();
-        if(RefreshTimerText) RefreshTimerText!.text = Math.Ceiling(RefreshTargetTimer).ToString();
+        if (RefreshTimerText) RefreshTimerText!.text = Math.Ceiling(RefreshTargetTimer).ToString();
 
         ClosestTarget = PlayerControl.LocalPlayer.GetClosestPlayer();
-        if (ClosestTarget)
-        {
-            PlayerControl.AllPlayerControls.ToArray().Where(p => !p.IsSamePlayer(PlayerControl.LocalPlayer)).ToList().ForEach(p => p.cosmetics.currentBodySprite.BodySprite.material.SetFloat(PlayerUtils.Outline, 0f));
-            ClosestTarget!.SetOutline(Color);
-        }
+        PlayerControl.AllPlayerControls.ToArray().ForEach(p => p.ClearOutline());
+        if (BHunterKillButton.CouldUse() && PlayerControl.LocalPlayer.IsAlive()) ClosestTarget!.SetOutline(Color);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -125,6 +117,20 @@ public class BountyHunter : Role, IListener
         TimerStarted = false;
     }
 
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnPlayerRequestMurder(PlayerMurderEvent @event)
+    {
+        var victim = @event.Target;
+        var killer = @event.Player;
+
+        if (killer.IsRole(this))
+        {
+            killer.RpcMurderPlayer(victim, true);
+            return false;
+        }
+
+        return true;
+    }
     [EventHandler(EventHandlerType.Postfix)]
     public void OnPlayerMurder(PlayerMurderEvent @event)
     {
@@ -152,10 +158,12 @@ public class BountyHunter : Role, IListener
         var transform = TargetPoolable.transform;
         transform.localPosition = new Vector3(-3f, -2f, 0);
         transform.localScale = new Vector3(0.7f, 0.7f, 0);
+        TargetPoolable.name = "BountyHunterPooableTarget";
         TargetPoolable.gameObject.SetActive(true);
 
         RefreshTimerText = Object.Instantiate(HudManager.Instance.AbilityButton.cooldownTimerText, TargetPoolable.transform.FindChild("Names"));
-        RefreshTimerText.transform.localPosition = Vector3.zero;
+        RefreshTimerText.transform.localPosition = new(0, 0.5f, 0);
+        RefreshTimerText.name = "TimerText";
     }
 
     private void RefreshTarget()

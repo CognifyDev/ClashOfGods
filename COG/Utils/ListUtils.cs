@@ -26,4 +26,6 @@ public static class ListUtils
         list.RemoveAt(0);
         return obj;
     }
+
+    public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action) => collection.ToList().ForEach(action);
 }
