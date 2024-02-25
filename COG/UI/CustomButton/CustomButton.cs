@@ -156,30 +156,6 @@ public class CustomButton
         };
     }
 
-    //public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool>? hasButton,
-    //    Sprite sprite, int row, KeyCode? hotkey, string text, Cooldown cooldown, int usesLimit,
-    //    string hotkeyName = "", int order = -1)
-    //{
-    //    return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, null, hotkey, text,
-    //        false, cooldown, -1f, usesLimit, hotkeyName)
-    //    { 
-    //        Row = row, 
-    //        Order = order
-    //    };
-    //}
-
-    //public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-    //    Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Cooldown cooldown,
-    //    float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
-    //{
-    //    return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
-    //        true, cooldown, effectTime, usesLimit, hotkeyName)
-    //    { 
-    //        Row = row ,
-    //        Order = order
-    //    };
-    //}
-
     public void SetActive(bool active)
     {
         if (active)
@@ -220,7 +196,7 @@ public class CustomButton
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 
         if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn() ||
-            (MapBehaviour.Instance?.IsOpen ?? true))
+            (MapBehaviour.Instance?.IsOpen ?? false))
         {
             SetActive(false);
             return;
@@ -254,27 +230,23 @@ public class CustomButton
             GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
     }
 
-    public void OnMeetingEndSpawn()
-    {
-        OnMeetingEnd();
-    }
+    public void OnMeetingEndSpawn() => OnMeetingEnd();
+    
 
 #nullable disable
     private void CheckClick()
     {
         if (Timer <= 0f && CouldUse())
         {
-            IsEffectActive = false;
-            ActionButton!.cooldownTimerText.color = Palette.EnabledColor;
-            Debug.Assert(OnEffect != null, nameof(OnEffect) + " != null");
-            OnEffect();
-            ResetCooldown();
-        }
-        else
-        {
-            if (UsesRemaining <= 0 && UsesLimit > 0) return;
-            OnClick();
-            if (HasEffect && !IsEffectActive)
+            if (HasEffect && IsEffectActive)
+            {
+                IsEffectActive = false;
+                ActionButton.cooldownTimerText.color = Palette.EnabledColor;
+                Debug.Assert(OnEffect != null, $"{nameof(OnEffect)} != null");
+                OnEffect();
+                ResetCooldown();
+            }
+            else
             {
                 if (UsesRemaining <= 0 && UsesLimit > 0) return;
                 OnClick();
@@ -283,15 +255,9 @@ public class CustomButton
                     IsEffectActive = true;
                     ResetEffectTime();
                 }
-                else
-                {
-                    ResetCooldown();
-                }
 
                 if (UsesLimit > 0) UsesRemaining--;
             }
-
-            if (UsesLimit > 0) UsesRemaining--;
         }
     }
 

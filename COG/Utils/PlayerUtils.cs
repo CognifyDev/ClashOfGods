@@ -224,6 +224,8 @@ public static class PlayerUtils
         pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 1f);
         pc.cosmetics.currentBodySprite.BodySprite.material.SetColor(OutlineColor, color);
     }
+
+    public static void ClearOutline(this PlayerControl pc) => pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
 }
 
 public enum DeathReason
