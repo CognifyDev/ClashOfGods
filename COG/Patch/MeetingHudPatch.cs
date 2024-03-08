@@ -73,3 +73,15 @@ internal class MeetingHudUpdatePatch
         }
     }
 }
+
+[HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.VotingComplete))]
+internal class MeetingHudVotingCompletePatch
+{
+    public static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] MeetingHud.VoterState[] states, [HarmonyArgument(1)] GameData.PlayerInfo exiled, [HarmonyArgument(2)] bool tie)
+    {
+        if (__instance.state == MeetingHud.VoteStates.Results) return;
+
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new MeetingVotingCompleteEvent(__instance, states, exiled, tie), EventHandlerType.Postfix);
+    }
+}
