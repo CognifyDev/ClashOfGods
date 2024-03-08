@@ -1,6 +1,6 @@
 ﻿using COG.Listener;
+using COG.Listener.Event.Impl;
 using COG.Utils;
-using System.Linq;
 
 
 namespace COG.Patch;
@@ -10,8 +10,8 @@ internal class MeetingHudStartPatch
 {
     public static void Postfix(MeetingHud __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnMeetingStart(__instance);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new MeetingStartEvent(__instance), EventHandlerType.Postfix);
     }
 }
 
@@ -22,28 +22,22 @@ internal class MeetingHudCastVotePatch
     {
         if (!AmongUsClient.Instance.AmHost) return false;
 
-        var returnAble = false;
-
         var voterPlayer = PlayerUtils.GetPlayerById(srcPlayerId);
         var targetPlayer = PlayerUtils.GetPlayerById(suspectPlayerId);
         // 通常情况下voter作为发出请求方，voter的pc不会为null，target的pc因为退出可能会为null
 
-        if (voterPlayer == null || targetPlayer == null)
-        {
-            Main.Logger.LogWarning($"voter or target has a null pc, castvote check should be skipped. {srcPlayerId} => {suspectPlayerId}");
-            returnAble = true;
-        }
+        bool isSkip = suspectPlayerId == (byte)253;
 
-        Main.Logger.LogInfo($"{voterPlayer.Data.PlayerName} = Cast Vote => {targetPlayer.Data.PlayerName}");
-        if (!returnAble)
-            foreach (var unused in ListenerManager.GetManager().GetListeners()
-                        .Where(listener => !listener.OnCastVote(__instance, voterPlayer, targetPlayer) && !returnAble)) returnAble = true;
+        Main.Logger.LogInfo($"{voterPlayer?.Data.PlayerName} = Cast Vote => {(isSkip ? "Skipped" : targetPlayer?.Data.PlayerName)}");
 
-        if (returnAble)
+        var result = ListenerManager.GetManager()
+            .ExecuteHandlers(new MeetingCastVoteEvent(__instance, voterPlayer, targetPlayer, isSkip), EventHandlerType.Prefix);
+
+        if (!result)
             __instance.RpcClearVote(voterPlayer.GetClientID());
         
         // 在listener中return false以取消玩家的投票事件，此后需要通过rpcClearVote清除玩家的投票操作，以允许玩家重新投票。
-        return !returnAble;
+        return result;
     }
 
     public static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] byte srcPlayerId, [HarmonyArgument(1)] byte suspectPlayerId)
@@ -54,14 +48,10 @@ internal class MeetingHudCastVotePatch
         var voterPlayer = PlayerUtils.GetPlayerById(srcPlayerId);
         var targetPlayer = PlayerUtils.GetPlayerById(suspectPlayerId);
 
-        if (voterPlayer == null || targetPlayer == null)
-        {
-            Main.Logger.LogWarning($"voter or target has a null pc. Voted check should not happen. {srcPlayerId} => {suspectPlayerId}");
-            return;
-        }
+        bool isSkip = suspectPlayerId == (byte)253;
 
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnVoted(__instance, voterPlayer, targetPlayer);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new MeetingCastVoteEvent(__instance, voterPlayer, targetPlayer, isSkip), EventHandlerType.Postfix);
     }
 }
 
@@ -70,15 +60,16 @@ internal class MeetingHudUpdatePatch
 {
     private static int bufferTime = 10;
     // 缓冲时间，Update通常每1秒执行30次, bufferTime每次Update加1 !
+    // 我们不需要像PlayerControl那样高频率执行patch，meetinghud的绘图会导致卡顿
     public static void Postfix(MeetingHud __instance)
     {
         bufferTime--;
         if (bufferTime < 0 && __instance.discussionTimer > 0)
         {
-            bufferTime = 10;
+            bufferTime = 10; // 这个值可能需要后续测试调整
 
-            foreach (var listener in ListenerManager.GetManager().GetListeners())
-                listener.OnMeetingHudUpdate(__instance);
+            ListenerManager.GetManager()
+                .ExecuteHandlers(new MeetingFixedUpdateEvent(__instance), EventHandlerType.Postfix);
         }
     }
 }
