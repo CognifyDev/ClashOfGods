@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using COG.Listener.Event;
@@ -45,7 +44,7 @@ public class ListenerManager
             var attribute = attributes[0] as EventHandlerAttribute;
             var type = attribute!.EventHandlerType;
             _handlers.Add(new Handler(listener, methodInfo, type));
-            Main.Logger.LogInfo(
+            Main.Logger.LogDebug(
                 $"Registered listener handler => {methodInfo.Name} from {listener.GetType().Name} by type of {type.ToString()}");
         }
     }
@@ -92,7 +91,7 @@ public class ListenerManager
     /// Get the list of handlers
     /// </summary>
     /// <returns>handler list</returns>
-    public Handler[] GetHandlers(IListener? listener = null)
+    public IEnumerable<Handler> GetHandlers(IListener? listener = null)
     {
         return listener == null
             ? _handlers.ToArray()

@@ -222,7 +222,7 @@ public partial class Main : BasePlugin
         
         // 调用 GlobalCustomOptionConstant 静态构造方法来初始化
         typeof(GlobalCustomOptionConstant).GetType();
-
+        
         Harmony.PatchAll();
 
         foreach (var plugin in PluginManager.GetPlugins()) plugin.OnEnable();

@@ -65,7 +65,7 @@ internal class PlayerShapeShiftPatch
 
         var result = ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerShapeShiftEvent(__instance, target, shouldAnimate), EventHandlerType.Prefix);
-        if (result)
+        if (!result)
             __instance.RpcRejectShapeshift();
         return result;
     }
