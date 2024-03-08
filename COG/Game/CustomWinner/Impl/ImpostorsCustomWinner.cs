@@ -29,7 +29,7 @@ public class ImpostorsCustomWinner : IWinnable
         if (DestroyableSingleton<HeliSabotageSystem>.Instance is { } instance) // 等效于检测是否为null并设变量为实例
         {
             if (!instance.IsActive) return false;
-            if (instance.Countdown <= 0f) 
+            if (instance.Countdown <= 0f)
             {
                 CustomWinnerManager.RegisterCustomWinners(PlayerUtils.AllImpostors.Select(pr => pr.Player));
                 CustomWinnerManager.SetWinText(LanguageConfig.Instance.ImpostorsWinText);
@@ -42,5 +42,8 @@ public class ImpostorsCustomWinner : IWinnable
         return false;
     }
 
-    public ulong GetWeight() => IWinnable.GetOrder(1);
+    public ulong GetWeight()
+    {
+        return IWinnable.GetOrder(1);
+    }
 }

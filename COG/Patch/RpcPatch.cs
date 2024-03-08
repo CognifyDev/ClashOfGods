@@ -1,54 +1,35 @@
-using System.Linq;
 using COG.Listener;
+using COG.Listener.Event.Impl.Player;
 
 namespace COG.Patch;
-
-[HarmonyPatch(typeof(LobbyBehaviour), nameof(LobbyBehaviour.HandleRpc))]
-internal class LobbyBehaviourHandleRpcPatch
-{
-    private static void Prefix([HarmonyArgument(0)] byte callId, 
-        [HarmonyArgument(1)] MessageReader reader)
-    {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-        {
-            Main.Logger.LogInfo($"Rpc {callId} received, rpc length => {reader.Length}");
-            listener.OnLobbyRPCReceived(callId, reader);
-        }
-    }
-}
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
 internal class RPCHandlerPatch
 {
     [HarmonyPostfix]
-    public static void Postfix([HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
+    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] byte callId,
+        [HarmonyArgument(1)] MessageReader reader)
     {
         Main.Logger.LogInfo($"Rpc {callId} received, rpc length => {reader.Length}");
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
-            listener.AfterRPCReceived(callId, reader);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader), EventHandlerType.Postfix);
     }
 
     [HarmonyPrefix]
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId,
         [HarmonyArgument(1)] MessageReader reader)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnRPCReceived(callId, reader);
-
+        var result = ListenerManager.GetManager().ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader),
+            EventHandlerType.Prefix);
         var rpcType = (RpcCalls)callId;
         var subReader = MessageReader.Get(reader);
-        switch (rpcType)
+        if (RpcCalls.SendChat.Equals(rpcType))
         {
-            case RpcCalls.SendChat:
-                var text = subReader.ReadString();
-                var returnAble = false;
-                foreach (var unused in ListenerManager.GetManager().GetListeners()
-                             .Where(listener => !listener.OnPlayerChat(__instance, text) && !returnAble))
-                    returnAble = true;
-
-                if (returnAble) return false;
-                break;
+            var text = subReader.ReadString();
+            ListenerManager.GetManager()
+                .ExecuteHandlers(new PlayerChatEvent(__instance, text!), EventHandlerType.Postfix);
         }
 
-        return true;
+        return result;
     }
 }

@@ -14,7 +14,6 @@ using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
-using COG.States;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -27,6 +26,7 @@ using Reactor.Networking.Attributes;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using System.IO;
+using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Impl;
 using COG.Plugin.Manager;
@@ -45,6 +45,8 @@ namespace COG;
 [BepInDependency(ReactorPlugin.Id)]
 [BepInProcess("Among Us.exe")]
 [ReactorModFlags(ModFlags.RequireOnAllClients)]
+
+// ReSharper disable once ClassNeverInstantiated.Global
 public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
@@ -52,8 +54,8 @@ public partial class Main : BasePlugin
     public const string DisplayName = "ClashOfGods";
 
     public static ManualLogSource Logger = null!;
-    public static VersionInfo VersionInfo { get; set; } = null!;
-    public static string PluginVersion { get; private set; } = "Unknown";
+    public static VersionInfo VersionInfo { get; private set; } = null!;
+    public static string PluginVersion { get; private set; } = null!;
     private Harmony Harmony { get; } = new(PluginGuid);
 
     public static Main Instance { get; private set; } = null!;
@@ -104,7 +106,9 @@ public partial class Main : BasePlugin
         }
 
         ModUpdater.FetchUpdate();
-        
+        Logger.LogInfo(
+            $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
+
         // Load plugins
         try
         {
@@ -114,24 +118,21 @@ public partial class Main : BasePlugin
         {
             Logger.LogError(e.Message);
         }
-        
-        // Register listeners
-        ListenerManager.GetManager().RegisterListeners(new[]
+
+        ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
-            new GameListener(),
-            new VersionShowerListener(),
             new PlayerListener(),
-            new OptionListener(),
-            new ModOptionListener(),
+            new DeadPlayerListener(),
             new CustomButtonListener(),
-            new RpcListener(),
-            new GameObjectListener(),
-            new DeadPlayerManager(),
             new CustomWinnerListener(),
-            CachedPlayer.GetCachedPlayerListener(),
-            new TaskAdderListener()
+            new GameListener(),
+            new ModOptionListener(),
+            new RpcListener(),
+            new TaskAdderListener(),
+            new VersionShowerListener()
         });
+
 
         // Register sidebar texts
         SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
@@ -159,12 +160,17 @@ public partial class Main : BasePlugin
             new Impostor(),
             new Cleaner(),
             // new Troublemaker(),
+            new BountyHunter(),
             // 此职业暂时未完成
 
             // Neutral
             new Jester(),
             new Opportunist()
         });
+
+        // Register listeners from role
+        foreach (var role in Role.RoleManager.GetManager().GetRoles())
+            ListenerManager.GetManager().RegisterListener(role.GetListener());
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]
@@ -210,9 +216,13 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
-
-        GlobalCustomOption.Init();
-
+        
+        // ReSharper disable once PossibleMistakenCallToGetType.2
+        // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+        
+        // 调用 GlobalCustomOptionConstant 静态构造方法来初始化
+        typeof(GlobalCustomOptionConstant).GetType();
+        
         Harmony.PatchAll();
 
         foreach (var plugin in PluginManager.GetPlugins()) plugin.OnEnable();
@@ -224,7 +234,7 @@ public partial class Main : BasePlugin
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
         Role.RoleManager.GetManager().GetRoles().Clear();
-        ListenerManager.GetManager().GetListeners().Clear();
+        ListenerManager.GetManager().UnRegisterHandlers();
         SidebarTextManager.GetManager().GetSidebarTexts().Clear();
         CustomWinnerManager.AllWinners.Clear();
         CustomWinnerManager.CustomWinners.Clear();

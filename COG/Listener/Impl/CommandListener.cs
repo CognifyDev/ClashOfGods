@@ -1,13 +1,16 @@
 using System;
+using System.Linq;
 using COG.Command;
+using COG.Listener.Event.Impl.Player;
 
 namespace COG.Listener.Impl;
 
 public class CommandListener : IListener
 {
-    public bool OnHostChat(ChatController controller)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnLocalPlayerChat(LocalPlayerChatEvent @event)
     {
-        var text = controller.freeChatField.textArea.text;
+        var text = @event.GetChatController().freeChatField.textArea.text;
         if (!text.ToLower().StartsWith("/")) return true;
 
         var cancellable = false;
@@ -21,21 +24,17 @@ public class CommandListener : IListener
         return !cancellable;
     }
 
-    public bool OnPlayerChat(PlayerControl player, string text)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerChat(PlayerChatEvent @event)
     {
-        if (!text.ToLower().StartsWith("/")) return true;
+        var text = @event.Text;
+        var player = @event.Player;
+        if (!text.ToLower().StartsWith("/")) return;
 
-        var cancellable = false;
-        foreach (var command in CommandManager.GetManager().GetCommands())
-        {
-            if (command.HostOnly) continue;
-
-            if (text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) || ContainAliases(text, command))
-                command.OnExecute(player, AsCommandStringArray(text));
-            if (command.Cancellable) cancellable = true;
-        }
-
-        return !cancellable;
+        foreach (var command in CommandManager.GetManager().GetCommands().Where(command => !command.HostOnly)
+                     .Where(command => text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) ||
+                                       ContainAliases(text, command)))
+            command.OnExecute(player, AsCommandStringArray(text));
     }
 
     private string[] AsCommandStringArray(string text)

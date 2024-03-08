@@ -1,43 +1,121 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using COG.Listener.Event;
+using COG.Utils;
 
 namespace COG.Listener;
 
 public class ListenerManager
 {
+    /// <summary>
+    /// The instance of listener manager
+    /// </summary>
     private static ListenerManager? _manager;
 
-    private readonly List<IListener> _listeners = new();
-
+    /// <summary>
+    /// Get the instance of listener manager
+    /// </summary>
+    /// <returns>instance</returns>
     public static ListenerManager GetManager()
     {
         return _manager ??= new ListenerManager();
     }
 
+    /// <summary>
+    /// The list of listeners
+    /// </summary>
+    private readonly List<Handler> _handlers = new();
+
+    /// <summary>
+    /// Register a listener
+    /// </summary>
+    /// <param name="listener">the listener</param>
     public void RegisterListener(IListener listener)
     {
-        _listeners.Add(listener);
+        foreach (var methodInfo in listener.GetType().GetMethods(BindingFlags.Instance |
+                                                                 BindingFlags.Public |
+                                                                 BindingFlags.NonPublic | 
+                                                                 BindingFlags.Static | 
+                                                                 BindingFlags.DeclaredOnly))
+        {
+            var attributes = methodInfo.GetCustomAttributes(typeof(EventHandlerAttribute), false);
+            if (attributes.Length < 1) continue;
+            var attribute = attributes[0] as EventHandlerAttribute;
+            var type = attribute!.EventHandlerType;
+            _handlers.Add(new Handler(listener, methodInfo, type));
+            Main.Logger.LogDebug(
+                $"Registered listener handler => {methodInfo.Name} from {listener.GetType().Name} by type of {type.ToString()}");
+        }
     }
 
-    public void RegisterListeners(IEnumerable<IListener> listeners)
+    /// <summary>
+    /// Register a listener if it not exists
+    /// </summary>
+    /// <param name="listener">the listener</param>
+    public void RegisterListenerIfNotExists(IListener listener)
     {
-        _listeners.AddRange(listeners);
+        if (!GetHandlers(listener).ToList().IsEmpty())
+        {
+            RegisterListener(listener);
+        }
     }
 
-    public void UnregisterListener(IListener listener)
+    /// <summary>
+    /// Unregister handlers
+    /// </summary>
+    /// <param name="handlers"></param>
+    public void UnRegisterHandlers(Handler[] handlers)
     {
-        _listeners.Remove(listener);
+        _handlers.RemoveAll(handlers.Contains);
     }
 
-    public IListener? GetTypeListener<T>() where T : IListener
+    /// <summary>
+    /// Unregister all handlers
+    /// </summary>
+    public void UnRegisterHandlers()
     {
-        foreach (var listener in _listeners.OfType<T>()) return listener;
-
-        return null;
+        _handlers.Clear();
     }
 
-    public List<IListener> GetListeners()
+    /// <summary>
+    /// Register listeners
+    /// </summary>
+    /// <param name="listeners">listeners</param>
+    public void RegisterListeners(IListener[] listeners)
     {
-        return _listeners;
+        listeners.ToList().ForEach(RegisterListener);
+    }
+
+    /// <summary>
+    /// Get the list of handlers
+    /// </summary>
+    /// <returns>handler list</returns>
+    public IEnumerable<Handler> GetHandlers(IListener? listener = null)
+    {
+        return listener == null
+            ? _handlers.ToArray()
+            : _handlers.Where(handler => listener.Equals(handler.Listener)).ToArray();
+    }
+
+    /// <summary>
+    /// Execute handlers
+    /// </summary>
+    public bool ExecuteHandlers(Event.Event @event, EventHandlerType type)
+    {
+        var toReturn = true;
+
+        foreach (var handler in _handlers)
+        {
+            if (!type.Equals(handler.EventHandlerType) ||
+                !handler.EventType.IsInstanceOfType(@event)) continue;
+
+            var returnType = handler.Method.ReturnType;
+            var result = handler.Method.Invoke(handler.Listener, new object?[] { @event });
+
+            if (type == EventHandlerType.Prefix && returnType == typeof(bool) && !(bool)result!) toReturn = false;
+        }
+
+        return toReturn;
     }
 }

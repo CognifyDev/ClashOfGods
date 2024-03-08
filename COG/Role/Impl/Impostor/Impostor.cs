@@ -1,7 +1,6 @@
 ﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
-using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
@@ -17,8 +16,8 @@ public class Impostor : Role
         Description = LanguageConfig.Instance.ImpostorDescription;
     }
 
-    public override IListener GetListener(PlayerControl player)
+    public override IListener GetListener()
     {
-        return IListener.Empty;
+        return IListener.EmptyListener;
     }
 }

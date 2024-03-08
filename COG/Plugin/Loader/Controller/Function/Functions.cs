@@ -2,6 +2,8 @@
 using System.Linq;
 using COG.Plugin.Manager;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace COG.Plugin.Loader.Controller.Function;
 
 public class Functions

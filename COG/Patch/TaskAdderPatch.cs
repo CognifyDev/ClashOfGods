@@ -1,59 +1,41 @@
-﻿using AmongUs.GameOptions;
-using COG.Listener;
-using COG.Role;
-using COG.Role.Impl;
-using COG.Role.Impl.Crewmate;
-using COG.Role.Impl.Impostor;
-using COG.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
+﻿using COG.Listener;
+using COG.Listener.Event.Impl.TAButton;
+using COG.Listener.Event.Impl.TAGame;
 
-namespace COG.Patch
+namespace COG.Patch;
+
+[HarmonyPatch(typeof(TaskAdderGame), nameof(TaskAdderGame.ShowFolder))]
+public static class TaskAdderPatch
 {
-    [HarmonyPatch(typeof(TaskAdderGame), nameof(TaskAdderGame.ShowFolder))]
-    public static class TaskAdderPatch
+    public static bool Prefix(TaskAdderGame __instance, [HarmonyArgument(0)] TaskFolder taskFolder)
     {
-        static TaskFolder RoleFolder;
-        public static void Prefix(TaskAdderGame __instance, [HarmonyArgument(0)] TaskFolder taskFolder)
-        {
-            foreach (var listener in ListenerManager.GetManager().GetListeners())
-                listener.OnTaskAdderShowFolder(__instance, taskFolder);
-        }
-
-        public static void Postfix(TaskAdderGame __instance, [HarmonyArgument(0)] TaskFolder taskFolder)
-        {
-            foreach (var listener in ListenerManager.GetManager().GetListeners())
-                listener.AfterTaskAdderShowFolder(__instance, taskFolder);
-        }
+        return ListenerManager.GetManager().ExecuteHandlers(new TaskAdderGameShowFolderEvent(__instance, taskFolder),
+            EventHandlerType.Prefix);
     }
 
-    [HarmonyPatch(typeof(TaskAddButton))]
-    public static class TaskAddButtonPatch
+    public static void Postfix(TaskAdderGame __instance, [HarmonyArgument(0)] TaskFolder taskFolder)
     {
-        static TaskAddButton LastClicked = null;
+        ListenerManager.GetManager().ExecuteHandlers(new TaskAdderGameShowFolderEvent(__instance, taskFolder),
+            EventHandlerType.Postfix);
+    }
+}
 
-        [HarmonyPatch(nameof(TaskAddButton.Update))]
-        [HarmonyPrefix]
-        public static void ButtonUpdatePatch(TaskAddButton __instance)
-        {
-            foreach (var listener in ListenerManager.GetManager().GetListeners())
-                listener.OnTaskButtonUpdate(__instance);
-        }
+[HarmonyPatch(typeof(TaskAddButton))]
+public static class TaskAddButtonPatch
+{
+    [HarmonyPatch(nameof(TaskAddButton.Update))]
+    [HarmonyPrefix]
+    public static bool ButtonUpdatePatch(TaskAddButton __instance)
+    {
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new TaskAddButtonUpdateEvent(__instance), EventHandlerType.Prefix);
+    }
 
-        [HarmonyPatch(nameof(TaskAddButton.AddTask))]
-        [HarmonyPrefix]
-        public static bool AddTaskPatch(TaskAddButton __instance)
-        {
-            var returnAble = false;
-            foreach (var unused in ListenerManager.GetManager().GetListeners()
-                         .Where(listener => !listener.OnTaskButtonAddTask(__instance) && !returnAble)) returnAble = true;
-
-            return !returnAble;
-        }
+    [HarmonyPatch(nameof(TaskAddButton.AddTask))]
+    [HarmonyPrefix]
+    public static bool AddTaskPatch(TaskAddButton __instance)
+    {
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new TaskAddButtonAddTaskEvent(__instance), EventHandlerType.Prefix);
     }
 }

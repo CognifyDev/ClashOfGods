@@ -6,22 +6,22 @@ namespace COG.Plugin.Loader.Controller.Classes.Role;
 
 public class RoleController
 {
-    public Lua Lua { get; }
-    public IPlugin Plugin { get; }
+    private readonly Lua _luaController;
+    private readonly IPlugin _plugin;
     
     public RoleController(Lua lua, IPlugin plugin)
     {
-        Lua = lua;
-        Plugin = plugin;
+        _luaController = lua;
+        _plugin = plugin;
     }
 
-    public COG.Role.Role RegisterRole(string name, string color, int campType, bool showInOptions)
+    public COG.Role.Role StartRoleInstance(string name, string color, int campType, bool showInOptions)
     {
-
-        var role = new RolePlugin(name, ColorUtils.AsColor(color), (CampType)campType, showInOptions);
-        COG.Role.RoleManager.GetManager().RegisterRole(role);
-        return role;
+        return new COG.Role.Role(name, ColorUtils.AsColor(color), (CampType) campType, showInOptions);
     }
 
-    public COG.Role.RoleManager GetRoleManager() => COG.Role.RoleManager.GetManager();
+    public void RegisterRole(COG.Role.Role role)
+    {
+        COG.Role.RoleManager.GetManager().RegisterRole(role);
+    }
 }

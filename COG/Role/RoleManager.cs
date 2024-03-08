@@ -10,8 +10,6 @@ public class RoleManager
 
     private readonly List<Role> _roles = new();
 
-    private uint _nextId;
-
     public Role[] GetTypeCampRoles(CampType campType)
     {
         return _roles.Where(role => role.CampType == campType && role.MainRoleOption!.GetBool()).ToArray();
@@ -42,12 +40,10 @@ public class RoleManager
         return _roles.FirstOrDefault(r => r.GetType().Name == name);
     }
 
-    public Role? GetRoleById(uint id)
+    public Role? GetRoleById(int id)
     {
         return _roles.FirstOrDefault(role => role.Id == id);
     }
-
-    public uint GetAvailableRoleId() => _nextId ++;
 
     /// <summary>
     ///     获取一个新的获取器
@@ -72,7 +68,7 @@ public class RoleManager
         {
             foreach (var role in GetManager().GetRoles()
                          .Where(role =>
-                             role.MainRoleOption != null && role.ShowInOptions && role.MainRoleOption.GetBool()))
+                             role is { MainRoleOption: not null, ShowInOptions: true } && role.MainRoleOption.GetBool()))
                 if (role.RoleNumberOption != null)
                 {
                     var times = (int)role.RoleNumberOption.GetFloat();

@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace COG.Utils;
 
@@ -7,18 +8,19 @@ public static class WebUtils
     public static string GetWebByAPIMethod(string url, string apiKey)
     {
         using var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("User-Agent", "your-app-name"); // Add a User-Agent header
+        client.DefaultRequestHeaders.Add("User-Agent",
+            $"{Main.DisplayName}/{Main.PluginVersion}"); // Add a User-Agent header
         if (!string.IsNullOrEmpty(apiKey))
-        {
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("token", apiKey); // Add the API key for authentication
-        }
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("token",
+                    apiKey); // Add the API key for authentication
 
         var response = client.GetAsync(url).Result;
         response.EnsureSuccessStatusCode();
         var responseBody = response.Content.ReadAsStringAsync().Result;
         return responseBody;
     }
-    
+
     public static string GetWeb(string url)
     {
         // 创建 HttpClient 实例
@@ -38,7 +40,7 @@ public static class WebUtils
             // 返回网页源代码
             return responseBody;
         }
-        catch (HttpRequestException e)
+        catch (System.Exception e)
         {
             Main.Logger.LogError(e.Message);
         }

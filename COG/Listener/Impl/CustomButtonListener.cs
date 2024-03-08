@@ -1,25 +1,29 @@
-﻿using COG.UI.CustomButton;
+﻿using COG.Listener.Event.Impl.HManager;
+using COG.UI.CustomButton;
 
 namespace COG.Listener.Impl;
 
 internal class CustomButtonListener : IListener
 {
-    public void OnHudStart(HudManager? hud)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnHudStart(HudManagerStartEvent @event)
     {
-        CustomButton.Inited = false;
-        CustomButton.Init(hud);
+        CustomButton.Initialized = false;
+        CustomButton.Init(@event.Manager);
     }
 
-    public void OnHudUpdate(HudManager manager)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
-        if (!CustomButton.Inited) return;
+        if (!CustomButton.Initialized) return;
         CustomButton.GetAllButtons();
         CustomButton.ArrangePosition();
         foreach (var button in CustomButtonManager.GetManager().GetButtons()) button.Update();
     }
 
-    public void OnHudDestroy(HudManager hud)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnHudDestroy(HudManagerDestroyEvent @event)
     {
-        CustomButton.Inited = false;
+        CustomButton.Initialized = false;
     }
 }

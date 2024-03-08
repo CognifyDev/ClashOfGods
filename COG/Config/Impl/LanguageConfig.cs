@@ -1,5 +1,6 @@
 using System;
 using COG.Utils;
+using Steamworks;
 
 namespace COG.Config.Impl;
 
@@ -18,17 +19,7 @@ public class LanguageConfig : Config
         new ResourceFile("COG.Resources.InDLL.Config.language.yml")
     )
     {
-        try
-        {
-            SetTranslations();
-        }
-        catch (NullReferenceException)
-        {
-            // 找不到项，说明配置文件版本过低
-            // 重新加载
-            LoadConfig(true);
-            Instance = new LanguageConfig();
-        }
+        SetTranslations();
     }
 
     private LanguageConfig(string path) : base(
@@ -76,12 +67,12 @@ public class LanguageConfig : Config
 
         SheriffName = GetString("role.crewmate.sheriff.name");
         SheriffDescription = GetString("role.crewmate.sheriff.description");
-        SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");                                          
+        SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");
 
         // Impostors
         ImpostorName = GetString("role.impostor.impostor.name");
         ImpostorDescription = GetString("role.impostor.impostor.description");
-        
+
         CleanerName = GetString("role.impostor.cleaner.name");
         CleanerDescription = GetString("role.impostor.cleaner.description");
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
@@ -90,6 +81,15 @@ public class LanguageConfig : Config
         TroublemakerDescription = GetString("role.impostor.troublemaker.description");
         TroublemakerDuration = GetString("role.impostor.troublemaker.menu.duration");
         TroublemakerCooldown = GetString("role.impostor.troublemaker.menu.cd");
+
+        BountyHunterName = GetString("role.impostor.bountyhunter.name");
+        BountyHunterDescription = GetString("role.impostor.bountyhunter.description");
+        BountyHunterDefaultCd = GetString("role.impostor.bountyhunter.menu.cd");
+        BountyHunterRefreshTargetTime = GetString("role.impostor.bountyhunter.menu.target-refresh-time");
+        BountyHunterHasArrowToTarget = GetString("role.impostor.bountyhunter.menu.has-arrow");
+        BountyHunterKillCorrectCd = GetString("role.impostor.bountyhunter.menu.cd-kill-target");
+        BountyHunterKillIncorrectCd = GetString("role.impostor.bountyhunter.menu.cd-kill-non-target");
+        BountyHunterCantSelectTargetError = GetString("role.impostor.bountyhunter.error.select-target-error");
 
         // Neutral
         JesterName = GetString("role.neutral.jester.name");
@@ -110,7 +110,7 @@ public class LanguageConfig : Config
         MaxNumMessage = GetString("role.global.max-num");
         AllowStartMeeting = GetString("role.global.allow-start-meeting");
         AllowReportDeadBody = GetString("role.global.allow-report-body");
-        KillCooldown = GetString("role.global.");
+        KillCooldown = GetString("role.global.kill-cooldown");
 
         SidebarTextOriginal = GetString("sidebar-text.original");
         SidebarTextNeutral = GetString("sidebar-text.neutral");
@@ -184,7 +184,7 @@ public class LanguageConfig : Config
     // Impostor
     public string ImpostorName { get; private set; } = null!;
     public string ImpostorDescription { get; private set; } = null!;
-    
+
     public string CleanerName { get; private set; } = null!;
     public string CleanerDescription { get; private set; } = null!;
     public string CleanBodyCooldown { get; private set; } = null!;
@@ -200,6 +200,15 @@ public class LanguageConfig : Config
 
     public string OpportunistName { get; private set; } = null!;
     public string OpportunistDescription { get; private set; } = null!;
+
+    public string BountyHunterName { get; private set; } = null!;
+    public string BountyHunterDescription { get; private set; } = null!;
+    public string BountyHunterDefaultCd { get; private set; } = null!;
+    public string BountyHunterRefreshTargetTime { get; private set; } = null!;
+    public string BountyHunterHasArrowToTarget { get; private set; } = null!;
+    public string BountyHunterKillCorrectCd { get; private set; } = null!;
+    public string BountyHunterKillIncorrectCd { get; private set; } = null!;
+    public string BountyHunterCantSelectTargetError { get; private set; } = null!;
 
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
@@ -246,7 +255,7 @@ public class LanguageConfig : Config
     public string UnloadModButtonName { get; private set; } = null!;
     public string UnloadModSuccessfulMessage { get; private set; } = null!;
     public string UnloadModInGameErrorMsg { get; private set; } = null!;
-    
+
     // Update
     public string UpToDate { get; private set; } = null!;
     public string NonCheck { get; private set; } = null!;
@@ -260,7 +269,11 @@ public class LanguageConfig : Config
     private string GetString(string location)
     {
         var toReturn = YamlReader!.GetString(location);
-        if (toReturn is null or "" or " ") throw new NullReferenceException();
+        if (toReturn is null or "" or " ")
+        {
+            Main.Logger.LogInfo($"Error getting string (location: {location})");
+            toReturn = location;
+        }
 
         return toReturn;
     }

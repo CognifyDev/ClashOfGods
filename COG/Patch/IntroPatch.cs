@@ -1,8 +1,7 @@
 ﻿using COG.Listener;
-using COG.Utils;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
-using System.Linq;
+using COG.Listener.Event.Impl.ICutscene;
 
 namespace COG.Patch;
 
@@ -12,47 +11,55 @@ internal class SetUpRoleTextPatch
     [HarmonyPrefix]
     public static bool Prefix(IntroCutscene __instance, ref IEnumerator __result)
     {
-        var toReturn = true;
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            if (!listener.OnSetUpRoleText(__instance, ref __result))
-                toReturn = false;
-
-        return toReturn;
+        var @event = new IntroCutsceneShowRoleEvent(__instance, __result);
+        var result = ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Prefix);
+        __result = @event.GetResult();
+        return result;
     }
 }
 
 [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginCrewmate))]
 public static class BeginCrewmatePatch
 {
-    public static void Prefix(
+    [HarmonyPrefix]
+    public static bool Prefix(
         IntroCutscene __instance,
         ref List<PlayerControl> teamToDisplay)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
-            listener.OnSetUpTeamText(__instance, ref teamToDisplay);
+        var @event = new IntroCutsceneBeginCrewmateEvent(__instance, teamToDisplay);
+        var result = ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Prefix);
+        teamToDisplay = @event.GetTeamToDisplay();
+        return result;
     }
 
     [HarmonyPostfix]
-    public static void Postfix(IntroCutscene __instance)
+    public static void Postfix(IntroCutscene __instance, ref List<PlayerControl> teamToDisplay)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.AfterSetUpTeamText(__instance);
+        var @event = new IntroCutsceneBeginCrewmateEvent(__instance, teamToDisplay);
+        ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Postfix);
+        teamToDisplay = @event.GetTeamToDisplay();
     }
 }
 
 [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginImpostor))]
 public static class IntroCutsceneBeginImpostorPatch
 {
-    public static void Prefix(
+    [HarmonyPrefix]
+    public static bool Prefix(
         IntroCutscene __instance,
         ref List<PlayerControl> yourTeam)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners().ToList())
-            listener.OnSetUpTeamText(__instance, ref yourTeam);
+        var @event = new IntroCutsceneBeginImpostorEvent(__instance, yourTeam);
+        var result = ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Prefix);
+        yourTeam = @event.GetYourTeam();
+        return result;
     }
 
     [HarmonyPostfix]
-    public static void Postfix(IntroCutscene __instance)
+    public static void Postfix(IntroCutscene __instance, ref List<PlayerControl> yourTeam)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.AfterSetUpTeamText(__instance);
+        var @event = new IntroCutsceneBeginImpostorEvent(__instance, yourTeam);
+        var result = ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Postfix);
+        yourTeam = @event.GetYourTeam();
     }
 }

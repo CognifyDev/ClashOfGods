@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
@@ -14,22 +13,21 @@ namespace COG.Role;
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
-[Serializable]
-public abstract class Role
+public class Role
 {
-    protected Role(string name, Color color, CampType campType, bool showInOptions)
+    public Role(string name, Color color, CampType campType, bool showInOptions)
     {
         Name = name;
         BaseRole = false;
         Description = "";
         Color = color;
         CampType = campType;
-        BaseRoleType = RoleTypes.Crewmate;
+        BaseRoleType = campType == CampType.Impostor ? RoleTypes.Impostor : RoleTypes.Crewmate;
         SubRole = false;
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
-        CanSabotage = false;
-        Id = RoleManager.GetManager().GetAvailableRoleId();
+        CanSabotage = campType == CampType.Impostor;
+        Id = name.GetHashCode();
         ShowInOptions = showInOptions;
 
         if (ShowInOptions)
@@ -44,7 +42,7 @@ public abstract class Role
     /// <summary>
     ///     角色特征码
     /// </summary>
-    public uint Id { get; }
+    public int Id { get; }
 
     /// <summary>
     ///     角色颜色
@@ -55,7 +53,7 @@ public abstract class Role
     ///     角色名称
     /// </summary>
     public string Name { get; }
-    
+
     /// <summary>
     ///     是否是基本职业
     /// </summary>
@@ -111,35 +109,34 @@ public abstract class Role
     /// </summary>
     public CustomOption? RoleNumberOption { get; }
 
-    public List<PlayerControl> Players => GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList();
-
-    public bool Debug { get; init; } = false;
+    public List<PlayerControl> Players =>
+        GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList();
 
     /// <summary>
     ///     添加一个按钮
     /// </summary>
     /// <param name="button">要添加的按钮</param>
-    protected void AddButton(CustomButton button)
+    public void AddButton(CustomButton button)
     {
-        if (button.HasButton == null || Debug) button.HasButton = () => true;
+        button.HasButton ??= () => true;
 
-        if (Debug)
-            button.Cooldown = () => 0f;
-        else
-            button.HasButton += () =>
-            {
-                var player = PlayerControl.LocalPlayer;
-                var role = player.GetRoleInstance();
-                return role != null && role.Name.Equals(Name);
-            };
+        button.HasButton += () =>
+        {
+            var player = PlayerControl.LocalPlayer;
+            var role = player.GetRoleInstance();
+            return role != null && role.Name.Equals(Name);
+        };
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
-    protected static CustomOption.CustomOptionType ToCustomOption(Role role)
+    public static CustomOption.CustomOptionType ToCustomOption(Role role)
     {
         if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.CustomOptionType.Addons;
         return (CustomOption.CustomOptionType)role.CampType;
     }
 
-    public abstract IListener GetListener(PlayerControl player);
+    public virtual IListener GetListener()
+    {
+        return IListener.EmptyListener;
+    }
 }

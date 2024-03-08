@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Listener;
+using COG.Listener.Event.Impl.AuClient;
+using COG.Listener.Event.Impl.ICutscene;
+using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;
+using COG.Utils.Coding;
 using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
@@ -21,6 +25,10 @@ public enum ColorType
 
 public static class PlayerUtils
 {
+    public static readonly int Outline = Shader.PropertyToID("_Outline");
+    public static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
+    public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
+
     public static IEnumerable<PlayerRole> AllImpostors =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor);
 
@@ -59,7 +67,10 @@ public static class PlayerUtils
         return closestPlayer;
     }
 
-    public static List<PlayerControl> GetAllPlayers() => new(PlayerControl.AllPlayerControls.ToArray());
+    public static List<PlayerControl> GetAllPlayers()
+    {
+        return new List<PlayerControl>(PlayerControl.AllPlayerControls.ToArray());
+    }
 
     public static List<PlayerControl> GetAllAlivePlayers()
     {
@@ -99,6 +110,7 @@ public static class PlayerUtils
         return GetAllPlayers().FirstOrDefault(playerControl => playerControl.PlayerId == playerId);
     }
 
+    // ReSharper disable once MemberCanBePrivate.Global
     public static ClientData? GetClient(this PlayerControl player)
     {
         var client = AmongUsClient.Instance.allClients.ToArray()
@@ -125,7 +137,8 @@ public static class PlayerUtils
 
     public static bool IsRole(this PlayerControl player, Role.Role role)
     {
-        return player.GetRoleInstance() == role;
+        var targetRole = player.GetRoleInstance();
+        return targetRole != null && targetRole.Id.Equals(role.Id);
     }
 
     public static DeadBody? GetClosestBody(List<DeadBody>? untargetable = null)
@@ -136,7 +149,8 @@ public static class PlayerUtils
         if (!ShipStatus.Instance) return null;
         var position = PlayerControl.LocalPlayer.GetTruePosition();
 
-        foreach (var body in Object.FindObjectsOfType<DeadBody>().Where(b => untargetable != null ? untargetable.Contains(b) : true))
+        foreach (var body in Object.FindObjectsOfType<DeadBody>()
+                     .Where(b => untargetable != null ? untargetable.Contains(b) : true))
         {
             var vector = body.TruePosition - position;
             var magnitude = vector.magnitude;
@@ -170,6 +184,48 @@ public static class PlayerUtils
             _ => LanguageConfig.Instance.UnknownKillReason
         };
     }
+
+    /// <summary>
+    /// 设置玩家外观
+    /// </summary>
+    /// <param name="poolable"></param>
+    /// <param name="player"></param>
+    public static void SetPlayerAppearance(this PlayerControl player, PoolablePlayer poolable)
+    {
+        if (!poolable || !player) return;
+
+        var outfit = player.CurrentOutfit;
+        var data = player.Data;
+        poolable.SetBodyColor(player.cosmetics.ColorId);
+        if (data.IsDead) poolable.SetBodyAsGhost();
+        poolable.SetBodyType(player.BodyType);
+        if (AmongUs.Data.DataManager.Settings.Accessibility.ColorBlindMode) poolable.SetColorBlindTag();
+
+        poolable.SetSkin(outfit.SkinId, outfit.ColorId);
+        poolable.SetHat(outfit.HatId, outfit.ColorId);
+        poolable.SetName(data.PlayerName);
+        poolable.SetFlipX(true);
+        poolable.SetBodyCosmeticsVisible(true);
+        poolable.SetVisor(outfit.VisorId, outfit.ColorId);
+
+        var names = poolable.transform.FindChild("Names");
+        names.localPosition = new(0, -0.75f, 0);
+        names.localScale = new(1.5f, 1.5f, 1f);
+    }
+
+    /// <summary>
+    /// 设置角色外侧的线
+    /// 比如: 击杀时候的红线
+    /// </summary>
+    /// <param name="pc">目标玩家</param>
+    /// <param name="color">颜色</param>
+    public static void SetOutline(this PlayerControl pc, Color color)
+    {
+        pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 1f);
+        pc.cosmetics.currentBodySprite.BodySprite.material.SetColor(OutlineColor, color);
+    }
+
+    public static void ClearOutline(this PlayerControl pc) => pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
 }
 
 public enum DeathReason
@@ -180,41 +236,54 @@ public enum DeathReason
     Exiled
 }
 
-public class DeadPlayerManager : IListener
+public class DeadPlayerListener : IListener
 {
-    public static List<DeadPlayer> DeadPlayers { get; } = new();
-
-    public void OnMurderPlayer(PlayerControl killer, PlayerControl target)
+    [EventHandler(EventHandlerType.Postfix)]
+    private void OnMurderPlayer(PlayerMurderEvent @event)
     {
+        var target = @event.Target;
+        var killer = @event.Player;
         if (!(target.Data.IsDead && killer && target)) return;
 
-        var reason = GetDeathReason(killer, target);
+        var reason = DeadPlayerManager.GetDeathReason(killer, target);
         _ = new DeadPlayer(DateTime.Now, reason, target, killer);
     }
 
-    public void OnPlayerLeft(AmongUsClient client, ClientData data, DisconnectReasons reason)
+    [EventHandler(EventHandlerType.Postfix)]
+    private void OnPlayerLeft(AmongUsClientLeaveEvent @event)
     {
-        if (DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
+        var data = @event.ClientData;
+        if (DeadPlayerManager.DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
         _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
     }
 
-    public void OnCoBegin()
+    [EventHandler(EventHandlerType.Prefix)]
+    private void OnCoBegin(IntroCutsceneCoBeginEvent @event)
     {
-        DeadPlayers.Clear();
+        DeadPlayerManager.DeadPlayers.Clear();
     }
 
-    public void OnPlayerExile(ExileController controller)
+    [EventHandler(EventHandlerType.Postfix)]
+    private void OnPlayerExile(PlayerExileEvent @event)
     {
+        var controller = @event.ExileController;
         if (controller.exiled == null) return;
         _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, controller.exiled.Object, null);
     }
 
-    public void OnAirshipPlayerExile(AirshipExileController controller)
+    [EventHandler(EventHandlerType.Postfix)]
+    private void OnAirshipPlayerExile(PlayerExileOnAirshipEvent @event)
     {
-        OnPlayerExile(controller);
+        OnPlayerExile(new PlayerExileEvent(@event.Player, @event.Controller));
     }
+}
 
-    public static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
+public class DeadPlayerManager
+{
+    public static List<DeadPlayer> DeadPlayers { get; } = new();
+
+
+    internal static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
     {
         try
         {
@@ -225,32 +294,32 @@ public class DeadPlayerManager : IListener
             return DeathReason.Unknown;
         }
     }
+}
 
-    public class DeadPlayer
+public class DeadPlayer
+{
+    public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl? killer)
     {
-        public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl? killer)
-        {
-            DeadTime = deadTime;
-            DeathReason = deathReason;
-            Player = player;
-            Killer = killer;
-            Role = player.GetRoleInstance();
-            PlayerId = player.PlayerId;
-            DeadPlayers.Add(this);
-        }
+        DeadTime = deadTime;
+        DeathReason = deathReason;
+        Player = player;
+        Killer = killer;
+        Role = player.GetRoleInstance();
+        PlayerId = player.PlayerId;
+        DeadPlayerManager.DeadPlayers.Add(this);
+    }
 
-        public DateTime DeadTime { get; private set; }
-        public DeathReason? DeathReason { get; }
-        public PlayerControl Player { get; }
-        public PlayerControl? Killer { get; }
-        public Role.Role? Role { get; private set; }
-        public byte PlayerId { get; }
+    public DateTime DeadTime { get; private set; }
+    public DeathReason? DeathReason { get; }
+    public PlayerControl Player { get; }
+    public PlayerControl? Killer { get; }
+    public Role.Role? Role { get; private set; }
+    public byte PlayerId { get; }
 
-        //先这样，以后再改，反正暂时用不着
-        public override string ToString()
-        {
-            return Player + " was killed by " + Killer;
-        }
+    // 先这样，以后再改，反正暂时用不着
+    public override string ToString()
+    {
+        return Player + " was killed by " + Killer;
     }
 }
 
@@ -278,7 +347,7 @@ public class PlayerRole
             : COG.Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 }
-
+/*
 public class CachedPlayer : IListener
 {
     public CachedPlayer(PlayerControl player)
@@ -321,19 +390,22 @@ public class CachedPlayer : IListener
     public bool IsDead => DeadStatus == null;
     public bool PlayerIsNull => Player == null;
 
-    public void OnPlayerJoin(AmongUsClient amongUsClient, ClientData data)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerJoin(AmongUsClientJoinEvent @event)
     {
-        _ = new CachedPlayer(data.Character);
+        _ = new CachedPlayer(@event.ClientData.Character);
     }
 
-    public void OnCoBegin()
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
     {
         AllPlayers.RemoveAll(cp =>
-            cp.IsDead && /* Will not continue if cp.IsDead is true */
+            cp.IsDead && // Will not continue if cp.IsDead is true
             cp.DeadStatus!.DeathReason == DeathReason.Disconnected);
     }
 
-    public void OnGameJoined(AmongUsClient amongUsClient, string gameIdString)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameJoined(LocalAmongUsClientJoinEvent @event)
     {
         AllPlayers.Clear();
         // Reset
@@ -358,3 +430,4 @@ public class CachedPlayer : IListener
         return player != null;
     }
 }
+*/

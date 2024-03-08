@@ -6,12 +6,12 @@ namespace COG.Plugin.Loader.Controller.Classes.Globe;
 
 public class PluginController
 {
-    private Lua Lua { get; }
+    private readonly Lua _lua;
     private readonly IPlugin _plugin;
 
     internal PluginController(Lua lua, IPlugin plugin)
     {
-        Lua = lua;
+        _lua = lua;
         _plugin = plugin;
     }
 
@@ -51,6 +51,12 @@ public class PluginController
         _plugin.OnDisable();
     }
 
-    public RpcUtils.RpcWriter GetRpcWriter(string playerId, string callId, string targets) =>
-        RpcUtils.StartRpcImmediately(PlayerUtils.GetPlayerById(byte.Parse(playerId))!, byte.Parse(callId), targets.Equals("") ? null : targets.Split(",").Where(p => PlayerUtils.GetPlayerById(byte.Parse(p)) != null).Select(s => PlayerUtils.GetPlayerById(byte.Parse(s))!).ToArray());
+    public RpcUtils.RpcWriter GetRpcWriter(string playerId, string callId, string targets)
+    {
+        return RpcUtils.StartRpcImmediately(PlayerUtils.GetPlayerById(byte.Parse(playerId))!, byte.Parse(callId),
+            targets.Equals("")
+                ? null
+                : targets.Split(",").Where(p => PlayerUtils.GetPlayerById(byte.Parse(p)) != null)
+                    .Select(s => PlayerUtils.GetPlayerById(byte.Parse(s))!).ToArray());
+    }
 }

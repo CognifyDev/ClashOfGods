@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Listener;
+using COG.Constant;
 using COG.Rpc;
 using COG.Utils;
 using TMPro;
@@ -15,7 +15,7 @@ using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
 using Object = UnityEngine.Object;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using COG.States;
+using COG.UI.SidebarText;
 using COG.Utils.WinAPI;
 
 namespace COG.UI.CustomOption;
@@ -64,7 +64,10 @@ public sealed class CustomOption
     private static int _typeId;
 
     public static CustomOption? GetCustomOptionByCharacteristicCode(int characteristicCode)
-        => Options.FirstOrDefault(customOption => customOption != null && customOption.CharacteristicCode == characteristicCode);
+    {
+        return Options.FirstOrDefault(customOption =>
+            customOption != null && customOption.CharacteristicCode == characteristicCode);
+    }
 
     // Option creation
     public CustomOption(bool ignore, CustomOptionType type, string name, object[] selections,
@@ -108,7 +111,7 @@ public sealed class CustomOption
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
             defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
-    
+
     public static void ShareConfigs(PlayerControl target)
     {
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
@@ -118,18 +121,23 @@ public sealed class CustomOption
         var localPlayer = PlayerControl.LocalPlayer;
 
         // 新建写入器
-        var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions, SendOption.Reliable, target.GetClientID());
+        var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions,
+            SendOption.Reliable, target.GetClientID());
 
         var sb = new StringBuilder();
 
-        foreach (var option in from option in Options where option != null where !option.Ignore where option.Selection != option.DefaultSelection select option)
+        foreach (var option in from option in Options
+                 where option != null
+                 where !option.Ignore
+                 where option.Selection != option.DefaultSelection
+                 select option)
         {
             sb.Append(option.ID + "|" + option.Selection);
             sb.Append(',');
         }
-        
+
         writer.Write(sb.ToString().RemoveLast());
-        
+
         // id|selection,id|selection
 
         // OK 现在进行一个结束
@@ -237,13 +245,7 @@ public sealed class CustomOption
             CreateClassicTabs(__instance);
         }
 
-        /* FIXME
-         * 
-         * 常规设置的两个预设用选项位置错误
-         * 
-         */
-
-        private static void CreateClassicTabs(GameOptionsMenu __instance)
+        private static void CreateClassicTabs(GameOptionsMenu instance)
         {
             var allTypes = Enum.GetValues<CustomOptionType>();
             var typeNameDictionary = new Dictionary<CustomOptionType, string>();
@@ -264,7 +266,8 @@ public sealed class CustomOption
             var template = Object.FindObjectsOfType<StringOption>().FirstOrDefault();
             if (template == null) return;
 
-            var gameSettings = GameObject.Find("Main Camera/PlayerOptionsMenu(Clone)").transform.FindChild("Game Settings");
+            var gameSettings = GameObject.Find("Main Camera/PlayerOptionsMenu(Clone)").transform
+                .FindChild("Game Settings");
             var gameSettingMenu = Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
 
             var settingsMenu = new Dictionary<CustomOptionType, (GameObject?, GameOptionsMenu?)>();
@@ -320,7 +323,7 @@ public sealed class CustomOption
                     [settingsMenu[CustomOptionType.Addons].Item1!.gameObject] = modifierTabHighlight
                 };
 
-                int a = 0;
+                var a = 0;
                 foreach (var tab in tabs)
                 {
                     var button = tab.GetComponentInChildren<PassiveButton>();
@@ -336,11 +339,12 @@ public sealed class CustomOption
                 }
             }
 
-            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2.GetComponentsInChildren<OptionBehaviour>().ToList());
+            var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key,
+                kvp => kvp.Value.Item2!.GetComponentsInChildren<OptionBehaviour>().ToList());
 
-            DestroyOptions(typeOptions.Select(kvp=>kvp.Value).ToList());
+            DestroyOptions(typeOptions.Select(kvp => kvp.Value).ToList());
 
-            var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2.transform);
+            var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.transform);
 
             foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
             {
@@ -505,7 +509,7 @@ public class StringOptionPatch
         //if (FirstOpen)
         //    __instance.Value = __instance.oldValue = option.Selection = option.DefaultSelection;
         //else
-            __instance.Value = __instance.oldValue = option.Selection;
+        __instance.Value = __instance.oldValue = option.Selection;
 
         __instance.ValueText.text = option.Selections[option.Selection].ToString();
 
@@ -527,7 +531,7 @@ internal class GameOptionsMenuUpdatePatch
                                         gameSettingMenu.RolesSettings.gameObject.active)) return;
 
         __instance.GetComponentInParent<Scroller>().ContentYBounds.max = -0.5F + __instance.Children.Length * 0.55F;
-        
+
         _timer += Time.deltaTime;
         if (_timer < 0.1f) return;
 
@@ -538,17 +542,18 @@ internal class GameOptionsMenuUpdatePatch
         var offset = 2.75f;
         var objType = new Dictionary<string, CustomOptionType>
         {
-            { "COGSettings",CustomOptionType.General },
-            {"ImpostorSettings", CustomOptionType.Impostor},
-            {"NeutralSettings", CustomOptionType.Neutral},
-            {"CrewmateSettings", CustomOptionType.Crewmate},
-            {"AddonsSettings", CustomOptionType.Addons}
+            { "GeneralSettings", CustomOptionType.General },
+            { "ImpostorSettings", CustomOptionType.Impostor },
+            { "NeutralSettings", CustomOptionType.Neutral },
+            { "CrewmateSettings", CustomOptionType.Crewmate },
+            { "AddonsSettings", CustomOptionType.Addons }
         };
 
         foreach (var option in Options.Where(o => o != null))
         {
             if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Type != kvp.Value)) continue;
-            if (!(option?.OptionBehaviour && option?.OptionBehaviour?.gameObject)) return;
+            if (!(option != null && option.OptionBehaviour && option.OptionBehaviour != null &&
+                  option.OptionBehaviour!.gameObject)) return;
             var enabled = true;
             var parent = option!.Parent;
 
@@ -567,16 +572,15 @@ internal class GameOptionsMenuUpdatePatch
                 localPosition = new Vector3(localPosition.x, offset, localPosition.z);
                 transform.localPosition = localPosition;
             }
-
         }
 
 
         //每帧更新预设选项名称与按下按钮操作
-        var load = (ToggleOption)GlobalCustomOption.LoadPreset.OptionBehaviour!;
-        var save = (ToggleOption)GlobalCustomOption.SavePreset.OptionBehaviour!;
+        var load = (ToggleOption)GlobalCustomOptionConstant.LoadPreset.OptionBehaviour!;
+        var save = (ToggleOption)GlobalCustomOptionConstant.SavePreset.OptionBehaviour!;
 
-        load!.TitleText.text = GlobalCustomOption.LoadPreset.Name;
-        save!.TitleText.text = GlobalCustomOption.SavePreset.Name;
+        load!.TitleText.text = GlobalCustomOptionConstant.LoadPreset.Name;
+        save!.TitleText.text = GlobalCustomOptionConstant.SavePreset.Name;
 
         load.OnValueChanged = new Action<OptionBehaviour>((_) => OpenPresetWithDialogue());
         save.OnValueChanged = new Action<OptionBehaviour>((_) => SaveOptionWithDialogue());
@@ -592,8 +596,23 @@ internal class HudStringPatch
         if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek)
             return; // Allow Vanilla Hide N Seek
 
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnIGameOptionsExtensionsDisplay(ref __result);
+        var pages = SidebarTextManager.GetManager().GetSidebarTexts().Count;
+
+        if (pages <= 0) return;
+
+        var sidebars = SidebarTextManager.GetManager().GetSidebarTexts();
+        if (GameOptionsNextPagePatch.TypePage > sidebars.Count || GameOptionsNextPagePatch.TypePage == 0)
+            GameOptionsNextPagePatch.TypePage = 1;
+
+        if (sidebars.Count <= 0) return;
+
+        var sidebar = sidebars[GameOptionsNextPagePatch.TypePage - 1];
+        var text = sidebar.Title + Environment.NewLine;
+
+        sidebar.ForResult(ref __result);
+        foreach (var sidebarObject in sidebar.Objects) text += sidebarObject + Environment.NewLine;
+        text += LanguageConfig.Instance.MessageForNextPage.CustomFormat(GameOptionsNextPagePatch.TypePage, pages);
+        __result = text;
     }
 
     public static string GetOptByType(CustomOptionType type)
@@ -604,7 +623,6 @@ internal class HudStringPatch
             if (option != null && option.Type == type && !option.Ignore)
                 opt.Add(option);
         foreach (var option in opt)
-        {
             // 临时解决方案
             try
             {
@@ -613,7 +631,7 @@ internal class HudStringPatch
             catch (IndexOutOfRangeException)
             {
             }
-        }
+
         return txt;
         /*
          * FIXME
@@ -633,9 +651,26 @@ internal class HudStringPatch
 [HarmonyPatch(typeof(KeyboardJoystick), nameof(KeyboardJoystick.Update))]
 public static class GameOptionsNextPagePatch
 {
+    internal static int TypePage = 1;
+
     public static void Postfix(KeyboardJoystick __instance)
     {
-        foreach (var listener in ListenerManager.GetManager().GetListeners())
-            listener.OnKeyboardJoystickUpdate(__instance);
+        if (Input.GetKeyDown(KeyCode.Tab)) TypePage += 1;
+
+        // from Alpha1 to Alpha9
+        for (var num = (int)KeyCode.Alpha1; num <= (int)KeyCode.Alpha9; num++)
+        {
+            var page = num - ((int)KeyCode.Alpha1 - 1); // 指代的page
+            var keycode = (KeyCode)num;
+            if (Input.GetKeyDown(keycode)) TypePage = page;
+        }
+
+        // from Keypad1 to Keypad9
+        for (var num = (int)KeyCode.Keypad1; num <= (int)KeyCode.Keypad9; num++)
+        {
+            var page = num - ((int)KeyCode.Keypad1 - 1);
+            var keycode = (KeyCode)num;
+            if (Input.GetKeyDown(keycode)) TypePage = page;
+        }
     }
 }

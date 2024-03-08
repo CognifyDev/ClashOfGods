@@ -1,18 +1,23 @@
 using AmongUs.GameOptions;
-using COG;
-using COG.Listener;
+using COG.Listener.Event.Impl.TAButton;
+using COG.Listener.Event.Impl.TAGame;
+using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
-using COG.Role.Impl;
-using COG.Role;
 using COG.Utils;
+
+namespace COG.Listener.Impl;
 
 public class TaskAdderListener : IListener
 {
     public static TaskFolder? RoleFolder;
-    public static TaskAddButton? LastClicked = null;
-    public void OnTaskAdderShowFolder(TaskAdderGame taskAdderGame, TaskFolder folder)
+    public static TaskAddButton? LastClicked;
+
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnTaskAdderShowFolder(TaskAdderGameShowFolderEvent @event)
     {
+        var taskAdderGame = @event.TaskAdderGame;
+        var folder = @event.GetTaskFolder();
         if (taskAdderGame.Root == folder && RoleFolder == null)
         {
             RoleFolder = UnityEngine.Object.Instantiate(taskAdderGame.RootFolderPrefab, taskAdderGame.transform);
@@ -23,15 +28,18 @@ public class TaskAdderListener : IListener
         }
     }
 
-    public void AfterTaskAdderShowFolder(TaskAdderGame taskAdderGame, TaskFolder folder)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void AfterTaskAdderShowFolder(TaskAdderGameShowFolderEvent @event)
     {
+        var taskAdderGame = @event.TaskAdderGame;
+        var folder = @event.GetTaskFolder();
         if (RoleFolder != null && RoleFolder.FolderName == folder.FolderName)
         {
-            float xCursor = 0f;
-            float yCursor = 0f;
-            float maxHeight = 0f;
+            var xCursor = 0f;
+            var yCursor = 0f;
+            var maxHeight = 0f;
 
-            foreach (var role in COG.Role.RoleManager.GetManager().GetRoles())
+            foreach (var role in Role.RoleManager.GetManager().GetRoles())
             {
                 if (role is Unknown or Crewmate or Impostor) continue;
                 var button = UnityEngine.Object.Instantiate(taskAdderGame.RoleButton);
@@ -40,7 +48,7 @@ public class TaskAdderListener : IListener
 
                 RoleBehaviour roleBehaviour = new()
                 {
-                    Role = (RoleTypes)COG.Role.RoleManager.GetManager().GetRoles().IndexOf(role) + 100
+                    Role = (RoleTypes)Role.RoleManager.GetManager().GetRoles().IndexOf(role) + 100
                 };
                 button.Role = roleBehaviour;
 
@@ -50,14 +58,18 @@ public class TaskAdderListener : IListener
         }
     }
 
-    public void OnTaskButtonUpdate(TaskAddButton button)
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnTaskButtonUpdate(TaskAddButtonUpdateEvent @event)
     {
+        var button = @event.TaskAddButton;
         try
         {
+            if (button.Text.text.StartsWith("Be_")) return;
             var role = button.Role;
-            int type = 99;
+            var type = 99;
             if (!role && !((type = (ushort)role.Role) > 100)) return;
-            if (type is not <= 7 and not 99) button.Overlay.gameObject.SetActive(LastClicked?.Role.Role == button.Role.Role);
+            if (type is > 7 and not 99)
+                button.Overlay.gameObject.SetActive(LastClicked!.Role.Role == button.Role.Role);
         }
         catch
         {
@@ -65,16 +77,20 @@ public class TaskAdderListener : IListener
         }
     }
 
-    public bool OnTaskButtonAddTask(TaskAddButton button)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnTaskButtonAddTask(TaskAddButtonAddTaskEvent @event)
     {
+        var button = @event.TaskAddButton;
         var role = button.Role;
-        int type = 99;
+        var type = 99;
+        if (button.Text.text.StartsWith("Be_")) return true;
         if (!role && !((type = (ushort)role.Role) > 100)) return true;
-        if (type is not <= 7 and not 99)
+        if (type is > 7 and not 99)
         {
-            PlayerControl.LocalPlayer.SetCustomRole(COG.Role.RoleManager.GetManager().GetRoles()[type - 100]);
+            PlayerControl.LocalPlayer.SetCustomRole(Role.RoleManager.GetManager().GetRoles()[type - 100]);
             LastClicked = button;
         }
+
         return false;
     }
 }
