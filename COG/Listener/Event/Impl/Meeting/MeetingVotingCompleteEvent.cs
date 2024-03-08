@@ -12,5 +12,7 @@ public class MeetingVotingCompleteEvent : MeetingEvent
         Exiled = exiled;
         Tie = tie;
     }
+
+    // 此事件在会议hud销毁前，向玩家展示投票票数结果这个行为完成后发生
 }
 
