@@ -1,12 +1,11 @@
 #pragma warning disable SYSLIB0014
-using COG.Utils;
-using COG.Utils.Version;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using COG.Utils.Version;
+using Newtonsoft.Json.Linq;
 
-namespace COG;
+namespace COG.Utils;
 
 /// <summary>
 /// 模组更新类
