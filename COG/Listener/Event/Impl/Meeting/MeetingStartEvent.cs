@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl;
+namespace COG.Listener.Event.Impl.Meeting;
 
 public class MeetingStartEvent : MeetingEvent
 {
