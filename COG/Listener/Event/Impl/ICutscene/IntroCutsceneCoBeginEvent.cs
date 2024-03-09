@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.ICutscene;
+namespace COG.Listener.Event.Impl.ICutscene;
 
 public class IntroCutsceneCoBeginEvent : IntroCutsceneEvent
 {

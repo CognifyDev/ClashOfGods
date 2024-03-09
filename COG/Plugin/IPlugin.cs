@@ -1,4 +1,4 @@
-﻿namespace COG.Plugin;
+namespace COG.Plugin;
 
 public interface IPlugin
 {

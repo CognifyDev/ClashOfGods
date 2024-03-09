@@ -1,4 +1,4 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Rpc;
 using COG.UI.CustomButton;

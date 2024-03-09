@@ -1,4 +1,4 @@
-﻿global using Hazel;
+global using Hazel;
 global using HarmonyLib;
 using System.Linq;
 using BepInEx;

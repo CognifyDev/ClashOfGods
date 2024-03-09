@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl;
+namespace COG.Listener.Event.Impl;
 
 /// <summary>
 /// 这个事件为关于玩家操作的总事件

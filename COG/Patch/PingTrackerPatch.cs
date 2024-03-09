@@ -1,4 +1,4 @@
-﻿using COG.Listener;
+using COG.Listener;
 using COG.Listener.Event.Impl.Game;
 
 namespace COG.Patch;

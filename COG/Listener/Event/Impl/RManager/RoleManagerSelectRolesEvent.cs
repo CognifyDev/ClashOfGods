@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.RManager;
+namespace COG.Listener.Event.Impl.RManager;
 
 public class RoleManagerSelectRolesEvent : RoleManagerEvent
 {

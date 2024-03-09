@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl;
+namespace COG.Listener.Event.Impl;
 
 public class TaskAdderGameEvent : Event
 {

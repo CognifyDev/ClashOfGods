@@ -1,4 +1,4 @@
-﻿namespace COG.Listener;
+namespace COG.Listener;
 
 /// <summary>
 /// LISTENER INTERFACE

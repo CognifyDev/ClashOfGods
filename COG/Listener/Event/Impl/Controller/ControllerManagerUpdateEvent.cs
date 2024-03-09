@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.Controller;
+namespace COG.Listener.Event.Impl.Controller;
 
 public class ControllerManagerUpdateEvent : ControllerEvent
 {

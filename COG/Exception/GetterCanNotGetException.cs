@@ -1,4 +1,4 @@
-﻿namespace COG.Exception;
+namespace COG.Exception;
 
 public class GetterCanNotGetException : System.Exception
 {

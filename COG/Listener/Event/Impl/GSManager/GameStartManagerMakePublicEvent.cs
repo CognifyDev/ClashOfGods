@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.GSManager;
+namespace COG.Listener.Event.Impl.GSManager;
 
 public class GameStartManagerMakePublicEvent : GameStartManagerEvent
 {

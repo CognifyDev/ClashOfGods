@@ -1,4 +1,4 @@
-﻿namespace COG.Patch;
+namespace COG.Patch;
 
 public static class ServerPatch
 {

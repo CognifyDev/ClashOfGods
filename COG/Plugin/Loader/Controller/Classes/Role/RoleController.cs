@@ -1,4 +1,4 @@
-﻿using COG.Role;
+using COG.Role;
 using COG.Utils;
 using NLua;
 

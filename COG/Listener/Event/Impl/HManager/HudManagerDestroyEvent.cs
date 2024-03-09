@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.HManager;
+namespace COG.Listener.Event.Impl.HManager;
 
 public class HudManagerDestroyEvent : HudManagerEvent
 {

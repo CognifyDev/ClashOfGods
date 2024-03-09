@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.TAButton;
+namespace COG.Listener.Event.Impl.TAButton;
 
 public class TaskAddButtonUpdateEvent : TaskAddButtonEvent
 {

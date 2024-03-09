@@ -1,4 +1,4 @@
-﻿namespace COG.Constant;
+namespace COG.Constant;
 
 /// <summary>
 /// 资源列表常量类

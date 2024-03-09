@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.Game;
+namespace COG.Listener.Event.Impl.Game;
 
 public class OptionsMenuBehaviourStartEvent : GameEvent<OptionsMenuBehaviour>
 {

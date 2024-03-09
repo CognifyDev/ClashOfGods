@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.VentImpl;
+namespace COG.Listener.Event.Impl.VentImpl;
 
 public class VentCheckEvent : VentEvent
 {

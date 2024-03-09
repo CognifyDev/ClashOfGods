@@ -1,4 +1,4 @@
-﻿using InnerNet;
+using InnerNet;
 
 namespace COG.Listener.Event.Impl.AuClient;
 

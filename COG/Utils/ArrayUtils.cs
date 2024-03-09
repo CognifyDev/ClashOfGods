@@ -1,4 +1,4 @@
-﻿namespace COG.Utils;
+namespace COG.Utils;
 
 public static class ArrayUtils
 {

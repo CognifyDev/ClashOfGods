@@ -1,4 +1,4 @@
-﻿using COG.Config.Impl;
+using COG.Config.Impl;
 using COG.Role;
 using UnityEngine;
 

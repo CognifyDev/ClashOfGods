@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.Player;
+namespace COG.Listener.Event.Impl.Player;
 
 /// <summary>
 /// 一个Rpc被捕捉的时候，这个事件会触发

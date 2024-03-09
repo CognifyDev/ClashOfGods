@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.DBody;
+namespace COG.Listener.Event.Impl.DBody;
 
 public class DeadBodyClickEvent : DeadBodyEvent
 {

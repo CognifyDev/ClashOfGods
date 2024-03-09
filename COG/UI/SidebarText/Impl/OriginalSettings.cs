@@ -1,4 +1,4 @@
-﻿using COG.Config.Impl;
+using COG.Config.Impl;
 
 namespace COG.UI.SidebarText.Impl;
 

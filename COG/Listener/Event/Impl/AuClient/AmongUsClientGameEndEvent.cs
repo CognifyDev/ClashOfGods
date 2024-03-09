@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.AuClient;
+namespace COG.Listener.Event.Impl.AuClient;
 
 public class AmongUsClientGameEndEvent : AmongUsClientEvent
 {

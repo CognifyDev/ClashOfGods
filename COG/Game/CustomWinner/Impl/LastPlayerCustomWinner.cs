@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using COG.Config.Impl;
 using COG.Utils;
 

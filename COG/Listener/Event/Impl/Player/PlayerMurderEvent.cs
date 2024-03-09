@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.Player;
+namespace COG.Listener.Event.Impl.Player;
 
 /// <summary>
 /// 当一个玩家击杀时，会触发这个事件<para></para>

@@ -1,4 +1,4 @@
-﻿using Il2CppSystem.Collections.Generic;
+using Il2CppSystem.Collections.Generic;
 
 namespace COG.Listener.Event.Impl.Player;
 

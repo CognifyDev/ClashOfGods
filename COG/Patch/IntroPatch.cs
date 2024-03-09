@@ -1,4 +1,4 @@
-﻿using COG.Listener;
+using COG.Listener;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
 using COG.Listener.Event.Impl.ICutscene;

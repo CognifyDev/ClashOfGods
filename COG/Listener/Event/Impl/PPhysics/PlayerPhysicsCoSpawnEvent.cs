@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.PPhysics;
+namespace COG.Listener.Event.Impl.PPhysics;
 
 public class PlayerPhysicsCoSpawnEvent : PlayerPhysicsEvent
 {

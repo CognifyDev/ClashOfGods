@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace COG.Plugin.Loader.Controller.Function;
 

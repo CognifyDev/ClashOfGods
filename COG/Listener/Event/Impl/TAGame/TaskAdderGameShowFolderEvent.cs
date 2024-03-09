@@ -1,4 +1,4 @@
-﻿namespace COG.Listener.Event.Impl.TAGame;
+namespace COG.Listener.Event.Impl.TAGame;
 
 public class TaskAdderGameShowFolderEvent : TaskAdderGameEvent
 {

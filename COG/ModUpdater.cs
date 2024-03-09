@@ -1,4 +1,4 @@
-﻿#pragma warning disable SYSLIB0014
+#pragma warning disable SYSLIB0014
 using COG.Utils;
 using COG.Utils.Version;
 using Newtonsoft.Json.Linq;

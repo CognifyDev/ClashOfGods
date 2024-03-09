@@ -1,4 +1,4 @@
-﻿namespace COG.Exception.Plugin;
+namespace COG.Exception.Plugin;
 
 public class CannotLoadPluginException : System.Exception
 {
