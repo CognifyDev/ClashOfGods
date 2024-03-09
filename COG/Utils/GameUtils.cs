@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
-using COG.Listener.Impl;
 using COG.Rpc;
 using COG.States;
 

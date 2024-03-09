@@ -8,7 +8,6 @@ using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;
-using COG.Utils.Coding;
 using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
