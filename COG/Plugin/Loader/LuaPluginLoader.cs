@@ -1,5 +1,7 @@
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using COG.Exception.Plugin;
 using COG.Plugin.Loader.Controller.Classes.Globe;
@@ -69,6 +71,14 @@ public class LuaPluginLoader : IPlugin
                                		import = function () end
                                	
                                """);
+
+        
+        LuaController.DoString($"""
+                                
+                                      luanet.load_assembly("{Main.DisplayName}")
+                                	
+                                """);
+        
         LuaController.DoFile(ScriptPath + "\\" + _mainClass);
         if (!CheckPlugin())
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a correct plugin with functions");
@@ -92,7 +102,18 @@ public class LuaPluginLoader : IPlugin
 
     private void MakeLanguage()
     {
-        LuaController.LoadCLRPackage();
+        
+        var assembly = Assembly.GetExecutingAssembly();
+        var allClasses = assembly.GetAllClassesFromAssembly();
+        foreach (var type in allClasses.Where(type => (type.Namespace == null || type.Namespace.StartsWith("COG")) && type.Namespace != null))
+        {
+            if (type.FullName != null && (type.FullName.Contains('`') || type.FullName.Contains('>') || type.FullName.Contains('<'))) continue;
+            LuaController.DoString($"""
+                                    
+                                         {type.Name} = luanet.import_type("{type.FullName}")
+                                    	
+                                    """);
+        }
 
         // register global values
         LuaController["COG_VERSION"] = Main.PluginVersion;
