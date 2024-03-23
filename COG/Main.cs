@@ -159,8 +159,8 @@ public partial class Main : BasePlugin
             // Impostor
             new Impostor(),
             new Cleaner(),
-            // new Troublemaker(),
             new BountyHunter(),
+            // new Troublemaker(),
             // 此职业暂时未完成
 
             // Neutral
