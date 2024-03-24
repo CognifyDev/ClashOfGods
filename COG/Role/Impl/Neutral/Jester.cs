@@ -25,7 +25,7 @@ public class Jester : Role, IListener, IWinnable
             false, ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true,
             MainRoleOption);
 
-        CustomWinnerManager.RegisterCustomWinnerInstance(this);
+        CustomWinnerManager.RegisterWinnableInstance(this);
     }
 
     public bool CanWin()
@@ -35,7 +35,7 @@ public class Jester : Role, IListener, IWinnable
             dp.DeathReason == Utils.DeathReason.Exiled);
         if (jester == null) return false;
         GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);
-        CustomWinnerManager.RegisterCustomWinner(jester.Player);
+        CustomWinnerManager.RegisterWinningPlayer(jester.Player);
         return true;
     }
 

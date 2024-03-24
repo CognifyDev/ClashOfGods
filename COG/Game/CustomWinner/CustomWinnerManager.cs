@@ -12,24 +12,24 @@ public static class CustomWinnerManager
     public static string WinText { get; private set; } = "";
     public static Color WinColor { get; private set; } = Color.white;
 
-    public static void RegisterCustomWinner(PlayerControl winner)
+    public static void RegisterWinningPlayer(PlayerControl winner)
     {
         AllWinners.Add(new WinningPlayerData(winner.Data));
     }
 
-    public static void UnRegisterCustomWinner(PlayerControl playerControl)
+    public static void UnregisterWinningPlayer(PlayerControl playerControl)
     {
         foreach (var winningPlayerData in AllWinners)
             if (playerControl.Data.PlayerName.Equals(winningPlayerData.PlayerName))
                 AllWinners.Remove(winningPlayerData);
     }
 
-    public static void RegisterCustomWinners(IEnumerable<PlayerControl> winners)
+    public static void RegisterWinningPlayers(IEnumerable<PlayerControl> winners)
     {
         winners.ToList().ForEach(w => AllWinners.Add(new WinningPlayerData(w.Data)));
     }
 
-    public static void ResetCustomWinners()
+    public static void ResetWinningPlayers()
     {
         AllWinners.Clear();
     }
@@ -44,14 +44,14 @@ public static class CustomWinnerManager
         WinColor = color;
     }
 
-    public static void RegisterCustomWinnerInstance(IWinnable customWinner)
+    public static void RegisterWinnableInstance(IWinnable customWinner)
     {
         CustomWinners.Add(customWinner);
     }
 
-    public static void RegisterCustomWinnersInstances(IEnumerable<IWinnable> customWinners)
+    public static void RegisterWinnableInstances(IEnumerable<IWinnable> customWinners)
     {
-        customWinners.ToList().ForEach(RegisterCustomWinnerInstance);
+        customWinners.ToList().ForEach(RegisterWinnableInstance);
     }
 
     internal static bool CheckEndForCustomWinners()

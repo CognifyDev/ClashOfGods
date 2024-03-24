@@ -66,7 +66,7 @@ public class Opportunist : Role, IListener
     {
         if (!GameStates.InGame) return;
         var target = @event.Target;
-        if (target.GetRoleInstance()!.Id == Id) CustomWinnerManager.UnRegisterCustomWinner(target);
+        if (target.GetRoleInstance()!.Id == Id) CustomWinnerManager.UnregisterWinningPlayer(target);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -76,7 +76,7 @@ public class Opportunist : Role, IListener
         var thread = new Thread(() =>
         {
             Thread.Sleep(500);
-            CustomWinnerManager.RegisterCustomWinners(PlayerUtils.GetAllPlayers()
+            CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.GetAllPlayers()
                 .Where(p => p.GetRoleInstance()!.Id == Id));
         });
         thread.Start();
