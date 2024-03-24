@@ -11,7 +11,7 @@ public class LastPlayerCustomWinner : IWinnable
         if (PlayerUtils.GetAllAlivePlayers().Count > 1) return false;
         var lastPlayer = PlayerUtils.GetAllAlivePlayers().FirstOrDefault();
         if (!lastPlayer) return false;
-        CustomWinnerManager.RegisterCustomWinners(PlayerUtils.GetAllAlivePlayers());
+        CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.GetAllAlivePlayers());
         CustomWinnerManager.SetWinText(
             LanguageConfig.Instance.NeutralsWinText.CustomFormat(lastPlayer!.Data.PlayerName));
         CustomWinnerManager.SetWinColor(lastPlayer.GetRoleInstance()!.Color);

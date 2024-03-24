@@ -19,19 +19,22 @@ public class ImpostorsCustomWinner : IWinnable
                 .Where(pair => pair.Player && !pair.Player.Data.IsDead).Select(pair => pair.Player).ToList().Count
             && aliveNeutrals.Select(p => p.Role.CanKill).ToList().Count <= 0)
         {
-            CustomWinnerManager.RegisterCustomWinners(PlayerUtils.AllImpostors.Select(pr => pr.Player));
+            CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllImpostors.Select(pr => pr.Player));
             CustomWinnerManager.SetWinText(LanguageConfig.Instance.ImpostorsWinText);
             CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
             GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
             return true;
         }
 
+        // FIXME
+        // 破坏胜利判断无效
+
         if (DestroyableSingleton<HeliSabotageSystem>.Instance is { } instance) // 等效于检测是否为null并设变量为实例
         {
             if (!instance.IsActive) return false;
             if (instance.Countdown <= 0f)
             {
-                CustomWinnerManager.RegisterCustomWinners(PlayerUtils.AllImpostors.Select(pr => pr.Player));
+                CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllImpostors.Select(pr => pr.Player));
                 CustomWinnerManager.SetWinText(LanguageConfig.Instance.ImpostorsWinText);
                 CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
                 GameManager.Instance.RpcEndGame(GameOverReason.ImpostorBySabotage, false);

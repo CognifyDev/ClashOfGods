@@ -210,7 +210,7 @@ public partial class Main : BasePlugin
         });
 
         // Register CustomWinners
-        CustomWinnerManager.RegisterCustomWinnersInstances(new IWinnable[]
+        CustomWinnerManager.RegisterWinnableInstances(new IWinnable[]
         {
             new CrewmatesCustomWinner(),
             new ImpostorsCustomWinner(),

@@ -106,7 +106,7 @@ public class CustomWinnerListener : IListener
         // Reset
         CustomWinnerManager.SetWinText("");
         CustomWinnerManager.SetWinColor(Color.white);
-        CustomWinnerManager.ResetCustomWinners();
+        CustomWinnerManager.ResetWinningPlayers();
     }
 
     private static void SetUpRoleSummary(EndGameManager manager)
