@@ -18,7 +18,7 @@ public class Jackal : Role
     public Jackal() : base("Jackal", new(0, 180f, 235f), CampType.Neutral, true)
     {
         Description = "";
-        BaseRoleType = RoleTypes.Engineer;
+        BaseRoleType = RoleTypes.Crewmate;
 
         if (ShowInOptions)
         {
