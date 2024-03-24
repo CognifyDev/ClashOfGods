@@ -230,6 +230,8 @@ public partial class Main : BasePlugin
 
     public override bool Unload()
     {
+        foreach (var plugin in PluginManager.GetPlugins()) plugin.OnDisable();
+        
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
@@ -242,9 +244,6 @@ public partial class Main : BasePlugin
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
         MainMenuPatch.CustomBG!.Destroy();
         PluginSingleton<ReactorPlugin>.Instance.Unload();
-
-        foreach (var plugin in PluginManager.GetPlugins()) plugin.OnDisable();
-
         return false;
     }
 }
