@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
+using COG.Role;
 using COG.Rpc;
 using COG.States;
 
@@ -85,6 +86,17 @@ public static class GameUtils
     public static void RpcSetCustomRole(this PlayerControl pc, Role.Role role)
     {
         if (!pc) return;
+        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
+        writer.Write(pc.PlayerId);
+        writer.WritePacked(role.Id);
+        writer.Finish();
+        SetCustomRole(pc, role);
+    }
+
+    public static void RpcSetCustomRole<T>(this PlayerControl pc) where T: Role.Role
+    {
+        if (!pc) return;
+        var role = Role.RoleManager.GetManager().GetTypeRoleInstance<T>();
         var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
         writer.Write(pc.PlayerId);
         writer.WritePacked(role.Id);

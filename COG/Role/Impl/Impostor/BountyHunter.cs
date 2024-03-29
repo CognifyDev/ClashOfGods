@@ -135,12 +135,9 @@ public class BountyHunter : Role, IListener
     public void OnPlayerMurder(PlayerMurderEvent @event)
     {
         var victim = @event.Target;
-        if (!PlayerControl.LocalPlayer.IsRole(this))
-        {
-            if (!CurrentTarget) return;
-            if (victim.IsSamePlayer(CurrentTarget!)) RefreshTarget();
-            return;
-        }
+        if (!PlayerControl.LocalPlayer.IsRole(this)) return;
+        if (!CurrentTarget) return;
+        if (victim.IsSamePlayer(CurrentTarget!)) RefreshTarget();
 
         if (!Players.Any(pc => pc.IsSamePlayer(@event.Player)) || !CurrentTarget) return;
         Debug.Assert(CdAfterKillingTarget != null, nameof(CdAfterKillingTarget) + " != null");

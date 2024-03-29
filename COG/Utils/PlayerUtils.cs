@@ -230,6 +230,14 @@ public static class PlayerUtils
     public static bool IsRole<T>(this PlayerControl pc) where T : Role.Role => IsRole(pc, Role.RoleManager.GetManager().GetTypeRoleInstance<T>());
 
     public static bool IsInJackalTeam(this PlayerControl pc) => pc.IsRole<Jackal>() || pc.IsRole<Sidekick>();
+
+    public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color)
+    {
+        var target = pc.GetClosestPlayer();
+        PlayerControl.AllPlayerControls.ForEach(new Action<PlayerControl>((p) => p.ClearOutline()));
+        target?.SetOutline(color);
+        return target;
+    }
 }
 
 public enum DeathReason
