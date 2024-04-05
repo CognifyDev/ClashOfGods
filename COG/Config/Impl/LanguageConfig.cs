@@ -96,6 +96,14 @@ public class LanguageConfig : Config
         OpportunistName = GetString("role.neutral.opportunist.name");
         OpportunistDescription = GetString("role.neutral.opportunist.description");
 
+        JackalName = GetString("role.neutral.jackal.name");
+        JackalDescription = GetString("role.neutral.jackal.description");
+        JackalCreateSidekickCd = GetString("role.neutral.jackal.create-sidekick-cd");
+        JackalKillCd = GetString("role.neutral.jackal.kill-cd");
+
+        SidekickName = GetString("role.neutral.sidekick.name");
+        SidekickCanCreateSidekick = GetString("role.neutral.sidekick.can-create-sidekick");
+
         Enable = GetString("option.enable");
         Disable = GetString("option.disable");
         CogOptions = GetString("option.main.cog-options");
@@ -130,6 +138,7 @@ public class LanguageConfig : Config
         KillAction = GetString("action.kill");
         CleanAction = GetString("action.clean");
         MakeTrouble = GetString("action.make-trouble");
+        CreateSidekick = GetString("action.create-sidekick");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 
@@ -208,6 +217,14 @@ public class LanguageConfig : Config
     public string BountyHunterKillIncorrectCd { get; private set; } = null!;
     public string BountyHunterCantSelectTargetError { get; private set; } = null!;
 
+    public string JackalName { get; private set; } = null!;
+    public string JackalDescription { get; private set; } = null!;
+    public string JackalCreateSidekickCd { get; private set; } = null!;
+    public string JackalKillCd { get; private set; } = null!;
+
+    public string SidekickName { get; private set; } = null!;
+    public string SidekickCanCreateSidekick { get; private set; } = null!;
+
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;
@@ -242,6 +259,7 @@ public class LanguageConfig : Config
     public string KillAction { get; private set; } = null!;
     public string CleanAction { get; private set; } = null!;
     public string MakeTrouble { get; private set; } = null!;
+    public string CreateSidekick { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 

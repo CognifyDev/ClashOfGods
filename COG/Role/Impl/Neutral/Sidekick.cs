@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
@@ -13,14 +14,14 @@ namespace COG.Role.Impl.Neutral;
 public class Sidekick : Role, IListener
 {
     public CustomOption SidekickCanCreateSidekick { get; }
-    public Sidekick() : base("", RoleManager.GetManager().GetTypeRoleInstance<Jackal>().Color, CampType.Neutral, false)
+    public Sidekick() : base(LanguageConfig.Instance.SidekickName, RoleManager.GetManager().GetTypeRoleInstance<Jackal>().Color, CampType.Neutral, false)
     {
         BaseRoleType = RoleTypes.Crewmate;
         CanVent = true;
 
         if (ShowInOptions)
         {
-            SidekickCanCreateSidekick = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, "", true, MainRoleOption);
+            SidekickCanCreateSidekick = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, LanguageConfig.Instance.SidekickCanCreateSidekick, true, RoleManager.GetManager().GetTypeRoleInstance<Jackal>().MainRoleOption);
         }
     }
 

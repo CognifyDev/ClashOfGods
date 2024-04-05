@@ -27,9 +27,9 @@ public class Jackal : Role, IListener
     public static PlayerControl? CurrentTarget { get; set; }
     public static bool CreatedSidekick { get; set; } = false;
     public static Dictionary<PlayerControl, PlayerControl> JackalSidekick { get; set; } = new();
-    public Jackal() : base("Jackal", new(0, 180f, 235f), CampType.Neutral, true)
+    public Jackal() : base(LanguageConfig.Instance.JackalName, new(0, 180f, 235f), CampType.Neutral, true)
     {
-        Description = "";
+        Description = LanguageConfig.Instance.JackalDescription;
         BaseRoleType = RoleTypes.Crewmate;
 
         CanSabotage = true;
@@ -37,8 +37,8 @@ public class Jackal : Role, IListener
 
         if (ShowInOptions)
         {
-            CreateSidekickCd = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, "", 30f, 10f, 60f, 5f, MainRoleOption)!;
-            JackalKillCd = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, "", 30f, 10f, 60f, 5f, MainRoleOption)!;
+            CreateSidekickCd = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, LanguageConfig.Instance.JackalCreateSidekickCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            JackalKillCd = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, LanguageConfig.Instance.JackalKillCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
         }
 
         CreateSidekickButton = CustomButton.Create(
@@ -58,7 +58,7 @@ public class Jackal : Role, IListener
             null!,
             2,
             KeyCode.C,
-            "",
+            LanguageConfig.Instance.CreateSidekick,
             (Cooldown)new Func<float>(() => CreateSidekickCd?.GetFloat() ?? 30f),
             0
         );
@@ -96,7 +96,7 @@ public class Jackal : Role, IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         if (!PlayerControl.LocalPlayer.IsRole(this)) return;
-        CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
+        if (PlayerControl.LocalPlayer.IsAlive()) CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
