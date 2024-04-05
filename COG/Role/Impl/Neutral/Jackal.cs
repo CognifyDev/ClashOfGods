@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
+using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
@@ -9,6 +10,8 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
 using COG.Utils.Coding;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
@@ -17,12 +20,13 @@ namespace COG.Role.Impl.Neutral;
 [NotTested]
 public class Jackal : Role, IListener
 {
-    private CustomOption SidekickCanCreateSidekick { get; }
-    private CustomOption CreateSidekickCd { get; }
-    private CustomOption JackalKillCd { get; }
-    private CustomButton CreateSidekickButton { get; }
-    private CustomButton JackalKillButton { get; }
-    private static PlayerControl? CurrentTarget { get; set; }
+    public CustomOption CreateSidekickCd { get; }
+    public CustomOption JackalKillCd { get; }
+    public CustomButton CreateSidekickButton { get; }
+    public CustomButton JackalKillButton { get; }
+    public static PlayerControl? CurrentTarget { get; set; }
+    public static bool CreatedSidekick { get; set; } = false;
+    public static Dictionary<PlayerControl, PlayerControl> JackalSidekick { get; set; } = new();
     public Jackal() : base("Jackal", new(0, 180f, 235f), CampType.Neutral, true)
     {
         Description = "";
@@ -30,7 +34,6 @@ public class Jackal : Role, IListener
 
         if (ShowInOptions)
         {
-            SidekickCanCreateSidekick = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, "", true, MainRoleOption);
             CreateSidekickCd = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, "", 30f, 10f, 60f, 5f, MainRoleOption)!;
             JackalKillCd = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, "", 30f, 10f, 60f, 5f, MainRoleOption)!;
         }
@@ -38,16 +41,18 @@ public class Jackal : Role, IListener
         CreateSidekickButton = CustomButton.Create(
             () =>
             {
-                CurrentTarget!.RpcSetCustomRole<Sidekick>();
+                PlayerControl.LocalPlayer.RpcCreateSidekick(CurrentTarget!);
+                CreatedSidekick = true;
+                
             },
             () => CreateSidekickButton?.ResetCooldown(),
             couldUse: () => CurrentTarget,
-            () => true,
+            () => !CreatedSidekick,
             null!,
             2,
             KeyCode.C,
             "",
-            (Cooldown)CreateSidekickCd!.GetFloat,
+            (Cooldown)new Func<float>(() => CreateSidekickCd?.GetFloat() ?? 30f),
             0
         );
 
@@ -72,7 +77,7 @@ public class Jackal : Role, IListener
             row: 1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            (Cooldown)(JackalKillCd?.GetFloat() ?? 30f),
+            (Cooldown)new Func<float>(() => JackalKillCd?.GetFloat() ?? 30f),
             -1
         );
 
@@ -85,6 +90,13 @@ public class Jackal : Role, IListener
     {
         if (!PlayerControl.LocalPlayer.IsRole(this)) return;
         CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameStart(GameStartEvent @event)
+    {
+        CreatedSidekick = false;
+        JackalSidekick.Clear();
     }
 
     public override IListener GetListener() => this;
