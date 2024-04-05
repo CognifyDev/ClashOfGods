@@ -32,6 +32,9 @@ public class Jackal : Role, IListener
         Description = "";
         BaseRoleType = RoleTypes.Crewmate;
 
+        CanSabotage = true;
+        CanVent = true;
+
         if (ShowInOptions)
         {
             CreateSidekickCd = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral, "", 30f, 10f, 60f, 5f, MainRoleOption)!;

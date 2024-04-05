@@ -3,16 +3,20 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.Utils;
+using COG.Utils.Coding;
 using System.Linq;
 
 namespace COG.Role.Impl.Neutral;
 
+[NotUsed]
+[Unfinished]
 public class Sidekick : Role, IListener
 {
     public CustomOption SidekickCanCreateSidekick { get; }
     public Sidekick() : base("", RoleManager.GetManager().GetTypeRoleInstance<Jackal>().Color, CampType.Neutral, false)
     {
         BaseRoleType = RoleTypes.Crewmate;
+        CanVent = true;
 
         if (ShowInOptions)
         {
