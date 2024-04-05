@@ -307,11 +307,11 @@ public class PlayerControlCompleteTaskPatch
 {
     public static bool Prefix(PlayerControl __instance, uint idx)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerTaskFinishEvent(__instance), EventHandlerType.Prefix);
+        return ListenerManager.GetManager().ExecuteHandlers(new PlayerTaskFinishEvent(__instance, idx), EventHandlerType.Prefix);
     }
 
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] uint idx)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerTaskFinishEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager().ExecuteHandlers(new PlayerTaskFinishEvent(__instance, idx), EventHandlerType.Postfix);
     }
 }
