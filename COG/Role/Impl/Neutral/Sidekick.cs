@@ -33,4 +33,6 @@ public class Sidekick : Role, IListener
         if (victim.IsSamePlayer(Jackal.JackalSidekick.FirstOrDefault(kvp => kvp.Value.IsSamePlayer(PlayerControl.LocalPlayer)).Key))
             PlayerControl.LocalPlayer.RpcSetCustomRole<Jackal>();
     }
+
+    public override IListener GetListener() => this;
 }
