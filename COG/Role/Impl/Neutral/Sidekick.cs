@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
-using COG.Role;
 using COG.UI.CustomOption;
 using COG.Utils;
+using System.Linq;
 
 namespace COG.Role.Impl.Neutral;
 
@@ -24,5 +24,8 @@ public class Sidekick : Role, IListener
     public void OnPlayerMurder(PlayerMurderEvent @event)
     {
         if (!PlayerControl.LocalPlayer.IsRole(this)) return;
+        var victim = @event.Target;
+        if (victim.IsSamePlayer(Jackal.JackalSidekick.FirstOrDefault(kvp => kvp.Value.IsSamePlayer(PlayerControl.LocalPlayer)).Key))
+            PlayerControl.LocalPlayer.RpcSetCustomRole<Jackal>();
     }
 }

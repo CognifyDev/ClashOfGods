@@ -43,11 +43,15 @@ public class Jackal : Role, IListener
             {
                 PlayerControl.LocalPlayer.RpcCreateSidekick(CurrentTarget!);
                 CreatedSidekick = true;
-                
             },
             () => CreateSidekickButton?.ResetCooldown(),
             couldUse: () => CurrentTarget,
-            () => !CreatedSidekick,
+            () =>
+            {
+                if (!RoleManager.GetManager().GetTypeRoleInstance<Sidekick>().SidekickCanCreateSidekick.GetBool()
+                    && JackalSidekick.ContainsValue(PlayerControl.LocalPlayer)) return false;
+                return !CreatedSidekick;
+            },
             null!,
             2,
             KeyCode.C,
