@@ -10,7 +10,7 @@ using System.Linq;
 namespace COG.Role.Impl.Neutral;
 
 [NotUsed]
-[Unfinished]
+[NotTested]
 public class Sidekick : Role, IListener
 {
     public CustomOption SidekickCanCreateSidekick { get; }
