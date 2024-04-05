@@ -20,7 +20,7 @@ public class RoleManager
         _roles.Add(role);
     }
 
-    public Role GetTypeRoleInstance<T>() where T : Role
+    public T GetTypeRoleInstance<T>() where T : Role
     {
         return _roles.OfType<T>().FirstOrDefault()!;
     }

@@ -160,8 +160,11 @@ public partial class Main : BasePlugin
             new Impostor(),
             new Cleaner(),
             new BountyHunter(),
-            // new Troublemaker(),
-            // 此职业暂时未完成
+            /* 下方职业未完成
+            new Troublemaker(),
+            new Jackal(),
+            new Sidekick(),
+             */
 
             // Neutral
             new Jester(),
@@ -210,7 +213,7 @@ public partial class Main : BasePlugin
         });
 
         // Register CustomWinners
-        CustomWinnerManager.RegisterCustomWinnersInstances(new IWinnable[]
+        CustomWinnerManager.RegisterWinnableInstances(new IWinnable[]
         {
             new CrewmatesCustomWinner(),
             new ImpostorsCustomWinner(),

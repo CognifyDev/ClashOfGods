@@ -20,7 +20,6 @@ using COG.Listener.Event.Impl.HManager;
 namespace COG.Role.Impl.Impostor;
 
 [Unfinished]
-[NotTested]
 // ReSharper disable All
 public class BountyHunter : Role, IListener
 {
@@ -95,9 +94,8 @@ public class BountyHunter : Role, IListener
         if (RefreshTargetTimer <= 0f) RefreshTarget();
         if (RefreshTimerText) RefreshTimerText!.text = Math.Ceiling(RefreshTargetTimer).ToString();
 
-        ClosestTarget = PlayerControl.LocalPlayer.GetClosestPlayer();
-        PlayerControl.AllPlayerControls.ToArray().ForEach(p => p.ClearOutline());
-        if (BHunterKillButton.CouldUse() && PlayerControl.LocalPlayer.IsAlive()) ClosestTarget!.SetOutline(Color);
+        if (PlayerControl.LocalPlayer.IsAlive())
+            ClosestTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -135,12 +133,9 @@ public class BountyHunter : Role, IListener
     public void OnPlayerMurder(PlayerMurderEvent @event)
     {
         var victim = @event.Target;
-        if (!PlayerControl.LocalPlayer.IsRole(this))
-        {
-            if (!CurrentTarget) return;
-            if (victim.IsSamePlayer(CurrentTarget!)) RefreshTarget();
-            return;
-        }
+        if (!PlayerControl.LocalPlayer.IsRole(this)) return;
+        if (!CurrentTarget) return;
+        if (victim.IsSamePlayer(CurrentTarget!)) RefreshTarget();
 
         if (!Players.Any(pc => pc.IsSamePlayer(@event.Player)) || !CurrentTarget) return;
         Debug.Assert(CdAfterKillingTarget != null, nameof(CdAfterKillingTarget) + " != null");

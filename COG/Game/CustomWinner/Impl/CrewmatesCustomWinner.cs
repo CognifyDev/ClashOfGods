@@ -15,7 +15,7 @@ public class CrewmatesCustomWinner : IWinnable
             if (PlayerUtils.AllImpostors.Where(pair => pair.Player && !pair.Player.Data.IsDead)
                     .Select(pair => pair.Player).ToList().Count == 0)
             {
-                CustomWinnerManager.RegisterCustomWinners(PlayerUtils.AllCremates.Select(p => p.Player));
+                CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllCremates.Select(p => p.Player));
                 CustomWinnerManager.SetWinText(LanguageConfig.Instance.CrewmatesWinText);
                 CustomWinnerManager.SetWinColor(Palette.CrewmateBlue);
                 GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);
@@ -24,10 +24,11 @@ public class CrewmatesCustomWinner : IWinnable
         }
         else
         {
-            CustomWinnerManager.RegisterCustomWinners(PlayerUtils.AllCremates.Select(p => p.Player));
+            CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllCremates.Select(p => p.Player));
             CustomWinnerManager.SetWinText(LanguageConfig.Instance.CrewmatesWinText);
             CustomWinnerManager.SetWinColor(Palette.CrewmateBlue);
             GameManager.Instance.RpcEndGame(GameOverReason.HumansByTask, false);
+            return true;
         }
 
         return false;

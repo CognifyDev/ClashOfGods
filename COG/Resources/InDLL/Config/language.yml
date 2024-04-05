@@ -53,6 +53,14 @@ role:
     opportunist:
       name: "投机主义者"
       description: "活到最后！"
+    jackal:
+      name: "豺狼"
+      description: "招募跟班，杀死所有人"
+      create-sidekick-cd: "招募冷却"
+      kill-cd: "击杀冷却"
+    sidekick:
+      name: "跟班"
+      can-create-sidekick: "继位后可继续传火"
 camp:
   unknown:
     name: "未知阵营"
@@ -109,6 +117,7 @@ action:
   kill: "击杀"
   clean: "清理"
   make-trouble: "干扰"
+  create-sidekick: "招募"
 game:
   end:
     show-players-roles-message: "玩家职业: "

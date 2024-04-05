@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
+using COG.Role;
+using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using COG.States;
 
@@ -82,6 +84,13 @@ public static class GameUtils
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
     }
 
+    public static void SetCustomRole<T>(this PlayerControl pc) where T: Role.Role
+    {
+        if (!pc) return;
+        var role = Role.RoleManager.GetManager().GetTypeRoleInstance<T>();
+        pc.SetCustomRole(role);
+    }
+
     public static void RpcSetCustomRole(this PlayerControl pc, Role.Role role)
     {
         if (!pc) return;
@@ -90,5 +99,35 @@ public static class GameUtils
         writer.WritePacked(role.Id);
         writer.Finish();
         SetCustomRole(pc, role);
+    }
+
+    public static void RpcSetCustomRole<T>(this PlayerControl pc) where T: Role.Role
+    {
+        if (!pc) return;
+        var role = Role.RoleManager.GetManager().GetTypeRoleInstance<T>();
+        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
+        writer.Write(pc.PlayerId);
+        writer.WritePacked(role.Id);
+        writer.Finish();
+        SetCustomRole(pc, role);
+    }
+
+    public static void RpcCreateSidekick(this PlayerControl jackal, PlayerControl target)
+    {
+        if (!(jackal && target)) return;
+
+        var writer = RpcUtils.StartRpcImmediately(jackal, KnownRpc.CreateSidekick);
+        writer.Write(jackal.PlayerId);
+        writer.Write(target.PlayerId);
+        writer.Finish();
+
+        CreateSidekick(jackal, target);
+    }
+
+    public static void CreateSidekick(this PlayerControl jackal, PlayerControl target)
+    {
+        if (!(jackal && target)) return;
+        target.SetCustomRole<Sidekick>();
+        Jackal.JackalSidekick.Add(jackal, target);
     }
 }
