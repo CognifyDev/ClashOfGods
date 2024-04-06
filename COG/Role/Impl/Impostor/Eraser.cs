@@ -1,6 +1,9 @@
 using AmongUs.GameOptions;
 using COG.Listener;
+using COG.Listener.Event.Impl.HManager;
 using COG.Role.Impl.Crewmate;
+using COG.Role.Impl.Neutral;
+using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -31,14 +34,28 @@ public class Eraser : Role, IListener
 
         EraseButton = CustomButton.Create(() =>
         {
-            //CurrentTarget!.RpcSetCustomRole<Crewmate.Crewmate>();
+            var role = CurrentTarget!.GetRoleInstance();
+            Role? newRole = role!.CampType switch
+            {
+                CampType.Crewmate => RoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
+                CampType.Neutral => RoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),
+                CampType.Impostor => RoleManager.GetManager().GetTypeRoleInstance<Impostor>(),
+                _ => null
+            };
+
+            if (newRole != null) CurrentTarget!.RpcSetCustomRole(newRole);
+
             var currentCd = EraseButton!.Cooldown();
             EraseButton.SetCooldown(currentCd + (IncreaseCooldownAfterErasing?.GetFloat() ?? 10f));
         },
         EraseButton!.ResetCooldown,
         couldUse: () =>
         {
-            return !CurrentTarget;
+            if (!CanEraseImpostor?.GetBool() ?? false && CurrentTarget)
+            {
+                return CurrentTarget!.GetRoleInstance()?.CampType != CampType.Impostor;
+            }
+            return false;
         },
         () => true,
         null!,
@@ -47,6 +64,13 @@ public class Eraser : Role, IListener
         "",
         (Cooldown)(() => InitialEraseCooldown?.GetFloat() ?? 30f),
         -1);
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnHudUpdate(HudManagerUpdateEvent @event)
+    {
+        if (!(GameStates.InGame && PlayerControl.LocalPlayer.IsRole(this))) return;
+        CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
     }
 
     public override IListener GetListener() => this;

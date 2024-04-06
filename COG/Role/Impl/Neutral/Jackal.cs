@@ -6,6 +6,7 @@ using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
+using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -95,7 +96,7 @@ public class Jackal : Role, IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
-        if (!PlayerControl.LocalPlayer.IsRole(this)) return;
+        if (!(GameStates.InGame && PlayerControl.LocalPlayer.IsRole(this))) return;
         if (PlayerControl.LocalPlayer.IsAlive()) CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
     }
 
