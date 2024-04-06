@@ -231,12 +231,19 @@ public static class PlayerUtils
 
     public static bool IsInJackalTeam(this PlayerControl pc) => pc.IsRole<Jackal>() || pc.IsRole<Sidekick>();
 
-    public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color)
+    public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color, bool checkDist = true)
     {
         var target = pc.GetClosestPlayer();
         PlayerControl.AllPlayerControls.ForEach(new Action<PlayerControl>((p) => p.ClearOutline()));
-        target?.SetOutline(color);
-        return target;
+        if (!target) return null;
+        if (GameUtils.GetGameOptions().KillDistance >=
+            Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(),
+            target!.GetTruePosition()) && checkDist)
+        {
+            target!.SetOutline(color);
+            return target;
+        }
+        return null;
     }
 }
 
