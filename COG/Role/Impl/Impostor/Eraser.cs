@@ -16,6 +16,7 @@ public class Eraser : Role, IListener
 {
     public CustomOption InitialEraseCooldown { get; }
     public CustomOption IncreaseCooldownAfterErasing { get; }
+    public CustomOption CanEraseImpostor { get; }
     public CustomButton EraseButton { get; }
     public static PlayerControl? CurrentTarget { get; set; }
     public Eraser() : base("", Palette.ImpostorRed, CampType.Impostor, true)
@@ -25,12 +26,12 @@ public class Eraser : Role, IListener
             var type = ToCustomOption(this);
             InitialEraseCooldown = CustomOption.Create(false, type, "", 30f, 10f, 60f, 5f, MainRoleOption);
             IncreaseCooldownAfterErasing = CustomOption.Create(false, type, "", 10f, 5f, 15f, 5f, MainRoleOption);
-
+            CanEraseImpostor = CustomOption.Create(false, type, "", false, MainRoleOption);
         }
 
         EraseButton = CustomButton.Create(() =>
         {
-            CurrentTarget!.RpcSetCustomRole<Crewmate.Crewmate>();
+            //CurrentTarget!.RpcSetCustomRole<Crewmate.Crewmate>();
             var currentCd = EraseButton!.Cooldown();
             EraseButton.SetCooldown(currentCd + (IncreaseCooldownAfterErasing?.GetFloat() ?? 10f));
         },
