@@ -52,10 +52,8 @@ public class Eraser : Role, IListener
         couldUse: () =>
         {
             if (!CanEraseImpostor?.GetBool() ?? false && CurrentTarget)
-            {
                 return CurrentTarget!.GetRoleInstance()?.CampType != CampType.Impostor;
-            }
-            return false;
+            return CurrentTarget;
         },
         () => true,
         null!,
