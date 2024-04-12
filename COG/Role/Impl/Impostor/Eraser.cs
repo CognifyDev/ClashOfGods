@@ -34,9 +34,9 @@ public class Eraser : Role, IListener
         if (ShowInOptions)
         {
             var type = ToCustomOption(this);
-            InitialEraseCooldown = CustomOption.Create(false, type, LanguageConfig.Instance.EraserInitialEraseCd, 30f, 10f, 60f, 5f, MainRoleOption);
-            IncreaseCooldownAfterErasing = CustomOption.Create(false, type, LanguageConfig.Instance.EraserIncreaseCdAfterErasing, 10f, 5f, 15f, 5f, MainRoleOption);
-            CanEraseImpostors = CustomOption.Create(false, type, LanguageConfig.Instance.EraserCanEraseImpostors, false, MainRoleOption);
+            InitialEraseCooldown = CustomOption.Create(type, LanguageConfig.Instance.EraserInitialEraseCd, 30f, 10f, 60f, 5f, MainRoleOption);
+            IncreaseCooldownAfterErasing = CustomOption.Create(type, LanguageConfig.Instance.EraserIncreaseCdAfterErasing, 10f, 5f, 15f, 5f, MainRoleOption);
+            CanEraseImpostors = CustomOption.Create(type, LanguageConfig.Instance.EraserCanEraseImpostors, false, MainRoleOption);
         }
 
         EraseButton = CustomButton.Create(() =>

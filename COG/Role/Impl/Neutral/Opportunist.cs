@@ -23,7 +23,7 @@ public class Opportunist : Role, IListener
     public Opportunist() : base(LanguageConfig.Instance.OpportunistName, Color.yellow, CampType.Neutral, true)
     {
         Description = LanguageConfig.Instance.OpportunistDescription;
-        _killCooldownOption = CustomOption.Create(false, CustomOption.CustomOptionType.Neutral,
+        _killCooldownOption = CustomOption.Create(CustomOption.OptionPageType.Neutral,
             LanguageConfig.Instance.KillCooldown, 45f, 20f, 200f, 1f, MainRoleOption);
         BaseRoleType = RoleTypes.Impostor;
         _killButton = CustomButton.Create(

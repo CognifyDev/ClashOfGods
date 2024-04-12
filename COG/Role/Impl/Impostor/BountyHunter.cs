@@ -48,14 +48,14 @@ public class BountyHunter : Role, IListener
         if (ShowInOptions)
         {
             var optionType = ToCustomOption(this);
-            BHunterKillCd = CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterDefaultCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            BHunterKillCd = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterDefaultCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
             BHunterRefreshTargetTime =
-                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f, 5f, MainRoleOption)!;
-            //HasArrowToTarget = CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
+                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            //HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
             CdAfterKillingTarget =
-                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f, MainRoleOption)!;
+                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f, MainRoleOption)!;
             CdAfterKillingNonTarget =
-                CustomOption.Create(false, optionType, LanguageConfig.Instance.BountyHunterKillIncorrectCd, 60f, 60f, 120f, 5f, MainRoleOption)!;
+                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillIncorrectCd, 60f, 60f, 120f, 5f, MainRoleOption)!;
         }
         
         BHunterKillButton = CustomButton.Create(
