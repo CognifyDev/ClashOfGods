@@ -35,6 +35,13 @@ role:
         cd-kill-non-target: "击杀非目标冷却时间"
       error:
         select-target-error: "无法为赏金猎人选择目标。"
+    eraser:
+      name: "抹除者"
+      description: "抹除别人的职业"
+      menu:
+        initial-erase-cd: "初始擦除冷却"
+        increase-cd-after-erasing: "擦除后增加冷却"
+        can-erase-imps: "可擦除内鬼职业"
   crewmate:
     crewmate:
       name: "船员"
@@ -118,6 +125,7 @@ action:
   clean: "清理"
   make-trouble: "干扰"
   create-sidekick: "招募"
+  erase-action: "抹除"
 game:
   end:
     show-players-roles-message: "玩家职业: "

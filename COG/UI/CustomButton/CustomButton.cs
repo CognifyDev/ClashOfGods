@@ -13,35 +13,35 @@ namespace COG.UI.CustomButton;
 
 public class CustomButton
 {
-    public ActionButton? ActionButton;
-    public Func<float> Cooldown = () => GameUtils.GetGameOptions().KillCooldown;
-    public Func<bool> CouldUse;
-    public float EffectTime;
-    public GameObject? GameObject;
-    public Func<bool>? HasButton;
-    public bool HasEffect;
-    public KeyCode? Hotkey;
-    public string HotkeyName;
+    public ActionButton? ActionButton { get; set; }
+    public Func<float> Cooldown { get; set; } = () => GameUtils.GetGameOptions().KillCooldown;
+    public Func<bool> CouldUse{get;set;}
+    public float EffectTime{get;set;}
+    public GameObject? GameObject{get;set;}
+    public Func<bool>? HasButton{get;set;}
+    public bool HasEffect{get;set;}
+    public KeyCode? Hotkey{get;set;}
+    public string HotkeyName{get;set;}
 
-    public HudManager? Hud;
-    public bool IsEffectActive;
-    public Material? Material;
-    public Action OnClick;
-    public Action? OnEffect;
-    public Action OnMeetingEnd;
-    public PassiveButton? PassiveButton;
-    public Vector3 Position;
-    public Sprite Sprite;
-    public SpriteRenderer? SpriteRenderer;
+    public HudManager? Hud{get;set;}
+    public bool IsEffectActive{get;set;}
+    public Material? Material{get;set;}
+    public Action OnClick{get;set;}
+    public Action? OnEffect{get;set;}
+    public Action OnMeetingEnd{get;set;}
+    public PassiveButton? PassiveButton{get;set;}
+    public Vector3 Position{get;set;}
+    public Sprite Sprite{get;set;}
+    public SpriteRenderer? SpriteRenderer { get; set; }
 
-    public string Text;
-    public TextMeshPro? TextMesh;
-    public float Timer;
-    public int UsesLimit;
-    public int UsesRemaining;
-    public bool IsCustomPosition;
-    public int Row;
-    public int Order;
+    public string Text { get; set; }
+    public TextMeshPro? TextMesh { get; set; }
+    public float Timer { get; set; }
+    public int UsesLimit { get;set; }
+    public int UsesRemaining { get; set; }
+    public bool IsCustomPosition { get; set; }
+    public int Row { get; set; }
+    public int Order { get; set; }
 
     public static bool Initialized { get; internal set; }
     internal static List<ActionButton> AllVanillaButtons = new();
