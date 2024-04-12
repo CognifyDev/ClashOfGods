@@ -89,6 +89,12 @@ public class LanguageConfig : Config
         BountyHunterKillIncorrectCd = GetString("role.impostor.bountyhunter.menu.cd-kill-non-target");
         BountyHunterCantSelectTargetError = GetString("role.impostor.bountyhunter.error.select-target-error");
 
+        EraserName = GetString("role.impostor.eraser.name");
+        EraserDescription = GetString("role.impostor.eraser.description");
+        EraserInitialEraseCd = GetString("role.impostor.eraser.menu.initial-cd");
+        EraserIncreaseCdAfterErasing = GetString("role.impostor.eraser.menu.increase-cd-after-erasing");
+        EraserCanEraseImpostors = GetString("role.impostor.eraser.menu.can-erase-imps");
+
         // Neutral
         JesterName = GetString("role.neutral.jester.name");
         JesterDescription = GetString("role.neutral.jester.description");
@@ -139,6 +145,7 @@ public class LanguageConfig : Config
         CleanAction = GetString("action.clean");
         MakeTrouble = GetString("action.make-trouble");
         CreateSidekick = GetString("action.create-sidekick");
+        EraseAction = GetString("action.erase-action");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 
@@ -196,18 +203,6 @@ public class LanguageConfig : Config
     public string CleanerDescription { get; private set; } = null!;
     public string CleanBodyCooldown { get; private set; } = null!;
 
-    public string TroublemakerName { get; private set; } = null!;
-    public string TroublemakerDescription { get; private set; } = null!;
-    public string TroublemakerDuration { get; private set; } = null!;
-    public string TroublemakerCooldown { get; private set; } = null!;
-
-    // Neutral
-    public string JesterName { get; private set; } = null!;
-    public string JesterDescription { get; private set; } = null!;
-
-    public string OpportunistName { get; private set; } = null!;
-    public string OpportunistDescription { get; private set; } = null!;
-
     public string BountyHunterName { get; private set; } = null!;
     public string BountyHunterDescription { get; private set; } = null!;
     public string BountyHunterDefaultCd { get; private set; } = null!;
@@ -216,6 +211,24 @@ public class LanguageConfig : Config
     public string BountyHunterKillCorrectCd { get; private set; } = null!;
     public string BountyHunterKillIncorrectCd { get; private set; } = null!;
     public string BountyHunterCantSelectTargetError { get; private set; } = null!;
+
+    public string TroublemakerName { get; private set; } = null!;
+    public string TroublemakerDescription { get; private set; } = null!;
+    public string TroublemakerDuration { get; private set; } = null!;
+    public string TroublemakerCooldown { get; private set; } = null!;
+
+    public string EraserName { get; private set; } = null!;
+    public string EraserDescription { get; private set; } = null!;
+    public string EraserInitialEraseCd { get; private set; } = null!;
+    public string EraserIncreaseCdAfterErasing { get; private set; } = null!;
+    public string EraserCanEraseImpostors { get; private set; } = null!;
+
+    // Neutral
+    public string JesterName { get; private set; } = null!;
+    public string JesterDescription { get; private set; } = null!;
+
+    public string OpportunistName { get; private set; } = null!;
+    public string OpportunistDescription { get; private set; } = null!;
 
     public string JackalName { get; private set; } = null!;
     public string JackalDescription { get; private set; } = null!;
@@ -260,6 +273,7 @@ public class LanguageConfig : Config
     public string CleanAction { get; private set; } = null!;
     public string MakeTrouble { get; private set; } = null!;
     public string CreateSidekick { get; private set; } = null!;
+    public string EraseAction { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
