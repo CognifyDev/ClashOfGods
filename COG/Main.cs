@@ -164,6 +164,7 @@ public partial class Main : BasePlugin
             new Troublemaker(),
             new Jackal(),
             new Sidekick(),
+            new Eraser(),
              */
 
             // Neutral

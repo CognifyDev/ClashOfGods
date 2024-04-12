@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.HManager;
+using COG.Listener.Event.Impl.Meeting;
 using COG.Role.Impl.Neutral;
 using COG.States;
 using COG.UI.CustomButton;
@@ -17,14 +18,18 @@ namespace COG.Role.Impl.Impostor;
 [Unfinished]
 public class Eraser : Role, IListener
 {
+#pragma warning disable CS8618
     public CustomOption InitialEraseCooldown { get; }
     public CustomOption IncreaseCooldownAfterErasing { get; }
     public CustomOption CanEraseImpostors { get; }
     public CustomButton EraseButton { get; }
     public static PlayerControl? CurrentTarget { get; set; }
+    public static Dictionary<PlayerControl, Role> TempErasedPlayerRoles { get; set; }
     public Eraser() : base(LanguageConfig.Instance.EraserName, Palette.ImpostorRed, CampType.Impostor, true)
     {
+        BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.EraserDescription;
+        TempErasedPlayerRoles = new();
 
         if (ShowInOptions)
         {
@@ -45,7 +50,7 @@ public class Eraser : Role, IListener
                 _ => null
             };
 
-            if (newRole != null) CurrentTarget!.RpcSetCustomRole(newRole);
+            if (newRole != null) TempErasedPlayerRoles.Add(CurrentTarget!, newRole);
 
             var currentCd = EraseButton!.Cooldown();
             EraseButton.SetCooldown(currentCd + (IncreaseCooldownAfterErasing?.GetFloat() ?? 10f));
@@ -73,5 +78,20 @@ public class Eraser : Role, IListener
         CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
     }
 
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnMeetingEnd(MeetingVotingCompleteEvent @event)
+    {
+        TempErasedPlayerRoles.ForEach(kvp =>
+        {
+            var (player, role) = kvp;
+            player.RpcSetCustomRole(role);
+        });
+
+        TempErasedPlayerRoles.Clear();
+        return true;
+    }
+
     public override IListener GetListener() => this;
+
+#pragma warning restore CS8618
 }
