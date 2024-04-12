@@ -13,13 +13,13 @@ public static class GlobalCustomOptionConstant
 
     static GlobalCustomOptionConstant()
     {
-        LoadPreset = CustomOption.Create(true, CustomOption.CustomOptionType.General,
-            LanguageConfig.Instance.LoadPreset, false, null, true);
+        LoadPreset = CustomOption.Create(CustomOption.OptionPageType.General,
+            LanguageConfig.Instance.LoadPreset, false, null, true, CustomOption.OptionType.Button);
         
-        SavePreset = CustomOption.Create(true, CustomOption.CustomOptionType.General,
-            LanguageConfig.Instance.SavePreset, false, null, true);
+        SavePreset = CustomOption.Create(CustomOption.OptionPageType.General,
+            LanguageConfig.Instance.SavePreset, false, null, true, CustomOption.OptionType.Button);
         
-        DebugMode = CustomOption.Create(false, CustomOption.CustomOptionType.General,
+        DebugMode = CustomOption.Create(CustomOption.OptionPageType.General,
             LanguageConfig.Instance.DebugMode, false, null, true);
     }
 }

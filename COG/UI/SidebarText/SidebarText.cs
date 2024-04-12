@@ -21,14 +21,14 @@ public class SidebarText
     {
     }
 
-    public static string GetOptionMessage(CustomOption.CustomOption.CustomOptionType type)
+    public static string GetOptionMessage(CustomOption.CustomOption.OptionPageType type)
     {
         var text = "";
         CustomOption.CustomOption? parent = null;
         foreach (var customOption in CustomOption.CustomOption.Options)
         {
             if (customOption == null) continue;
-            if (customOption.Type != type) continue;
+            if (customOption.Page != type) continue;
             if (parent != null && parent == customOption.Parent) goto SetOptions;
             parent = customOption.Parent;
             if (parent == null) continue;

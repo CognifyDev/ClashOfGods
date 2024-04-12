@@ -26,13 +26,19 @@ namespace COG.UI.CustomOption;
 public sealed class CustomOption
 {
     [Serializable]
-    public enum CustomOptionType
+    public enum OptionPageType
     {
         General = 0,
         Impostor = 1,
         Neutral = 2,
         Crewmate = 3,
         Addons = 4
+    }
+
+    public enum OptionType
+    {
+        Default = 0,
+        Button = 1
     }
 
     internal static bool FirstOpen = true;
@@ -55,11 +61,11 @@ public sealed class CustomOption
 
     public readonly object[] Selections;
 
-    public readonly CustomOptionType Type;
+    public readonly OptionPageType Page;
 
     public readonly int CharacteristicCode;
 
-    public bool Ignore;
+    public OptionType SpecialOptionType;
 
     private static int _typeId;
 
@@ -70,10 +76,9 @@ public sealed class CustomOption
     }
 
     // Option creation
-    public CustomOption(bool ignore, CustomOptionType type, string name, object[] selections,
-        object defaultValue, CustomOption? parent, bool isHeader)
+    public CustomOption(OptionPageType type, string name, object[] selections,
+        object defaultValue, CustomOption? parent, bool isHeader, OptionType specialOptionType)
     {
-        Ignore = ignore;
         ID = _typeId;
         _typeId++;
         Name = parent == null ? name : ColorUtils.ToColorString(Color.gray, "→ ") + name;
@@ -83,33 +88,34 @@ public sealed class CustomOption
         Selection = DefaultSelection;
         Parent = parent;
         IsHeader = isHeader;
-        Type = type;
+        Page = type;
         Selection = 0;
+        SpecialOptionType = specialOptionType;
         Options.Add(this);
 
         CharacteristicCode = GetHashCode();
     }
 
-    public static CustomOption Create(bool ignore, CustomOptionType type, string name, string[] selections,
-        CustomOption? parent = null, bool isHeader = false)
+    public static CustomOption Create(OptionPageType type, string name, string[] selections,
+        CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
-        return new CustomOption(ignore, type, name, selections, "", parent, isHeader);
+        return new CustomOption(type, name, selections, "", parent, isHeader, optionType);
     }
 
-    public static CustomOption Create(bool ignore, CustomOptionType type, string name, float defaultValue, float min,
-        float max, float step, CustomOption? parent = null, bool isHeader = false)
+    public static CustomOption Create(OptionPageType type, string name, float defaultValue, float min,
+        float max, float step, CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
         List<object> selections = new();
         for (var s = min; s <= max; s += step) selections.Add(s);
-        return new CustomOption(ignore, type, name, selections.ToArray(), defaultValue, parent, isHeader);
+        return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader, optionType);
     }
 
-    public static CustomOption Create(bool ignore, CustomOptionType type, string name, bool defaultValue,
-        CustomOption? parent = null, bool isHeader = false)
+    public static CustomOption Create(OptionPageType type, string name, bool defaultValue,
+        CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
-        return new CustomOption(ignore, type, name,
+        return new CustomOption(type, name,
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
-            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
+            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader, optionType);
     }
 
     public static void ShareConfigs(PlayerControl target)
@@ -128,7 +134,7 @@ public sealed class CustomOption
 
         foreach (var option in from option in Options
                  where option != null
-                 where !option.Ignore
+                 where option.SpecialOptionType != OptionType.Button
                  where option.Selection != option.DefaultSelection
                  select option)
         {
@@ -173,7 +179,7 @@ public sealed class CustomOption
         {
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
-            foreach (var option in Options.Where(o => o is { Ignore: false }).OrderBy(o => o!.ID))
+            foreach (var option in Options.Where(o => o is not { SpecialOptionType: OptionType.Button }).OrderBy(o => o!.ID))
                 writer.WriteLine(option!.ID + " " + option.Selection);
         }
         catch (System.Exception e)
@@ -247,8 +253,8 @@ public sealed class CustomOption
 
         private static void CreateClassicTabs(GameOptionsMenu instance)
         {
-            var allTypes = Enum.GetValues<CustomOptionType>();
-            var typeNameDictionary = new Dictionary<CustomOptionType, string>();
+            var allTypes = Enum.GetValues<OptionPageType>();
+            var typeNameDictionary = new Dictionary<OptionPageType, string>();
             allTypes.ToList().ForEach(t => typeNameDictionary[t] = t.ToString() + "Settings");
             var isReturn = SetNames(
                 new Dictionary<string, string>
@@ -270,7 +276,7 @@ public sealed class CustomOption
                 .FindChild("Game Settings");
             var gameSettingMenu = Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
 
-            var settingsMenu = new Dictionary<CustomOptionType, (GameObject?, GameOptionsMenu?)>();
+            var settingsMenu = new Dictionary<OptionPageType, (GameObject?, GameOptionsMenu?)>();
             foreach (var (type, name) in typeNameDictionary)
             {
                 var setting = Object.Instantiate(gameSettings, gameSettings.transform.parent);
@@ -316,11 +322,11 @@ public sealed class CustomOption
                 {
                     [gameSettingMenu.RegularGameSettings] = gameSettingMenu.GameSettingsHightlight,
                     [gameSettingMenu.RolesSettings.gameObject] = gameSettingMenu.RolesSettingsHightlight,
-                    [settingsMenu[CustomOptionType.General].Item1!.gameObject] = cogTabHighlight,
-                    [settingsMenu[CustomOptionType.Impostor].Item1!.gameObject] = impostorTabHighlight,
-                    [settingsMenu[CustomOptionType.Neutral].Item1!.gameObject] = neutralTabHighlight,
-                    [settingsMenu[CustomOptionType.Crewmate].Item1!.gameObject] = crewmateTabHighlight,
-                    [settingsMenu[CustomOptionType.Addons].Item1!.gameObject] = modifierTabHighlight
+                    [settingsMenu[OptionPageType.General].Item1!.gameObject] = cogTabHighlight,
+                    [settingsMenu[OptionPageType.Impostor].Item1!.gameObject] = impostorTabHighlight,
+                    [settingsMenu[OptionPageType.Neutral].Item1!.gameObject] = neutralTabHighlight,
+                    [settingsMenu[OptionPageType.Crewmate].Item1!.gameObject] = crewmateTabHighlight,
+                    [settingsMenu[OptionPageType.Addons].Item1!.gameObject] = modifierTabHighlight
                 };
 
                 var a = 0;
@@ -346,36 +352,41 @@ public sealed class CustomOption
 
             var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.transform);
 
-            foreach (var option in Options.Where(option => option == null || (int)option.Type <= 4))
+            foreach (var option in Options.Where(option => option == null || (int)option.Page <= 4))
             {
                 if (option?.OptionBehaviour == null && option != null)
                 {
-                    if (!option.Ignore)
+                    switch (option.SpecialOptionType)
                     {
-                        var stringOption = Object.Instantiate(template, menus[option.Type]);
-                        typeOptions[option.Type].Add(stringOption);
-                        stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
-                        stringOption.TitleText.text = stringOption.name = option.Name;
-                        if (FirstOpen)
-                            stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
-                        else
-                            stringOption.Value = stringOption.oldValue = option.Selection;
+                        case OptionType.Default:
+                            {
+                                var stringOption = Object.Instantiate(template, menus[option.Page]);
+                                typeOptions[option.Page].Add(stringOption);
+                                stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
+                                stringOption.TitleText.text = stringOption.name = option.Name;
+                                if (FirstOpen)
+                                    stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
+                                else
+                                    stringOption.Value = stringOption.oldValue = option.Selection;
 
-                        stringOption.ValueText.text = option.Selections[option.Selection].ToString();
+                                stringOption.ValueText.text = option.Selections[option.Selection].ToString();
 
-                        option.OptionBehaviour = stringOption;
-                    }
-                    else // 对预设用选项处理
-                    {
-                        var templateToggle = GameObject.Find("ResetToDefault")?.GetComponent<ToggleOption>();
-                        if (!templateToggle) return;
+                                option.OptionBehaviour = stringOption;
+                            }
+                            break;
+                        case OptionType.Button:
+                            {
+                                var templateToggle = GameObject.Find("ResetToDefault")?.GetComponent<ToggleOption>();
+                                if (!templateToggle) return;
 
-                        var strOpt = Object.Instantiate(templateToggle, menus[option.Type]);
-                        strOpt!.transform.Find("CheckBox")?.gameObject.SetActive(false);
-                        strOpt.TitleText.transform.localPosition = Vector3.zero;
-                        strOpt.name = option.Name;
+                                var strOpt = Object.Instantiate(templateToggle, menus[option.Page]);
+                                strOpt!.transform.Find("CheckBox")?.gameObject.SetActive(false);
+                                strOpt.TitleText.transform.localPosition = Vector3.zero;
+                                strOpt.name = option.Name;
 
-                        option.OptionBehaviour = strOpt;
+                                option.OptionBehaviour = strOpt;
+                            }
+                            break;
                     }
                 }
 
@@ -500,7 +511,7 @@ public class StringOptionPatch
     public static bool OnEnablePatch(StringOption __instance)
     {
         var option = Options.FirstOrDefault(option =>
-            option?.OptionBehaviour == __instance && !option.Ignore);
+            option?.OptionBehaviour == __instance && option.SpecialOptionType != OptionType.Button);
         if (option == null) return true;
 
         __instance.OnValueChanged = new Action<OptionBehaviour>(_ => { });
@@ -540,18 +551,18 @@ internal class GameOptionsMenuUpdatePatch
         if (TimerForBugFix < 3.0f) FirstOpen = false;
 
         var offset = 2.75f;
-        var objType = new Dictionary<string, CustomOptionType>
+        var objType = new Dictionary<string, OptionPageType>
         {
-            { "GeneralSettings", CustomOptionType.General },
-            { "ImpostorSettings", CustomOptionType.Impostor },
-            { "NeutralSettings", CustomOptionType.Neutral },
-            { "CrewmateSettings", CustomOptionType.Crewmate },
-            { "AddonsSettings", CustomOptionType.Addons }
+            { "GeneralSettings", OptionPageType.General },
+            { "ImpostorSettings", OptionPageType.Impostor },
+            { "NeutralSettings", OptionPageType.Neutral },
+            { "CrewmateSettings", OptionPageType.Crewmate },
+            { "AddonsSettings", OptionPageType.Addons }
         };
 
         foreach (var option in Options.Where(o => o != null))
         {
-            if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Type != kvp.Value)) continue;
+            if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Page != kvp.Value)) continue;
             if (!(option != null && option.OptionBehaviour && option.OptionBehaviour != null &&
                   option.OptionBehaviour!.gameObject)) return;
             var enabled = true;
@@ -615,12 +626,12 @@ internal class HudStringPatch
         __result = text;
     }
 
-    public static string GetOptByType(CustomOptionType type)
+    public static string GetOptByType(OptionPageType type)
     {
         var txt = "";
         List<CustomOption> opt = new();
         foreach (var option in Options)
-            if (option != null && option.Type == type && !option.Ignore)
+            if (option != null && option.Page == type && option.SpecialOptionType != OptionType.Button)
                 opt.Add(option);
         foreach (var option in opt)
             // 临时解决方案

@@ -14,7 +14,7 @@ public class ModSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new[]
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOption.CustomOptionType.General)
+            HudStringPatch.GetOptByType(CustomOption.CustomOption.OptionPageType.General)
         });
     }
 }

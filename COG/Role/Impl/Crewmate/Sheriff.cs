@@ -22,7 +22,7 @@ public class Sheriff : Role, IListener
         Description = LanguageConfig.Instance.SheriffDescription;
 
         if (ShowInOptions)
-            SheriffKillCd = CustomOption.Create(false, CustomOption.CustomOptionType.Crewmate,
+            SheriffKillCd = CustomOption.Create(CustomOption.OptionPageType.Crewmate,
                 LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
 
         SheriffKillButton = CustomButton.Create(

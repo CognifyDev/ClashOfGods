@@ -33,9 +33,9 @@ public class Troublemaker : Role
         CanSabotage = true;
         BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.TroublemakerDescription;
-        MakeTroubleCd = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor,
+        MakeTroubleCd = CustomOption.Create(CustomOption.OptionPageType.Impostor,
             LanguageConfig.Instance.TroublemakerCooldown, 15f, 11f, 120f, 1f, MainRoleOption);
-        MakeTroubleDuration = CustomOption.Create(false, CustomOption.CustomOptionType.Impostor,
+        MakeTroubleDuration = CustomOption.Create(CustomOption.OptionPageType.Impostor,
             LanguageConfig.Instance.TroublemakerDuration, 10f, 1f, 10f, 1f, MainRoleOption);
         MakeTroubleButton = CustomButton.Create(
             () =>

@@ -32,9 +32,9 @@ public class Role
 
         if (ShowInOptions)
         {
-            MainRoleOption = CustomOption.Create(false, ToCustomOption(this),
+            MainRoleOption = CustomOption.Create(ToCustomOption(this),
                 ColorUtils.ToColorString(Color, Name), false, null, true);
-            RoleNumberOption = CustomOption.Create(false, ToCustomOption(this),
+            RoleNumberOption = CustomOption.Create(ToCustomOption(this),
                 LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, MainRoleOption);
         }
     }
@@ -129,10 +129,10 @@ public class Role
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
-    public static CustomOption.CustomOptionType ToCustomOption(Role role)
+    public static CustomOption.OptionPageType ToCustomOption(Role role)
     {
-        if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.CustomOptionType.Addons;
-        return (CustomOption.CustomOptionType)role.CampType;
+        if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.OptionPageType.Addons;
+        return (CustomOption.OptionPageType)role.CampType;
     }
 
     public virtual IListener GetListener()
