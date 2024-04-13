@@ -1,22 +1,21 @@
+using AmongUs.GameOptions;
+using COG.Config.Impl;
+using COG.Rpc;
+using COG.UI.SidebarText;
+using COG.Utils;
+using COG.Utils.WinAPI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using AmongUs.GameOptions;
-using COG.Config.Impl;
-using COG.Constant;
-using COG.Rpc;
-using COG.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
-using Object = UnityEngine.Object;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using COG.UI.SidebarText;
-using COG.Utils.WinAPI;
+using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomOption;
 
@@ -68,6 +67,8 @@ public sealed class CustomOption
     public OptionType SpecialOptionType;
 
     private static int _typeId;
+
+    public Action<OptionBehaviour>? OnClickIfButton;
 
     public static CustomOption? GetCustomOptionByCharacteristicCode(int characteristicCode)
     {
@@ -179,7 +180,7 @@ public sealed class CustomOption
         {
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
-            foreach (var option in Options.Where(o => o is not { SpecialOptionType: OptionType.Button }).OrderBy(o => o!.ID))
+            foreach (var option in Options.Where(o => o is { SpecialOptionType: OptionType.Default }).OrderBy(o => o!.ID))
                 writer.WriteLine(option!.ID + " " + option.Selection);
         }
         catch (System.Exception e)
@@ -585,16 +586,13 @@ internal class GameOptionsMenuUpdatePatch
             }
         }
 
-
-        //每帧更新预设选项名称与按下按钮操作
-        var load = (ToggleOption)GlobalCustomOptionConstant.LoadPreset.OptionBehaviour!;
-        var save = (ToggleOption)GlobalCustomOptionConstant.SavePreset.OptionBehaviour!;
-
-        load!.TitleText.text = GlobalCustomOptionConstant.LoadPreset.Name;
-        save!.TitleText.text = GlobalCustomOptionConstant.SavePreset.Name;
-
-        load.OnValueChanged = new Action<OptionBehaviour>((_) => OpenPresetWithDialogue());
-        save.OnValueChanged = new Action<OptionBehaviour>((_) => SaveOptionWithDialogue());
+        //每帧更新按钮选项名称与按下按钮操作
+        foreach (var option in Options.Where(o => o != null && o.SpecialOptionType == OptionType.Button))
+        {
+            var toggle = (ToggleOption)option!.OptionBehaviour!;
+            toggle.TitleText.text = option.Name;
+            toggle.OnValueChanged = option.OnClickIfButton ?? new Action<OptionBehaviour>((_) => { });
+        }
     }
 }
 

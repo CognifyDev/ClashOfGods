@@ -18,7 +18,10 @@ public static class GlobalCustomOptionConstant
         
         SavePreset = CustomOption.Create(CustomOption.OptionPageType.General,
             LanguageConfig.Instance.SavePreset, false, null, true, CustomOption.OptionType.Button);
-        
+
+        LoadPreset.OnClickIfButton = new((_) => CustomOption.OpenPresetWithDialogue());
+        SavePreset.OnClickIfButton = new((_) => CustomOption.SaveOptionWithDialogue());
+
         DebugMode = CustomOption.Create(CustomOption.OptionPageType.General,
             LanguageConfig.Instance.DebugMode, false, null, true);
     }
