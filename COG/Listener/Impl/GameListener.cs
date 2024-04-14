@@ -16,7 +16,6 @@ using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
-using COG.UI.CustomExileText;
 using COG.Utils;
 using Il2CppSystem;
 using Il2CppSystem.Collections;
