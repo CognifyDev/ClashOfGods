@@ -392,5 +392,7 @@ public class GameListener : IListener
         if (role == null) return;
 
         controller.completeString = role.HandleEjectText(player!);
+
+        // TODO: 添加驱逐确认支持
     }
 }
