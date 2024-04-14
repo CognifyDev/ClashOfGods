@@ -138,3 +138,5 @@ game:
     disconnected: "掉线"
     default: "死亡"
     unknown: "未知"
+  exile:
+    default: "%player% 是 %role%。"

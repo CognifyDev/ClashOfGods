@@ -16,6 +16,7 @@ using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
+using COG.UI.CustomExileText;
 using COG.Utils;
 using Il2CppSystem;
 using Il2CppSystem.Collections;
@@ -378,5 +379,18 @@ public class GameListener : IListener
         // playerId1|roleId1,playerId2|roleId2 
 
         writer.Finish();
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnBeginExile(PlayerExileBeginEvent @event)
+    {
+        var controller = @event.ExileController;
+        var player = @event.Exiled?.Object;
+        if (!player) return;
+
+        var role = player!.GetRoleInstance();
+        if (role == null) return;
+
+        controller.completeString = role.HandleEjectText(player!);
     }
 }

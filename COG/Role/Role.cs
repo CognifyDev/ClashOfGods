@@ -129,6 +129,8 @@ public class Role
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
+    public virtual string HandleEjectText(PlayerControl player) => LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, player.GetRoleInstance()!.Name);
+
     public static CustomOption.OptionPageType ToCustomOption(Role role)
     {
         if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.OptionPageType.Addons;
