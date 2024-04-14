@@ -379,4 +379,19 @@ public class GameListener : IListener
 
         writer.Finish();
     }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnBeginExile(PlayerExileBeginEvent @event)
+    {
+        var controller = @event.ExileController;
+        var player = @event.Exiled?.Object;
+        if (!player) return;
+
+        var role = player!.GetRoleInstance();
+        if (role == null) return;
+
+        controller.completeString = role.HandleEjectText(player!);
+
+        // TODO: 添加驱逐确认支持
+    }
 }

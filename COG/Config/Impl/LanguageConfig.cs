@@ -165,6 +165,8 @@ public class LanguageConfig : Config
         ImpostorsWinText = GetString("game.end.wins.impostor");
         CrewmatesWinText = GetString("game.end.wins.crewmate");
         NeutralsWinText = GetString("game.end.wins.neutral");
+
+        DefaultEjectText = GetString("game.exile.default");
     }
 
     public static LanguageConfig Instance { get; private set; }
@@ -294,6 +296,8 @@ public class LanguageConfig : Config
     public string ImpostorsWinText { get; private set; } = null!;
     public string CrewmatesWinText { get; private set; } = null!;
     public string NeutralsWinText { get; private set; } = null!;
+
+    public string DefaultEjectText { get; private set; } = null!;
 
 
     private string GetString(string location)

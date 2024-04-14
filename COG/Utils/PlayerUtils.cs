@@ -283,7 +283,7 @@ public class DeadPlayerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    private void OnPlayerExile(PlayerExileEvent @event)
+    private void OnPlayerExile(PlayerExileEndEvent @event)
     {
         var controller = @event.ExileController;
         if (controller.exiled == null) return;
@@ -293,7 +293,7 @@ public class DeadPlayerListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     private void OnAirshipPlayerExile(PlayerExileOnAirshipEvent @event)
     {
-        OnPlayerExile(new PlayerExileEvent(@event.Player, @event.Controller));
+        OnPlayerExile(new PlayerExileEndEvent(@event.Player, @event.Controller));
     }
 }
 
