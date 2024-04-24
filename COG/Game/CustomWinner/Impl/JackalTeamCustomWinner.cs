@@ -1,6 +1,6 @@
-using COG.Game.CustomWinner;
 using COG.Utils;
 using System.Linq;
+using COG.Role.Impl.Neutral;
 
 namespace COG.Game.CustomWinner.Impl;
 

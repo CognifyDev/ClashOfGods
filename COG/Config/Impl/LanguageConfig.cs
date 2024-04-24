@@ -1,4 +1,5 @@
 using COG.Utils;
+// ReSharper disable All
 
 namespace COG.Config.Impl;
 
@@ -80,14 +81,14 @@ public class LanguageConfig : Config
         TroublemakerDuration = GetString("role.impostor.troublemaker.menu.duration");
         TroublemakerCooldown = GetString("role.impostor.troublemaker.menu.cd");
 
-        BountyHunterName = GetString("role.impostor.bountyhunter.name");
-        BountyHunterDescription = GetString("role.impostor.bountyhunter.description");
-        BountyHunterDefaultCd = GetString("role.impostor.bountyhunter.menu.cd");
-        BountyHunterRefreshTargetTime = GetString("role.impostor.bountyhunter.menu.target-refresh-time");
-        BountyHunterHasArrowToTarget = GetString("role.impostor.bountyhunter.menu.has-arrow");
-        BountyHunterKillCorrectCd = GetString("role.impostor.bountyhunter.menu.cd-kill-target");
-        BountyHunterKillIncorrectCd = GetString("role.impostor.bountyhunter.menu.cd-kill-non-target");
-        BountyHunterCantSelectTargetError = GetString("role.impostor.bountyhunter.error.select-target-error");
+        BountyHunterName = GetString("role.impostor.bounty-hunter.name");
+        BountyHunterDescription = GetString("role.impostor.bounty-hunter.description");
+        BountyHunterDefaultCd = GetString("role.impostor.bounty-hunter.menu.cd");
+        BountyHunterRefreshTargetTime = GetString("role.impostor.bounty-hunter.menu.target-refresh-time");
+        BountyHunterHasArrowToTarget = GetString("role.impostor.bounty-hunter.menu.has-arrow");
+        BountyHunterKillCorrectCd = GetString("role.impostor.bounty-hunter.menu.cd-kill-target");
+        BountyHunterKillIncorrectCd = GetString("role.impostor.bounty-hunter.menu.cd-kill-non-target");
+        BountyHunterCantSelectTargetError = GetString("role.impostor.bounty-hunter.error.select-target-error");
 
         EraserName = GetString("role.impostor.eraser.name");
         EraserDescription = GetString("role.impostor.eraser.description");

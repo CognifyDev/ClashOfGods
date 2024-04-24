@@ -1,13 +1,12 @@
-﻿# First Plugin
+﻿# 第一个插件
 
-### Preamble
-This one will teach you how to create your first plugin by using the computer language Lua.
-Of course, we think you have learned about Lua a lot.
+### 概要
+本章节将会教你如何使用计算机语言Lua创建属于你的插件。当然，我们默认您已经有足够的Lua语言基础。
 
-### How to be like a plugin
-Firstly, you should make you plugin organised by the plugin system.
+### 如何像插件一样
+首先，你应该让你的插件被插件系统识别。
 <br>
-To be a plugin, you must make your plugin directory like this:
+要成为一个插件，您必须使您的插件目录如下：
 <br>
 ~~~
 .
@@ -17,34 +16,34 @@ To be a plugin, you must make your plugin directory like this:
 ~~~
 <br>
 
-#### About *plugin.yml*
-A plugin.yml must include these projects:
+#### 关于 *plugin.yml*
+一个 plugin.yml 必须包含下列项：
 ~~~yaml
 name: PluginName
-# The name of the plugin
+# 插件的名字
 
 author: Author
-# The author of the plugin
+# 插件的作者
 
 version: 1.0
-# The version of the plugin
+# 插件的版本
 
 main: main.lua
-# The name of the start file of the plugin
+# 插件的启动文件
 ~~~
-<span style='font-size:10px;'>**WARNING: NO ONE CAN BE OMITTED.**</span>
+<span style='font-size:10px;'>**注意： 所有项均不可省略。**</span>
 
-#### About *main.lua*
-A plugin must have 2 functions which are named onEnable and onDisable.
-Here is an example.
+#### 关于 *main.lua*
+一个插件必须包含2个函数，分别名为onEnable和onDisable。
+下面是一个例子：
 ~~~lua
 function onEnable()
-    --- codes here
+    --- 代码
 end 
 
 function onDisable()
-    --- codes here
+    --- 代码
 end
 ~~~
-**onEnable** will be executed when the plugin starts to be LOADED.<br>
-**onDisable** will be executed when the plugin starts to be UNLOADED.
+**onEnable** 将会在插件启动的时候调用<br>
+**onDisable** 将会在插件被卸载的时候调用
