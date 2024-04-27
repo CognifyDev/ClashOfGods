@@ -6,10 +6,10 @@ public class PlayerExileBeginEvent : PlayerEvent
     /// ÇýÖð¿ØÖÆÆ÷
     /// </summary>
     public ExileController ExileController { get; }
-    public GameData.PlayerInfo Exiled { get; }
+    public GameData.PlayerInfo? Exiled { get; }
     public bool Tie { get; }
 
-    public PlayerExileBeginEvent(PlayerControl player, ExileController controller, GameData.PlayerInfo exiled, bool tie) : base(player)
+    public PlayerExileBeginEvent(PlayerControl? player, ExileController controller, GameData.PlayerInfo? exiled, bool tie) : base(player!)
     {
         ExileController = controller;
         Exiled = exiled;
