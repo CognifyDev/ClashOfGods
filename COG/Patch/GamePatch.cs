@@ -321,11 +321,11 @@ public class ExileControllerBeginPatch
 {
     public static bool Prefix(ExileController __instance, GameData.PlayerInfo exiled, bool tie)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled.Object, __instance, exiled, tie), EventHandlerType.Prefix);
+        return ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie), EventHandlerType.Prefix);
     }
 
     public static void Postfix(ExileController __instance, [HarmonyArgument(0)] GameData.PlayerInfo exiled, [HarmonyArgument(1)] bool tie)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled.Object, __instance, exiled, tie), EventHandlerType.Postfix);
+        ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie), EventHandlerType.Postfix);
     }
 }
