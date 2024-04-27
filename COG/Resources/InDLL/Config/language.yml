@@ -24,7 +24,7 @@ role:
       menu:
         cd: "冷却时间"
         duration: "持续时间"
-    bountyhunter:
+    bounty-hunter:
       name: "赏金猎人"
       description: "击杀目标可以减少冷却，但击杀非目标则会增加冷却"
       menu:
@@ -139,4 +139,4 @@ game:
     default: "死亡"
     unknown: "未知"
   exile:
-    default: "%player% 是 %role%。"
+    default: "%player% 是 %role%"

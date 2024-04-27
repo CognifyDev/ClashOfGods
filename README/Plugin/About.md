@@ -1,6 +1,6 @@
-﻿# Plugin System
-We prepared a plugin system for developers. Here is the page to teach you how to use it.
+﻿# 插件系统
+我们为开发者准备了一个插件系统帮助开发者为模组开发拓展插件。
 
-#### Contents
-1. [First Plugin](First%20Plugin.md)
-2. [Functions](Functions.md)
+#### 目录
+1. [第一个插件](First%20Plugin.md)
+2. [原生函数](Functions.md)

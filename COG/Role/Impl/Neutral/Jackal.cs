@@ -109,3 +109,8 @@ public class Jackal : Role, IListener
 
     public override IListener GetListener() => this;
 }
+
+public static class JackalUtils
+{
+    public static bool IsInJackalTeam(this PlayerControl pc) => pc.IsRole<Jackal>() || pc.IsRole<Sidekick>();
+}

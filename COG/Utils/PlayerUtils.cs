@@ -229,8 +229,6 @@ public static class PlayerUtils
 
     public static bool IsRole<T>(this PlayerControl pc) where T : Role.Role => IsRole(pc, Role.RoleManager.GetManager().GetTypeRoleInstance<T>());
 
-    public static bool IsInJackalTeam(this PlayerControl pc) => pc.IsRole<Jackal>() || pc.IsRole<Sidekick>();
-
     public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color, bool checkDist = true)
     {
         var target = pc.GetClosestPlayer();
