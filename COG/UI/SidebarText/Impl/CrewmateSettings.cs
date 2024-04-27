@@ -14,7 +14,7 @@ public class CrewmateSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new[]
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOption.OptionPageType.Crewmate)
+            HudStringPatch.GetOptByType(CustomOption.CustomOption.TabType.Crewmate)
         });
     }
 }

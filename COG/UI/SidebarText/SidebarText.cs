@@ -21,7 +21,7 @@ public class SidebarText
     {
     }
 
-    public static string GetOptionMessage(CustomOption.CustomOption.OptionPageType type)
+    public static string GetOptionMessage(CustomOption.CustomOption.TabType type)
     {
         var text = "";
         CustomOption.CustomOption? parent = null;

@@ -12,7 +12,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using Object = UnityEngine.Object;
@@ -25,7 +24,7 @@ namespace COG.UI.CustomOption;
 public sealed class CustomOption
 {
     [Serializable]
-    public enum OptionPageType
+    public enum TabType
     {
         General = 0,
         Impostor = 1,
@@ -60,7 +59,7 @@ public sealed class CustomOption
 
     public readonly object[] Selections;
 
-    public readonly OptionPageType Page;
+    public readonly TabType Page;
 
     public readonly int CharacteristicCode;
 
@@ -77,7 +76,7 @@ public sealed class CustomOption
     }
 
     // Option creation
-    public CustomOption(OptionPageType type, string name, object[] selections,
+    public CustomOption(TabType type, string name, object[] selections,
         object defaultValue, CustomOption? parent, bool isHeader, OptionType specialOptionType)
     {
         ID = _typeId;
@@ -97,13 +96,13 @@ public sealed class CustomOption
         CharacteristicCode = GetHashCode();
     }
 
-    public static CustomOption Create(OptionPageType type, string name, string[] selections,
+    public static CustomOption Create(TabType type, string name, string[] selections,
         CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
         return new CustomOption(type, name, selections, "", parent, isHeader, optionType);
     }
 
-    public static CustomOption Create(OptionPageType type, string name, float defaultValue, float min,
+    public static CustomOption Create(TabType type, string name, float defaultValue, float min,
         float max, float step, CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
         List<object> selections = new();
@@ -111,7 +110,7 @@ public sealed class CustomOption
         return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader, optionType);
     }
 
-    public static CustomOption Create(OptionPageType type, string name, bool defaultValue,
+    public static CustomOption Create(TabType type, string name, bool defaultValue,
         CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
         return new CustomOption(type, name,
@@ -134,10 +133,10 @@ public sealed class CustomOption
         var sb = new StringBuilder();
 
         foreach (var option in from option in Options
-                 where option != null
-                 where option.SpecialOptionType != OptionType.Button
-                 where option.Selection != option.DefaultSelection
-                 select option)
+                               where option != null
+                               where option.SpecialOptionType != OptionType.Button
+                               where option.Selection != option.DefaultSelection
+                               select option)
         {
             sb.Append(option.ID + "|" + option.Selection);
             sb.Append(',');
@@ -254,10 +253,10 @@ public sealed class CustomOption
 
         private static void CreateClassicTabs(GameOptionsMenu instance)
         {
-            var allTypes = Enum.GetValues<OptionPageType>();
-            var typeNameDictionary = new Dictionary<OptionPageType, string>();
+            var allTypes = Enum.GetValues<TabType>();
+            var typeNameDictionary = new Dictionary<TabType, string>();
             allTypes.ToList().ForEach(t => typeNameDictionary[t] = t.ToString() + "Settings");
-            var isReturn = SetNames(
+            var shouldReturn = SetTabDisplayName(
                 new Dictionary<string, string>
                 {
                     ["GeneralSettings"] = LanguageConfig.Instance.GeneralSetting,
@@ -267,7 +266,9 @@ public sealed class CustomOption
                     ["AddonsSettings"] = LanguageConfig.Instance.AddonsSetting
                 });
 
-            if (isReturn) return;
+            if (shouldReturn) return;
+
+            Main.Logger.LogInfo("Begin to init CustomOption");
 
             // Setup COG tab
             var template = Object.FindObjectsOfType<StringOption>().FirstOrDefault();
@@ -277,70 +278,82 @@ public sealed class CustomOption
                 .FindChild("Game Settings");
             var gameSettingMenu = Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
 
-            var settingsMenu = new Dictionary<OptionPageType, (GameObject?, GameOptionsMenu?)>();
+            var settingsMenu = new Dictionary<TabType, (GameObject?, GameOptionsMenu?)>();
+
             foreach (var (type, name) in typeNameDictionary)
             {
                 var setting = Object.Instantiate(gameSettings, gameSettings.transform.parent);
-                var menu = GetMenu(setting.gameObject, name);
+                var menu = GetOptionMenuComponent(setting.gameObject, name);
                 settingsMenu[type] = (setting.gameObject, menu);
+            }
+
+            GameObject? GetSetting(TabType tab)
+            {
+                if (settingsMenu!.TryGetValue(tab, out var pair))
+                    return pair.Item1;
+                return null;
             }
 
             var roleTab = GameObject.Find("RoleTab");
             var gameTab = GameObject.Find("GameTab");
 
-            var cogTab = Object.Instantiate(roleTab, roleTab.transform.parent);
-            var cogTabHighlight = GetTabHighlight(cogTab, "COGTab", "COG.Resources.InDLL.Images.Setting.COG.png");
+            var typeTabHighlights = new Dictionary<TabType, (GameObject, SpriteRenderer)>();
 
-            var impostorTab = Object.Instantiate(roleTab, cogTab.transform);
-            var impostorTabHighlight = GetTabHighlight(impostorTab, "ImpostorTab",
-                "COG.Resources.InDLL.Images.Setting.Imposter.png");
+            var lastTab = roleTab.transform.parent;
+            foreach (var type in allTypes)
+            {
+                var tab = Object.Instantiate(roleTab, lastTab);
+                var highlight = SetHighlightSprite(tab, $"{type}Tab", $"COG.Resources.InDLL.Images.Setting.{type}.png");
 
-            var neutralTab = Object.Instantiate(roleTab, impostorTab.transform);
-            var neutralTabHighlight =
-                GetTabHighlight(neutralTab, "NeutralTab", "COG.Resources.InDLL.Images.Setting.Neutral.png");
+                typeTabHighlights[type] = (tab, highlight);
+                lastTab = tab.transform;
+            }
 
-            var crewmateTab = Object.Instantiate(roleTab, neutralTab.transform);
-            var crewmateTabHighlight = GetTabHighlight(crewmateTab, "CrewmateTab",
-                "COG.Resources.InDLL.Images.Setting.Crewmate.png");
+            (GameObject?, SpriteRenderer?) GetTabHighlightPair(TabType tab)
+            {
+                if (typeTabHighlights!.TryGetValue(tab, out var pair))
+                    return pair;
+                return (null, null);
+            }
 
-            var modifierTab = Object.Instantiate(roleTab, crewmateTab.transform);
-            var modifierTabHighlight = GetTabHighlight(modifierTab, "ModifierTab",
-                "COG.Resources.InDLL.Images.Setting.SubRole.png");
+            GameObject? GetTab(TabType tab) => GetTabHighlightPair(tab).Item1;
+
+            SpriteRenderer? GetHighlight(TabType tab) => GetTabHighlightPair(tab).Item2;
 
             // Position of Tab Icons
             gameTab.transform.position += Vector3.left * 3f;
             roleTab.transform.position += Vector3.left * 3f;
-            cogTab.transform.position += Vector3.left * 2f;
-            impostorTab.transform.localPosition = Vector3.right * 1f;
-            neutralTab.transform.localPosition = Vector3.right * 1f;
-            crewmateTab.transform.localPosition = Vector3.right * 1f;
-            modifierTab.transform.localPosition = Vector3.right * 1f;
 
-            var tabs = new[] { gameTab, roleTab, cogTab, impostorTab, neutralTab, crewmateTab, modifierTab };
+            GetTab(TabType.General)!.transform.position += Vector3.left * 2f;
+
+            allTypes.Where(t => t != TabType.General).ForEach(t =>
+                GetTab(t)!.transform.localPosition = Vector3.right * 1f);
+
+            var tabs = new List<GameObject> { gameTab, roleTab };
+            allTypes.ForEach(t => tabs.Add(GetTab(t)!));
+
             if (gameSettingMenu != null)
             {
                 var settingsHighlightMap = new Dictionary<GameObject, SpriteRenderer>
                 {
                     [gameSettingMenu.RegularGameSettings] = gameSettingMenu.GameSettingsHightlight,
-                    [gameSettingMenu.RolesSettings.gameObject] = gameSettingMenu.RolesSettingsHightlight,
-                    [settingsMenu[OptionPageType.General].Item1!.gameObject] = cogTabHighlight,
-                    [settingsMenu[OptionPageType.Impostor].Item1!.gameObject] = impostorTabHighlight,
-                    [settingsMenu[OptionPageType.Neutral].Item1!.gameObject] = neutralTabHighlight,
-                    [settingsMenu[OptionPageType.Crewmate].Item1!.gameObject] = crewmateTabHighlight,
-                    [settingsMenu[OptionPageType.Addons].Item1!.gameObject] = modifierTabHighlight
+                    [gameSettingMenu.RolesSettings.gameObject] = gameSettingMenu.RolesSettingsHightlight
                 };
+
+                foreach (var t in allTypes)
+                    settingsHighlightMap.Add(GetSetting(t)!, GetHighlight(t)!);
 
                 var a = 0;
                 foreach (var tab in tabs)
                 {
+                    var index = a; // 如在下方方法调用直接用a会导致问题（值类型的锅）
                     var button = tab.GetComponentInChildren<PassiveButton>();
-                    if (button == null) continue;
-                    var copiedIndex = a;
-                    button.OnClick = new Button.ButtonClickedEvent();
+                    if (!button) continue;
+                    button.OnClick = new();
                     button.OnClick.AddListener((Action)(() =>
                     {
                         if (settingsHighlightMap == null!) return;
-                        SetListener(settingsHighlightMap, copiedIndex);
+                        SetTabActive(settingsHighlightMap, index);
                     }));
                     a++;
                 }
@@ -349,9 +362,14 @@ public sealed class CustomOption
             var typeOptions = settingsMenu.ToDictionary(kvp => kvp.Key,
                 kvp => kvp.Value.Item2!.GetComponentsInChildren<OptionBehaviour>().ToList());
 
+            // Destroy vanilla options in new tab
             DestroyOptions(typeOptions.Select(kvp => kvp.Value).ToList());
 
-            var menus = settingsMenu.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item2!.transform);
+            Main.Logger.LogInfo("Finished tab initialization");
+
+            var menus = settingsMenu.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Item2!.transform);
 
             foreach (var option in Options.Where(option => option == null || (int)option.Page <= 4))
             {
@@ -394,24 +412,27 @@ public sealed class CustomOption
                 if (option?.OptionBehaviour != null) option.OptionBehaviour.gameObject.SetActive(true);
             }
 
+            Main.Logger.LogInfo("Finished option item initialization");
+
             SetOptions(
                 settingsMenu.Select(kvp => kvp.Value.Item2!).ToList(),
                 typeOptions.Select(kvp => kvp.Value).ToList(),
                 settingsMenu.Select(kvp => kvp.Value.Item1!).ToList()
             );
+
+            Main.Logger.LogInfo("Set up options");
         }
 
-        private static void SetListener(Dictionary<GameObject, SpriteRenderer> settingsHighlightMap, int index)
+        private static void SetTabActive(Dictionary<GameObject, SpriteRenderer> settingsHighlightMap, int index)
         {
-            foreach (var entry in settingsHighlightMap)
+            int i = 0;
+            foreach (var (setting, highlight) in settingsHighlightMap)
             {
-                if (entry.Key == null || entry.Value == null) continue;
-                entry.Key.SetActive(false);
-                entry.Value.enabled = false;
+                setting.SetActive(i == index);
+                highlight.enabled = i == index;
+                i++;
             }
-
-            settingsHighlightMap.ElementAt(index).Key.SetActive(true);
-            settingsHighlightMap.ElementAt(index).Value.enabled = true;
+            Main.Logger.LogInfo("Opened tab: " + index);
         }
 
         private static void DestroyOptions(List<List<OptionBehaviour>> optionBehavioursList)
@@ -420,21 +441,24 @@ public sealed class CustomOption
                 Object.Destroy(option.gameObject);
         }
 
-        private static bool SetNames(Dictionary<string, string> gameObjectNameDisplayNameMap)
+        private static bool SetTabDisplayName(Dictionary<string, string> displayNameMap)
         {
-            foreach (var entry in gameObjectNameDisplayNameMap)
-                if (GameObject.Find(entry.Key) != null)
+            foreach (var entry in displayNameMap)
+            {
+                // 寻找当前打开的设置页（未被打开则是null），再设置页面标题
+                GameObject obj;
+                if (obj = GameObject.Find(entry.Key))
                 {
-                    // Settings setup has already been performed, fixing the title of the tab and returning
-                    GameObject.Find(entry.Key).transform.FindChild("GameGroup").FindChild("Text")
+                    obj.transform.FindChild("GameGroup").FindChild("Text")
                         .GetComponent<TextMeshPro>().SetText(entry.Value);
                     return true;
                 }
+            }
 
             return false;
         }
 
-        private static GameOptionsMenu GetMenu(GameObject setting, string settingName)
+        private static GameOptionsMenu GetOptionMenuComponent(GameObject setting, string settingName)
         {
             var menu = setting.transform.FindChild("GameGroup").FindChild("SliderInner")
                 .GetComponent<GameOptionsMenu>();
@@ -443,23 +467,14 @@ public sealed class CustomOption
             return menu;
         }
 
-        private static SpriteRenderer GetTabHighlight(GameObject tab, string tabName, string tabSpritePath)
-        {
-            var tabHighlight = tab.transform.FindChild("Hat Button").FindChild("Tab Background")
-                .GetComponent<SpriteRenderer>();
-            tab.transform.FindChild("Hat Button").FindChild("Icon").GetComponent<SpriteRenderer>().sprite =
-                ResourceUtils.LoadSprite(tabSpritePath, 100f);
-            tab.name = "tabName";
+        private static SpriteRenderer SetHighlightSprite(GameObject tab, string tabName, string tabSpritePath) => SetHighlightSprite(tab, tabName, ResourceUtils.LoadSprite(tabSpritePath, 100f)!);
 
-            return tabHighlight;
-        }
-
-        private static SpriteRenderer GetTabHighlight(GameObject tab, string tabName, Sprite tabSprite)
+        private static SpriteRenderer SetHighlightSprite(GameObject tab, string tabName, Sprite tabSprite)
         {
             var tabHighlight = tab.transform.FindChild("Hat Button").FindChild("Tab Background")
                 .GetComponent<SpriteRenderer>();
             tab.transform.FindChild("Hat Button").FindChild("Icon").GetComponent<SpriteRenderer>().sprite = tabSprite;
-            tab.name = "tabName";
+            tab.name = tabName;
 
             return tabHighlight;
         }
@@ -552,13 +567,13 @@ internal class GameOptionsMenuUpdatePatch
         if (TimerForBugFix < 3.0f) FirstOpen = false;
 
         var offset = 2.75f;
-        var objType = new Dictionary<string, OptionPageType>
+        var objType = new Dictionary<string, TabType>
         {
-            { "GeneralSettings", OptionPageType.General },
-            { "ImpostorSettings", OptionPageType.Impostor },
-            { "NeutralSettings", OptionPageType.Neutral },
-            { "CrewmateSettings", OptionPageType.Crewmate },
-            { "AddonsSettings", OptionPageType.Addons }
+            { "GeneralSettings", TabType.General },
+            { "ImpostorSettings", TabType.Impostor },
+            { "NeutralSettings", TabType.Neutral },
+            { "CrewmateSettings", TabType.Crewmate },
+            { "AddonsSettings", TabType.Addons }
         };
 
         foreach (var option in Options.Where(o => o != null))
@@ -624,7 +639,7 @@ internal class HudStringPatch
         __result = text;
     }
 
-    public static string GetOptByType(OptionPageType type)
+    public static string GetOptByType(TabType type)
     {
         var txt = "";
         List<CustomOption> opt = new();

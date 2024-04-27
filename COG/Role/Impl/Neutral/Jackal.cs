@@ -38,8 +38,8 @@ public class Jackal : Role, IListener
 
         if (ShowInOptions)
         {
-            CreateSidekickCd = CustomOption.Create(CustomOption.OptionPageType.Neutral, LanguageConfig.Instance.JackalCreateSidekickCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
-            JackalKillCd = CustomOption.Create(CustomOption.OptionPageType.Neutral, LanguageConfig.Instance.JackalKillCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            CreateSidekickCd = CustomOption.Create(CustomOption.TabType.Neutral, LanguageConfig.Instance.JackalCreateSidekickCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            JackalKillCd = CustomOption.Create(CustomOption.TabType.Neutral, LanguageConfig.Instance.JackalKillCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
         }
 
         CreateSidekickButton = CustomButton.Create(

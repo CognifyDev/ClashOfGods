@@ -131,10 +131,10 @@ public class Role
 
     public virtual string HandleEjectText(PlayerControl player) => LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, player.GetRoleInstance()!.Name);
 
-    public static CustomOption.OptionPageType ToCustomOption(Role role)
+    public static CustomOption.TabType ToCustomOption(Role role)
     {
-        if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.OptionPageType.Addons;
-        return (CustomOption.OptionPageType)role.CampType;
+        if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.TabType.Addons;
+        return (CustomOption.TabType)role.CampType;
     }
 
     public virtual IListener GetListener()

@@ -21,7 +21,7 @@ public class Sidekick : Role, IListener
 
         if (ShowInOptions)
         {
-            SidekickCanCreateSidekick = CustomOption.Create(CustomOption.OptionPageType.Neutral, LanguageConfig.Instance.SidekickCanCreateSidekick, true, RoleManager.GetManager().GetTypeRoleInstance<Jackal>().MainRoleOption);
+            SidekickCanCreateSidekick = CustomOption.Create(CustomOption.TabType.Neutral, LanguageConfig.Instance.SidekickCanCreateSidekick, true, RoleManager.GetManager().GetTypeRoleInstance<Jackal>().MainRoleOption);
         }
     }
 
