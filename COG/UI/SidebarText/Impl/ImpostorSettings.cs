@@ -14,7 +14,7 @@ public class ImpostorSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new[]
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOption.OptionPageType.Impostor)
+            HudStringPatch.GetOptByType(CustomOption.CustomOption.TabType.Impostor)
         });
     }
 }

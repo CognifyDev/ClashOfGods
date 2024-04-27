@@ -24,7 +24,7 @@ public class Cleaner : Role, IListener
         Description = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
 
-        CleanBodyCd = CustomOption.Create(CustomOption.OptionPageType.Impostor,
+        CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor,
             LanguageConfig.Instance.CleanBodyCooldown, 30f, 1f, 60f, 1f, MainRoleOption);
 
         CleanBodyButton = CustomButton.Create(

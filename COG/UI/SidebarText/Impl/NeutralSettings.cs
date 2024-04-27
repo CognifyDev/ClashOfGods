@@ -14,7 +14,7 @@ public class NeutralSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new[]
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOption.OptionPageType.Neutral)
+            HudStringPatch.GetOptByType(CustomOption.CustomOption.TabType.Neutral)
         });
     }
 }

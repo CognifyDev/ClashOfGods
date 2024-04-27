@@ -13,16 +13,16 @@ public static class GlobalCustomOptionConstant
 
     static GlobalCustomOptionConstant()
     {
-        LoadPreset = CustomOption.Create(CustomOption.OptionPageType.General,
+        LoadPreset = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.LoadPreset, false, null, true, CustomOption.OptionType.Button);
         
-        SavePreset = CustomOption.Create(CustomOption.OptionPageType.General,
+        SavePreset = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.SavePreset, false, null, true, CustomOption.OptionType.Button);
 
         LoadPreset.OnClickIfButton = new((_) => CustomOption.OpenPresetWithDialogue());
         SavePreset.OnClickIfButton = new((_) => CustomOption.SaveOptionWithDialogue());
 
-        DebugMode = CustomOption.Create(CustomOption.OptionPageType.General,
+        DebugMode = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.DebugMode, false, null, true);
     }
 }

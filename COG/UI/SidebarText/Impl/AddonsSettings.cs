@@ -14,7 +14,7 @@ public class AddonsSettings : SidebarText
         Objects.Clear();
         Objects.AddRange(new[]
         {
-            HudStringPatch.GetOptByType(CustomOption.CustomOption.OptionPageType.Addons)
+            HudStringPatch.GetOptByType(CustomOption.CustomOption.TabType.Addons)
         });
     }
 }
