@@ -132,14 +132,14 @@ internal class ExileControllerWrapUpPatch
     public static bool Prefix(ExileController __instance)
     {
         return ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerExileEndEvent(__instance.exiled.Object, __instance),
+            .ExecuteHandlers(new PlayerExileEndEvent(__instance.exiled?.Object, __instance),
                 EventHandlerType.Prefix);
     }
 
     public static void Postfix(ExileController __instance)
     {
         ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerExileEndEvent(__instance.exiled.Object, __instance),
+            .ExecuteHandlers(new PlayerExileEndEvent(__instance.exiled?.Object, __instance),
                 EventHandlerType.Postfix);
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
     }
