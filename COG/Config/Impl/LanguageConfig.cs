@@ -168,6 +168,7 @@ public class LanguageConfig : Config
         NeutralsWinText = GetString("game.end.wins.neutral");
 
         DefaultEjectText = GetString("game.exile.default");
+        AlivePlayerInfo = GetString("game.exile.alive-player-info");
     }
 
     public static LanguageConfig Instance { get; private set; }
@@ -299,6 +300,7 @@ public class LanguageConfig : Config
     public string NeutralsWinText { get; private set; } = null!;
 
     public string DefaultEjectText { get; private set; } = null!;
+    public string AlivePlayerInfo { get; private set; } = null!;
 
 
     private string GetString(string location)

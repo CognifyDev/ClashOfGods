@@ -386,12 +386,19 @@ public class GameListener : IListener
         if (!GameUtils.GetGameOptions().ConfirmImpostor) return;
 
         var controller = @event.ExileController;
-        var player = @event.Exiled?.Object;
+        var player = @event.Player;
         if (!player) return;
 
         var role = player!.GetRoleInstance();
         if (role == null) return;
-        
+
+        int GetCount(IEnumerable<PlayerRole> list) => list.Select(p => p.Player).Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+
+        int crewCount = GetCount(PlayerUtils.AllCrewmates);
+        int impCount = GetCount(PlayerUtils.AllImpostors);
+        int neutralCount = GetCount(PlayerUtils.AllNeutrals);
+
         controller.completeString = role.HandleEjectText(player!);
+        controller.ImpostorText.text = LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
     }
 }
