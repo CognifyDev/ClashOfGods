@@ -15,7 +15,7 @@ public class ImpostorsCustomWinner : IWinnable
             .ToList();
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor).ToList()
             .ForEach(pair => aliveImpostors.Add(pair.Player));
-        if (aliveImpostors.Count >= PlayerUtils.AllCremates
+        if (aliveImpostors.Count >= PlayerUtils.AllCrewmates
                 .Where(pair => pair.Player && !pair.Player.Data.IsDead).Select(pair => pair.Player).ToList().Count
             && aliveNeutrals.Select(p => p.Role.CanKill).ToList().Count <= 0)
         {

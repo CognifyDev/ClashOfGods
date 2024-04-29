@@ -386,12 +386,29 @@ public class GameListener : IListener
         if (!GameUtils.GetGameOptions().ConfirmImpostor) return;
 
         var controller = @event.ExileController;
-        var player = @event.Exiled?.Object;
+        var player = @event.Player;
         if (!player) return;
 
         var role = player!.GetRoleInstance();
         if (role == null) return;
-        
-        controller.completeString = role.HandleEjectText(player!);
+
+        int GetCount(IEnumerable<PlayerRole> list) => list.Select(p => p.Player).Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+
+        int crewCount = GetCount(PlayerUtils.AllCrewmates);
+        int impCount = GetCount(PlayerUtils.AllImpostors);
+        int neutralCount = GetCount(PlayerUtils.AllNeutrals);
+
+        var roleText = controller.completeString = role.HandleEjectText(player!);
+        var playerInfoText = controller.ImpostorText.text = LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
+
+        Main.Logger.LogInfo($"Eject text: {roleText} & {playerInfoText}");
+
+        /* 
+         * 
+         * TODO:
+         * 
+         * 修复文字修改无效的问题
+         * 
+         */
     }
 }

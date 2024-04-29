@@ -32,7 +32,7 @@ public static class PlayerUtils
     public static IEnumerable<PlayerRole> AllImpostors =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor);
 
-    public static IEnumerable<PlayerRole> AllCremates =>
+    public static IEnumerable<PlayerRole> AllCrewmates =>
         GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Crewmate);
 
     public static IEnumerable<PlayerRole> AllNeutrals =>

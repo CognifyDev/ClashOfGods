@@ -129,8 +129,11 @@ public class Role
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
-    public virtual string HandleEjectText(PlayerControl player) => LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, player.GetRoleInstance()!.Name);
-
+    public virtual string HandleEjectText(PlayerControl player)
+    {
+        var role = player.GetRoleInstance();
+        return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, role!.Name.Color(role!.Color));
+    }
     public static CustomOption.TabType ToCustomOption(Role role)
     {
         if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.TabType.Addons;

@@ -7,7 +7,7 @@ public class PlayerExileEndEvent : PlayerEvent
     /// </summary>
     public ExileController ExileController { get; }
 
-    public PlayerExileEndEvent(PlayerControl player, ExileController controller) : base(player)
+    public PlayerExileEndEvent(PlayerControl? player, ExileController controller) : base(player!)
     {
         ExileController = controller;
     }
