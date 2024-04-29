@@ -246,12 +246,12 @@ public sealed class CustomOption
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
     private class GameOptionsMenuStartPatch
     {
-        public static void Postfix(GameOptionsMenu __instance)
+        public static void Postfix()
         {
-            CreateClassicTabs(__instance);
+            CreateClassicTabs();
         }
 
-        private static void CreateClassicTabs(GameOptionsMenu instance)
+        private static void CreateClassicTabs()
         {
             var allTypes = Enum.GetValues<TabType>();
             var typeNameDictionary = new Dictionary<TabType, string>();
@@ -423,6 +423,11 @@ public sealed class CustomOption
             Main.Logger.LogInfo("Set up options");
         }
 
+        /// <summary>
+        /// Open the tab.
+        /// </summary>
+        /// <param name="settingsHighlightMap">A dictionary that contains setting to open and the highlight of the setting</param>
+        /// <param name="index">The index of the highlight in <param name="settingsHighlightMap"></param>
         private static void SetTabActive(Dictionary<GameObject, SpriteRenderer> settingsHighlightMap, int index)
         {
             int i = 0;
@@ -435,12 +440,21 @@ public sealed class CustomOption
             Main.Logger.LogInfo("Opened tab: " + index);
         }
 
+        /// <summary>
+        /// Destroy <see cref="OptionBehaviour"/> in the list.
+        /// </summary>
+        /// <param name="optionBehavioursList"></param>
         private static void DestroyOptions(List<List<OptionBehaviour>> optionBehavioursList)
         {
             foreach (var option in optionBehavioursList.SelectMany(optionBehaviours => optionBehaviours))
                 Object.Destroy(option.gameObject);
         }
 
+        /// <summary>
+        /// Set the title text of current tab.
+        /// </summary>
+        /// <param name="displayNameMap">A dictionary that contains the name and the title of the tabs.</param>
+        /// <returns></returns>
         private static bool SetTabDisplayName(Dictionary<string, string> displayNameMap)
         {
             foreach (var entry in displayNameMap)
@@ -458,6 +472,12 @@ public sealed class CustomOption
             return false;
         }
 
+        /// <summary>
+        /// Get <see cref="GameOptionsMenu"/> component of the setting.
+        /// </summary>
+        /// <param name="setting"></param>
+        /// <param name="settingName">Name to set</param>
+        /// <returns></returns>
         private static GameOptionsMenu GetOptionMenuComponent(GameObject setting, string settingName)
         {
             var menu = setting.transform.FindChild("GameGroup").FindChild("SliderInner")
@@ -467,8 +487,22 @@ public sealed class CustomOption
             return menu;
         }
 
+        /// <summary>
+        /// Set the icon of the tab.
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="tabName">Name to set</param>
+        /// <param name="tabSprite">The location of the image</param>
+        /// <returns>The highlight of the icon</returns>
         private static SpriteRenderer SetHighlightSprite(GameObject tab, string tabName, string tabSpritePath) => SetHighlightSprite(tab, tabName, ResourceUtils.LoadSprite(tabSpritePath, 100f)!);
 
+        /// <summary>
+        /// Set the icon of the tab.
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="tabName">Name to set</param>
+        /// <param name="tabSprite">Icon to set</param>
+        /// <returns>The highlight of the icon</returns>
         private static SpriteRenderer SetHighlightSprite(GameObject tab, string tabName, Sprite tabSprite)
         {
             var tabHighlight = tab.transform.FindChild("Hat Button").FindChild("Tab Background")
@@ -479,6 +513,12 @@ public sealed class CustomOption
             return tabHighlight;
         }
 
+        /// <summary>
+        /// Set up options.
+        /// </summary>
+        /// <param name="menus"></param>
+        /// <param name="options"></param>
+        /// <param name="settings"></param>
         private static void SetOptions(List<GameOptionsMenu> menus, List<List<OptionBehaviour>> options,
             List<GameObject> settings)
         {

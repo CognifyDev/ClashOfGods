@@ -398,7 +398,17 @@ public class GameListener : IListener
         int impCount = GetCount(PlayerUtils.AllImpostors);
         int neutralCount = GetCount(PlayerUtils.AllNeutrals);
 
-        controller.completeString = role.HandleEjectText(player!);
-        controller.ImpostorText.text = LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
+        var roleText = controller.completeString = role.HandleEjectText(player!);
+        var playerInfoText = controller.ImpostorText.text = LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
+
+        Main.Logger.LogInfo($"Eject text: {roleText} & {playerInfoText}");
+
+        /* 
+         * 
+         * TODO:
+         * 
+         * 修复文字修改无效的问题
+         * 
+         */
     }
 }
