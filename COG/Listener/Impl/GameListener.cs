@@ -402,13 +402,14 @@ public class GameListener : IListener
         var playerInfoText = controller.ImpostorText.text = LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
 
         Main.Logger.LogInfo($"Eject text: {roleText} & {playerInfoText}");
+    }
 
-        /* 
-         * 
-         * TODO:
-         * 
-         * 修复文字修改无效的问题
-         * 
-         */
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnFreeplayStartAssignDefaultRole(GameStartEvent @event)
+    {
+        if (AmongUsClient.Instance.NetworkMode != NetworkModes.FreePlay) return;
+
+        foreach (var player in PlayerControl.AllPlayerControls) 
+            player.RpcSetCustomRole<Crewmate>();
     }
 }

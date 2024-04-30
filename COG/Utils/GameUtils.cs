@@ -6,6 +6,7 @@ using COG.Role;
 using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using COG.States;
+using UnityEngine;
 
 namespace COG.Utils;
 
@@ -129,5 +130,13 @@ public static class GameUtils
         if (!(jackal && target)) return;
         target.SetCustomRole<Sidekick>();
         Jackal.JackalSidekick.Add(jackal, target);
+    }
+
+    public static List<Transform> GetAllChildren(this Transform transform)
+    {
+        List<Transform> result = new();
+        for (int i = 0; i < transform.childCount; i++) 
+            result.Add(transform.GetChild(i));
+        return result;
     }
 }

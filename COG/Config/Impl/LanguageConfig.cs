@@ -42,6 +42,7 @@ public class LanguageConfig : Config
     {
         MessageForNextPage = GetString("lobby.message-for-next-page");
         MakePublicMessage = GetString("lobby.make-public-message");
+        VanillaRoleDisabled = GetString("lobby.vanilla-role-disabled");
 
         GeneralSetting = GetString("menu.general.name");
         ImpostorRolesSetting = GetString("menu.impostor.name");
@@ -92,7 +93,7 @@ public class LanguageConfig : Config
 
         EraserName = GetString("role.impostor.eraser.name");
         EraserDescription = GetString("role.impostor.eraser.description");
-        EraserInitialEraseCd = GetString("role.impostor.eraser.menu.initial-cd");
+        EraserInitialEraseCd = GetString("role.impostor.eraser.menu.initial-erase-cd");
         EraserIncreaseCdAfterErasing = GetString("role.impostor.eraser.menu.increase-cd-after-erasing");
         EraserCanEraseImpostors = GetString("role.impostor.eraser.menu.can-erase-imps");
 
@@ -174,6 +175,7 @@ public class LanguageConfig : Config
     public static LanguageConfig Instance { get; private set; }
     public string MessageForNextPage { get; private set; } = null!;
     public string MakePublicMessage { get; private set; } = null!;
+    public string VanillaRoleDisabled { get; private set; } = null!;
 
     public string GeneralSetting { get; private set; } = null!;
     public string ImpostorRolesSetting { get; private set; } = null!;
