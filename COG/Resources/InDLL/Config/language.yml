@@ -1,6 +1,7 @@
 lobby:
   message-for-next-page: "按 TAB 切换下一页... %currentpage%/%pagecount%"
   make-public-message: "禁止设置为公开"
+  vanilla-role-disabled: "原版职业已被禁用"
 role:
   unknown:
     name: "未知"

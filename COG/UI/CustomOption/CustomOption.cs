@@ -4,6 +4,7 @@ using COG.Rpc;
 using COG.UI.SidebarText;
 using COG.Utils;
 using COG.Utils.WinAPI;
+using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -533,6 +534,27 @@ public sealed class CustomOption
                 menus[i].Children = options[i].ToArray();
                 settings[i].gameObject.SetActive(false);
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Start))]
+    private class RoleSettingsMenuPatch
+    {
+        public const string TitleObjectName = "Text";
+        public static void Postfix(RolesSettingsMenu __instance)
+        {
+            __instance.transform.FindChild("Right Panel").gameObject.SetActive(false);
+
+            void SetChildrenInactiveBut(Transform transform, string name)=> transform.GetAllChildren().Where(t => t.name != name).ForEach(t => t.gameObject.SetActive(false));
+
+            SetChildrenInactiveBut(__instance.transform.FindChild("Left Panel"), __instance.RoleChancesSettings.name);
+            SetChildrenInactiveBut(__instance.RoleChancesSettings.transform, TitleObjectName);
+
+            __instance.RoleChancesSettings.transform.FindChild(TitleObjectName).GetComponent<TextTranslatorTMP>().Destroy();
+            var titleText = __instance.RoleChancesSettings.transform.FindChild(TitleObjectName).GetComponent<TextMeshPro>();
+            titleText.alignment = TextAlignmentOptions.Center;
+            titleText.transform.localPosition = new(2.5f, 0, 0);
+            titleText.text = LanguageConfig.Instance.VanillaRoleDisabled;
         }
     }
 }
