@@ -8,7 +8,7 @@ public class Crewmate : Role
 {
     public Crewmate() : base(LanguageConfig.Instance.CrewmateName, Color.white, CampType.Crewmate, false)
     {
-        BaseRole = true;
+        IsBaseRole = true;
         Description = LanguageConfig.Instance.CrewmateDescription;
     }
 

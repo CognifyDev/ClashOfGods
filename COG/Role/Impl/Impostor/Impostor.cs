@@ -10,7 +10,7 @@ public class Impostor : Role
     {
         CanKill = true;
         CanVent = true;
-        BaseRole = true;
+        IsBaseRole = true;
         CanSabotage = true;
         BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.ImpostorDescription;
