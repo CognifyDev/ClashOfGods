@@ -741,6 +741,7 @@ public static class GameOptionsNextPagePatch
 
     public static void Postfix(KeyboardJoystick __instance)
     {
+        if (HudManager.Instance.Chat.freeChatField.textArea.hasFocus) return; // 忽略正在聊天时的按键操作
         if (Input.GetKeyDown(KeyCode.Tab)) TypePage += 1;
 
         // from Alpha1 to Alpha9

@@ -18,7 +18,7 @@ public class Role
     public Role(string name, Color color, CampType campType, bool showInOptions)
     {
         Name = name;
-        BaseRole = false;
+        IsBaseRole = false;
         Description = "";
         Color = color;
         CampType = campType;
@@ -57,7 +57,7 @@ public class Role
     /// <summary>
     ///     是否是基本职业
     /// </summary>
-    public bool BaseRole { get; protected init; }
+    public bool IsBaseRole { get; protected init; }
 
     /// <summary>
     ///     角色介绍

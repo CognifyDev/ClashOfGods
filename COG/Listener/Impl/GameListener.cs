@@ -156,10 +156,10 @@ public class GameListener : IListener
     public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        foreach (var playerRole in GameUtils.PlayerRoleData)
-        {
-            playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
-        }
+        //foreach (var playerRole in GameUtils.PlayerRoleData)
+        //{
+        //    playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
+        //}
     }
 
     [EventHandler(EventHandlerType.Postfix)]
