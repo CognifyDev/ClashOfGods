@@ -63,7 +63,7 @@ public class Jackal : Role, IListener
             2,
             KeyCode.C,
             LanguageConfig.Instance.CreateSidekick,
-            (Cooldown)new Func<float>(() => CreateSidekickCd?.GetFloat() ?? 30f),
+            () => CreateSidekickCd?.GetFloat() ?? 30f,
             0
         );
 
@@ -85,7 +85,7 @@ public class Jackal : Role, IListener
             row: 1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            (Cooldown)new Func<float>(() => JackalKillCd?.GetFloat() ?? 30f),
+            () => JackalKillCd?.GetFloat() ?? 30f,
             -1
         );
 

@@ -118,8 +118,6 @@ public class Role
     /// <param name="button">要添加的按钮</param>
     public void AddButton(CustomButton button)
     {
-        button.HasButton ??= () => true;
-
         button.HasButton += () =>
         {
             var player = PlayerControl.LocalPlayer;

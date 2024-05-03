@@ -49,7 +49,7 @@ public class Opportunist : Role, IListener
             2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            (Cooldown)_killCooldownOption!.GetFloat,
+            () => _killCooldownOption!.GetFloat(),
             -1
         );
 

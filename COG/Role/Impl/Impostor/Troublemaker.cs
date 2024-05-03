@@ -66,7 +66,7 @@ public class Troublemaker : Role
             row: 2,
             KeyCode.C,
             LanguageConfig.Instance.MakeTrouble,
-            (Cooldown)MakeTroubleCd!.GetFloat,
+            () => MakeTroubleCd!.GetFloat(),
             0
         );
 

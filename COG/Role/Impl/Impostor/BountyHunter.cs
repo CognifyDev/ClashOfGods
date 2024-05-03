@@ -79,7 +79,7 @@ public class BountyHunter : Role, IListener
             row: 1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            (Cooldown)30f,
+            () => 30f,
             -1
         );
 

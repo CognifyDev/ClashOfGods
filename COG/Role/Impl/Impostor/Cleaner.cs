@@ -16,7 +16,7 @@ namespace COG.Role.Impl.Impostor;
 
 public class Cleaner : Role, IListener
 {
-    private CustomOption? CleanBodyCd { get; }
+    private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
 
     public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
@@ -41,7 +41,7 @@ public class Cleaner : Role, IListener
             2,
             KeyCode.C,
             LanguageConfig.Instance.CleanAction,
-            (Cooldown)CleanBodyCd!.GetFloat,
+            () => CleanBodyCd.GetFloat(),
             0
         );
 

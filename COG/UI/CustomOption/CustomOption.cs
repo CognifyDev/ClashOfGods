@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using COG.Utils.Coding;
 using TMPro;
 using UnityEngine;
 using static COG.UI.CustomOption.CustomOption;
@@ -22,6 +23,7 @@ namespace COG.UI.CustomOption;
 // Code base from
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
 [DataContract]
+[ShitCode]
 public sealed class CustomOption
 {
     [Serializable]

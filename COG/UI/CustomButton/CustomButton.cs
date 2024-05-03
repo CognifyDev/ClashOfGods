@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using COG.Utils;
+using COG.Utils.Coding;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,14 +11,15 @@ using Object = UnityEngine.Object;
 
 namespace COG.UI.CustomButton;
 
+[ShitCode]
 public class CustomButton
 {
     public ActionButton? ActionButton { get; set; }
-    public Func<float> Cooldown { get; set; } = () => GameUtils.GetGameOptions().KillCooldown;
+    public Func<float> Cooldown { get; set; }
     public Func<bool> CouldUse { get; set; }
     public float EffectTime { get; set; }
     public GameObject? GameObject { get; set; }
-    public Func<bool>? HasButton { get; set; }
+    public Func<bool> HasButton { get; set; }
     public bool HasEffect { get; set; }
     public KeyCode? Hotkey { get; set; }
     public string HotkeyName { get; set; }
@@ -47,8 +48,8 @@ public class CustomButton
     internal static List<ActionButton> AllVanillaButtons = new();
 
     private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton,
-        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Cooldown cooldown,
+        Func<bool> hasButton,
+        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Func<float> cooldown,
         float effectTime,
         int usesLimit, string hotkeyName)
     {
@@ -63,7 +64,7 @@ public class CustomButton
         Hotkey = hotkey;
         Text = text;
         HasEffect = hasEffect;
-        Cooldown = () => cooldown;
+        Cooldown = cooldown;
         EffectTime = effectTime;
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
@@ -89,7 +90,7 @@ public class CustomButton
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Cooldown cooldown,
+        Func<bool>? hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
@@ -112,8 +113,8 @@ public class CustomButton
     /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Cooldown cooldown, int usesLimit,
+    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton,
+        Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit,
         string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text,
@@ -127,8 +128,8 @@ public class CustomButton
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool>? hasButton,
-        Sprite sprite, int row, KeyCode? hotkey, string text, Cooldown cooldown, int usesLimit,
+    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton,
+        Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit,
         string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, null, hotkey, text,
@@ -145,7 +146,7 @@ public class CustomButton
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Cooldown cooldown,
+        Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
@@ -188,21 +189,21 @@ public class CustomButton
 
     public void Update()
     {
-        var hasBtn = HasButton ?? (() => true);
+        var hasButton = HasButton();
         var isCoolingDown = Timer > 0f;
         var hotkeyText = "";
         if (HotkeyName == "") hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 
-        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasBtn() ||
+        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasButton ||
             (MapBehaviour.Instance?.IsOpen ?? false))
         {
             SetActive(false);
             return;
         }
 
-        SetActive(hasBtn());
+        SetActive(hasButton);
         var lp = PlayerControl.LocalPlayer;
         if (isCoolingDown && !lp.inVent && lp.moveable) Timer -= Time.deltaTime;
         ActionButton!.SetCoolDown(Timer, Cooldown());
@@ -213,7 +214,8 @@ public class CustomButton
             ActionButton.SetInfiniteUses();
 
         var desat = Shader.PropertyToID("_Desat");
-        if (hasBtn() && !isCoolingDown && CouldUse())
+        var couldUse = CouldUse();
+        if (hasButton && !isCoolingDown && couldUse)
         {
             SpriteRenderer!.color = TextMesh!.color = Palette.EnabledColor;
             Material!.SetFloat(desat, 0f);
@@ -223,6 +225,8 @@ public class CustomButton
             SpriteRenderer!.color = TextMesh!.color = Palette.DisabledClear;
             Material!.SetFloat(desat, 1f);
         }
+        
+        Main.Logger.LogInfo("(string) " + Timer);
 
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) CheckClick();
 
@@ -347,41 +351,5 @@ public class CustomButton
             var pos = new Vector3(x - now, y, z);
             btn.GameObject!.transform.localPosition = btn.Position = pos;
         }
-    }
-}
-
-public class Cooldown
-{
-    private float? Number;
-    private Func<float>? Expression;
-
-    public Cooldown(float num)
-    {
-        Number = num;
-    }
-
-    public Cooldown(Func<float> exp)
-    {
-        Expression = exp;
-    }
-
-    public static implicit operator float(Cooldown cd)
-    {
-        return cd.Number ?? float.PositiveInfinity;
-    }
-
-    public static implicit operator Func<float>(Cooldown cd)
-    {
-        return cd.Expression ?? (() => float.PositiveInfinity);
-    }
-
-    public static implicit operator Cooldown(float cd)
-    {
-        return new Cooldown(cd);
-    }
-
-    public static implicit operator Cooldown(Func<float> cd)
-    {
-        return new Cooldown(cd);
     }
 }

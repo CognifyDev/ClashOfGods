@@ -48,7 +48,7 @@ public class Sheriff : Role, IListener
             2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            (Cooldown)SheriffKillCd!.GetFloat,
+            () => SheriffKillCd!.GetFloat(),
             -1
         );
 

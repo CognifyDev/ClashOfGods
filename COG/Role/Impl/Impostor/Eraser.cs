@@ -71,7 +71,7 @@ public class Eraser : Role, IListener
             2,
             KeyCode.E,
             LanguageConfig.Instance.EraseAction,
-            (Cooldown)(() => InitialEraseCooldown?.GetFloat() ?? 30f),
+            () => InitialEraseCooldown?.GetFloat() ?? 30f,
             -1);
     }
 
