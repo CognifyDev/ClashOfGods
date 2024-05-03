@@ -15,7 +15,7 @@ public class ListenerController
 {
     private Lua Lua { get; }
     private IPlugin Plugin { get; }
-    
+
     public ListenerController(Lua lua, IPlugin plugin)
     {
         Lua = lua;
@@ -36,7 +36,7 @@ public class ListenerController
 
         if (eventType == null) return;
         var constructedType = controllerType.MakeGenericType(eventType);
-        
+
         var instance = Activator.CreateInstance(constructedType, function, prefix) as IListener;
         ListenerManager.GetManager().RegisterListener(instance!);
     }
@@ -46,13 +46,13 @@ public class ListenerController
     {
         private readonly LuaFunction _function;
         private readonly bool _prefix;
-        
+
         public ListenerControllerListener(LuaFunction function, bool prefix)
         {
             _function = function;
             _prefix = prefix;
         }
-        
+
         [EventHandler(EventHandlerType.Prefix)]
         private bool OnPrefixEventHandle(T @event)
         {

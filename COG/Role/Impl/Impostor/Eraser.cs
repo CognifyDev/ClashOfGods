@@ -25,6 +25,7 @@ public class Eraser : Role, IListener
     public CustomButton EraseButton { get; }
     public static PlayerControl? CurrentTarget { get; set; }
     public static Dictionary<PlayerControl, Role> TempErasedPlayerRoles { get; set; }
+
     public Eraser() : base(LanguageConfig.Instance.EraserName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         BaseRoleType = RoleTypes.Impostor;
@@ -34,41 +35,44 @@ public class Eraser : Role, IListener
         if (ShowInOptions)
         {
             var type = ToCustomOption(this);
-            InitialEraseCooldown = CustomOption.Create(type, LanguageConfig.Instance.EraserInitialEraseCd, 30f, 10f, 60f, 5f, MainRoleOption);
-            IncreaseCooldownAfterErasing = CustomOption.Create(type, LanguageConfig.Instance.EraserIncreaseCdAfterErasing, 10f, 5f, 15f, 5f, MainRoleOption);
-            CanEraseImpostors = CustomOption.Create(type, LanguageConfig.Instance.EraserCanEraseImpostors, false, MainRoleOption);
+            InitialEraseCooldown = CustomOption.Create(type, LanguageConfig.Instance.EraserInitialEraseCd, 30f, 10f,
+                60f, 5f, MainRoleOption);
+            IncreaseCooldownAfterErasing = CustomOption.Create(type,
+                LanguageConfig.Instance.EraserIncreaseCdAfterErasing, 10f, 5f, 15f, 5f, MainRoleOption);
+            CanEraseImpostors = CustomOption.Create(type, LanguageConfig.Instance.EraserCanEraseImpostors, false,
+                MainRoleOption);
         }
 
         EraseButton = CustomButton.Create(() =>
-        {
-            var role = CurrentTarget!.GetRoleInstance();
-            Role? newRole = role!.CampType switch
             {
-                CampType.Crewmate => RoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
-                CampType.Neutral => RoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),
-                CampType.Impostor => RoleManager.GetManager().GetTypeRoleInstance<Impostor>(),
-                _ => null
-            };
+                var role = CurrentTarget!.GetRoleInstance();
+                Role? newRole = role!.CampType switch
+                {
+                    CampType.Crewmate => RoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
+                    CampType.Neutral => RoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),
+                    CampType.Impostor => RoleManager.GetManager().GetTypeRoleInstance<Impostor>(),
+                    _ => null
+                };
 
-            if (newRole != null) TempErasedPlayerRoles.Add(CurrentTarget!, newRole);
+                if (newRole != null) TempErasedPlayerRoles.Add(CurrentTarget!, newRole);
 
-            var currentCd = EraseButton!.Cooldown();
-            EraseButton.SetCooldown(currentCd + (IncreaseCooldownAfterErasing?.GetFloat() ?? 10f));
-        },
-        EraseButton!.ResetCooldown,
-        couldUse: () =>
-        {
-            if (!CanEraseImpostors?.GetBool() ?? false && CurrentTarget)
-                return CurrentTarget!.GetRoleInstance()?.CampType != CampType.Impostor;
-            return CurrentTarget;
-        },
-        () => true,
-        null!,
-        2,
-        KeyCode.E,
-        LanguageConfig.Instance.EraseAction,
-        (Cooldown)(() => InitialEraseCooldown?.GetFloat() ?? 30f),
-        -1);
+                var currentCd = EraseButton!.Cooldown();
+                EraseButton.SetCooldown(currentCd + (IncreaseCooldownAfterErasing?.GetFloat() ?? 10f));
+            },
+            EraseButton!.ResetCooldown,
+            couldUse: () =>
+            {
+                if (!CanEraseImpostors?.GetBool() ?? false && CurrentTarget)
+                    return CurrentTarget!.GetRoleInstance()?.CampType != CampType.Impostor;
+                return CurrentTarget;
+            },
+            () => true,
+            null!,
+            2,
+            KeyCode.E,
+            LanguageConfig.Instance.EraseAction,
+            (Cooldown)(() => InitialEraseCooldown?.GetFloat() ?? 30f),
+            -1);
     }
 
     [EventHandler(EventHandlerType.Postfix)]

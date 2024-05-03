@@ -27,8 +27,7 @@ public class BountyHunter : Role, IListener
     private CustomOption? BHunterKillCd { get; set; }
     private CustomOption? BHunterRefreshTargetTime { get; init; }
 
-    [NotUsed]
-    private CustomOption? HasArrowToTarget { get; set; }
+    [NotUsed] private CustomOption? HasArrowToTarget { get; set; }
 
     private CustomOption? CdAfterKillingTarget { get; init; }
     private CustomOption? CdAfterKillingNonTarget { get; init; }
@@ -48,21 +47,22 @@ public class BountyHunter : Role, IListener
         if (ShowInOptions)
         {
             var optionType = ToCustomOption(this);
-            BHunterKillCd = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterDefaultCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            BHunterKillCd = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterDefaultCd, 30f, 10f,
+                60f, 5f, MainRoleOption)!;
             BHunterRefreshTargetTime =
-                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f, 5f, MainRoleOption)!;
+                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f,
+                    5f, MainRoleOption)!;
             //HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
             CdAfterKillingTarget =
-                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f, MainRoleOption)!;
+                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f,
+                    MainRoleOption)!;
             CdAfterKillingNonTarget =
-                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillIncorrectCd, 60f, 60f, 120f, 5f, MainRoleOption)!;
+                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillIncorrectCd, 60f, 60f, 120f, 5f,
+                    MainRoleOption)!;
         }
-        
+
         BHunterKillButton = CustomButton.Create(
-            () =>
-            {
-                PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget);
-            },
+            () => { PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget); },
             () => BHunterKillButton?.ResetCooldown(),
             couldUse: () =>
             {
@@ -129,6 +129,7 @@ public class BountyHunter : Role, IListener
 
         return true;
     }
+
     [EventHandler(EventHandlerType.Postfix)]
     public void OnPlayerMurder(PlayerMurderEvent @event)
     {
@@ -149,14 +150,15 @@ public class BountyHunter : Role, IListener
     private void CreatePoolable()
     {
         TargetPoolable = Object.Instantiate(PlayerUtils.PoolablePlayerPrefab!, HudManager.Instance.transform);
-        
+
         var transform = TargetPoolable.transform;
         transform.localPosition = new Vector3(-3f, -2f, 0);
         transform.localScale = new Vector3(0.7f, 0.7f, 0);
         TargetPoolable.name = "BountyHunterPooableTarget";
         TargetPoolable.gameObject.SetActive(true);
 
-        RefreshTimerText = Object.Instantiate(HudManager.Instance.AbilityButton.cooldownTimerText, TargetPoolable.transform.FindChild("Names"));
+        RefreshTimerText = Object.Instantiate(HudManager.Instance.AbilityButton.cooldownTimerText,
+            TargetPoolable.transform.FindChild("Names"));
         RefreshTimerText.transform.localPosition = new(0, 0.5f, 0);
         RefreshTimerText.name = "TimerText";
     }
@@ -188,9 +190,9 @@ public class BountyHunter : Role, IListener
 
         /*
          * FIXME
-         * 
+         *
          * 船员模型的衣服在船员的底下（不知道是不是树懒的问题）
-         * 
+         *
          */
 
         CurrentTarget.SetPlayerAppearance(TargetPoolable);

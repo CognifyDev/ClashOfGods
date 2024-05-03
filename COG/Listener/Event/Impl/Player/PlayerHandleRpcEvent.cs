@@ -10,7 +10,7 @@ public class PlayerHandleRpcEvent : PlayerEvent
     /// Rpc的CallId
     /// </summary>
     public byte CallId { get; }
-    
+
     /// <summary>
     /// Rpc读取操作器
     /// </summary>

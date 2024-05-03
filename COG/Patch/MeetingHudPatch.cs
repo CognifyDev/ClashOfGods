@@ -22,8 +22,9 @@ internal class MeetingHudStartPatch
 internal class MeetingHudCastVotePatch
 {
     private const byte SkipSuspectPlayerId = 253;
-    
-    public static bool Prefix(MeetingHud __instance, [HarmonyArgument(0)] byte srcPlayerId, [HarmonyArgument(1)] byte suspectPlayerId)
+
+    public static bool Prefix(MeetingHud __instance, [HarmonyArgument(0)] byte srcPlayerId,
+        [HarmonyArgument(1)] byte suspectPlayerId)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
 
@@ -33,10 +34,12 @@ internal class MeetingHudCastVotePatch
 
         var isSkip = suspectPlayerId == SkipSuspectPlayerId;
 
-        Main.Logger.LogDebug($"{voterPlayer.Data.PlayerName} = Cast Vote => {(isSkip ? "Skipped" : targetPlayer == null ? "Unknown" : targetPlayer.Data.PlayerName)}");
+        Main.Logger.LogDebug(
+            $"{voterPlayer.Data.PlayerName} = Cast Vote => {(isSkip ? "Skipped" : targetPlayer == null ? "Unknown" : targetPlayer.Data.PlayerName)}");
 
         var result = ListenerManager.GetManager()
-            .ExecuteHandlers(new MeetingCastVoteEvent(__instance, voterPlayer, targetPlayer, isSkip), EventHandlerType.Prefix);
+            .ExecuteHandlers(new MeetingCastVoteEvent(__instance, voterPlayer, targetPlayer, isSkip),
+                EventHandlerType.Prefix);
 
         if (!result)
             __instance.RpcClearVote(voterPlayer.GetClientID());
@@ -45,7 +48,8 @@ internal class MeetingHudCastVotePatch
         return result;
     }
 
-    public static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] byte srcPlayerId, [HarmonyArgument(1)] byte suspectPlayerId)
+    public static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] byte srcPlayerId,
+        [HarmonyArgument(1)] byte suspectPlayerId)
     {
         if (!AmongUsClient.Instance.AmHost) return;
         // CastVote行为通常只会由房主处理，因为client只会定向向host发送CastVote rpc.
@@ -56,7 +60,8 @@ internal class MeetingHudCastVotePatch
         var isSkip = suspectPlayerId == SkipSuspectPlayerId;
 
         ListenerManager.GetManager()
-            .ExecuteHandlers(new MeetingCastVoteEvent(__instance, voterPlayer, targetPlayer, isSkip), EventHandlerType.Postfix);
+            .ExecuteHandlers(new MeetingCastVoteEvent(__instance, voterPlayer, targetPlayer, isSkip),
+                EventHandlerType.Postfix);
     }
 }
 
@@ -65,6 +70,7 @@ internal class MeetingHudCastVotePatch
 internal class MeetingHudUpdatePatch
 {
     private static int bufferTime = 10;
+
     // 缓冲时间，Update通常每1秒执行30次, bufferTime每次Update加1 !
     // 我们不需要像PlayerControl那样高频率执行patch，MeetingHud的绘图会导致卡顿
     public static void Postfix(MeetingHud __instance)
@@ -84,7 +90,8 @@ internal class MeetingHudUpdatePatch
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 internal class MeetingHudVotingCompletePatch
 {
-    private static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] MeetingHud.VoterState[] states, [HarmonyArgument(1)] GameData.PlayerInfo exiled, [HarmonyArgument(2)] bool tie)
+    private static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] MeetingHud.VoterState[] states,
+        [HarmonyArgument(1)] GameData.PlayerInfo exiled, [HarmonyArgument(2)] bool tie)
     {
         if (__instance.state == MeetingHud.VoteStates.Results) return;
 

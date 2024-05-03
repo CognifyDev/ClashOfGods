@@ -220,13 +220,13 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
-        
+
         // ReSharper disable once PossibleMistakenCallToGetType.2
         // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-        
+
         // 调用 GlobalCustomOptionConstant 静态构造方法来初始化
         typeof(GlobalCustomOptionConstant).GetType();
-        
+
         Harmony.PatchAll();
 
         foreach (var plugin in PluginManager.GetPlugins()) plugin.OnEnable();
@@ -235,7 +235,7 @@ public partial class Main : BasePlugin
     public override bool Unload()
     {
         foreach (var plugin in PluginManager.GetPlugins()) plugin.OnDisable();
-        
+
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();

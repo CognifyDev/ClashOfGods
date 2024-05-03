@@ -52,7 +52,7 @@ public class Opportunist : Role, IListener
             (Cooldown)_killCooldownOption!.GetFloat,
             -1
         );
-            
+
         AddButton(_killButton);
     }
 

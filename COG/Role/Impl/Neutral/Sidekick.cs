@@ -14,14 +14,18 @@ namespace COG.Role.Impl.Neutral;
 public class Sidekick : Role, IListener
 {
     public CustomOption SidekickCanCreateSidekick { get; }
-    public Sidekick() : base(LanguageConfig.Instance.SidekickName, RoleManager.GetManager().GetTypeRoleInstance<Jackal>().Color, CampType.Neutral, false)
+
+    public Sidekick() : base(LanguageConfig.Instance.SidekickName,
+        RoleManager.GetManager().GetTypeRoleInstance<Jackal>().Color, CampType.Neutral, false)
     {
         BaseRoleType = RoleTypes.Crewmate;
         CanVent = true;
 
         if (ShowInOptions)
         {
-            SidekickCanCreateSidekick = CustomOption.Create(CustomOption.TabType.Neutral, LanguageConfig.Instance.SidekickCanCreateSidekick, true, RoleManager.GetManager().GetTypeRoleInstance<Jackal>().MainRoleOption);
+            SidekickCanCreateSidekick = CustomOption.Create(CustomOption.TabType.Neutral,
+                LanguageConfig.Instance.SidekickCanCreateSidekick, true,
+                RoleManager.GetManager().GetTypeRoleInstance<Jackal>().MainRoleOption);
         }
     }
 
@@ -30,7 +34,8 @@ public class Sidekick : Role, IListener
     {
         if (!PlayerControl.LocalPlayer.IsRole(this)) return;
         var victim = @event.Target;
-        if (victim.IsSamePlayer(Jackal.JackalSidekick.FirstOrDefault(kvp => kvp.Value.IsSamePlayer(PlayerControl.LocalPlayer)).Key))
+        if (victim.IsSamePlayer(Jackal.JackalSidekick
+                .FirstOrDefault(kvp => kvp.Value.IsSamePlayer(PlayerControl.LocalPlayer)).Key))
             PlayerControl.LocalPlayer.RpcSetCustomRole<Jackal>();
     }
 

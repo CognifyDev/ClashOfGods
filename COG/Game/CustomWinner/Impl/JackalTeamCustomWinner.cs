@@ -10,10 +10,12 @@ public class JackalTeamCustomWinner : IWinnable
     {
         if (PlayerUtils.GetAllAlivePlayers().All(p => p.IsInJackalTeam()))
         {
-            CustomWinnerManager.RegisterWinningPlayers(PlayerControl.AllPlayerControls.ToArray().Where(p => p.IsInJackalTeam()));
+            CustomWinnerManager.RegisterWinningPlayers(PlayerControl.AllPlayerControls.ToArray()
+                .Where(p => p.IsInJackalTeam()));
             GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
             return true;
         }
+
         return false;
     }
 

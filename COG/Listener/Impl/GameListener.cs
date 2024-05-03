@@ -392,14 +392,16 @@ public class GameListener : IListener
         var role = player!.GetRoleInstance();
         if (role == null) return;
 
-        int GetCount(IEnumerable<PlayerRole> list) => list.Select(p => p.Player).Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+        int GetCount(IEnumerable<PlayerRole> list) => list.Select(p => p.Player)
+            .Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
 
         int crewCount = GetCount(PlayerUtils.AllCrewmates);
         int impCount = GetCount(PlayerUtils.AllImpostors);
         int neutralCount = GetCount(PlayerUtils.AllNeutrals);
 
         var roleText = controller.completeString = role.HandleEjectText(player!);
-        var playerInfoText = controller.ImpostorText.text = LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
+        var playerInfoText = controller.ImpostorText.text =
+            LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
 
         Main.Logger.LogInfo($"Eject text: {roleText} & {playerInfoText}");
     }
@@ -409,7 +411,7 @@ public class GameListener : IListener
     {
         if (AmongUsClient.Instance.NetworkMode != NetworkModes.FreePlay) return;
 
-        foreach (var player in PlayerControl.AllPlayerControls) 
+        foreach (var player in PlayerControl.AllPlayerControls)
             player.RpcSetCustomRole<Crewmate>();
     }
 }

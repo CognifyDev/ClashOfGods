@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using COG.Utils;
 using NLua;
+
 // ReSharper disable UnusedMember.Global
 
 namespace COG.Plugin.Loader.Controller.Classes.Player;

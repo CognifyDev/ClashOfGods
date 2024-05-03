@@ -15,7 +15,7 @@ public static class GlobalCustomOptionConstant
     {
         LoadPreset = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.LoadPreset, false, null, true, CustomOption.OptionType.Button);
-        
+
         SavePreset = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.SavePreset, false, null, true, CustomOption.OptionType.Button);
 

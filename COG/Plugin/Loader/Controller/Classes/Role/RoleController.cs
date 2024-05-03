@@ -8,7 +8,7 @@ public class RoleController
 {
     private readonly Lua _luaController;
     private readonly IPlugin _plugin;
-    
+
     public RoleController(Lua lua, IPlugin plugin)
     {
         _luaController = lua;
@@ -17,7 +17,7 @@ public class RoleController
 
     public COG.Role.Role StartRoleInstance(string name, string color, int campType, bool showInOptions)
     {
-        return new COG.Role.Role(name, ColorUtils.AsColor(color), (CampType) campType, showInOptions);
+        return new COG.Role.Role(name, ColorUtils.AsColor(color), (CampType)campType, showInOptions);
     }
 
     public void RegisterRole(COG.Role.Role role)

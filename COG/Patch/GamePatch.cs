@@ -307,12 +307,14 @@ public class PlayerControlCompleteTaskPatch
 {
     public static bool Prefix(PlayerControl __instance, uint idx)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerTaskFinishEvent(__instance, idx), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerTaskFinishEvent(__instance, idx), EventHandlerType.Prefix);
     }
 
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] uint idx)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerTaskFinishEvent(__instance, idx), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerTaskFinishEvent(__instance, idx), EventHandlerType.Postfix);
     }
 }
 
@@ -321,11 +323,15 @@ public class ExileControllerBeginPatch
 {
     public static bool Prefix(ExileController __instance, GameData.PlayerInfo exiled, bool tie)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie), EventHandlerType.Prefix);
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie),
+                EventHandlerType.Prefix);
     }
 
-    public static void Postfix(ExileController __instance, [HarmonyArgument(0)] GameData.PlayerInfo exiled, [HarmonyArgument(1)] bool tie)
+    public static void Postfix(ExileController __instance, [HarmonyArgument(0)] GameData.PlayerInfo exiled,
+        [HarmonyArgument(1)] bool tie)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie), EventHandlerType.Postfix);
+        ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie),
+            EventHandlerType.Postfix);
     }
 }

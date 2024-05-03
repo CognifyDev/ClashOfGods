@@ -40,11 +40,11 @@ public class Troublemaker : Role
         MakeTroubleButton = CustomButton.Create(
             () =>
             {
-
                 if (_task != null)
                 {
                     startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
                 }
+
                 _task = new Thread(() =>
                 {
                     while (true)
@@ -58,7 +58,6 @@ public class Troublemaker : Role
                     }
                 });
                 _task.Start();
-
             },
             () => MakeTroubleButton?.ResetCooldown(),
             couldUse: () => true,

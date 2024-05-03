@@ -1,4 +1,5 @@
 using COG.Utils;
+
 // ReSharper disable All
 
 namespace COG.Config.Impl;

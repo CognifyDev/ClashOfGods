@@ -28,6 +28,7 @@ public class Jackal : Role, IListener
     public static PlayerControl? CurrentTarget { get; set; }
     public static bool CreatedSidekick { get; set; } = false;
     public static Dictionary<PlayerControl, PlayerControl> JackalSidekick { get; set; } = new();
+
     public Jackal() : base(LanguageConfig.Instance.JackalName, new(0, 180f, 235f), CampType.Neutral, true)
     {
         Description = LanguageConfig.Instance.JackalDescription;
@@ -38,8 +39,10 @@ public class Jackal : Role, IListener
 
         if (ShowInOptions)
         {
-            CreateSidekickCd = CustomOption.Create(CustomOption.TabType.Neutral, LanguageConfig.Instance.JackalCreateSidekickCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
-            JackalKillCd = CustomOption.Create(CustomOption.TabType.Neutral, LanguageConfig.Instance.JackalKillCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            CreateSidekickCd = CustomOption.Create(CustomOption.TabType.Neutral,
+                LanguageConfig.Instance.JackalCreateSidekickCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
+            JackalKillCd = CustomOption.Create(CustomOption.TabType.Neutral, LanguageConfig.Instance.JackalKillCd, 30f,
+                10f, 60f, 5f, MainRoleOption)!;
         }
 
         CreateSidekickButton = CustomButton.Create(
@@ -64,11 +67,8 @@ public class Jackal : Role, IListener
             0
         );
 
-        JackalKillButton= CustomButton.Create(
-            () =>
-            {
-                PlayerControl.LocalPlayer.CmdCheckMurder(CurrentTarget);
-            },
+        JackalKillButton = CustomButton.Create(
+            () => { PlayerControl.LocalPlayer.CmdCheckMurder(CurrentTarget); },
             () => JackalKillButton?.ResetCooldown(),
             couldUse: () =>
             {
@@ -97,7 +97,8 @@ public class Jackal : Role, IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         if (!(GameStates.InGame && PlayerControl.LocalPlayer.IsRole(this))) return;
-        if (PlayerControl.LocalPlayer.IsAlive()) CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
+        if (PlayerControl.LocalPlayer.IsAlive())
+            CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
     }
 
     [EventHandler(EventHandlerType.Postfix)]

@@ -15,29 +15,29 @@ public class CustomButton
 {
     public ActionButton? ActionButton { get; set; }
     public Func<float> Cooldown { get; set; } = () => GameUtils.GetGameOptions().KillCooldown;
-    public Func<bool> CouldUse{get;set;}
-    public float EffectTime{get;set;}
-    public GameObject? GameObject{get;set;}
-    public Func<bool>? HasButton{get;set;}
-    public bool HasEffect{get;set;}
-    public KeyCode? Hotkey{get;set;}
-    public string HotkeyName{get;set;}
+    public Func<bool> CouldUse { get; set; }
+    public float EffectTime { get; set; }
+    public GameObject? GameObject { get; set; }
+    public Func<bool>? HasButton { get; set; }
+    public bool HasEffect { get; set; }
+    public KeyCode? Hotkey { get; set; }
+    public string HotkeyName { get; set; }
 
-    public HudManager? Hud{get;set;}
-    public bool IsEffectActive{get;set;}
-    public Material? Material{get;set;}
-    public Action OnClick{get;set;}
-    public Action? OnEffect{get;set;}
-    public Action OnMeetingEnd{get;set;}
-    public PassiveButton? PassiveButton{get;set;}
-    public Vector3 Position{get;set;}
-    public Sprite Sprite{get;set;}
+    public HudManager? Hud { get; set; }
+    public bool IsEffectActive { get; set; }
+    public Material? Material { get; set; }
+    public Action OnClick { get; set; }
+    public Action? OnEffect { get; set; }
+    public Action OnMeetingEnd { get; set; }
+    public PassiveButton? PassiveButton { get; set; }
+    public Vector3 Position { get; set; }
+    public Sprite Sprite { get; set; }
     public SpriteRenderer? SpriteRenderer { get; set; }
 
     public string Text { get; set; }
     public TextMeshPro? TextMesh { get; set; }
     public float Timer { get; set; }
-    public int UsesLimit { get;set; }
+    public int UsesLimit { get; set; }
     public int UsesRemaining { get; set; }
     public bool IsCustomPosition { get; set; }
     public int Row { get; set; }
@@ -231,7 +231,7 @@ public class CustomButton
     }
 
     public void OnMeetingEndSpawn() => OnMeetingEnd();
-    
+
 
 #nullable disable
     private void CheckClick()

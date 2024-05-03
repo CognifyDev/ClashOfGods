@@ -85,7 +85,7 @@ public static class GameUtils
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
     }
 
-    public static void SetCustomRole<T>(this PlayerControl pc) where T: Role.Role
+    public static void SetCustomRole<T>(this PlayerControl pc) where T : Role.Role
     {
         if (!pc) return;
         var role = Role.RoleManager.GetManager().GetTypeRoleInstance<T>();
@@ -102,7 +102,7 @@ public static class GameUtils
         SetCustomRole(pc, role);
     }
 
-    public static void RpcSetCustomRole<T>(this PlayerControl pc) where T: Role.Role
+    public static void RpcSetCustomRole<T>(this PlayerControl pc) where T : Role.Role
     {
         if (!pc) return;
         var role = Role.RoleManager.GetManager().GetTypeRoleInstance<T>();
@@ -135,7 +135,7 @@ public static class GameUtils
     public static List<Transform> GetAllChildren(this Transform transform)
     {
         List<Transform> result = new();
-        for (int i = 0; i < transform.childCount; i++) 
+        for (int i = 0; i < transform.childCount; i++)
             result.Add(transform.GetChild(i));
         return result;
     }

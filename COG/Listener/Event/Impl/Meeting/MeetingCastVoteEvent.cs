@@ -9,19 +9,20 @@ public class MeetingCastVoteEvent : MeetingEvent
     /// 投票者
     /// </summary>
     public PlayerControl Voter { get; }
-    
+
     /// <summary>
     /// 被投票者
     /// 当是跳过的时候或者退出的时候这个会返回 null
     /// </summary>
     public PlayerControl? Target { get; }
-    
+
     /// <summary>
     /// 是否是跳过投票
     /// </summary>
     public bool IsSkipped { get; }
 
-    public MeetingCastVoteEvent(MeetingHud meetingHud, PlayerControl voter, PlayerControl? target, bool didSkip) : base(meetingHud)
+    public MeetingCastVoteEvent(MeetingHud meetingHud, PlayerControl voter, PlayerControl? target, bool didSkip) :
+        base(meetingHud)
     {
         Voter = voter;
         Target = target;

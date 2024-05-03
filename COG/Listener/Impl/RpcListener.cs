@@ -53,19 +53,19 @@ public class RpcListener : IListener
 
                 break;
             case KnownRpc.SetRole:
-                {
-                    var playerId = reader.ReadByte();
-                    var roleId = reader.ReadPackedInt32();
-                    PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(Role.RoleManager.GetManager().GetRoleById(roleId)!);
-                    break;
-                }
+            {
+                var playerId = reader.ReadByte();
+                var roleId = reader.ReadPackedInt32();
+                PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(Role.RoleManager.GetManager().GetRoleById(roleId)!);
+                break;
+            }
             case KnownRpc.CreateSidekick:
-                {
-                    var jackalId = reader.ReadByte();
-                    var sidekickId = reader.ReadByte();
-                    PlayerUtils.GetPlayerById(jackalId)!.CreateSidekick(PlayerUtils.GetPlayerById(sidekickId)!);
-                    break;
-                }
+            {
+                var jackalId = reader.ReadByte();
+                var sidekickId = reader.ReadByte();
+                PlayerUtils.GetPlayerById(jackalId)!.CreateSidekick(PlayerUtils.GetPlayerById(sidekickId)!);
+                break;
+            }
         }
     }
 }

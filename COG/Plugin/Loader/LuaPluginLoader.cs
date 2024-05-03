@@ -11,6 +11,7 @@ using COG.Plugin.Loader.Controller.Classes.Role;
 using COG.Plugin.Loader.Controller.Function;
 using COG.Utils;
 using NLua;
+
 #pragma warning disable SYSLIB0014
 
 namespace COG.Plugin.Loader;
@@ -72,13 +73,13 @@ public class LuaPluginLoader : IPlugin
                                	
                                """);
 
-        
+
         LuaController.DoString($"""
                                 
                                       luanet.load_assembly("{Main.DisplayName}")
                                 	
                                 """);
-        
+
         LuaController.DoFile(ScriptPath + "\\" + _mainClass);
         if (!CheckPlugin())
             throw new CannotLoadPluginException($"{directoryInfo.Name} not a correct plugin with functions");
@@ -102,12 +103,13 @@ public class LuaPluginLoader : IPlugin
 
     private void MakeLanguage()
     {
-        
         var assembly = Assembly.GetExecutingAssembly();
         var allClasses = assembly.GetAllClassesFromAssembly();
-        foreach (var type in allClasses.Where(type => (type.Namespace == null || type.Namespace.StartsWith("COG")) && type.Namespace != null))
+        foreach (var type in allClasses.Where(type =>
+                     (type.Namespace == null || type.Namespace.StartsWith("COG")) && type.Namespace != null))
         {
-            if (type.FullName != null && (type.FullName.Contains('`') || type.FullName.Contains('>') || type.FullName.Contains('<'))) continue;
+            if (type.FullName != null &&
+                (type.FullName.Contains('`') || type.FullName.Contains('>') || type.FullName.Contains('<'))) continue;
             LuaController.DoString($"""
                                     
                                          {type.Name} = luanet.import_type("{type.FullName}")

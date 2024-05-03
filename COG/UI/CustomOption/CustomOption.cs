@@ -104,7 +104,8 @@ public sealed class CustomOption
     }
 
     public static CustomOption Create(TabType type, string name, float defaultValue, float min,
-        float max, float step, CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
+        float max, float step, CustomOption? parent = null, bool isHeader = false,
+        OptionType optionType = OptionType.Default)
     {
         List<object> selections = new();
         for (var s = min; s <= max; s += step) selections.Add(s);
@@ -116,7 +117,8 @@ public sealed class CustomOption
     {
         return new CustomOption(type, name,
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
-            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader, optionType);
+            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader,
+            optionType);
     }
 
     public static void ShareConfigs(PlayerControl target)
@@ -134,10 +136,10 @@ public sealed class CustomOption
         var sb = new StringBuilder();
 
         foreach (var option in from option in Options
-                               where option != null
-                               where option.SpecialOptionType != OptionType.Button
-                               where option.Selection != option.DefaultSelection
-                               select option)
+                 where option != null
+                 where option.SpecialOptionType != OptionType.Button
+                 where option.Selection != option.DefaultSelection
+                 select option)
         {
             sb.Append(option.ID + "|" + option.Selection);
             sb.Append(',');
@@ -180,7 +182,8 @@ public sealed class CustomOption
         {
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
-            foreach (var option in Options.Where(o => o is { SpecialOptionType: OptionType.Default }).OrderBy(o => o!.ID))
+            foreach (var option in Options.Where(o => o is { SpecialOptionType: OptionType.Default })
+                         .OrderBy(o => o!.ID))
                 writer.WriteLine(option!.ID + " " + option.Selection);
         }
         catch (System.Exception e)
@@ -379,33 +382,33 @@ public sealed class CustomOption
                     switch (option.SpecialOptionType)
                     {
                         case OptionType.Default:
-                            {
-                                var stringOption = Object.Instantiate(template, menus[option.Page]);
-                                typeOptions[option.Page].Add(stringOption);
-                                stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
-                                stringOption.TitleText.text = stringOption.name = option.Name;
-                                if (FirstOpen)
-                                    stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
-                                else
-                                    stringOption.Value = stringOption.oldValue = option.Selection;
+                        {
+                            var stringOption = Object.Instantiate(template, menus[option.Page]);
+                            typeOptions[option.Page].Add(stringOption);
+                            stringOption.OnValueChanged = new Action<OptionBehaviour>(_ => { });
+                            stringOption.TitleText.text = stringOption.name = option.Name;
+                            if (FirstOpen)
+                                stringOption.Value = stringOption.oldValue = option.Selection = option.DefaultSelection;
+                            else
+                                stringOption.Value = stringOption.oldValue = option.Selection;
 
-                                stringOption.ValueText.text = option.Selections[option.Selection].ToString();
+                            stringOption.ValueText.text = option.Selections[option.Selection].ToString();
 
-                                option.OptionBehaviour = stringOption;
-                            }
+                            option.OptionBehaviour = stringOption;
+                        }
                             break;
                         case OptionType.Button:
-                            {
-                                var templateToggle = GameObject.Find("ResetToDefault")?.GetComponent<ToggleOption>();
-                                if (!templateToggle) return;
+                        {
+                            var templateToggle = GameObject.Find("ResetToDefault")?.GetComponent<ToggleOption>();
+                            if (!templateToggle) return;
 
-                                var strOpt = Object.Instantiate(templateToggle, menus[option.Page]);
-                                strOpt!.transform.Find("CheckBox")?.gameObject.SetActive(false);
-                                strOpt.TitleText.transform.localPosition = Vector3.zero;
-                                strOpt.name = option.Name;
+                            var strOpt = Object.Instantiate(templateToggle, menus[option.Page]);
+                            strOpt!.transform.Find("CheckBox")?.gameObject.SetActive(false);
+                            strOpt.TitleText.transform.localPosition = Vector3.zero;
+                            strOpt.name = option.Name;
 
-                                option.OptionBehaviour = strOpt;
-                            }
+                            option.OptionBehaviour = strOpt;
+                        }
                             break;
                     }
                 }
@@ -438,6 +441,7 @@ public sealed class CustomOption
                 highlight.enabled = i == index;
                 i++;
             }
+
             Main.Logger.LogInfo("Opened tab: " + index);
         }
 
@@ -495,7 +499,8 @@ public sealed class CustomOption
         /// <param name="tabName">Name to set</param>
         /// <param name="tabSprite">The location of the image</param>
         /// <returns>The highlight of the icon</returns>
-        private static SpriteRenderer SetHighlightSprite(GameObject tab, string tabName, string tabSpritePath) => SetHighlightSprite(tab, tabName, ResourceUtils.LoadSprite(tabSpritePath, 100f)!);
+        private static SpriteRenderer SetHighlightSprite(GameObject tab, string tabName, string tabSpritePath) =>
+            SetHighlightSprite(tab, tabName, ResourceUtils.LoadSprite(tabSpritePath, 100f)!);
 
         /// <summary>
         /// Set the icon of the tab.
@@ -541,17 +546,21 @@ public sealed class CustomOption
     private class RoleSettingsMenuPatch
     {
         public const string TitleObjectName = "Text";
+
         public static void Postfix(RolesSettingsMenu __instance)
         {
             __instance.transform.FindChild("Right Panel").gameObject.SetActive(false);
 
-            void SetChildrenInactiveBut(Transform transform, string name)=> transform.GetAllChildren().Where(t => t.name != name).ForEach(t => t.gameObject.SetActive(false));
+            void SetChildrenInactiveBut(Transform transform, string name) => transform.GetAllChildren()
+                .Where(t => t.name != name).ForEach(t => t.gameObject.SetActive(false));
 
             SetChildrenInactiveBut(__instance.transform.FindChild("Left Panel"), __instance.RoleChancesSettings.name);
             SetChildrenInactiveBut(__instance.RoleChancesSettings.transform, TitleObjectName);
 
-            __instance.RoleChancesSettings.transform.FindChild(TitleObjectName).GetComponent<TextTranslatorTMP>().Destroy();
-            var titleText = __instance.RoleChancesSettings.transform.FindChild(TitleObjectName).GetComponent<TextMeshPro>();
+            __instance.RoleChancesSettings.transform.FindChild(TitleObjectName).GetComponent<TextTranslatorTMP>()
+                .Destroy();
+            var titleText = __instance.RoleChancesSettings.transform.FindChild(TitleObjectName)
+                .GetComponent<TextMeshPro>();
             titleText.alignment = TextAlignmentOptions.Center;
             titleText.transform.localPosition = new(2.5f, 0, 0);
             titleText.text = LanguageConfig.Instance.VanillaRoleDisabled;

@@ -225,9 +225,11 @@ public static class PlayerUtils
         pc.cosmetics.currentBodySprite.BodySprite.material.SetColor(OutlineColor, color);
     }
 
-    public static void ClearOutline(this PlayerControl pc) => pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
+    public static void ClearOutline(this PlayerControl pc) =>
+        pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
 
-    public static bool IsRole<T>(this PlayerControl pc) where T : Role.Role => IsRole(pc, Role.RoleManager.GetManager().GetTypeRoleInstance<T>());
+    public static bool IsRole<T>(this PlayerControl pc) where T : Role.Role =>
+        IsRole(pc, Role.RoleManager.GetManager().GetTypeRoleInstance<T>());
 
     public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color, bool checkDist = true)
     {
@@ -236,11 +238,12 @@ public static class PlayerUtils
         if (!target) return null;
         if (GameUtils.GetGameOptions().KillDistance >=
             Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(),
-            target!.GetTruePosition()) && checkDist)
+                target!.GetTruePosition()) && checkDist)
         {
             target!.SetOutline(color);
             return target;
         }
+
         return null;
     }
 }

@@ -12,7 +12,7 @@ public class Event
     private static readonly List<Type> SubClasses = typeof(Event).GetAllSubclasses();
 
     public static List<Type> GetSubClasses() => new(SubClasses);
-    
+
     public string Name { get; }
     public int Id { get; }
 

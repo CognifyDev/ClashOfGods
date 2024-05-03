@@ -18,7 +18,7 @@ public static class ListUtils
         return list.OrderBy(_ => random.Next()).ToList();
     }
 
-    public static bool IsEmpty<T>(this List<T> list) => list is not { Count: > 0 }; 
+    public static bool IsEmpty<T>(this List<T> list) => list is not { Count: > 0 };
 
     public static T GetOneAndDelete<T>(this List<T> list)
     {
@@ -27,5 +27,6 @@ public static class ListUtils
         return obj;
     }
 
-    public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action) => collection.ToList().ForEach(action);
+    public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action) =>
+        collection.ToList().ForEach(action);
 }
