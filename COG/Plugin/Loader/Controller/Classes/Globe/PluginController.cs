@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using COG.Utils;
 using NLua;
@@ -49,6 +50,21 @@ public class PluginController
     public void OnDisable()
     {
         _plugin.OnDisable();
+    }
+
+    public Func<object> GetFuncInstanceWithReturn(string functionName)
+    {
+        var function = _lua.GetFunction(functionName);
+        return () =>
+        {
+            var result = function.Call();
+            if (result == null)
+            {
+                throw new System.Exception("result is null");
+            }
+
+            return result[0];
+        };
     }
 
     public RpcUtils.RpcWriter GetRpcWriter(string playerId, string callId, string targets)

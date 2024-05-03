@@ -28,6 +28,8 @@ public class PlayerController
     {
         player.MurderPlayer(player, GameUtils.DefaultFlag);
     }
+    
+    public PlayerControl GetLocalPlayerController() => PlayerControl.LocalPlayer;
 
     public bool IsRole(PlayerControl player, COG.Role.Role role)
     {
