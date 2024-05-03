@@ -15,6 +15,8 @@ namespace COG.Role;
 /// </summary>
 public class Role
 {
+    private static int _order;
+    
     public Role(string name, Color color, CampType campType, bool showInOptions)
     {
         Name = name;
@@ -27,7 +29,8 @@ public class Role
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
         CanSabotage = campType == CampType.Impostor;
-        Id = name.GetHashCode();
+        Id = _order;
+        _order ++;
         ShowInOptions = showInOptions;
 
         if (ShowInOptions)

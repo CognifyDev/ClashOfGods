@@ -225,8 +225,6 @@ public class CustomButton
             SpriteRenderer!.color = TextMesh!.color = Palette.DisabledClear;
             Material!.SetFloat(desat, 1f);
         }
-        
-        Main.Logger.LogInfo("(string) " + Timer);
 
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) CheckClick();
 
@@ -260,7 +258,8 @@ public class CustomButton
                     ResetEffectTime();
                 }
 
-                if (UsesLimit > 0) UsesRemaining--;
+                if (UsesLimit > 0) UsesRemaining --;
+                if (UsesLimit <= 0 || UsesRemaining > 0) ResetCooldown();
             }
         }
     }

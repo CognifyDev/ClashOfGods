@@ -35,7 +35,7 @@ public class Cleaner : Role, IListener
                 RpcCleanDeadBody(body!);
             },
             () => CleanBodyButton?.ResetCooldown(),
-            () => true,
+            () => PlayerUtils.GetClosestBody() != null,
             () => true,
             ResourceUtils.LoadSpriteFromResources(ResourcesConstant.CleanDeadBodyButton, 100f)!,
             2,
