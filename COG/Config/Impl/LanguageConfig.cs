@@ -70,6 +70,9 @@ public class LanguageConfig : Config
         SheriffDescription = GetString("role.crewmate.sheriff.description");
         SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");
 
+        SpyName = GetString("role.crewmate.spy.name");
+        SpyDescription = GetString("role.crewmate.spy.description");
+
         // Impostors
         ImpostorName = GetString("role.impostor.impostor.name");
         ImpostorDescription = GetString("role.impostor.impostor.description");
@@ -202,6 +205,9 @@ public class LanguageConfig : Config
     public string SheriffDescription { get; private set; } = null!;
     public string SheriffKillCooldown { get; private set; } = null!;
 
+    public string SpyName { get; private set; } = null!;
+    public string SpyDescription { get; private set; } = null!;
+    
     // Impostor
     public string ImpostorName { get; private set; } = null!;
     public string ImpostorDescription { get; private set; } = null!;

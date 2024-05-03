@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using COG.Utils;
 using NLua;
+using UnityEngine;
 
 namespace COG.Plugin.Loader.Controller.Classes.Globe;
 
@@ -52,6 +53,11 @@ public class PluginController
         _plugin.OnDisable();
     }
 
+    public KeyCode GetKeyCodeById(int id)
+    {
+        return (KeyCode) id;
+    }
+
     public Func<object> GetFuncInstanceWithReturn(string functionName)
     {
         var function = _lua.GetFunction(functionName);
@@ -64,6 +70,15 @@ public class PluginController
             }
 
             return result[0];
+        };
+    }
+
+    public Action GetActionInstance(string functionName)
+    {
+        var function = _lua.GetFunction(functionName);
+        return () =>
+        {
+            function.Call();
         };
     }
 

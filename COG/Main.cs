@@ -155,6 +155,7 @@ public partial class Main : BasePlugin
             new Crewmate(),
             new Bait(),
             new Sheriff(),
+            // new Spy(),
 
             // Impostor
             new Impostor(),
