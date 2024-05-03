@@ -240,7 +240,7 @@ public static class PlayerUtils
             Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(),
                 target!.GetTruePosition()) && checkDist)
         {
-            target!.SetOutline(color);
+            target.SetOutline(color);
             return target;
         }
 
