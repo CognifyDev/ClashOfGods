@@ -1,4 +1,5 @@
-﻿using COG.Config.Impl;
+﻿using System.Linq;
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Game;
 using COG.Utils;
@@ -8,7 +9,6 @@ using UnityEngine;
 namespace COG.Role.Impl.Crewmate;
 
 [NotTested]
-[NotUsed]
 public class Spy : Role, IListener
 {
     public Spy() : base(LanguageConfig.Instance.SpyName, Color.grey, CampType.Crewmate, true)
@@ -23,7 +23,8 @@ public class Spy : Role, IListener
         {
             if (!player.IsRole<Spy>()) continue;
             var name = player.Data.PlayerName;
-            player.RpcSetName($"<color=#FF0000>{name}</color>");
+            player.RpcSetNamePrivately($"<color=#FF0000>{name}</color>", 
+                PlayerUtils.GetAllAlivePlayers().Where(playerControl => playerControl.IsRole<Spy>()).ToArray());
         }
     }
     

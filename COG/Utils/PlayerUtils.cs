@@ -9,6 +9,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Neutral;
+using COG.Rpc;
 using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
@@ -183,6 +184,19 @@ public static class PlayerUtils
             DeathReason.Disconnected => LanguageConfig.Instance.Disconnected,
             _ => LanguageConfig.Instance.UnknownKillReason
         };
+    }
+
+    public static void RpcSetNamePrivately(this PlayerControl player, string name, PlayerControl[] targets)
+    {
+        foreach (var target in targets)
+        {
+            var clientId = target.GetClientID();
+            var writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SetName,
+                SendOption.Reliable, clientId);
+            writer.Write(name);
+            writer.Write(false);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
+        }
     }
 
     /// <summary>
