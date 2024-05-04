@@ -118,6 +118,12 @@ public class LanguageConfig : Config
 
         SidekickName = GetString("role.neutral.sidekick.name");
         SidekickCanCreateSidekick = GetString("role.neutral.sidekick.can-create-sidekick");
+        
+        // Sub-roles
+        GuesserName = GetString("role.sub-roles.guesser.name");
+        GuesserDescription = GetString("role.sub-roles.guesser.description");
+        GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
+        GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
 
         Enable = GetString("option.enable");
         Disable = GetString("option.disable");
@@ -255,6 +261,12 @@ public class LanguageConfig : Config
     public string SidekickName { get; private set; } = null!;
     public string SidekickCanCreateSidekick { get; private set; } = null!;
 
+    // Sub-roles
+    public string GuesserName { get; private set; } = null!;
+    public string GuesserDescription { get; private set; } = null!;
+    public string GuesserMaxGuessTime { get; private set; } = null!;
+    public string GuesserGuessContinuously { get; private set; } = null!;
+    
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;

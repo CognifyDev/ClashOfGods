@@ -80,7 +80,7 @@ public class Role
     /// <summary>
     ///     是否为副职业
     /// </summary>
-    public bool SubRole { get; }
+    public bool SubRole { get; protected init; }
 
     /// <summary>
     ///     在选项中显示
@@ -134,7 +134,7 @@ public class Role
     {
         var role = player.GetRoleInstance();
         return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName,
-            role!.Name.Color(role!.Color));
+            role!.Name.Color(role.Color));
     }
 
     public static CustomOption.TabType ToCustomOption(Role role)

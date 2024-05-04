@@ -72,6 +72,12 @@ role:
     sidekick:
       name: "跟班"
       can-create-sidekick: "继位后可继续传火"
+  sub-roles:
+    guesser:
+      name: "赌怪"
+      description: "生命就是豪赌"
+      max-guess-time: "最大猜测次数"
+      guess-continuously: "连续赌注"
 camp:
   unknown:
     name: "未知阵营"

@@ -1,4 +1,9 @@
-﻿using COG.States;
+﻿using AmongUs.GameOptions;
+using COG.States;
+using Reactor.Utilities.Extensions;
+using UnityEngine;
+// ReSharper disable InconsistentNaming
+// ReSharper disable RedundantAssignment
 
 namespace COG.Patch;
 
@@ -28,9 +33,35 @@ public static class IsVersionModdedPatch
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
 public static class DestroyQuickButton
 {
-    public static void Prefix(ChatController __instance)
+    public static void Postfix(ChatController __instance)
     {
-        if (__instance.quickChatButton.gameObject.active)
-            __instance.quickChatButton.gameObject.SetActive(false);
+        var gameObject = __instance.quickChatButton.gameObject;
+        if (gameObject == null || gameObject.IsDestroyedOrNull())
+            gameObject!.DestroyImmediate();
+    }
+}
+
+[HarmonyPatch(typeof(OptionsMenuBehaviour), nameof(OptionsMenuBehaviour.Update))]
+public static class DestroyUselessButtons
+{
+    public static void Postfix()
+    {
+        var gameObject = GameObject.Find("OptionsMenu/DataTab/TwitchLinkButton");
+        if (gameObject != null && !gameObject.IsDestroyedOrNull())
+        {
+            gameObject.DestroyImmediate();
+        }
+    }
+}
+
+[HarmonyPatch(typeof(GameOptionsManager), nameof(GameOptionsManager.SwitchGameMode))]
+public static class NormalModeOnly
+{
+    public static void Postfix(GameOptionsManager __instance)
+    {
+        if (__instance.currentGameMode != GameModes.Normal)
+        {
+            __instance.SwitchGameMode(GameModes.Normal);
+        }
     }
 }

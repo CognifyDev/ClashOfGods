@@ -4,29 +4,23 @@ using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.HManager;
-using COG.Listener.Event.Impl.Player;
-using COG.Role;
 using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
-using COG.Utils.Coding;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
-[NotUsed]
-[NotTested]
 public class Jackal : Role, IListener
 {
-    public CustomOption CreateSidekickCd { get; }
-    public CustomOption JackalKillCd { get; }
-    public CustomButton CreateSidekickButton { get; }
-    public CustomButton JackalKillButton { get; }
-    public static PlayerControl? CurrentTarget { get; set; }
-    public static bool CreatedSidekick { get; set; } = false;
+    private CustomOption CreateSidekickCd { get; } = null!;
+    private CustomOption JackalKillCd { get; } = null!;
+    private CustomButton CreateSidekickButton { get; }
+    private CustomButton JackalKillButton { get; }
+    private static PlayerControl? CurrentTarget { get; set; }
+    private bool CreatedSidekick { get; set; }
     public static Dictionary<PlayerControl, PlayerControl> JackalSidekick { get; set; } = new();
 
     public Jackal() : base(LanguageConfig.Instance.JackalName, new(0, 180f, 235f), CampType.Neutral, true)
@@ -40,9 +34,9 @@ public class Jackal : Role, IListener
         if (ShowInOptions)
         {
             CreateSidekickCd = CustomOption.Create(CustomOption.TabType.Neutral,
-                LanguageConfig.Instance.JackalCreateSidekickCd, 30f, 10f, 60f, 5f, MainRoleOption)!;
+                LanguageConfig.Instance.JackalCreateSidekickCd, 30f, 10f, 60f, 5f, MainRoleOption);
             JackalKillCd = CustomOption.Create(CustomOption.TabType.Neutral, LanguageConfig.Instance.JackalKillCd, 30f,
-                10f, 60f, 5f, MainRoleOption)!;
+                10f, 60f, 5f, MainRoleOption);
         }
 
         CreateSidekickButton = CustomButton.Create(
