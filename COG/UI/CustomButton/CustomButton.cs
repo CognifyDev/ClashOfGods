@@ -197,7 +197,7 @@ public class CustomButton
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 
-        if (!PlayerControl.LocalPlayer || MeetingHud.Instance || ExileController.Instance || !hasButton || PlayerStates.IsShowingMap())
+        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || !hasButton || PlayerStates.IsShowingMap())
         {
             SetActive(false);
             return;
@@ -243,7 +243,7 @@ public class CustomButton
             if (HasEffect && IsEffectActive)
             {
                 IsEffectActive = false;
-                ActionButton.cooldownTimerText.color = Palette.EnabledColor;
+                if (ActionButton != null) ActionButton.cooldownTimerText.color = Palette.EnabledColor;
                 Debug.Assert(OnEffect != null, $"{nameof(OnEffect)} != null");
                 OnEffect();
                 ResetCooldown();
