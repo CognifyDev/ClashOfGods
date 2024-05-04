@@ -88,6 +88,9 @@ public static class PlayerUtils
         return player.PlayerId == target.PlayerId;
     }
 
+    public static PlayerRole? GetPlayerRoleInstance(this PlayerControl player) => 
+        GameUtils.PlayerRoleData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
+
     public static Role.Role? GetRoleInstance(this PlayerControl player)
     {
         return (from keyValuePair in GameUtils.PlayerRoleData
@@ -138,8 +141,8 @@ public static class PlayerUtils
 
     public static bool IsRole(this PlayerControl player, Role.Role role)
     {
-        var targetRole = player.GetRoleInstance();
-        return targetRole != null && targetRole.Id.Equals(role.Id);
+        var targetRole = player.GetPlayerRoleInstance();
+        return targetRole != null && (targetRole.Role.Id.Equals(role.Id) || targetRole.SubRoles.Contains(role));
     }
 
     public static DeadBody? GetClosestBody(List<DeadBody>? untargetable = null)
@@ -359,18 +362,20 @@ public class DeadPlayer
 
 public class PlayerRole
 {
-    public PlayerRole(PlayerControl player, Role.Role role)
+    public PlayerRole(PlayerControl player, Role.Role role, Role.Role[]? subRoles = null)
     {
         Player = player;
         Role = role;
         PlayerName = player.name;
         PlayerId = player.PlayerId;
+        SubRoles = subRoles != null ? subRoles.Where(subRole => subRole.SubRole).ToArray() : Array.Empty<Role.Role>();
     }
 
     public PlayerControl Player { get; }
     public Role.Role Role { get; }
     public string PlayerName { get; }
     public byte PlayerId { get; }
+    public Role.Role[] SubRoles { get; private set; }
 
     public static Role.Role GetRole(string? playerName = null, byte? playerId = null)
     {

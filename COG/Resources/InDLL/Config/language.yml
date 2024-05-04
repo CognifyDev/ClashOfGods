@@ -91,6 +91,7 @@ menu:
     load-preset: "加载预设"
     save-preset: "保存预设"
     debug-mode: "<color=#9AFF00>调试模式</color>"
+    max-sub-role-number: "最大副职业数量"
   impostor:
     name: "内鬼职业设置"
   neutral:

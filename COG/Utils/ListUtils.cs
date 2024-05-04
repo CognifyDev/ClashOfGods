@@ -12,11 +12,7 @@ public static class ListUtils
     /// <param name="list">欲打乱List</param>
     /// <typeparam name="T">元素类型</typeparam>
     /// <returns>打乱后的List</returns>
-    public static List<T> Disarrange<T>(this List<T> list)
-    {
-        var random = new Random();
-        return list.OrderBy(_ => random.Next()).ToList();
-    }
+    public static List<T> Disarrange<T>(this IEnumerable<T> list) => list.OrderBy(_ => new Random().Next()).ToList();
 
     public static bool IsEmpty<T>(this List<T> list) => list is not { Count: > 0 };
 

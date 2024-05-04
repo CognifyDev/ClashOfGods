@@ -1,9 +1,11 @@
 using COG.Utils;
+using COG.Utils.Coding;
 
 // ReSharper disable All
 
 namespace COG.Config.Impl;
 
+[ShitCode]
 public class LanguageConfig : Config
 {
     static LanguageConfig()
@@ -54,6 +56,7 @@ public class LanguageConfig : Config
         LoadPreset = GetString("menu.general.load-preset");
         SavePreset = GetString("menu.general.save-preset");
         DebugMode = GetString("menu.general.debug-mode");
+        MaxSubRoleNumber = GetString("menu.general.max-sub-role-number");
 
         // Unknown
         UnknownName = GetString("role.unknown.name");
@@ -189,6 +192,7 @@ public class LanguageConfig : Config
     public string SavePreset { get; private set; } = null!;
     public string LoadPreset { get; private set; } = null!;
     public string DebugMode { get; private set; } = null!;
+    public string MaxSubRoleNumber { get; private set; } = null!;
 
     // Unknown
     public string UnknownName { get; private set; } = null!;

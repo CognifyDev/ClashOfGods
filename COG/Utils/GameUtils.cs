@@ -75,12 +75,12 @@ public static class GameUtils
         return GameOptionsManager.Instance.currentNormalGameOptions;
     }
 
-    public static void SetCustomRole(this PlayerControl pc, Role.Role role)
+    public static void SetCustomRole(this PlayerControl pc, Role.Role role, Role.Role[]? subRoles = null)
     {
         if (!pc) return;
         var playerRole = PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
         if (playerRole is not null) PlayerRoleData.Remove(playerRole);
-        PlayerRoleData.Add(new PlayerRole(pc, role));
+        PlayerRoleData.Add(new PlayerRole(pc, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
         // pc.RpcSetRole(role.BaseRoleType);
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");

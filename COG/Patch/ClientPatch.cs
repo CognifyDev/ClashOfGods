@@ -14,6 +14,7 @@ class ServerUpdatePatch
         }
     }
 }
+
 [HarmonyPatch(typeof(Constants), nameof(Constants.IsVersionModded))]
 public static class IsVersionModdedPatch
 {
@@ -21,5 +22,15 @@ public static class IsVersionModdedPatch
     {
         __result = true;
         return false;
+    }
+}
+
+[HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
+public static class DestroyQuickButton
+{
+    public static void Prefix(ChatController __instance)
+    {
+        if (__instance.quickChatButton.gameObject.active)
+            __instance.quickChatButton.gameObject.SetActive(false);
     }
 }

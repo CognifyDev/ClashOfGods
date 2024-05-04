@@ -5,24 +5,23 @@ namespace COG.Constant;
 
 public static class GlobalCustomOptionConstant
 {
-    public static readonly CustomOption LoadPreset;
-
-    public static readonly CustomOption SavePreset;
-
-    public static readonly CustomOption DebugMode;
+    public static readonly CustomOption DebugMode, MaxSubRoleNumber;
 
     static GlobalCustomOptionConstant()
     {
-        LoadPreset = CustomOption.Create(CustomOption.TabType.General,
+        var loadPreset = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.LoadPreset, false, null, true, CustomOption.OptionType.Button);
 
-        SavePreset = CustomOption.Create(CustomOption.TabType.General,
+        var savePreset = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.SavePreset, false, null, true, CustomOption.OptionType.Button);
 
-        LoadPreset.OnClickIfButton = new((_) => CustomOption.OpenPresetWithDialogue());
-        SavePreset.OnClickIfButton = new((_) => CustomOption.SaveOptionWithDialogue());
+        loadPreset.OnClickIfButton = _ => CustomOption.OpenPresetWithDialogue();
+        savePreset.OnClickIfButton = _ => CustomOption.SaveOptionWithDialogue();
 
         DebugMode = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.DebugMode, false, null, true);
+
+        MaxSubRoleNumber = CustomOption.Create(CustomOption.TabType.General, LanguageConfig.Instance.MaxSubRoleNumber
+            , 1, 0, 10, 1, null, true);
     }
 }

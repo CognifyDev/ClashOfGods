@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,11 +18,12 @@ using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
 using COG.Utils;
-using Il2CppSystem;
 using Il2CppSystem.Collections;
 using UnityEngine;
+using Action = Il2CppSystem.Action;
 using Convert = System.Convert;
 using Object = UnityEngine.Object;
+using Random = System.Random;
 
 namespace COG.Listener.Impl;
 
@@ -91,11 +93,24 @@ public class GameListener : IListener
 
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
         {
-            var role = player.GetRoleInstance();
-            if (role is null) return;
+            var playerRole = player.GetPlayerRoleInstance();
+            if (playerRole is null) return;
+            var subRoles = playerRole.SubRoles;
+            var role = playerRole.Role;
             var text = player.cosmetics.nameText;
             text.color = role.Color;
-            text.text = new StringBuilder().Append(role.Name).Append('\n').Append(player.Data.PlayerName).ToString();
+            var subRoleText = new StringBuilder();
+            for (var i = 0; i < subRoles.Length; i++)
+            {
+                subRoleText.Append(subRoles[i].Name);
+                if (i < subRoles.Length - 1)
+                {
+                    subRoleText.Append(' ');
+                }
+            }
+            text.text = new StringBuilder().Append(role.Name)
+                .Append(subRoles == Array.Empty<Role.Role>() ? "" : subRoleText.ToString())
+                .Append('\n').Append(player.Data.PlayerName).ToString();
         }
     }
 
@@ -129,6 +144,9 @@ public class GameListener : IListener
             if (next.CampType == CampType.Impostor) equalsImpostorsNum++;
             rolesToAdd.Add(next);
         }
+        
+        // 新建副职业获取器
+        var subRoleGetter = Role.RoleManager.GetManager().NewGetter(true);
 
         for (var i = 0; i < players.Count; i++)
         {
@@ -142,8 +160,24 @@ public class GameListener : IListener
             {
                 role = Role.RoleManager.GetManager().GetTypeRoleInstance<Crewmate>(); // 无法分配默认职业为Crewmate
             }
+            
+            // 接下来分配副职业
+            var random = new Random();
+            var option = GlobalCustomOptionConstant.MaxSubRoleNumber;
+            var subRoleNumber = random.Next(0, (int) option.GetFloat()); // 获取这个玩家应当被给予的副职业数量
+            var subRoles = new List<Role.Role>();
+            var givenNumber = 0;
+            
+            while (subRoleGetter.HasNext())
+            {
+                if (subRoleNumber < givenNumber) break;
+                givenNumber ++;
+                var toAdd = subRoleGetter.GetNext();
+                if (toAdd == null) break;
+                subRoles.Add(toAdd);
+            }
 
-            player.SetCustomRole(role);
+            player.SetCustomRole(role, subRoles.ToArray());
         }
 
         // 打印职业分配信息
@@ -407,7 +441,7 @@ public class GameListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnFreeplayStartAssignDefaultRole(GameStartEvent @event)
+    public void OnFreePlayStartAssignDefaultRole(GameStartEvent @event)
     {
         if (AmongUsClient.Instance.NetworkMode != NetworkModes.FreePlay) return;
 

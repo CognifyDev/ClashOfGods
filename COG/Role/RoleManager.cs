@@ -49,9 +49,9 @@ public class RoleManager
     ///     获取一个新的获取器
     /// </summary>
     /// <returns>获取器实例</returns>
-    public RoleGetter NewGetter()
+    public RoleGetter NewGetter(bool subRolesOnly = false)
     {
-        return new RoleGetter();
+        return new RoleGetter(subRolesOnly);
     }
 
     public static RoleManager GetManager()
@@ -64,12 +64,12 @@ public class RoleManager
         private readonly List<Role> _roles = new();
         private int _selection;
 
-        internal RoleGetter()
+        internal RoleGetter(bool subRolesOnly = false)
         {
             foreach (var role in GetManager().GetRoles()
                          .Where(role =>
                              role is { MainRoleOption: not null, ShowInOptions: true, IsBaseRole: false } &&
-                             role.MainRoleOption.GetBool()))
+                             role.MainRoleOption.GetBool() && role.SubRole == subRolesOnly))
                 if (role.RoleNumberOption != null)
                 {
                     var times = (int)role.RoleNumberOption.GetFloat();
@@ -86,6 +86,8 @@ public class RoleManager
             _selection++;
             return toReturn;
         }
+
+        public bool IsEmpty() => _roles.IsEmpty();
 
         public bool HasNext()
         {
