@@ -99,7 +99,7 @@ public class GameListener : IListener
             var role = playerRole.Role;
             var text = player.cosmetics.nameText;
             text.color = role.Color;
-            var subRoleText = new StringBuilder();
+            var subRoleText = new StringBuilder(" ");
             for (var i = 0; i < subRoles.Length; i++)
             {
                 subRoleText.Append(subRoles[i].Name);

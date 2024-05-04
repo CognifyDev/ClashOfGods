@@ -78,6 +78,9 @@ role:
       description: "生命就是豪赌"
       max-guess-time: "最大猜测次数"
       guess-continuously: "连续赌注"
+    lighter:
+      name: "灯人"
+      description: "要相信光！"
 camp:
   unknown:
     name: "未知阵营"

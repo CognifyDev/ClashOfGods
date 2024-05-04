@@ -30,6 +30,7 @@ using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Impl;
 using COG.Plugin.Manager;
+using COG.Role.Impl.SubRole;
 using COG.Utils.WinAPI;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
@@ -170,7 +171,10 @@ public partial class Main : BasePlugin
 
             // Neutral
             new Jester(),
-            new Opportunist()
+            new Opportunist(),
+            
+            // Sub-roles
+            new Lighter()
         });
 
         // Register listeners from role

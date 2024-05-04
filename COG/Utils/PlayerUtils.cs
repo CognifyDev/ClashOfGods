@@ -375,7 +375,7 @@ public class PlayerRole
     public Role.Role Role { get; }
     public string PlayerName { get; }
     public byte PlayerId { get; }
-    public Role.Role[] SubRoles { get; private set; }
+    public Role.Role[] SubRoles { get; }
 
     public static Role.Role GetRole(string? playerName = null, byte? playerId = null)
     {

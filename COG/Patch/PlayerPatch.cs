@@ -278,3 +278,18 @@ internal class FixedUpdatePatch
         ListenerManager.GetManager().ExecuteHandlers(new PlayerFixedUpdateEvent(__instance), EventHandlerType.Postfix);
     }
 }
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.AdjustLighting))]
+internal class AdjustLightPatch
+{
+    public static bool Prefix(PlayerControl __instance)
+    {
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerAdjustLightingEvent(__instance), EventHandlerType.Prefix);
+    }
+
+    public static void Postfix(PlayerControl __instance)
+    {
+        ListenerManager.GetManager().ExecuteHandlers(new PlayerAdjustLightingEvent(__instance), EventHandlerType.Postfix);
+    }
+}

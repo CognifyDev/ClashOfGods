@@ -4,6 +4,8 @@ using COG.Listener.Event.Impl.Meeting;
 using COG.UI.CustomOption;
 using COG.Utils.Coding;
 using UnityEngine;
+using Il2CppInterop.Runtime.Attributes;
+using Reactor.Utilities.Attributes;
 
 namespace COG.Role.Impl.SubRole;
 
@@ -28,7 +30,7 @@ public class Guesser : Role, IListener
     public void OnMeetingStart(MeetingStartEvent @event)
     {
         var buttonStaff = GameObject.Find("Main Camera/Hud/MeetingHub/MeetingContents/ButtonStuff/");
-        
+        // ui here
     }
 
     public override IListener GetListener()

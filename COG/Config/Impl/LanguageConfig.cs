@@ -125,6 +125,9 @@ public class LanguageConfig : Config
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
 
+        LighterName = GetString("role.sub-roles.lighter.name");
+        LighterDescription = GetString("role.sub-roles.lighter.description");
+
         Enable = GetString("option.enable");
         Disable = GetString("option.disable");
         CogOptions = GetString("option.main.cog-options");
@@ -266,6 +269,9 @@ public class LanguageConfig : Config
     public string GuesserDescription { get; private set; } = null!;
     public string GuesserMaxGuessTime { get; private set; } = null!;
     public string GuesserGuessContinuously { get; private set; } = null!;
+
+    public string LighterName { get; private set; } = null!;
+    public string LighterDescription { get; private set; } = null!;
     
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
