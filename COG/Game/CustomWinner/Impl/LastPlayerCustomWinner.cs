@@ -14,7 +14,7 @@ public class LastPlayerCustomWinner : IWinnable
         CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.GetAllAlivePlayers());
         CustomWinnerManager.SetWinText(
             LanguageConfig.Instance.NeutralsWinText.CustomFormat(lastPlayer!.Data.PlayerName));
-        CustomWinnerManager.SetWinColor(lastPlayer.GetRoleInstance()!.Color);
+        CustomWinnerManager.SetWinColor(lastPlayer.GetMainRole()!.Color);
         GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
         return true;
     }

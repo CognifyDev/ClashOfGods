@@ -147,7 +147,7 @@ public partial class Main : BasePlugin
         });
 
         // Register roles
-        Role.RoleManager.GetManager().RegisterRoles(new Role.Role[]
+        Role.CustomRoleManager.GetManager().RegisterRoles(new Role.Role[]
         {
             // Unknown
             new Unknown(),
@@ -178,7 +178,7 @@ public partial class Main : BasePlugin
         });
 
         // Register listeners from role
-        foreach (var role in Role.RoleManager.GetManager().GetRoles())
+        foreach (var role in Role.CustomRoleManager.GetManager().GetRoles())
             ListenerManager.GetManager().RegisterListener(role.GetListener());
 
         // Register mod options
@@ -244,7 +244,7 @@ public partial class Main : BasePlugin
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
-        Role.RoleManager.GetManager().GetRoles().Clear();
+        Role.CustomRoleManager.GetManager().GetRoles().Clear();
         ListenerManager.GetManager().UnRegisterHandlers();
         SidebarTextManager.GetManager().GetSidebarTexts().Clear();
         CustomWinnerManager.AllWinners.Clear();

@@ -24,7 +24,7 @@ public class Spy : Role, IListener
             if (!player.IsRole<Spy>()) continue;
             var name = player.Data.PlayerName;
             player.RpcSetNamePrivately($"<color=#FF0000>{name}</color>", 
-                PlayerUtils.GetAllAlivePlayers().Where(playerControl => playerControl.GetRoleInstance()?.CampType == CampType.Impostor).ToArray());
+                PlayerUtils.GetAllAlivePlayers().Where(playerControl => playerControl.GetMainRole()?.CampType == CampType.Impostor).ToArray());
         }
     }
     

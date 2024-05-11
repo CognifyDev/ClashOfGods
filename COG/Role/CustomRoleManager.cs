@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace COG.Role;
 
-public class RoleManager
+public class CustomRoleManager
 {
-    private static readonly RoleManager Manager = new();
+    private static readonly CustomRoleManager Manager = new();
 
     private readonly List<Role> _roles = new();
 
@@ -54,7 +54,7 @@ public class RoleManager
         return new RoleGetter(subRolesOnly);
     }
 
-    public static RoleManager GetManager()
+    public static CustomRoleManager GetManager()
     {
         return Manager;
     }
@@ -69,7 +69,7 @@ public class RoleManager
             foreach (var role in GetManager().GetRoles()
                          .Where(role =>
                              role is { MainRoleOption: not null, ShowInOptions: true, IsBaseRole: false } &&
-                             role.MainRoleOption.GetBool() && role.SubRole == subRolesOnly))
+                             role.MainRoleOption.GetBool() && role.IsSubRole == subRolesOnly))
                 if (role.RoleNumberOption != null)
                 {
                     var times = (int)role.RoleNumberOption.GetFloat();

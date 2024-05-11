@@ -1,7 +1,7 @@
-using System.Linq;
 using COG.Config.Impl;
 using COG.Role;
 using COG.Utils;
+using System.Linq;
 
 namespace COG.Game.CustomWinner.Impl;
 
@@ -9,40 +9,72 @@ public class ImpostorsCustomWinner : IWinnable
 {
     public bool CanWin()
     {
-        var aliveImpostors = PlayerUtils.AllImpostors.Where(pair => pair.Player && !pair.Player.Data.IsDead)
-            .Select(pair => pair.Player).ToList();
-        var aliveNeutrals = PlayerUtils.AllNeutrals.Where(pair => pair.Player && !pair.Player.Data.IsDead)
-            .ToList();
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor).ToList()
+        var aliveImpostors = PlayerUtils.AllImpostors.Select(pair => pair.Player).Where
+            (p => p && p.IsAlive()).ToList();
+        var aliveNeutrals = PlayerUtils.AllNeutrals.Select(pair => pair.Player).Where
+            (p => p && p.IsAlive()).ToList();
+        GameUtils.PlayerRoleData.Where
+            (pair => pair.Role.CampType == CampType.Impostor).ToList()
             .ForEach(pair => aliveImpostors.Add(pair.Player));
         if (aliveImpostors.Count >= PlayerUtils.AllCrewmates
-                .Where(pair => pair.Player && !pair.Player.Data.IsDead).Select(pair => pair.Player).ToList().Count
-            && aliveNeutrals.Select(p => p.Role.CanKill).ToList().Count <= 0)
+                .Select(pair => pair.Player).Where
+                (p => p && p.IsAlive())
+                .ToList().Count
+            && aliveNeutrals.Where
+                (p => p.GetMainRole().CanKill).ToList().Count <= 0)
         {
-            CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllImpostors.Select(pr => pr.Player));
-            CustomWinnerManager.SetWinText(LanguageConfig.Instance.ImpostorsWinText);
-            CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
-            GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
+            SetImpostorTeamWinners(false);
             return true;
         }
 
-        // FIXME
-        // 破坏胜利判断无效
+        var systems = ShipStatus.Instance.Systems;
 
-        if (DestroyableSingleton<HeliSabotageSystem>.Instance is { } instance) // 等效于检测是否为null并设变量为实例
         {
-            if (!instance.IsActive) return false;
-            if (instance.Countdown <= 0f)
+            if (systems.TryGetValueSafeIl2Cpp(SystemTypes.LifeSupp, out var system))
             {
-                CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllImpostors.Select(pr => pr.Player));
-                CustomWinnerManager.SetWinText(LanguageConfig.Instance.ImpostorsWinText);
-                CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
-                GameManager.Instance.RpcEndGame(GameOverReason.ImpostorBySabotage, false);
-                return true;
+                LifeSuppSystemType o2Sabo = null!;
+                if ((o2Sabo = system.Cast<LifeSuppSystemType>()).Countdown <= 0)
+                {
+                    if (o2Sabo.Countdown <= 0f)
+                    {
+                        SetImpostorTeamWinners(true);
+                        return true;
+                    }
+                }
             }
         }
 
+        {
+            SystemTypes[] sabotageTypes =
+            {
+                SystemTypes.Reactor, SystemTypes.Laboratory, SystemTypes.HeliSabotage
+            };
+            foreach (var type in sabotageTypes)
+            {
+                if (systems.TryGetValueSafeIl2Cpp(type, out var system))
+                {
+                    ICriticalSabotage? sabotage = system.TryCast<ICriticalSabotage>();
+                    if (sabotage is null) return false;
+                    if (sabotage.Countdown <= 0)
+                    {
+                        SetImpostorTeamWinners(true);
+                        sabotage.ClearSabotage();
+                        return true;
+                    }
+                }
+            }
+
+        }
+
         return false;
+    }
+
+    private void SetImpostorTeamWinners(bool isSabo)
+    {
+        CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllImpostors.Select(pr => pr.Player));
+        CustomWinnerManager.SetWinText(LanguageConfig.Instance.ImpostorsWinText);
+        CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
+        GameManager.Instance.RpcEndGame(isSabo ? GameOverReason.ImpostorBySabotage : GameOverReason.ImpostorByKill, false);
     }
 
     public ulong GetWeight()

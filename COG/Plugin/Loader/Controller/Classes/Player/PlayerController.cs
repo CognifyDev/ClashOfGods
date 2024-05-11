@@ -21,7 +21,7 @@ public class PlayerController
 
     public COG.Role.Role? GetRoleByPlayer(PlayerControl playerControl)
     {
-        return playerControl.GetRoleInstance();
+        return playerControl.GetMainRole();
     }
 
     public void KillPlayer(PlayerControl player)

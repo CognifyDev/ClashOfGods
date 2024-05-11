@@ -22,6 +22,6 @@ public class RoleController
 
     public void RegisterRole(COG.Role.Role role)
     {
-        COG.Role.RoleManager.GetManager().RegisterRole(role);
+        COG.Role.CustomRoleManager.GetManager().RegisterRole(role);
     }
 }

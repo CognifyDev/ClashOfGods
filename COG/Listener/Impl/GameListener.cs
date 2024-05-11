@@ -66,7 +66,7 @@ public class GameListener : IListener
                 {
                     var texts = s.Split("|");
                     var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
-                    var role = Role.RoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
+                    var role = CustomRoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
                     player!.SetCustomRole(role!);
                 }
 
@@ -93,7 +93,7 @@ public class GameListener : IListener
 
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
         {
-            var playerRole = player.GetPlayerRoleInstance();
+            var playerRole = player.GetPlayerRole();
             if (playerRole is null) return;
             var subRoles = playerRole.SubRoles;
             var role = playerRole.Role;
@@ -129,7 +129,7 @@ public class GameListener : IListener
         var maxImpostorsNum = GameUtils.GetImpostorsNum();
 
         // 新建一个获取器
-        var getter = Role.RoleManager.GetManager().NewGetter();
+        var getter = CustomRoleManager.GetManager().NewGetter();
 
         // 获取已经获取的内鬼职业数量
         var equalsImpostorsNum = 0;
@@ -146,7 +146,7 @@ public class GameListener : IListener
         }
         
         // 新建副职业获取器
-        var subRoleGetter = Role.RoleManager.GetManager().NewGetter(true);
+        var subRoleGetter = CustomRoleManager.GetManager().NewGetter(true);
 
         for (var i = 0; i < players.Count; i++)
         {
@@ -158,7 +158,7 @@ public class GameListener : IListener
             }
             catch
             {
-                role = Role.RoleManager.GetManager().GetTypeRoleInstance<Crewmate>(); // 无法分配默认职业为Crewmate
+                role = CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>(); // 无法分配默认职业为Crewmate
             }
             
             // 接下来分配副职业
@@ -344,7 +344,7 @@ public class GameListener : IListener
         Role.Role? role;
         try
         {
-            role = player.GetRoleInstance();
+            role = player.GetMainRole();
         }
         catch
         {
@@ -423,7 +423,7 @@ public class GameListener : IListener
         var player = @event.Player;
         if (!player) return;
 
-        var role = player!.GetRoleInstance();
+        var role = player!.GetMainRole();
         if (role == null) return;
 
         int GetCount(IEnumerable<PlayerRole> list) => list.Select(p => p.Player)

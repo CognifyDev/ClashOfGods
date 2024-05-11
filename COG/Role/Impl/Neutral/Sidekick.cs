@@ -16,7 +16,7 @@ public class Sidekick : Role, IListener
     public CustomOption SidekickCanCreateSidekick { get; }
 
     public Sidekick() : base(LanguageConfig.Instance.SidekickName,
-        RoleManager.GetManager().GetTypeRoleInstance<Jackal>().Color, CampType.Neutral, false)
+        CustomRoleManager.GetManager().GetTypeRoleInstance<Jackal>().Color, CampType.Neutral, false)
     {
         BaseRoleType = RoleTypes.Crewmate;
         CanVent = true;
@@ -25,7 +25,7 @@ public class Sidekick : Role, IListener
         {
             SidekickCanCreateSidekick = CustomOption.Create(CustomOption.TabType.Neutral,
                 LanguageConfig.Instance.SidekickCanCreateSidekick, true,
-                RoleManager.GetManager().GetTypeRoleInstance<Jackal>().MainRoleOption);
+                CustomRoleManager.GetManager().GetTypeRoleInstance<Jackal>().MainRoleOption);
         }
     }
 

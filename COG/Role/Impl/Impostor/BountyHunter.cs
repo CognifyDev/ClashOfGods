@@ -166,7 +166,7 @@ public class BountyHunter : Role, IListener
     private void RefreshTarget()
     {
         var selectableTargets = PlayerControl.AllPlayerControls.ToArray().Where(p =>
-            p.GetRoleInstance()!.CampType != CampType.Impostor && p.IsAlive() &&
+            p.GetMainRole()!.CampType != CampType.Impostor && p.IsAlive() &&
             !PlayerControl.LocalPlayer.IsSamePlayer(p)).ToList();
         var r = new System.Random(DateTime.Now.Millisecond);
 

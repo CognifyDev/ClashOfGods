@@ -18,7 +18,7 @@ public class Bait : Role, IListener
         var killer = @event.Player;
         var target = @event.Target;
         if (killer == null || target == null) return;
-        var role = target.GetRoleInstance();
+        var role = target.GetMainRole();
         if (role != null && role.Name.Equals(Name)) killer.CmdReportDeadBody(target.Data);
     }
 

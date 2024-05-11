@@ -75,64 +75,6 @@ public static class GameUtils
         return GameOptionsManager.Instance.currentNormalGameOptions;
     }
 
-    public static void SetCustomRole(this PlayerControl pc, Role.Role role, Role.Role[]? subRoles = null)
-    {
-        if (!pc) return;
-        var playerRole = PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
-        if (playerRole is not null) PlayerRoleData.Remove(playerRole);
-        PlayerRoleData.Add(new PlayerRole(pc, role, subRoles));
-        RoleManager.Instance.SetRole(pc, role.BaseRoleType);
-        // pc.RpcSetRole(role.BaseRoleType);
-        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
-    }
-
-    public static void SetCustomRole<T>(this PlayerControl pc) where T : Role.Role
-    {
-        if (!pc) return;
-        var role = Role.RoleManager.GetManager().GetTypeRoleInstance<T>();
-        pc.SetCustomRole(role);
-    }
-
-    public static void RpcSetCustomRole(this PlayerControl pc, Role.Role role)
-    {
-        if (!pc) return;
-        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
-        writer.Write(pc.PlayerId);
-        writer.WritePacked(role.Id);
-        writer.Finish();
-        SetCustomRole(pc, role);
-    }
-
-    public static void RpcSetCustomRole<T>(this PlayerControl pc) where T : Role.Role
-    {
-        if (!pc) return;
-        var role = Role.RoleManager.GetManager().GetTypeRoleInstance<T>();
-        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
-        writer.Write(pc.PlayerId);
-        writer.WritePacked(role.Id);
-        writer.Finish();
-        SetCustomRole(pc, role);
-    }
-
-    public static void RpcCreateSidekick(this PlayerControl jackal, PlayerControl target)
-    {
-        if (!(jackal && target)) return;
-
-        var writer = RpcUtils.StartRpcImmediately(jackal, KnownRpc.CreateSidekick);
-        writer.Write(jackal.PlayerId);
-        writer.Write(target.PlayerId);
-        writer.Finish();
-
-        CreateSidekick(jackal, target);
-    }
-
-    public static void CreateSidekick(this PlayerControl jackal, PlayerControl target)
-    {
-        if (!(jackal && target)) return;
-        target.SetCustomRole<Sidekick>();
-        Jackal.JackalSidekick.Add(jackal, target);
-    }
-
     public static List<Transform> GetAllChildren(this Transform transform)
     {
         List<Transform> result = new();

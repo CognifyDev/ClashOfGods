@@ -25,7 +25,7 @@ public class Role
         Color = color;
         CampType = campType;
         BaseRoleType = campType == CampType.Impostor ? RoleTypes.Impostor : RoleTypes.Crewmate;
-        SubRole = false;
+        IsSubRole = false;
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
         CanSabotage = campType == CampType.Impostor;
@@ -80,7 +80,7 @@ public class Role
     /// <summary>
     ///     是否为副职业
     /// </summary>
-    public bool SubRole { get; protected init; }
+    public bool IsSubRole { get; protected init; }
 
     /// <summary>
     ///     在选项中显示
@@ -124,7 +124,7 @@ public class Role
         button.HasButton += () =>
         {
             var player = PlayerControl.LocalPlayer;
-            var role = player.GetRoleInstance();
+            var role = player.GetMainRole();
             return role != null && role.Name.Equals(Name);
         };
         CustomButtonManager.GetManager().RegisterCustomButton(button);
@@ -132,14 +132,14 @@ public class Role
 
     public virtual string HandleEjectText(PlayerControl player)
     {
-        var role = player.GetRoleInstance();
+        var role = player.GetMainRole();
         return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName,
             role!.Name.Color(role.Color));
     }
 
     public static CustomOption.TabType ToCustomOption(Role role)
     {
-        if (role.CampType == CampType.Unknown || role.SubRole) return CustomOption.TabType.Addons;
+        if (role.CampType == CampType.Unknown || role.IsSubRole) return CustomOption.TabType.Addons;
         return (CustomOption.TabType)role.CampType;
     }
 
