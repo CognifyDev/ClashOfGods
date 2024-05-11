@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Il2CppGenericCollections = Il2CppSystem.Collections.Generic;
 
 namespace COG.Utils;
 
@@ -25,4 +26,16 @@ public static class ListUtils
 
     public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action) =>
         collection.ToList().ForEach(action);
+
+    // Using methods that contains arguments with keyword out such as TryGetValue(TKey key, out TValue value) may cause some unexcepted situations happen, because of Il2CppUnhollower
+    public static bool TryGetValueSafeIl2Cpp<TKey, TValue>(this Il2CppGenericCollections.Dictionary<TKey, TValue> dic, TKey key, out TValue safeValue) where TKey : notnull
+    {
+        if (dic.ContainsKey(key))
+        {
+            safeValue = dic[key];
+            return true;
+        }
+        safeValue = default!;
+        return false;
+    }
 }

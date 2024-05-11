@@ -10,7 +10,7 @@ public class Lighter : Role, IListener
     public Lighter() : base(LanguageConfig.Instance.LighterName, Color.yellow, CampType.Unknown, true)
     {
         Description = LanguageConfig.Instance.LighterDescription;
-        SubRole = true;
+        IsSubRole = true;
     }
 
     [EventHandler(EventHandlerType.Prefix)]

@@ -18,7 +18,7 @@ public class Guesser : Role, IListener
     public Guesser() : base(LanguageConfig.Instance.GuesserName, Color.yellow, CampType.Unknown, true)
     {
         Description = LanguageConfig.Instance.GuesserDescription;
-        SubRole = true;
+        IsSubRole = true;
         
         MaxGuessTimeOption = CustomOption.Create(CustomOption.TabType.Addons,
             LanguageConfig.Instance.GuesserMaxGuessTime, 5, 1, 99, 1, MainRoleOption);

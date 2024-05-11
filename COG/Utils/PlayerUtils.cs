@@ -91,10 +91,11 @@ public static class PlayerUtils
     public static PlayerRole? GetPlayerRoleInstance(this PlayerControl player) => 
         GameUtils.PlayerRoleData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
 
-    public static Role.Role? GetRoleInstance(this PlayerControl player)
+    public static Role.Role? GetMainRole(this PlayerControl player)
     {
         return (from keyValuePair in GameUtils.PlayerRoleData
                 where keyValuePair.Player.IsSamePlayer(player)
+                where !keyValuePair.Role.IsSubRole
                 select keyValuePair.Role)
             .FirstOrDefault();
     }
@@ -341,7 +342,7 @@ public class DeadPlayer
         DeathReason = deathReason;
         Player = player;
         Killer = killer;
-        Role = player.GetRoleInstance();
+        Role = player.GetMainRole();
         PlayerId = player.PlayerId;
         DeadPlayerManager.DeadPlayers.Add(this);
     }
@@ -368,7 +369,7 @@ public class PlayerRole
         Role = role;
         PlayerName = player.name;
         PlayerId = player.PlayerId;
-        SubRoles = subRoles != null ? subRoles.Where(subRole => subRole.SubRole).ToArray() : Array.Empty<Role.Role>();
+        SubRoles = subRoles != null ? subRoles.Where(subRole => subRole.IsSubRole).ToArray() : Array.Empty<Role.Role>();
     }
 
     public PlayerControl Player { get; }

@@ -45,7 +45,7 @@ public class Eraser : Role, IListener
 
         EraseButton = CustomButton.Create(() =>
             {
-                var role = CurrentTarget!.GetRoleInstance();
+                var role = CurrentTarget!.GetMainRole();
                 Role? newRole = role!.CampType switch
                 {
                     CampType.Crewmate => RoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
@@ -63,7 +63,7 @@ public class Eraser : Role, IListener
             couldUse: () =>
             {
                 if (!CanEraseImpostors?.GetBool() ?? false && CurrentTarget)
-                    return CurrentTarget!.GetRoleInstance()?.CampType != CampType.Impostor;
+                    return CurrentTarget!.GetMainRole()?.CampType != CampType.Impostor;
                 return CurrentTarget;
             },
             () => true,

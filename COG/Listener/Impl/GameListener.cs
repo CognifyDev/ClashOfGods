@@ -344,7 +344,7 @@ public class GameListener : IListener
         Role.Role? role;
         try
         {
-            role = player.GetRoleInstance();
+            role = player.GetMainRole();
         }
         catch
         {
@@ -423,7 +423,7 @@ public class GameListener : IListener
         var player = @event.Player;
         if (!player) return;
 
-        var role = player!.GetRoleInstance();
+        var role = player!.GetMainRole();
         if (role == null) return;
 
         int GetCount(IEnumerable<PlayerRole> list) => list.Select(p => p.Player)

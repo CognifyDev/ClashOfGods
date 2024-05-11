@@ -63,7 +63,7 @@ public class Sheriff : Role, IListener
         var target = @event.Target;
         if (killer == null || target == null) return true;
         if (!killer.IsRole(this)) return true;
-        if (target.GetRoleInstance()!.CampType != CampType.Crewmate) return true;
+        if (target.GetMainRole()!.CampType != CampType.Crewmate) return true;
         killer.MurderPlayer(killer, GameUtils.DefaultFlag);
         return false;
     }

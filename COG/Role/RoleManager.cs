@@ -69,7 +69,7 @@ public class RoleManager
             foreach (var role in GetManager().GetRoles()
                          .Where(role =>
                              role is { MainRoleOption: not null, ShowInOptions: true, IsBaseRole: false } &&
-                             role.MainRoleOption.GetBool() && role.SubRole == subRolesOnly))
+                             role.MainRoleOption.GetBool() && role.IsSubRole == subRolesOnly))
                 if (role.RoleNumberOption != null)
                 {
                     var times = (int)role.RoleNumberOption.GetFloat();

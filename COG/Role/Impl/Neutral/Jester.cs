@@ -50,7 +50,7 @@ public class Jester : Role, IListener, IWinnable
         if (!GameStates.InGame) return true;
         var reportedPlayer = @event.Target;
         var player = @event.Player;
-        if (!Id.Equals(player.GetRoleInstance()?.Id)) return true;
+        if (!Id.Equals(player.GetMainRole()?.Id)) return true;
         var result1 = _allowStartMeeting.GetBool();
         var result2 = _allowReportDeadBody.GetBool();
         if (!result1 && reportedPlayer == null) return false;
