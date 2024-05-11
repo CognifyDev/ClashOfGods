@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
@@ -8,9 +5,11 @@ using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;
-using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using InnerNet;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 using Object = UnityEngine.Object;
@@ -88,16 +87,16 @@ public static class PlayerUtils
         return player.PlayerId == target.PlayerId;
     }
 
-    public static PlayerRole? GetPlayerRoleInstance(this PlayerControl player) => 
+    public static PlayerRole? GetPlayerRole(this PlayerControl player) =>
         GameUtils.PlayerRoleData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
 
-    public static Role.Role? GetMainRole(this PlayerControl player)
+    public static Role.Role GetMainRole(this PlayerControl player)
     {
         return (from keyValuePair in GameUtils.PlayerRoleData
                 where keyValuePair.Player.IsSamePlayer(player)
                 where !keyValuePair.Role.IsSubRole
                 select keyValuePair.Role)
-            .FirstOrDefault();
+            .FirstOrDefault() ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
     }
 
     public static void SetNamePrivately(PlayerControl target, PlayerControl seer, string name)
@@ -142,7 +141,7 @@ public static class PlayerUtils
 
     public static bool IsRole(this PlayerControl player, Role.Role role)
     {
-        var targetRole = player.GetPlayerRoleInstance();
+        var targetRole = player.GetPlayerRole();
         return targetRole != null && (targetRole.Role.Id.Equals(role.Id) || targetRole.SubRoles.Contains(role));
     }
 
@@ -247,7 +246,7 @@ public static class PlayerUtils
         pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
 
     public static bool IsRole<T>(this PlayerControl pc) where T : Role.Role =>
-        IsRole(pc, Role.RoleManager.GetManager().GetTypeRoleInstance<T>());
+        IsRole(pc, CustomRoleManager.GetManager().GetTypeRoleInstance<T>());
 
     public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color, bool checkDist = true)
     {
@@ -263,6 +262,47 @@ public static class PlayerUtils
         }
 
         return null;
+    }
+
+    public static void SetCustomRole(this PlayerControl pc, Role.Role role, Role.Role[]? subRoles = null)
+    {
+        if (!pc) return;
+
+        var playerRole = GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
+        if (playerRole is not null) GameUtils.PlayerRoleData.Remove(playerRole);
+
+        GameUtils.PlayerRoleData.Add(new PlayerRole(pc, role, subRoles));
+        RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+
+        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
+    }
+
+    public static void SetCustomRole<T>(this PlayerControl pc) where T : Role.Role
+    {
+        if (!pc) return;
+        var role = CustomRoleManager.GetManager().GetTypeRoleInstance<T>();
+        pc.SetCustomRole(role);
+    }
+
+    public static void RpcSetCustomRole(this PlayerControl pc, Role.Role role)
+    {
+        if (!pc) return;
+        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
+        writer.Write(pc.PlayerId);
+        writer.WritePacked(role.Id);
+        writer.Finish();
+        SetCustomRole(pc, role);
+    }
+
+    public static void RpcSetCustomRole<T>(this PlayerControl pc) where T : Role.Role
+    {
+        if (!pc) return;
+        var role = CustomRoleManager.GetManager().GetTypeRoleInstance<T>();
+        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
+        writer.Write(pc.PlayerId);
+        writer.WritePacked(role.Id);
+        writer.Finish();
+        SetCustomRole(pc, role);
     }
 }
 
@@ -384,7 +424,7 @@ public class PlayerRole
                null
             ? GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!
                 .Role
-            : COG.Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
+            : CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 }
 /*

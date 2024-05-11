@@ -4,6 +4,7 @@ using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.HManager;
+using COG.Rpc;
 using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
@@ -49,7 +50,7 @@ public class Jackal : Role, IListener
             couldUse: () => CurrentTarget,
             () =>
             {
-                if (!RoleManager.GetManager().GetTypeRoleInstance<Sidekick>().SidekickCanCreateSidekick.GetBool()
+                if (!CustomRoleManager.GetManager().GetTypeRoleInstance<Sidekick>().SidekickCanCreateSidekick.GetBool()
                     && JackalSidekick.ContainsValue(PlayerControl.LocalPlayer)) return false;
                 return !CreatedSidekick;
             },
@@ -108,4 +109,23 @@ public class Jackal : Role, IListener
 public static class JackalUtils
 {
     public static bool IsInJackalTeam(this PlayerControl pc) => pc.IsRole<Jackal>() || pc.IsRole<Sidekick>();
+
+    public static void RpcCreateSidekick(this PlayerControl jackal, PlayerControl target)
+    {
+        if (!(jackal && target)) return;
+
+        var writer = RpcUtils.StartRpcImmediately(jackal, KnownRpc.CreateSidekick);
+        writer.Write(jackal.PlayerId);
+        writer.Write(target.PlayerId);
+        writer.Finish();
+
+        CreateSidekick(jackal, target);
+    }
+
+    public static void CreateSidekick(this PlayerControl jackal, PlayerControl target)
+    {
+        if (!(jackal && target)) return;
+        target.SetCustomRole<Sidekick>();
+        Jackal.JackalSidekick.Add(jackal, target);
+    }
 }

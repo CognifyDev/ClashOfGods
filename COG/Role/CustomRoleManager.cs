@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace COG.Role;
 
-public class RoleManager
+public class CustomRoleManager
 {
-    private static readonly RoleManager Manager = new();
+    private static readonly CustomRoleManager Manager = new();
 
     private readonly List<Role> _roles = new();
 
@@ -54,7 +54,7 @@ public class RoleManager
         return new RoleGetter(subRolesOnly);
     }
 
-    public static RoleManager GetManager()
+    public static CustomRoleManager GetManager()
     {
         return Manager;
     }

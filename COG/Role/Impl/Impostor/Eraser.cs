@@ -48,9 +48,9 @@ public class Eraser : Role, IListener
                 var role = CurrentTarget!.GetMainRole();
                 Role? newRole = role!.CampType switch
                 {
-                    CampType.Crewmate => RoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
-                    CampType.Neutral => RoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),
-                    CampType.Impostor => RoleManager.GetManager().GetTypeRoleInstance<Impostor>(),
+                    CampType.Crewmate => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
+                    CampType.Neutral => CustomRoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),
+                    CampType.Impostor => CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>(),
                     _ => null
                 };
 

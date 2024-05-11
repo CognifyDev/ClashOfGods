@@ -31,7 +31,7 @@ public class Jester : Role, IListener, IWinnable
     public bool CanWin()
     {
         var jester = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp =>
-            dp.Role == RoleManager.GetManager().GetTypeRoleInstance<Jester>() &&
+            dp.Role == CustomRoleManager.GetManager().GetTypeRoleInstance<Jester>() &&
             dp.DeathReason == Utils.DeathReason.Exiled);
         if (jester == null) return false;
         GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);

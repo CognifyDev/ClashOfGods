@@ -1,4 +1,5 @@
 using COG.Listener.Event.Impl.Player;
+using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -56,7 +57,7 @@ public class RpcListener : IListener
             {
                 var playerId = reader.ReadByte();
                 var roleId = reader.ReadPackedInt32();
-                PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(Role.RoleManager.GetManager().GetRoleById(roleId)!);
+                PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(Role.CustomRoleManager.GetManager().GetRoleById(roleId)!);
                 break;
             }
             case KnownRpc.CreateSidekick:
