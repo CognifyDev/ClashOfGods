@@ -22,9 +22,8 @@ public static class ModUpdater
 
         try
         {
-            var webText = WebUtils.GetWebByAPIMethod(
-                "https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest",
-                "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");
+            return;
+            var webText = WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest");
             var jsonObject =
                 JObject.Parse(webText);
             var tagNameToken = jsonObject["tag_name"];

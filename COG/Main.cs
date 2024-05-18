@@ -95,7 +95,7 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/lua54.dll",
             "COG.Resources.InDLL.Depends.lua54.dll");
-
+/*
         var disabledVersion = WebUtils
             .GetWeb(
                 "https://raw.kkgithub.com/CognifyDev/.github/main/disabledVersions")
@@ -105,7 +105,7 @@ public partial class Main : BasePlugin
             Logger.LogError("The version of the mod has been disabled!");
             return;
         }
-
+*/
         ModUpdater.FetchUpdate();
         Logger.LogInfo(
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
