@@ -12,6 +12,7 @@ using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
+using COG.Listener.Event.Impl.TPBehaviour;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Role;
 using COG.Role.Impl.Crewmate;
@@ -448,5 +449,26 @@ public class GameListener : IListener
 
         foreach (var player in PlayerControl.AllPlayerControls)
             player.RpcSetCustomRole<Crewmate>();
+    }
+
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnTaskPanelSetText(TaskPanelBehaviourSetTaskTextEvent @event)
+    {
+        string originText = @event.GetTaskString();
+        var localRole = GameUtils.GetLocalPlayerRole();
+        if (originText == "None"|| localRole == null) return true;
+
+        var sb = new StringBuilder();
+        sb.Append(localRole.GetColorName()).Append('\n').Append(localRole.Description.Color(localRole.Color));
+
+        string impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
+        if (originText.StartsWith(impTaskText))
+        {
+            int idx = originText.IndexOf(impTaskText) + impTaskText.Length;
+            sb.Append(originText[idx..]);
+        }
+
+        @event.SetTaskString(sb.ToString());
+        return true;
     }
 }

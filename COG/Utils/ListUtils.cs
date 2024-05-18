@@ -27,7 +27,7 @@ public static class ListUtils
     public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action) =>
         collection.ToList().ForEach(action);
 
-    // Using methods that contains arguments with keyword out such as TryGetValue(TKey key, out TValue value) may cause some unexcepted situations happen, because of Il2CppUnhollower
+    // Using methods that contain arguments with keyword out such as TryGetValue(TKey key, out TValue value) may cause some unexcepted situations happen, because of Il2CppInterop
     public static bool TryGetValueSafeIl2Cpp<TKey, TValue>(this Il2CppGenericCollections.Dictionary<TKey, TValue> dic, TKey key, out TValue safeValue) where TKey : notnull
     {
         if (dic.ContainsKey(key))
