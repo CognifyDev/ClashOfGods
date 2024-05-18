@@ -5,7 +5,7 @@
         <DebugType>embedded</DebugType>
 
         <Description>A mod for Among Us</Description>
-        <Authors>commandf1</Authors>
+        <Authors>CognifyDev</Authors>
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
