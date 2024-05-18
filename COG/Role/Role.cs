@@ -137,6 +137,8 @@ public class Role
             role!.Name.Color(role.Color));
     }
 
+    public string GetColorName() => Name.Color(Color);
+
     public static CustomOption.TabType ToCustomOption(Role role)
     {
         if (role.CampType == CampType.Unknown || role.IsSubRole) return CustomOption.TabType.Addons;

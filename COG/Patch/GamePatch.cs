@@ -57,6 +57,7 @@ internal class EndGamePatch
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
         var @event = new AmongUsClientGameEndEvent(__instance, endGameResult);
+        var result = ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Prefix);
         endGameResult = @event.GetEndGameResult();
     }
 }
