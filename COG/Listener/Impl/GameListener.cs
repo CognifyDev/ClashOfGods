@@ -321,6 +321,7 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerVent(VentCheckEvent @event)
     {
+        // FIXME 可能是内鬼无法跳管的根源
         var playerInfo = @event.PlayerInfo;
         foreach (var playerRole in GameUtils.PlayerRoleData)
         {

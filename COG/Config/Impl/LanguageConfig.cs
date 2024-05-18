@@ -104,6 +104,9 @@ public class LanguageConfig : Config
         EraserIncreaseCdAfterErasing = GetString("role.impostor.eraser.menu.increase-cd-after-erasing");
         EraserCanEraseImpostors = GetString("role.impostor.eraser.menu.can-erase-imps");
 
+        MadmanName = GetString("role.impostor.madman.name");
+        MadmanDescription = GetString("role.impostor.madman.description");
+
         // Neutral
         JesterName = GetString("role.neutral.jester.name");
         JesterDescription = GetString("role.neutral.jester.description");
@@ -164,6 +167,7 @@ public class LanguageConfig : Config
         MakeTrouble = GetString("action.make-trouble");
         CreateSidekick = GetString("action.create-sidekick");
         EraseAction = GetString("action.erase-action");
+        AnnihilateAction = GetString("action.annihilate");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 
@@ -249,6 +253,9 @@ public class LanguageConfig : Config
     public string EraserIncreaseCdAfterErasing { get; private set; } = null!;
     public string EraserCanEraseImpostors { get; private set; } = null!;
 
+    public string MadmanName { get; private set; } = null!;
+    public string MadmanDescription { get; private set; } = null!;
+
     // Neutral
     public string JesterName { get; private set; } = null!;
     public string JesterDescription { get; private set; } = null!;
@@ -309,6 +316,7 @@ public class LanguageConfig : Config
     public string MakeTrouble { get; private set; } = null!;
     public string CreateSidekick { get; private set; } = null!;
     public string EraseAction { get; private set; } = null!;
+    public string AnnihilateAction { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 

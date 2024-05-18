@@ -44,13 +44,12 @@ public static class PlayerUtils
     /// <param name="target">目标玩家</param>
     /// <param name="mustAlive">是否必须为活着的玩家</param>
     /// <returns>最近位置的玩家</returns>
-    public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true)
+    public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true, float closestDistance = float.MaxValue)
     {
         var targetLocation = target.GetTruePosition();
         var players = mustAlive ? GetAllAlivePlayers() : GetAllPlayers();
 
         PlayerControl? closestPlayer = null;
-        var closestDistance = float.MaxValue;
 
         foreach (var player in players)
         {
@@ -59,7 +58,7 @@ public static class PlayerUtils
             var playerLocation = player.GetTruePosition();
             var distance = Vector2.Distance(targetLocation, playerLocation);
 
-            if (!(distance < closestDistance)) continue;
+            if (distance >= closestDistance) continue;
             closestDistance = distance;
             closestPlayer = player;
         }

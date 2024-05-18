@@ -1,6 +1,7 @@
 ﻿using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
+using COG.States;
 using UnityEngine;
 
 namespace COG.Role.Impl.SubRole;
@@ -16,6 +17,7 @@ public class Lighter : Role, IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerAdjustLighting(PlayerAdjustLightingEvent @event)
     {
+        if (!GameStates.InGame) return true;
         var player = @event.Player;
         if (player == null)
         {

@@ -106,10 +106,11 @@ public partial class Main : BasePlugin
             return;
         }
 */
+/*
         ModUpdater.FetchUpdate();
         Logger.LogInfo(
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
-
+*/
         // Load plugins
         try
         {
@@ -168,6 +169,7 @@ public partial class Main : BasePlugin
             new Sidekick(),
             new Eraser(),
              */
+            new Madman(),
 
             // Neutral
             new Jester(),
