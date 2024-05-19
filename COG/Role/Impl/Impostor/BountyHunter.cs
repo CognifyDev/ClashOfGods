@@ -16,6 +16,7 @@ using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
 using TMPro;
 using COG.Listener.Event.Impl.HManager;
+using COG.UI.Arrow;
 
 namespace COG.Role.Impl.Impostor;
 
@@ -27,7 +28,7 @@ public class BountyHunter : Role, IListener
     private CustomOption? BHunterKillCd { get; set; }
     private CustomOption? BHunterRefreshTargetTime { get; init; }
 
-    [NotUsed] private CustomOption? HasArrowToTarget { get; set; }
+    private CustomOption? HasArrowToTarget { get; set; }
 
     private CustomOption? CdAfterKillingTarget { get; init; }
     private CustomOption? CdAfterKillingNonTarget { get; init; }
@@ -37,6 +38,7 @@ public class BountyHunter : Role, IListener
     private PlayerControl? CurrentTarget { get; set; }
     private PlayerControl? ClosestTarget { get; set; }
     private TextMeshPro? RefreshTimerText { get; set; }
+    private Arrow? ArrowToTarget { get; set; }
 
     public BountyHunter() : base(LanguageConfig.Instance.BountyHunterName, Palette.ImpostorRed, CampType.Impostor, true)
     {
@@ -52,7 +54,7 @@ public class BountyHunter : Role, IListener
             BHunterRefreshTargetTime =
                 CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f,
                     5f, MainRoleOption)!;
-            //HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
+            HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
             CdAfterKillingTarget =
                 CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f,
                     MainRoleOption)!;
@@ -196,6 +198,12 @@ public class BountyHunter : Role, IListener
          */
 
         CurrentTarget.SetPlayerAppearance(TargetPoolable);
+
+        if (HasArrowToTarget?.GetBool() ?? false)
+        {
+            ArrowToTarget?.Destroy();
+            ArrowToTarget = new(CurrentTarget.transform.position, Color);
+        }
     }
 
     public override IListener GetListener() => this;
