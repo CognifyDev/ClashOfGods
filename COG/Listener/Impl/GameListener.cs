@@ -451,24 +451,37 @@ public class GameListener : IListener
             player.RpcSetCustomRole<Crewmate>();
     }
 
-    [EventHandler(EventHandlerType.Prefix)]
-    public bool OnTaskPanelSetText(TaskPanelBehaviourSetTaskTextEvent @event)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnTaskPanelSetText(TaskPanelBehaviourSetTaskTextEvent @event)
     {
         string originText = @event.GetTaskString();
         var localRole = GameUtils.GetLocalPlayerRole();
-        if (originText == "None"|| localRole == null) return true;
+        if (originText == "None"|| localRole == null) return;
 
         var sb = new StringBuilder();
-        sb.Append(localRole.GetColorName()).Append('\n').Append(localRole.Description.Color(localRole.Color));
+
+        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.Description.Color(localRole.Color)).Append("\r\n\r\n");
+        
+        /*
+            <color=#FF0000FF>进行破坏，将所有人杀死。
+            <color=#FF1919FF>假任务：</color></color>
+        */
 
         string impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
-        if (originText.StartsWith(impTaskText))
+        string fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
+        string impTaskTextFull = $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>";
+        
+        if (originText.StartsWith(impTaskTextFull))
         {
-            int idx = originText.IndexOf(impTaskText) + impTaskText.Length;
+            int idx = originText.IndexOf(impTaskTextFull) + impTaskText.Length;
             sb.Append(originText[idx..]);
+        }
+        else
+        {
+            sb.Append(originText);
         }
 
         @event.SetTaskString(sb.ToString());
-        return true;
+        return;
     }
 }

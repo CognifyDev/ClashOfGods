@@ -4,6 +4,7 @@ using System.Text;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.Game;
+using COG.States;
 using COG.Utils;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
@@ -18,6 +19,8 @@ public class CustomWinnerListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
+        GameStates.InGame = false;
+
         var manager = @event.Object;
         SetUpWinnerPlayers(manager);
         SetUpWinText(manager);
