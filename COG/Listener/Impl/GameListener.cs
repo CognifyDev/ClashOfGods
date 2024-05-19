@@ -469,11 +469,11 @@ public class GameListener : IListener
 
         string impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
         string fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
-        string impTaskTextFull = $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>";
+        string impTaskTextFull = $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
         
         if (originText.StartsWith(impTaskTextFull))
         {
-            int idx = originText.IndexOf(impTaskTextFull) + impTaskText.Length;
+            int idx = originText.IndexOf(impTaskTextFull) + impTaskTextFull.Length;
             sb.Append(originText[idx..]);
         }
         else
