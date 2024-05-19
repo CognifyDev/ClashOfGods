@@ -418,7 +418,6 @@ public class GameListener : IListener
 
         foreach (var player in PlayerControl.AllPlayerControls)
             player.RpcSetCustomRole<Crewmate>();
-        Arrow a = new(new(0, 0, 0));
     }
 
     [EventHandler(EventHandlerType.Postfix)]
