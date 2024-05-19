@@ -459,12 +459,21 @@ public class GameListener : IListener
         if (originText == "None"|| localRole == null) return;
 
         var sb = new StringBuilder();
-        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.Description.Color(localRole.Color)).Append("\r\n\r\n");
 
-        string impTaskText = Palette.ImpostorRed.ToColorString(TranslationController.Instance.GetString(StringNames.ImpostorTask));
-        if (originText.StartsWith(impTaskText))
+        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.Description.Color(localRole.Color)).Append("\r\n\r\n");
+        
+        /*
+            <color=#FF0000FF>进行破坏，将所有人杀死。
+            <color=#FF1919FF>假任务：</color></color>
+        */
+
+        string impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
+        string fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
+        string impTaskTextFull = $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>";
+        
+        if (originText.StartsWith(impTaskTextFull))
         {
-            int idx = originText.IndexOf(impTaskText) + impTaskText.Length;
+            int idx = originText.IndexOf(impTaskTextFull) + impTaskText.Length;
             sb.Append(originText[idx..]);
         }
         else
