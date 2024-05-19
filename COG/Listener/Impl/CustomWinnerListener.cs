@@ -27,6 +27,8 @@ public class CustomWinnerListener : IListener
         SetUpRoleSummary(manager);
     }
 
+    // FIXME：小人没有身体，只有名字
+
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
         manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList()

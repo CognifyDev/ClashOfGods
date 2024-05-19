@@ -165,10 +165,11 @@ public partial class Main : BasePlugin
             new BountyHunter(),
             /* 下方职业未完成
             new Troublemaker(),
+            
+             */
             new Jackal(),
             new Sidekick(),
             new Eraser(),
-             */
             new Madman(),
 
             // Neutral
