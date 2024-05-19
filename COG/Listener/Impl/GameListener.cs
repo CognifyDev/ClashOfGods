@@ -18,6 +18,7 @@ using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
+using COG.UI.Arrow;
 using COG.Utils;
 using Il2CppSystem.Collections;
 using UnityEngine;
@@ -31,20 +32,6 @@ namespace COG.Listener.Impl;
 public class GameListener : IListener
 {
     private static bool HasStartedRoom { get; set; }
-
-    [EventHandler(EventHandlerType.Prefix)]
-    public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
-    {
-        GameStates.InGame = true;
-        Main.Logger.LogInfo("Game started!");
-
-        if (!AmongUsClient.Instance.AmHost) return;
-
-        Main.Logger.LogInfo("Select roles for players...");
-        SelectRoles();
-        Main.Logger.LogInfo("Share roles for players...");
-        ShareRoles();
-    }
 
     [EventHandler(EventHandlerType.Prefix)]
     public void OnRPCReceived(PlayerHandleRpcEvent @event)
@@ -191,14 +178,20 @@ public class GameListener : IListener
     public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        //foreach (var playerRole in GameUtils.PlayerRoleData)
-        //{
-        //    playerRole.Player.RpcSetRole(playerRole.Role.BaseRoleType);
-        //}
+
+        GameStates.InGame = true;
+        Main.Logger.LogInfo("Game started!");
+
+        if (!AmongUsClient.Instance.AmHost) return;
+
+        Main.Logger.LogInfo("Select roles for players...");
+        SelectRoles();
+        Main.Logger.LogInfo("Share roles for players...");
+        ShareRoles();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameStart(GameStartManagerStartEvent @event)
+    public void OnJoinLobby(GameStartManagerStartEvent @event)
     {
         var manager = @event.GameStartManager;
         if (HasStartedRoom)
@@ -341,57 +334,33 @@ public class GameListener : IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         var manager = @event.Manager;
-        var player = PlayerControl.LocalPlayer;
-        if (player == null) return;
-        Role.Role? role;
-        try
-        {
-            role = player.GetMainRole();
-        }
-        catch
-        {
-            return;
-        }
+        Role.Role? role = GameUtils.GetLocalPlayerRole();
 
         if (role == null) return;
 
-        if (role.CanKill)
-        {
-            manager.KillButton.ToggleVisible(true);
-            player.Data.Role.CanUseKillButton = true;
-            manager.KillButton.gameObject.SetActive(true);
-        }
-        else
+        if (!role.CanKill)
         {
             manager.KillButton.SetDisabled();
             manager.KillButton.ToggleVisible(false);
             manager.KillButton.gameObject.SetActive(false);
         }
 
-        if (role.CanVent)
-        {
-            manager.ImpostorVentButton.ToggleVisible(true);
-            player.Data.Role.CanVent = true;
-            manager.ImpostorVentButton.gameObject.SetActive(true);
-        }
-        else
+        if (!role.CanVent)
         {
             manager.ImpostorVentButton.SetDisabled();
             manager.ImpostorVentButton.ToggleVisible(false);
             manager.ImpostorVentButton.gameObject.SetActive(false);
         }
 
-        if (role.CanSabotage)
-        {
-            manager.SabotageButton.ToggleVisible(true);
-            manager.SabotageButton.gameObject.SetActive(true);
-        }
-        else
+        if (!role.CanSabotage)
         {
             manager.SabotageButton.SetDisabled();
             manager.SabotageButton.ToggleVisible(false);
             manager.SabotageButton.gameObject.SetActive(false);
         }
+
+        Arrow.CreatedArrows.RemoveAll(a => a == null || !a.ArrowObject);
+        Arrow.CreatedArrows.ForEach(a => a.Update());
     }
 
     private static void ShareRoles()
@@ -449,6 +418,7 @@ public class GameListener : IListener
 
         foreach (var player in PlayerControl.AllPlayerControls)
             player.RpcSetCustomRole<Crewmate>();
+        Arrow a = new(new(0, 0, 0));
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -469,11 +439,11 @@ public class GameListener : IListener
 
         string impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
         string fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
-        string impTaskTextFull = $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>";
+        string impTaskTextFull = $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
         
         if (originText.StartsWith(impTaskTextFull))
         {
-            int idx = originText.IndexOf(impTaskTextFull) + impTaskText.Length;
+            int idx = originText.IndexOf(impTaskTextFull) + impTaskTextFull.Length;
             sb.Append(originText[idx..]);
         }
         else
