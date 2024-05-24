@@ -6,7 +6,7 @@ using COG.UI.ModOption;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
+
 
 namespace COG.Listener.Impl;
 

@@ -16,7 +16,7 @@ using TMPro;
 using UnityEngine;
 using static COG.UI.CustomOption.CustomOption;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using Object = UnityEngine.Object;
+
 
 namespace COG.UI.CustomOption;
 

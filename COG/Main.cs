@@ -1,5 +1,6 @@
 global using Hazel;
 global using HarmonyLib;
+global using Object = UnityEngine.Object;
 using System.Linq;
 using BepInEx;
 using BepInEx.Logging;

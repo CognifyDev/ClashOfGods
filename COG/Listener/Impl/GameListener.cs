@@ -24,7 +24,7 @@ using Il2CppSystem.Collections;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
 using Convert = System.Convert;
-using Object = UnityEngine.Object;
+
 using Random = System.Random;
 
 namespace COG.Listener.Impl;
@@ -443,7 +443,7 @@ public class GameListener : IListener
         if (originText.StartsWith(impTaskTextFull))
         {
             int idx = originText.IndexOf(impTaskTextFull) + impTaskTextFull.Length;
-            sb.Append(originText[idx..]);
+            sb.Append($"<color=#FF1919FF>{fakeTaskText}</color>").Append(originText[idx..]);
         }
         else
         {

@@ -8,7 +8,7 @@ using COG.Utils.WinAPI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
+
 
 namespace COG.Patch;
 
