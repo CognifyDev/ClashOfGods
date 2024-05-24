@@ -70,7 +70,7 @@ public class CustomRoleManager
                          .Where(role =>
                              role is { MainRoleOption: not null, ShowInOptions: true, IsBaseRole: false } &&
                              role.MainRoleOption.GetBool() && role.IsSubRole == subRolesOnly))
-                if (role.RoleNumberOption != null)
+                if (!role.OnRoleSelection(_roles) && role.RoleNumberOption != null)
                 {
                     var times = (int)role.RoleNumberOption.GetFloat();
                     for (var i = 0; i < times; i++) _roles.Add(role);

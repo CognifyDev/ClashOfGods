@@ -10,7 +10,6 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace COG.Role.Impl.Impostor;
 

@@ -13,7 +13,7 @@ using AmongUs.GameOptions;
 using COG.Constant;
 using COG.Utils.Coding;
 using Debug = System.Diagnostics.Debug;
-using Object = UnityEngine.Object;
+
 using TMPro;
 using COG.Listener.Event.Impl.HManager;
 using COG.UI.Arrow;

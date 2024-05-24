@@ -37,59 +37,70 @@ public abstract class RpcUtils
             _writers = writers;
         }
 
-        public void Write(bool value)
+        public RpcWriter Write(bool value)
         {
             foreach (var messageWriter in _writers) messageWriter.Write(value);
+            return this;
         }
 
-        public void Write(byte[] bytes)
+        public RpcWriter Write(byte[] bytes)
         {
             foreach (var messageWriter in _writers) messageWriter.Write(bytes);
+            return this;
         }
 
-        public void Write(string value)
+        public RpcWriter Write(string value)
         {
             foreach (var messageWriter in _writers) messageWriter.Write(value);
+            return this;
         }
 
-        public void Write(byte value)
+        public RpcWriter Write(byte value)
         {
             foreach (var messageWriter in _writers) messageWriter.Write(value);
+            return this;
         }
 
-        public void Write(sbyte value)
+        public RpcWriter Write(sbyte value)
         {
             foreach (var messageWriter in _writers) messageWriter.Write(value);
+            return this;
         }
 
-        public void Write(float value)
+        public RpcWriter Write(float value)
         {
             foreach (var messageWriter in _writers) messageWriter.Write(value);
+            return this;
         }
 
-        public void Write(int value)
+        public RpcWriter Write(int value)
         {
             foreach (var messageWriter in _writers) messageWriter.Write(value);
+            return this;
         }
 
-        public void WritePacked(int value)
+        public RpcWriter WritePacked(int value)
         {
             foreach (var messageWriter in _writers) messageWriter.WritePacked(value);
+            return this;
         }
 
-        public void WritePacked(uint value)
+        public RpcWriter WritePacked(uint value)
         {
             foreach (var messageWriter in _writers) messageWriter.WritePacked(value);
+            return this;
         }
 
-        public void WriteBytesAndSize(byte[] bytes)
+        public RpcWriter WriteBytesAndSize(byte[] bytes)
         {
             foreach (var messageWriter in _writers) messageWriter.WriteBytesAndSize(bytes);
+            return this;
         }
 
-        public void WriteNetObject(InnerNetObject obj)
+        public RpcWriter WriteNetObject(InnerNetObject obj)
         {
             foreach (var messageWriter in _writers) messageWriter.WriteNetObject(obj);
+            return this;
         }
 
         public void Finish()

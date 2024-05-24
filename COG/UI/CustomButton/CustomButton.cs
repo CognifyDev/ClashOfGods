@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Debug = System.Diagnostics.Debug;
-using Object = UnityEngine.Object;
+
 
 namespace COG.UI.CustomButton;
 
@@ -190,7 +190,7 @@ public class CustomButton
 
     public void Update()
     {
-        var hasButton = HasButton();
+        var hasButton = HasButton.GetInvocationList().All(d=>(bool)d.DynamicInvoke()!);
         var isCoolingDown = Timer > 0f;
         var hotkeyText = "";
         if (HotkeyName == "") hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
@@ -214,7 +214,7 @@ public class CustomButton
             ActionButton.SetInfiniteUses();
 
         var desat = Shader.PropertyToID("_Desat");
-        var couldUse = CouldUse();
+        var couldUse = CouldUse.GetInvocationList().All(d=>(bool)d.DynamicInvoke()!);
         if (hasButton && !isCoolingDown && couldUse)
         {
             SpriteRenderer!.color = TextMesh!.color = Palette.EnabledColor;

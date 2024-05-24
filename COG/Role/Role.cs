@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
@@ -17,7 +19,7 @@ public class Role
 {
     private static int _order;
     
-    public Role(string name, Color color, CampType campType, bool showInOptions)
+    public Role(string name, Color color, CampType campType, bool showInOptions = true)
     {
         Name = name;
         IsBaseRole = false;
@@ -112,8 +114,8 @@ public class Role
     /// </summary>
     public CustomOption? RoleNumberOption { get; }
 
-    public List<PlayerControl> Players =>
-        GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList();
+    public ReadOnlyCollection<PlayerControl> Players =>
+        new(GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList());
 
     /// <summary>
     ///     添加一个按钮
@@ -136,6 +138,13 @@ public class Role
         return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName,
             role!.Name.Color(role.Color));
     }
+
+    /// <summary>
+    /// 改写在分配该职业时的逻辑
+    /// </summary>
+    /// <param name="roles">职业列表</param>
+    /// <returns>如果返回true，则跳过自动根据 <seealso cref="RoleNumberOption"/> 添加此职业的待分配数量</returns>
+    public virtual bool OnRoleSelection(List<Role> roles) => false;
 
     public string GetColorName() => Name.Color(Color);
 
