@@ -4,6 +4,7 @@ using System.Text;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.Game;
+using COG.Role;
 using COG.States;
 using COG.Utils;
 using Reactor.Utilities.Extensions;
@@ -20,6 +21,7 @@ public class CustomWinnerListener : IListener
     public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
         GameStates.InGame = false;
+        CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
 
         var manager = @event.Object;
         SetUpWinnerPlayers(manager);
