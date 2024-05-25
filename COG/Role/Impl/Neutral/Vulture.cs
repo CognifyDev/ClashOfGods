@@ -5,6 +5,7 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Role.Impl.Impostor;
 using COG.Rpc;
+using COG.UI.Arrow;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -67,6 +68,7 @@ public class Vulture : Role, IListener, IWinnable
         EatenCount++;
     }
 
+    [EventHandler(EventHandlerType.Postfix)]
     public void OnReceiveRpc(PlayerHandleRpcEvent @event)
     {
         if ((KnownRpc)@event.CallId != KnownRpc.EatBody) return;
@@ -81,10 +83,26 @@ public class Vulture : Role, IListener, IWinnable
         EatBody(body!);
     }
 
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerDead(PlayerMurderEvent @event)
+    {
+        if (!(HasArrowToBodies?.GetBool() ?? true)) return;
+
+        var victim = @event.Target;
+        var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == victim.PlayerId);
+        _ = new Arrow(body!.transform.position);
+    }
+
     public override bool OnRoleSelection(List<Role> roles)
     {
         roles.RemoveAll(r => r == CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>()); // 场上不能同时存在秃鹫和清洁工
         return false;
+    }
+
+    public override void ClearRoleGameData()
+    {
+        EatenCount = 0;
+        ClosestBody = null;
     }
 
     public ulong GetWeight() => IWinnable.GetOrder(6);

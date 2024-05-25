@@ -180,6 +180,8 @@ public class GameListener : IListener
         if (!AmongUsClient.Instance.AmHost) return;
 
         GameStates.InGame = true;
+        CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
+        
         Main.Logger.LogInfo("Game started!");
 
         if (!AmongUsClient.Instance.AmHost) return;

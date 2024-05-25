@@ -164,11 +164,11 @@ public partial class Main : BasePlugin
             new Impostor(),
             new Cleaner(),
             new BountyHunter(),
+            new Eraser(),
             /* 下方职业未完成
             new Troublemaker(),
             new Jackal(),
             new Sidekick(),
-            new Eraser(),
              */
             new Madman(),
 

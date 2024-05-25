@@ -146,6 +146,8 @@ public class Role
     /// <returns>如果返回true，则跳过自动根据 <seealso cref="RoleNumberOption"/> 添加此职业的待分配数量</returns>
     public virtual bool OnRoleSelection(List<Role> roles) => false;
 
+    public virtual void ClearRoleGameData() { }
+
     public string GetColorName() => Name.Color(Color);
 
     public static CustomOption.TabType ToCustomOption(Role role)
