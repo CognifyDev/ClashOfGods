@@ -37,6 +37,7 @@ public class Cleaner : Role, IListener
                 var body = PlayerUtils.GetClosestBody();
                 if (!body) return;
                 RpcCleanDeadBody(body!);
+                KillButton?.ResetCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
             () => PlayerUtils.GetClosestBody() != null,
@@ -50,7 +51,11 @@ public class Cleaner : Role, IListener
         );
 
         KillButton = CustomButton.Create(
-            () => PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget),
+            () =>
+            {
+                PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget);
+                CleanBodyButton?.ResetCooldown();
+            },
             () => KillButton?.ResetCooldown(),
             couldUse: () =>
             {
