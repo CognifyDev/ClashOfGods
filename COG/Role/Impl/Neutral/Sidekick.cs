@@ -20,6 +20,7 @@ public class Sidekick : Role, IListener
     {
         BaseRoleType = RoleTypes.Crewmate;
         CanVent = true;
+        Description = LanguageConfig.Instance.SidekickDescription;
 
         if (ShowInOptions)
         {

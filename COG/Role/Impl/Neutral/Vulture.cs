@@ -23,20 +23,32 @@ public class Vulture : Role, IListener, IWinnable
     public CustomButton EatButton { get; }
     public static int EatenCount { get; private set; }
     private static DeadBody? ClosestBody { get; set; }
+    public static List<Arrow> Arrows { get; private set; } = new();
 
-    public Vulture() : base("Vulture", new(139, 69, 19), CampType.Neutral)
+    public Vulture() : base(LanguageConfig.Instance.VultureName, new(139, 69, 19), CampType.Neutral)
     {
-        Description = "";
+        Description = LanguageConfig.Instance.VultureDescription;
 
-        var page = ToCustomOption(this);
-        EatingCooldown = CustomOption.Create(page, "cd", 30f, 10f, 60f, 5f, MainRoleOption);
-        WinningEatenCount = CustomOption.Create(page, "count", 4f, 2f, 6f, 1f, MainRoleOption);
-        HasArrowToBodies = CustomOption.Create(page, "arrow", true, MainRoleOption);
+        if (ShowInOptions)
+        {
+            var page = ToCustomOption(this);
+            EatingCooldown = CustomOption.Create(page, LanguageConfig.Instance.VultureEatCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
+            WinningEatenCount = CustomOption.Create(page, LanguageConfig.Instance.VultureEatenCountToWin, 4f, 2f, 6f, 1f, MainRoleOption);
+            HasArrowToBodies = CustomOption.Create(page, LanguageConfig.Instance.VultureHasArrowToBodies, true, MainRoleOption);
+        }
 
         EatButton = CustomButton.Create(
             () =>
             {
                 ClosestBody = PlayerUtils.GetClosestBody();
+                var arrow = Arrows.FirstOrDefault(a => a.Target == ClosestBody!.transform.position);
+                
+                if (arrow != null)
+                {
+                    Arrows.Remove(arrow!);
+                    arrow.Destroy();
+                }
+                
                 RpcEatBody(ClosestBody!);
             },
             () => EatButton?.ResetCooldown(),
@@ -61,6 +73,8 @@ public class Vulture : Role, IListener, IWinnable
             .Finish();
         EatBody(body);
     }
+
+    // TODO: Show flash when someone dies
 
     public void EatBody(DeadBody body)
     {
@@ -87,10 +101,11 @@ public class Vulture : Role, IListener, IWinnable
     public void OnPlayerDead(PlayerMurderEvent @event)
     {
         if (!(HasArrowToBodies?.GetBool() ?? true)) return;
+        if (!PlayerControl.LocalPlayer.IsRole(this)) return;
 
         var victim = @event.Target;
         var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == victim.PlayerId);
-        _ = new Arrow(body!.transform.position);
+        Arrows.Add(new Arrow(body!.transform.position));
     }
 
     public override bool OnRoleSelection(List<Role> roles)
@@ -99,15 +114,18 @@ public class Vulture : Role, IListener, IWinnable
         return false;
     }
 
+    public override string HandleAdditionalPlayerName() => $"\n({EatenCount}/{(int)WinningEatenCount.GetFloat()})";
+
     public override void ClearRoleGameData()
     {
         EatenCount = 0;
         ClosestBody = null;
+        Arrows.Clear();
     }
 
     public ulong GetWeight() => IWinnable.GetOrder(6);
 
-    public bool CanWin()
+    public bool CanWin() // 只有房主会判断游戏胜利，因此玩家之间需要同步数据
     {
         if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
         {

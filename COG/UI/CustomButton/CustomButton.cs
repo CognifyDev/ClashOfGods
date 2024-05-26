@@ -204,6 +204,7 @@ public class CustomButton
         }
 
         SetActive(hasButton);
+        if (!hasButton) return;
         var lp = PlayerControl.LocalPlayer;
         if (isCoolingDown && !lp.inVent && lp.moveable) Timer -= Time.deltaTime;
         ActionButton!.SetCoolDown(Timer, Cooldown());

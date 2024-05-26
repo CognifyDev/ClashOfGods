@@ -24,7 +24,6 @@ using Il2CppSystem.Collections;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
 using Convert = System.Convert;
-
 using Random = System.Random;
 
 namespace COG.Listener.Impl;
@@ -98,7 +97,7 @@ public class GameListener : IListener
             }
             text.text = new StringBuilder().Append(role.Name)
                 .Append(subRoles == Array.Empty<Role.Role>() ? "" : subRoleText.ToString())
-                .Append('\n').Append(player.Data.PlayerName).ToString();
+                .Append('\n').Append(player.Data.PlayerName).Append(role.HandleAdditionalPlayerName()).ToString();
         }
     }
 
