@@ -114,6 +114,8 @@ public class Vulture : Role, IListener, IWinnable
         return false;
     }
 
+    public override string HandleAdditionalPlayerName() => $"\n({EatenCount}/{(int)WinningEatenCount.GetFloat()})";
+
     public override void ClearRoleGameData()
     {
         EatenCount = 0;

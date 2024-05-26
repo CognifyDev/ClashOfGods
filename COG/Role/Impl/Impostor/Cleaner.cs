@@ -24,6 +24,7 @@ public class Cleaner : Role, IListener
     {
         Description = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
+        CanKill = false;
 
         if (ShowInOptions)
         {

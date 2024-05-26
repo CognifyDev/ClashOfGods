@@ -139,6 +139,8 @@ public class Role
             role!.Name.Color(role.Color));
     }
 
+    public virtual string HandleAdditionalPlayerName() => "";
+
     /// <summary>
     /// 改写在分配该职业时的逻辑
     /// </summary>
