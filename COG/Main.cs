@@ -175,6 +175,7 @@ public partial class Main : BasePlugin
             // Neutral
             new Jester(),
             new Opportunist(),
+            new Vulture(),
             
             // Sub-roles
             new Lighter()

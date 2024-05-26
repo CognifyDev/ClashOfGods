@@ -74,6 +74,8 @@ public class Vulture : Role, IListener, IWinnable
         EatBody(body);
     }
 
+    // TODO: Show flash when someone dies
+
     public void EatBody(DeadBody body)
     {
         body.gameObject.SetActive(false);

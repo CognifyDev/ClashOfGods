@@ -17,14 +17,19 @@ public class Cleaner : Role, IListener
 {
     private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
+    private CustomButton KillButton { get; }
+    private static PlayerControl? ClosestTarget { get; set; }
 
     public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         Description = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
 
-        CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor,
-            LanguageConfig.Instance.CleanBodyCooldown, 30f, 1f, 60f, 1f, MainRoleOption);
+        if (ShowInOptions)
+        {
+            CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor,
+                LanguageConfig.Instance.CleanBodyCooldown, 30f, 1f, 60f, 1f, MainRoleOption);
+        }
 
         CleanBodyButton = CustomButton.Create(
             () =>
@@ -40,8 +45,30 @@ public class Cleaner : Role, IListener
             2,
             KeyCode.C,
             LanguageConfig.Instance.CleanAction,
-            () => CleanBodyCd.GetFloat(),
+            () => CleanBodyCd?.GetFloat() ?? 30f,
             0
+        );
+
+        KillButton = CustomButton.Create(
+            () => PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget),
+            () => KillButton?.ResetCooldown(),
+            couldUse: () =>
+            {
+                var target = ClosestTarget = PlayerControl.LocalPlayer;
+                if (target == null) return false;
+                var localPlayer = PlayerControl.LocalPlayer;
+                var localLocation = localPlayer.GetTruePosition();
+                var targetLocation = target.GetTruePosition();
+                var distance = Vector2.Distance(localLocation, targetLocation);
+                return GameUtils.GetGameOptions().KillDistance >= distance;
+            },
+            () => true,
+            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
+            row: 1,
+            KeyCode.Q,
+            LanguageConfig.Instance.KillAction,
+            () => CleanBodyCd?.GetFloat() ?? 30f,
+            -1
         );
 
         AddButton(CleanBodyButton);
