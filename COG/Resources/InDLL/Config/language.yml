@@ -74,7 +74,14 @@ role:
       kill-cd: "击杀冷却"
     sidekick:
       name: "跟班"
+      description: "协助豺狼，获得胜利"
       can-create-sidekick: "继位后可继续传火"
+    vulture:
+      name: "秃鹫"
+      description: "船员们的血肉，味道又如何呢？"
+      eat-cd: "吞噬冷却"
+      count-to-win: "胜利吞噬尸体数"
+      has-arrow: "箭头指向尸体"
   sub-roles:
     guesser:
       name: "赌怪"
@@ -144,6 +151,7 @@ action:
   create-sidekick: "招募"
   erase-action: "抹除"
   annihilate: "湮灭"
+  eat-action: "吞噬"
 game:
   end:
     show-players-roles-message: "玩家职业: "

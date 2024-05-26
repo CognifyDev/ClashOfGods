@@ -120,10 +120,15 @@ public class LanguageConfig : Config
         JackalKillCd = GetString("role.neutral.jackal.kill-cd");
 
         SidekickName = GetString("role.neutral.sidekick.name");
+        SidekickDescription = GetString("role.neutral.sidekick.description");
         SidekickCanCreateSidekick = GetString("role.neutral.sidekick.can-create-sidekick");
-        
-        // Sub-roles
-        GuesserName = GetString("role.sub-roles.guesser.name");
+
+        VultureName = GetString("role.neutral.vulture.name");
+        VultureDescription = GetString("role.neutral.vulture.description");
+        VultureEatCooldown = GetString("role.neutral.vulture.eat-cd");
+        VultureEatenCountToWin = GetString("role.neutral.vulture.count-to-win");
+        VultureHasArrowToBodies = GetString("role.neutral.vulture.has-arrow");
+
         GuesserDescription = GetString("role.sub-roles.guesser.description");
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
@@ -269,7 +274,14 @@ public class LanguageConfig : Config
     public string JackalKillCd { get; private set; } = null!;
 
     public string SidekickName { get; private set; } = null!;
+    public string SidekickDescription { get; private set; } = null!;
     public string SidekickCanCreateSidekick { get; private set; } = null!;
+
+    public string VultureName { get; private set; } = null!;
+    public string VultureDescription { get; private set; } = null!;
+    public string VultureEatCooldown { get; private set; } = null!;
+    public string VultureEatenCountToWin { get; private set; } = null!;
+    public string VultureHasArrowToBodies { get; private set; } = null!;
 
     // Sub-roles
     public string GuesserName { get; private set; } = null!;
@@ -317,6 +329,7 @@ public class LanguageConfig : Config
     public string CreateSidekick { get; private set; } = null!;
     public string EraseAction { get; private set; } = null!;
     public string AnnihilateAction { get; private set; } = null!;
+    public string EatAction { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 

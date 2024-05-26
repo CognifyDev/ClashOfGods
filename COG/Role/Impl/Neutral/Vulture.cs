@@ -23,19 +23,19 @@ public class Vulture : Role, IListener, IWinnable
     public CustomButton EatButton { get; }
     public static int EatenCount { get; private set; }
     private static DeadBody? ClosestBody { get; set; }
-    public static List<Arrow> Arrows { get; private set; } 
+    public static List<Arrow> Arrows { get; private set; } = new();
 
-    public Vulture() : base("Vulture", new(139, 69, 19), CampType.Neutral)
+    public Vulture() : base(LanguageConfig.Instance.VultureName, new(139, 69, 19), CampType.Neutral)
     {
-        Description = "";
+        Description = LanguageConfig.Instance.VultureDescription;
 
-        var page = ToCustomOption(this);
-        EatingCooldown = CustomOption.Create(page, "cd", 30f, 10f, 60f, 5f, MainRoleOption);
-        WinningEatenCount = CustomOption.Create(page, "count", 4f, 2f, 6f, 1f, MainRoleOption);
-        HasArrowToBodies = CustomOption.Create(page, "arrow", true, MainRoleOption);
-
-        EatenCount = 0;
-        Arrows = new();
+        if (ShowInOptions)
+        {
+            var page = ToCustomOption(this);
+            EatingCooldown = CustomOption.Create(page, LanguageConfig.Instance.VultureEatCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
+            WinningEatenCount = CustomOption.Create(page, LanguageConfig.Instance.VultureEatenCountToWin, 4f, 2f, 6f, 1f, MainRoleOption);
+            HasArrowToBodies = CustomOption.Create(page, LanguageConfig.Instance.VultureHasArrowToBodies, true, MainRoleOption);
+        }
 
         EatButton = CustomButton.Create(
             () =>
@@ -62,6 +62,8 @@ public class Vulture : Role, IListener, IWinnable
             0
         );
         AddButton(EatButton);
+
+        EatenCount = 0;
     }
 
     public void RpcEatBody(DeadBody body)
