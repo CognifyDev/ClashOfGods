@@ -109,8 +109,7 @@ public class BountyHunter : Role, IListener
         RefreshTarget();
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameEnd(GameSetEverythingUpEvent @event)
+    public override void ClearRoleGameData()
     {
         CurrentTarget = null;
         RefreshTimerText = null;

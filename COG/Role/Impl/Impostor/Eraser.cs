@@ -95,6 +95,12 @@ public class Eraser : Role, IListener
         return true;
     }
 
+    public override void ClearRoleGameData()
+    {
+        TempErasedPlayerRoles.Clear();
+        CurrentTarget = null;
+    }
+
     public override IListener GetListener() => this;
 
 #pragma warning restore CS8618
