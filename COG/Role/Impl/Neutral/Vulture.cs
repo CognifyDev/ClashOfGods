@@ -23,6 +23,7 @@ public class Vulture : Role, IListener, IWinnable
     public CustomButton EatButton { get; }
     public static int EatenCount { get; private set; }
     private static DeadBody? ClosestBody { get; set; }
+    public static List<Arrow> Arrows { get; private set; } 
 
     public Vulture() : base("Vulture", new(139, 69, 19), CampType.Neutral)
     {
@@ -33,10 +34,21 @@ public class Vulture : Role, IListener, IWinnable
         WinningEatenCount = CustomOption.Create(page, "count", 4f, 2f, 6f, 1f, MainRoleOption);
         HasArrowToBodies = CustomOption.Create(page, "arrow", true, MainRoleOption);
 
+        EatenCount = 0;
+        Arrows = new();
+
         EatButton = CustomButton.Create(
             () =>
             {
                 ClosestBody = PlayerUtils.GetClosestBody();
+                var arrow = Arrows.FirstOrDefault(a => a.Target == ClosestBody!.transform.position);
+                
+                if (arrow != null)
+                {
+                    Arrows.Remove(arrow!);
+                    arrow.Destroy();
+                }
+                
                 RpcEatBody(ClosestBody!);
             },
             () => EatButton?.ResetCooldown(),
@@ -50,8 +62,6 @@ public class Vulture : Role, IListener, IWinnable
             0
         );
         AddButton(EatButton);
-
-        EatenCount = 0;
     }
 
     public void RpcEatBody(DeadBody body)
@@ -87,10 +97,11 @@ public class Vulture : Role, IListener, IWinnable
     public void OnPlayerDead(PlayerMurderEvent @event)
     {
         if (!(HasArrowToBodies?.GetBool() ?? true)) return;
+        if (!PlayerControl.LocalPlayer.IsRole(this)) return;
 
         var victim = @event.Target;
         var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == victim.PlayerId);
-        _ = new Arrow(body!.transform.position);
+        Arrows.Add(new Arrow(body!.transform.position));
     }
 
     public override bool OnRoleSelection(List<Role> roles)
@@ -103,11 +114,12 @@ public class Vulture : Role, IListener, IWinnable
     {
         EatenCount = 0;
         ClosestBody = null;
+        Arrows.Clear();
     }
 
     public ulong GetWeight() => IWinnable.GetOrder(6);
 
-    public bool CanWin()
+    public bool CanWin() // 只有房主会判断游戏胜利，因此玩家之间需要同步数据
     {
         if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
         {
