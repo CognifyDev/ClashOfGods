@@ -4,7 +4,7 @@ using COG.Listener;
 
 namespace COG.Role.Impl.Impostor;
 
-public class Impostor : Role
+public class Impostor : CustomRole
 {
     public Impostor() : base(LanguageConfig.Instance.ImpostorName, Palette.ImpostorRed, CampType.Impostor, true)
     {

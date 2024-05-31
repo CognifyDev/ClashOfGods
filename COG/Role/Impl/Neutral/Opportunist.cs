@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
-public class Opportunist : Role, IListener
+public class Opportunist : CustomRole, IListener
 {
     private readonly CustomOption? _killCooldownOption;
     private readonly CustomButton _killButton;

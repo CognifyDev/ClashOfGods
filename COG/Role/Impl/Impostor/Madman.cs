@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
-public class Madman : Role, IListener
+public class Madman : CustomRole, IListener
 {
     private CustomButton AnnihilateButton { get; }
     

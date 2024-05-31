@@ -15,11 +15,11 @@ namespace COG.Role;
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
-public class Role
+public class CustomRole
 {
     private static int _order;
     
-    public Role(string name, Color color, CampType campType, bool showInOptions = true)
+    public CustomRole(string name, Color color, CampType campType, bool showInOptions = true)
     {
         Name = name;
         IsBaseRole = false;
@@ -146,13 +146,15 @@ public class Role
     /// </summary>
     /// <param name="roles">职业列表</param>
     /// <returns>如果返回true，则跳过自动根据 <seealso cref="RoleNumberOption"/> 添加此职业的待分配数量</returns>
-    public virtual bool OnRoleSelection(List<Role> roles) => false;
+    public virtual bool OnRoleSelection(List<CustomRole> roles) => false;
+
+    public virtual void AfterSharingRoles() { }
 
     public virtual void ClearRoleGameData() { }
 
     public string GetColorName() => Name.Color(Color);
 
-    public static CustomOption.TabType ToCustomOption(Role role)
+    public static CustomOption.TabType ToCustomOption(CustomRole role)
     {
         if (role.CampType == CampType.Unknown || role.IsSubRole) return CustomOption.TabType.Addons;
         return (CustomOption.TabType)role.CampType;

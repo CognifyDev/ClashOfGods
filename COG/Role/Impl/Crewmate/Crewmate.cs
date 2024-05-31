@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Crewmate : Role
+public class Crewmate : CustomRole
 {
     public Crewmate() : base(LanguageConfig.Instance.CrewmateName, Color.white, CampType.Crewmate, false)
     {

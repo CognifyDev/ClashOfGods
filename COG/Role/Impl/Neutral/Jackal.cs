@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
-public class Jackal : Role, IListener
+public class Jackal : CustomRole, IListener
 {
     private CustomOption CreateSidekickCd { get; } = null!;
     private CustomOption JackalKillCd { get; } = null!;

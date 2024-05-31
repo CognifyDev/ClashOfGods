@@ -22,7 +22,7 @@ namespace COG.Role.Impl.Impostor;
 
 [Unfinished]
 // ReSharper disable All
-public class BountyHunter : Role, IListener
+public class BountyHunter : CustomRole, IListener
 {
     private CustomButton BHunterKillButton { get; set; }
     private CustomOption? BHunterKillCd { get; set; }

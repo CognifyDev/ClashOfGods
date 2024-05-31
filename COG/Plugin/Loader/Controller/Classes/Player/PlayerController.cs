@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using COG.Utils;
 using NLua;
+using COG.Role;
 
 // ReSharper disable UnusedMember.Global
 
@@ -19,7 +20,7 @@ public class PlayerController
         _plugin = plugin;
     }
 
-    public COG.Role.Role? GetRoleByPlayer(PlayerControl playerControl)
+    public CustomRole? GetRoleByPlayer(PlayerControl playerControl)
     {
         return playerControl.GetMainRole();
     }
@@ -31,7 +32,7 @@ public class PlayerController
     
     public PlayerControl GetLocalPlayerController() => PlayerControl.LocalPlayer;
 
-    public bool IsRole(PlayerControl player, COG.Role.Role role)
+    public bool IsRole(PlayerControl player, CustomRole role)
     {
         return player.IsRole(role);
     }

@@ -14,7 +14,7 @@ namespace COG.Role.Impl.Impostor;
 [Unfinished]
 [NotTested]
 // ReSharper disable All
-public class Troublemaker : Role
+public class Troublemaker : CustomRole
 {
     private CustomOption? MakeTroubleCd { get; }
     private CustomOption? MakeTroubleDuration { get; }

@@ -11,7 +11,7 @@ namespace COG.Role.Impl.SubRole;
 
 [NotUsed]
 [NotTested]
-public class Guesser : Role, IListener
+public class Guesser : CustomRole, IListener
 {
     public CustomOption MaxGuessTimeOption, GuesserGuessContinuously;
     

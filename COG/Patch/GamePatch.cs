@@ -342,9 +342,5 @@ public class ExileControllerBeginPatch
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.ExitGame))]
 public static class LocalPlayerExitPatch
 {
-    public static void Postfix()
-    {
-        GameStates.InGame = false;
-        CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-    }
+    public static void Postfix()=> GameStates.InGame = false;
 }

@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using COG.Listener.Event.Impl.TAButton;
 using COG.Listener.Event.Impl.TAGame;
+using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
@@ -39,7 +40,7 @@ public class TaskAdderListener : IListener
             var yCursor = 0f;
             var maxHeight = 0f;
 
-            foreach (var role in Role.CustomRoleManager.GetManager().GetRoles())
+            foreach (var role in CustomRoleManager.GetManager().GetRoles())
             {
                 if (role is Unknown or Crewmate or Impostor) continue;
                 var button = UnityEngine.Object.Instantiate(taskAdderGame.RoleButton);
@@ -48,7 +49,7 @@ public class TaskAdderListener : IListener
 
                 RoleBehaviour roleBehaviour = new()
                 {
-                    Role = (RoleTypes)Role.CustomRoleManager.GetManager().GetRoles().IndexOf(role) + 100
+                    Role = (RoleTypes)CustomRoleManager.GetManager().GetRoles().IndexOf(role) + 100
                 };
                 button.Role = roleBehaviour;
 
@@ -87,7 +88,7 @@ public class TaskAdderListener : IListener
         if (!role && !((type = (ushort)role.Role) > 100)) return true;
         if (type is > 7 and not 99)
         {
-            PlayerControl.LocalPlayer.SetCustomRole(Role.CustomRoleManager.GetManager().GetRoles()[type - 100]);
+            PlayerControl.LocalPlayer.SetCustomRole(CustomRoleManager.GetManager().GetRoles()[type - 100]);
             LastClicked = button;
         }
 

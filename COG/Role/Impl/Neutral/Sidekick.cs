@@ -11,7 +11,7 @@ namespace COG.Role.Impl.Neutral;
 
 [NotUsed]
 [NotTested]
-public class Sidekick : Role, IListener
+public class Sidekick : CustomRole, IListener
 {
     public CustomOption SidekickCanCreateSidekick { get; }
 
