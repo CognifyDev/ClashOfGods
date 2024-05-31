@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
-public class Jester : Role, IListener, IWinnable
+public class Jester : CustomRole, IListener, IWinnable
 {
     private readonly CustomOption _allowStartMeeting;
     private readonly CustomOption _allowReportDeadBody;

@@ -1,3 +1,4 @@
+using COG.Role;
 using InnerNet;
 
 namespace COG.States;
@@ -7,10 +8,21 @@ namespace COG.States;
 /// </summary>
 public static class GameStates
 {
+    private static bool _inGame = false;
+
     /// <summary>
     /// 是否处于游戏中
     /// </summary>
-    public static bool InGame { get; internal set; }
+    public static bool InGame
+    {
+        get
+        {
+            CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
+            return _inGame;
+        }
+
+        set => _inGame = value;
+    }
 
     /// <summary>
     /// 是否在大厅中

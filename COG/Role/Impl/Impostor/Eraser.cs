@@ -16,7 +16,7 @@ namespace COG.Role.Impl.Impostor;
 
 [NotUsed]
 [Unfinished]
-public class Eraser : Role, IListener
+public class Eraser : CustomRole, IListener
 {
 #pragma warning disable CS8618
     public CustomOption InitialEraseCooldown { get; }
@@ -24,7 +24,7 @@ public class Eraser : Role, IListener
     public CustomOption CanEraseImpostors { get; }
     public CustomButton EraseButton { get; }
     public static PlayerControl? CurrentTarget { get; set; }
-    public static Dictionary<PlayerControl, Role> TempErasedPlayerRoles { get; set; }
+    public static Dictionary<PlayerControl, CustomRole> TempErasedPlayerRoles { get; set; }
 
     public Eraser() : base(LanguageConfig.Instance.EraserName, Palette.ImpostorRed, CampType.Impostor, true)
     {
@@ -46,7 +46,7 @@ public class Eraser : Role, IListener
         EraseButton = CustomButton.Create(() =>
             {
                 var role = CurrentTarget!.GetMainRole();
-                Role? newRole = role!.CampType switch
+                CustomRole? newRole = role!.CampType switch
                 {
                     CampType.Crewmate => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
                     CampType.Neutral => CustomRoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),

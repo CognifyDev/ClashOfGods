@@ -35,6 +35,7 @@ using COG.Role.Impl.SubRole;
 using COG.Utils.WinAPI;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
+using COG.Role;
 
 namespace COG;
 
@@ -149,7 +150,7 @@ public partial class Main : BasePlugin
         });
 
         // Register roles
-        Role.CustomRoleManager.GetManager().RegisterRoles(new Role.Role[]
+        CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
         {
             // Unknown
             new Unknown(),
@@ -182,7 +183,7 @@ public partial class Main : BasePlugin
         });
 
         // Register listeners from role
-        foreach (var role in Role.CustomRoleManager.GetManager().GetRoles())
+        foreach (var role in CustomRoleManager.GetManager().GetRoles())
             ListenerManager.GetManager().RegisterListener(role.GetListener());
 
         // Register mod options
@@ -248,7 +249,7 @@ public partial class Main : BasePlugin
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
-        Role.CustomRoleManager.GetManager().GetRoles().Clear();
+        CustomRoleManager.GetManager().GetRoles().Clear();
         ListenerManager.GetManager().UnRegisterHandlers();
         SidebarTextManager.GetManager().GetSidebarTexts().Clear();
         CustomWinnerManager.AllWinners.Clear();

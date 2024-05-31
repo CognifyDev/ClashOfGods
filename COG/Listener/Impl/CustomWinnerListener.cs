@@ -21,7 +21,6 @@ public class CustomWinnerListener : IListener
     public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
         GameStates.InGame = false;
-        CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
 
         var manager = @event.Object;
         SetUpWinnerPlayers(manager);

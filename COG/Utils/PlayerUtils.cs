@@ -89,7 +89,7 @@ public static class PlayerUtils
     public static PlayerRole? GetPlayerRole(this PlayerControl player) =>
         GameUtils.PlayerRoleData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
 
-    public static Role.Role GetMainRole(this PlayerControl player)
+    public static CustomRole GetMainRole(this PlayerControl player)
     {
         return (from keyValuePair in GameUtils.PlayerRoleData
                 where keyValuePair.Player.IsSamePlayer(player)
@@ -138,7 +138,7 @@ public static class PlayerUtils
         return !player.Data.IsDead;
     }
 
-    public static bool IsRole(this PlayerControl player, Role.Role role)
+    public static bool IsRole(this PlayerControl player, CustomRole role)
     {
         var targetRole = player.GetPlayerRole();
         return targetRole != null && (targetRole.Role.Id.Equals(role.Id) || targetRole.SubRoles.Contains(role));
@@ -244,7 +244,7 @@ public static class PlayerUtils
     public static void ClearOutline(this PlayerControl pc) =>
         pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
 
-    public static bool IsRole<T>(this PlayerControl pc) where T : Role.Role =>
+    public static bool IsRole<T>(this PlayerControl pc) where T : CustomRole =>
         IsRole(pc, CustomRoleManager.GetManager().GetTypeRoleInstance<T>());
 
     public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color, bool checkDist = true)
@@ -263,7 +263,7 @@ public static class PlayerUtils
         return null;
     }
 
-    public static void SetCustomRole(this PlayerControl pc, Role.Role role, Role.Role[]? subRoles = null)
+    public static void SetCustomRole(this PlayerControl pc, CustomRole role, CustomRole[]? subRoles = null)
     {
         if (!pc) return;
 
@@ -276,14 +276,14 @@ public static class PlayerUtils
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
     }
 
-    public static void SetCustomRole<T>(this PlayerControl pc) where T : Role.Role
+    public static void SetCustomRole<T>(this PlayerControl pc) where T : CustomRole
     {
         if (!pc) return;
         var role = CustomRoleManager.GetManager().GetTypeRoleInstance<T>();
         pc.SetCustomRole(role);
     }
 
-    public static void RpcSetCustomRole(this PlayerControl pc, Role.Role role)
+    public static void RpcSetCustomRole(this PlayerControl pc, CustomRole role)
     {
         if (!pc) return;
         var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
@@ -293,7 +293,7 @@ public static class PlayerUtils
         SetCustomRole(pc, role);
     }
 
-    public static void RpcSetCustomRole<T>(this PlayerControl pc) where T : Role.Role
+    public static void RpcSetCustomRole<T>(this PlayerControl pc) where T : CustomRole
     {
         if (!pc) return;
         var role = CustomRoleManager.GetManager().GetTypeRoleInstance<T>();
@@ -390,7 +390,7 @@ public class DeadPlayer
     public DeathReason? DeathReason { get; }
     public PlayerControl Player { get; }
     public PlayerControl? Killer { get; }
-    public Role.Role? Role { get; private set; }
+    public CustomRole? Role { get; private set; }
     public byte PlayerId { get; }
 
     // 先这样，以后再改，反正暂时用不着
@@ -402,22 +402,22 @@ public class DeadPlayer
 
 public class PlayerRole
 {
-    public PlayerRole(PlayerControl player, Role.Role role, Role.Role[]? subRoles = null)
+    public PlayerRole(PlayerControl player, CustomRole role, CustomRole[]? subRoles = null)
     {
         Player = player;
         Role = role;
         PlayerName = player.name;
         PlayerId = player.PlayerId;
-        SubRoles = subRoles != null ? subRoles.Where(subRole => subRole.IsSubRole).ToArray() : Array.Empty<Role.Role>();
+        SubRoles = subRoles != null ? subRoles.Where(subRole => subRole.IsSubRole).ToArray() : Array.Empty<CustomRole>();
     }
 
     public PlayerControl Player { get; }
-    public Role.Role Role { get; }
+    public CustomRole Role { get; }
     public string PlayerName { get; }
     public byte PlayerId { get; }
-    public Role.Role[] SubRoles { get; }
+    public CustomRole[] SubRoles { get; }
 
-    public static Role.Role GetRole(string? playerName = null, byte? playerId = null)
+    public static CustomRole GetRole(string? playerName = null, byte? playerId = null)
     {
         return GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) !=
                null

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl;
 
-public class Unknown : Role
+public class Unknown : CustomRole
 {
     public Unknown() : base(LanguageConfig.Instance.UnknownName, Color.white, CampType.Unknown, false)
     {

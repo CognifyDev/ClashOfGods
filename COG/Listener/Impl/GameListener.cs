@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
@@ -21,6 +17,10 @@ using COG.States;
 using COG.UI.Arrow;
 using COG.Utils;
 using Il2CppSystem.Collections;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
 using Convert = System.Convert;
@@ -91,7 +91,7 @@ public class GameListener : IListener
             var nameTextBuilder = new StringBuilder();
             var subRoleNameBuilder = new StringBuilder();
 
-            if (!subRoles.SequenceEqual(Array.Empty<Role.Role>()))
+            if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
                 foreach (var role in subRoles)
                     subRoleNameBuilder.Append(' ').Append(role);
 
@@ -102,13 +102,13 @@ public class GameListener : IListener
             var adtnalTextBuilder = new StringBuilder();
             foreach (var (color, text) in subRoles.ToList()
                     .Select(r => (
-                            r.Color, 
+                            r.Color,
                             r.HandleAdditionalPlayerName()
                      )))
                 adtnalTextBuilder.Append(' ').Append(text.Color(color));
 
             nameTextBuilder.Append(adtnalTextBuilder);
-            
+
             nameText.text = adtnalTextBuilder.ToString();
         }
     }
@@ -122,7 +122,7 @@ public class GameListener : IListener
         // 开始分配职业
         var players = PlayerUtils.GetAllPlayers().ToList().Disarrange(); // 打乱玩家顺序
 
-        var rolesToAdd = new List<Role.Role>(); // 新建集合，用来存储可用的职业
+        var rolesToAdd = new List<CustomRole>(); // 新建集合，用来存储可用的职业
 
         // 获取最大可以启用的内鬼数量
         var maxImpostorsNum = GameUtils.GetImpostorsNum();
@@ -143,14 +143,14 @@ public class GameListener : IListener
             if (next.CampType == CampType.Impostor) equalsImpostorsNum++;
             rolesToAdd.Add(next);
         }
-        
+
         // 新建副职业获取器
         var subRoleGetter = CustomRoleManager.GetManager().NewGetter(true);
 
         for (var i = 0; i < players.Count; i++)
         {
             var player = players[i];
-            Role.Role role;
+            CustomRole role;
             try
             {
                 role = rolesToAdd[i];
@@ -159,18 +159,18 @@ public class GameListener : IListener
             {
                 role = CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>(); // 无法分配默认职业为Crewmate
             }
-            
+
             // 接下来分配副职业
             var random = new Random();
             var option = GlobalCustomOptionConstant.MaxSubRoleNumber;
-            var subRoleNumber = random.Next(0, (int) option.GetFloat()); // 获取这个玩家应当被给予的副职业数量
-            var subRoles = new List<Role.Role>();
+            var subRoleNumber = random.Next(0, (int)option.GetFloat()); // 获取这个玩家应当被给予的副职业数量
+            var subRoles = new List<CustomRole>();
             var givenNumber = 0;
-            
+
             while (subRoleGetter.HasNext())
             {
                 if (subRoleNumber < givenNumber) break;
-                givenNumber ++;
+                givenNumber++;
                 var toAdd = subRoleGetter.GetNext();
                 if (toAdd == null) break;
                 subRoles.Add(toAdd);
@@ -191,16 +191,18 @@ public class GameListener : IListener
         if (!AmongUsClient.Instance.AmHost) return;
 
         GameStates.InGame = true;
-        CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-        
-        Main.Logger.LogInfo("Game started!");
+
+        Main.Logger.LogInfo("Shhhhhh!");
 
         if (!AmongUsClient.Instance.AmHost) return;
 
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
+
         Main.Logger.LogInfo("Share roles for players...");
         ShareRoles();
+
+        foreach (var availableRole in GameUtils.PlayerRoleData.Select(pr => pr.Role)) availableRole.AfterSharingRoles();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -347,7 +349,7 @@ public class GameListener : IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         var manager = @event.Manager;
-        Role.Role? role = GameUtils.GetLocalPlayerRole();
+        CustomRole? role = GameUtils.GetLocalPlayerRole();
 
         if (role == null) return;
 
@@ -425,12 +427,13 @@ public class GameListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnFreePlayStartAssignDefaultRole(GameStartEvent @event)
+    public void OnGameStart(GameStartEvent @event)
     {
-        if (AmongUsClient.Instance.NetworkMode != NetworkModes.FreePlay) return;
+        Main.Logger.LogInfo("Game started!");
 
-        foreach (var player in PlayerControl.AllPlayerControls)
-            player.RpcSetCustomRole<Crewmate>();
+        if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
+            foreach (var player in PlayerControl.AllPlayerControls)
+                player.RpcSetCustomRole<Crewmate>();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -438,12 +441,12 @@ public class GameListener : IListener
     {
         string originText = @event.GetTaskString();
         var localRole = GameUtils.GetLocalPlayerRole();
-        if (originText == "None"|| localRole == null) return;
+        if (originText == "None" || localRole == null) return;
 
         var sb = new StringBuilder();
 
         sb.Append(localRole.GetColorName()).Append('：').Append(localRole.Description.Color(localRole.Color)).Append("\r\n\r\n");
-        
+
         /*
             <color=#FF0000FF>进行破坏，将所有人杀死。
             <color=#FF1919FF>假任务：</color></color>
@@ -452,7 +455,7 @@ public class GameListener : IListener
         string impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
         string fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
         string impTaskTextFull = $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
-        
+
         if (originText.StartsWith(impTaskTextFull))
         {
             int idx = originText.IndexOf(impTaskTextFull) + impTaskTextFull.Length;

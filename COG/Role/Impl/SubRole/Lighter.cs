@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.SubRole;
 
-public class Lighter : Role, IListener
+public class Lighter : CustomRole, IListener
 {
     public Lighter() : base(LanguageConfig.Instance.LighterName, Color.yellow, CampType.Unknown, true)
     {

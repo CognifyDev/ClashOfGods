@@ -9,7 +9,7 @@ using UnityEngine;
 namespace COG.Role.Impl.Crewmate;
 
 [NotTested]
-public class Spy : Role, IListener
+public class Spy : CustomRole, IListener
 {
     public Spy() : base(LanguageConfig.Instance.SpyName, Color.grey, CampType.Crewmate, true)
     {

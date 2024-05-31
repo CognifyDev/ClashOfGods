@@ -8,39 +8,39 @@ public class CustomRoleManager
 {
     private static readonly CustomRoleManager Manager = new();
 
-    private readonly List<Role> _roles = new();
+    private readonly List<CustomRole> _roles = new();
 
-    public Role[] GetTypeCampRoles(CampType campType)
+    public CustomRole[] GetTypeCampRoles(CampType campType)
     {
         return _roles.Where(role => role.CampType == campType && role.MainRoleOption!.GetBool()).ToArray();
     }
 
-    public void RegisterRole(Role role)
+    public void RegisterRole(CustomRole role)
     {
         _roles.Add(role);
     }
 
-    public T GetTypeRoleInstance<T>() where T : Role
+    public T GetTypeRoleInstance<T>() where T : CustomRole
     {
         return _roles.OfType<T>().FirstOrDefault()!;
     }
 
-    public void RegisterRoles(Role[] roles)
+    public void RegisterRoles(CustomRole[] roles)
     {
         _roles.AddRange(roles);
     }
 
-    public List<Role> GetRoles()
+    public List<CustomRole> GetRoles()
     {
         return _roles;
     }
 
-    public Role? GetRoleByClassName(string name)
+    public CustomRole? GetRoleByClassName(string name)
     {
         return _roles.FirstOrDefault(r => r.GetType().Name == name);
     }
 
-    public Role? GetRoleById(int id)
+    public CustomRole? GetRoleById(int id)
     {
         return _roles.FirstOrDefault(role => role.Id == id);
     }
@@ -59,9 +59,9 @@ public class CustomRoleManager
         return Manager;
     }
 
-    public class RoleGetter : IGetter<Role?>
+    public class RoleGetter : IGetter<CustomRole?>
     {
-        private readonly List<Role> _roles = new();
+        private readonly List<CustomRole> _roles = new();
         private int _selection;
 
         internal RoleGetter(bool subRolesOnly = false)
@@ -79,7 +79,7 @@ public class CustomRoleManager
             _roles.Disarrange();
         }
 
-        public Role? GetNext()
+        public CustomRole? GetNext()
         {
             if (_selection >= _roles.Count) return null;
             var toReturn = _roles[_selection];

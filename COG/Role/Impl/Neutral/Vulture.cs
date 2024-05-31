@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
-public class Vulture : Role, IListener, IWinnable
+public class Vulture : CustomRole, IListener, IWinnable
 {
     public CustomOption EatingCooldown { get; }
     public CustomOption WinningEatenCount { get; }
@@ -107,10 +107,10 @@ public class Vulture : Role, IListener, IWinnable
         Arrows.Add(new Arrow(body!.transform.position));
     }
 
-    public override bool OnRoleSelection(List<Role> roles)
+    public override bool OnRoleSelection(List<CustomRole> roles)
     {
         bool disableVulture = new System.Random().Next(2) == 1;
-        Role roleToDisable = disableVulture ? this : CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>();
+        CustomRole roleToDisable = disableVulture ? this : CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>();
         roles.RemoveAll(r => r == roleToDisable); // 场上不能同时存在秃鹫和清洁工
         return false;
     }

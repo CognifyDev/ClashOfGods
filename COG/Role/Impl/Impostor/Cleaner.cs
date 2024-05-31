@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
-public class Cleaner : Role, IListener
+public class Cleaner : CustomRole, IListener
 {
     private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }

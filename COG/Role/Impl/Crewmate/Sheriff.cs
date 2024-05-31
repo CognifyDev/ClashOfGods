@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Sheriff : Role, IListener
+public class Sheriff : CustomRole, IListener
 {
     private CustomOption? SheriffKillCd { get; }
     private CustomButton SheriffKillButton { get; }
