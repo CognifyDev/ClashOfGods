@@ -15,13 +15,13 @@ public static class GameStates
     /// </summary>
     public static bool InGame
     {
-        get
+        get => _inGame;
+
+        set
         {
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-            return _inGame;
+            _inGame = value;
         }
-
-        set => _inGame = value;
     }
 
     /// <summary>
