@@ -1,5 +1,4 @@
 using COG.Config.Impl;
-using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
@@ -110,7 +109,9 @@ public class Vulture : Role, IListener, IWinnable
 
     public override bool OnRoleSelection(List<Role> roles)
     {
-        roles.RemoveAll(r => r == CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>()); // 场上不能同时存在秃鹫和清洁工
+        bool disableVulture = new System.Random().Next(2) == 1;
+        Role roleToDisable = disableVulture ? this : CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>();
+        roles.RemoveAll(r => r == roleToDisable); // 场上不能同时存在秃鹫和清洁工
         return false;
     }
 

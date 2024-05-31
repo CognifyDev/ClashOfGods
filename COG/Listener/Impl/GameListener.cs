@@ -82,22 +82,34 @@ public class GameListener : IListener
         {
             var playerRole = player.GetPlayerRole();
             if (playerRole is null) return;
+
             var subRoles = playerRole.SubRoles;
-            var role = playerRole.Role;
-            var text = player.cosmetics.nameText;
-            text.color = role.Color;
-            var subRoleText = new StringBuilder(" ");
-            for (var i = 0; i < subRoles.Length; i++)
-            {
-                subRoleText.Append(subRoles[i].Name);
-                if (i < subRoles.Length - 1)
-                {
-                    subRoleText.Append(' ');
-                }
-            }
-            text.text = new StringBuilder().Append(role.Name)
-                .Append(subRoles == Array.Empty<Role.Role>() ? "" : subRoleText.ToString())
-                .Append('\n').Append(player.Data.PlayerName).Append(role.HandleAdditionalPlayerName()).ToString();
+            var mainRole = playerRole.Role;
+            var nameText = player.cosmetics.nameText;
+            nameText.color = mainRole.Color;
+
+            var nameTextBuilder = new StringBuilder();
+            var subRoleNameBuilder = new StringBuilder();
+
+            if (!subRoles.SequenceEqual(Array.Empty<Role.Role>()))
+                foreach (var role in subRoles)
+                    subRoleNameBuilder.Append(' ').Append(role);
+
+            nameTextBuilder.Append(mainRole.Name)
+                .Append(subRoleNameBuilder)
+                .Append('\n').Append(player.Data.PlayerName);
+
+            var adtnalTextBuilder = new StringBuilder();
+            foreach (var (color, text) in subRoles.ToList()
+                    .Select(r => (
+                            r.Color, 
+                            r.HandleAdditionalPlayerName()
+                     )))
+                adtnalTextBuilder.Append(' ').Append(text.Color(color));
+
+            nameTextBuilder.Append(adtnalTextBuilder);
+            
+            nameText.text = adtnalTextBuilder.ToString();
         }
     }
 
