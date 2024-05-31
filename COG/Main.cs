@@ -56,7 +56,7 @@ public partial class Main : BasePlugin
     public const string PluginGuid = "top.cog.clashofgods";
     public const string DisplayName = "ClashOfGods";
 
-    public static ManualLogSource Logger = null!;
+    public static StackTraceLogger Logger { get; private set; } = null!;
     public static VersionInfo VersionInfo { get; private set; } = null!;
     public static string PluginVersion { get; private set; } = null!;
     private Harmony Harmony { get; } = new(PluginGuid);
@@ -74,7 +74,7 @@ public partial class Main : BasePlugin
             ? VersionInfo.Empty
             : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
 
-        Logger = BepInEx.Logging.Logger.CreateLogSource($"   {DisplayName}");
+        Logger = new($"   {DisplayName}");
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
 
