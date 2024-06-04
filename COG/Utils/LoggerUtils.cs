@@ -15,48 +15,25 @@ public class StackTraceLogger
         RegisteredCustomLogger.Add(this);
     }
 
-    public void LogDebug(object? msg)
-    {
-        if (msg == null) return;
-        BepInExLogger.LogDebug(GetFullString(msg));
-    }
+    public void LogDebug(object? msg) => BepInExLogger.LogDebug(GetFullString(msg));
 
-    public void LogInfo(object? msg)
-    {
-        if (msg == null) return;
-        BepInExLogger.LogInfo(GetFullString(msg));
-    }
+    public void LogInfo(object? msg) => BepInExLogger.LogInfo(GetFullString(msg));
 
-    public void LogWarning(object? msg)
-    {
-        if (msg == null) return;
-        BepInExLogger.LogWarning(GetFullString(msg));
-    }
+    public void LogWarning(object? msg) => BepInExLogger.LogWarning(GetFullString(msg));
 
-    public void LogFatal(object? msg)
-    {
-        if (msg == null) return;
-        BepInExLogger.LogFatal(GetFullString(msg));
-    }
+    public void LogFatal(object? msg) => BepInExLogger.LogFatal(GetFullString(msg));
 
-    public void LogError(object? msg)
-    {
-        if (msg == null) return;
-        BepInExLogger.LogError(GetFullString(msg));
-    }
+    public void LogError(object? msg) => BepInExLogger.LogError(GetFullString(msg));
 
-    public void LogMessage(object? msg)
-    {
-        if (msg == null) return;
-        BepInExLogger.LogMessage(GetFullString(msg));
-    }
+    public void LogMessage(object? msg) => BepInExLogger.LogMessage(GetFullString(msg));
 
-    private string GetFullString(object data)
+    private string GetFullString(object? data)
     {
         var st = new StackTrace().GetFrame(2);
         var method = st?.GetMethod();
+        data ??= "";
 
-        if (st == null || method == null) return "[Unknown]";
+        if (st == null || method == null) return $"[Unknown] {data}";
         var type = method.DeclaringType;
 
         return $"[{type?.FullName}::{method.Name}] {data}";
