@@ -4,8 +4,6 @@ using COG.Listener.Event.Impl.Meeting;
 using COG.UI.CustomOption;
 using COG.Utils.Coding;
 using UnityEngine;
-using Il2CppInterop.Runtime.Attributes;
-using Reactor.Utilities.Attributes;
 
 namespace COG.Role.Impl.SubRole;
 
@@ -15,7 +13,7 @@ public class Guesser : CustomRole, IListener
 {
     public CustomOption MaxGuessTimeOption, GuesserGuessContinuously;
 
-    public Guesser() : base(LanguageConfig.Instance.GuesserName, Color.yellow, CampType.Unknown, true)
+    public Guesser() : base(LanguageConfig.Instance.GuesserName, Color.yellow, CampType.Unknown)
     {
         Description = LanguageConfig.Instance.GuesserDescription;
         IsSubRole = true;

@@ -64,10 +64,7 @@ public class PluginController
         return () =>
         {
             var result = function.Call();
-            if (result == null)
-            {
-                throw new System.Exception("result is null");
-            }
+            if (result == null) throw new System.Exception("result is null");
 
             return result[0];
         };

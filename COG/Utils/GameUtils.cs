@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using AmongUs.GameOptions;
 using COG.Role;
-using COG.Role.Impl.Neutral;
-using COG.Rpc;
 using COG.States;
 using UnityEngine;
 
@@ -12,11 +9,10 @@ namespace COG.Utils;
 
 public static class GameUtils
 {
+    public const MurderResultFlags DefaultFlag = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
     public static List<PlayerRole> PlayerRoleData { get; } = new();
 
     public static GenericPopup? Popup { get; set; }
-
-    public const MurderResultFlags DefaultFlag = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
 
     /// <summary>
     ///     向游戏里面发送一条信息
@@ -76,7 +72,7 @@ public static class GameUtils
     public static List<Transform> GetAllChildren(this Transform transform)
     {
         List<Transform> result = new();
-        for (int i = 0; i < transform.childCount; i++)
+        for (var i = 0; i < transform.childCount; i++)
             result.Add(transform.GetChild(i));
         return result;
     }

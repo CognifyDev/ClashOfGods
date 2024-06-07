@@ -9,7 +9,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace COG.Patch;
 
 [HarmonyPatch(typeof(MainMenuManager))]
@@ -17,7 +16,7 @@ public static class MainMenuPatch
 {
     public static GameObject? CustomBG;
     public static readonly List<PassiveButton> Buttons = new();
-    public static bool PopupCreated = false;
+    public static bool PopupCreated;
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]
     [HarmonyPrefix]

@@ -8,7 +8,7 @@ namespace COG.Role.Impl.SubRole;
 
 public class Lighter : CustomRole, IListener
 {
-    public Lighter() : base(LanguageConfig.Instance.LighterName, Color.yellow, CampType.Unknown, true)
+    public Lighter() : base(LanguageConfig.Instance.LighterName, Color.yellow, CampType.Unknown)
     {
         Description = LanguageConfig.Instance.LighterDescription;
         IsSubRole = true;
@@ -19,10 +19,7 @@ public class Lighter : CustomRole, IListener
     {
         if (!GameStates.InGame) return true;
         var player = @event.Player;
-        if (player == null)
-        {
-            return true;
-        }
+        if (player == null) return true;
 
         player.SetFlashlightInputMethod();
         player.lightSource.SetupLightingForGameplay(false, 0.75f, player.TargetFlashlight.transform);

@@ -5,10 +5,6 @@ namespace COG.Utils.Version;
 
 public class VersionInfo
 {
-    public string Parent { get; }
-    public bool Beta { get; }
-    public ulong? BetaVersion { get; }
-
     public static readonly VersionInfo Empty = new(string.Empty);
 
     private VersionInfo(string parent, bool beta = false, ulong? betaVersion = null)
@@ -18,13 +14,17 @@ public class VersionInfo
         BetaVersion = betaVersion;
     }
 
+    public string Parent { get; }
+    public bool Beta { get; }
+    public ulong? BetaVersion { get; }
+
     public override string ToString()
     {
         return Beta ? $"{Parent}-beta.{BetaVersion}" : Parent;
     }
 
     /// <summary>
-    /// 给定一个版本信息，与之相比，看看自身是否为最新的版本号
+    ///     给定一个版本信息，与之相比，看看自身是否为最新的版本号
     /// </summary>
     /// <param name="versionInfo"></param>
     /// <returns>是否为最新版本号</returns>
@@ -78,7 +78,7 @@ public class VersionInfo
     }
 
     /// <summary>
-    /// 新建实例
+    ///     新建实例
     /// </summary>
     /// <param name="version"></param>
     /// <returns></returns>

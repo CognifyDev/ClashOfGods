@@ -12,10 +12,10 @@ namespace COG.Role.Impl.Neutral;
 
 public class Jester : CustomRole, IListener, IWinnable
 {
-    private readonly CustomOption _allowStartMeeting;
     private readonly CustomOption _allowReportDeadBody;
+    private readonly CustomOption _allowStartMeeting;
 
-    public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral, true)
+    public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral)
     {
         Description = LanguageConfig.Instance.JesterDescription;
         _allowStartMeeting = CustomOption.Create(

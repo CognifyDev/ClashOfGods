@@ -3,7 +3,6 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Meeting;
 using COG.Utils;
 
-
 namespace COG.Patch;
 
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]

@@ -41,162 +41,6 @@ public class LanguageConfig : Config
         }
     }
 
-    private void SetTranslations()
-    {
-        MessageForNextPage = GetString("lobby.message-for-next-page");
-        MakePublicMessage = GetString("lobby.make-public-message");
-        VanillaRoleDisabled = GetString("lobby.vanilla-role-disabled");
-
-        GeneralSetting = GetString("menu.general.name");
-        ImpostorRolesSetting = GetString("menu.impostor.name");
-        NeutralRolesSetting = GetString("menu.neutral.name");
-        CrewmateRolesSetting = GetString("menu.crewmate.name");
-        AddonsSetting = GetString("menu.addons.name");
-
-        LoadPreset = GetString("menu.general.load-preset");
-        SavePreset = GetString("menu.general.save-preset");
-        DebugMode = GetString("menu.general.debug-mode");
-        MaxSubRoleNumber = GetString("menu.general.max-sub-role-number");
-
-        // Unknown
-        UnknownName = GetString("role.unknown.name");
-        UnknownDescription = GetString("role.unknown.description");
-
-        // Crewmate
-        CrewmateName = GetString("role.crewmate.crewmate.name");
-        CrewmateDescription = GetString("role.crewmate.crewmate.description");
-
-        BaitName = GetString("role.crewmate.bait.name");
-        BaitDescription = GetString("role.crewmate.bait.description");
-
-        SheriffName = GetString("role.crewmate.sheriff.name");
-        SheriffDescription = GetString("role.crewmate.sheriff.description");
-        SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");
-
-        SpyName = GetString("role.crewmate.spy.name");
-        SpyDescription = GetString("role.crewmate.spy.description");
-
-        // Impostors
-        ImpostorName = GetString("role.impostor.impostor.name");
-        ImpostorDescription = GetString("role.impostor.impostor.description");
-
-        CleanerName = GetString("role.impostor.cleaner.name");
-        CleanerDescription = GetString("role.impostor.cleaner.description");
-        CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
-
-        TroublemakerName = GetString("role.impostor.troublemaker.name");
-        TroublemakerDescription = GetString("role.impostor.troublemaker.description");
-        TroublemakerDuration = GetString("role.impostor.troublemaker.menu.duration");
-        TroublemakerCooldown = GetString("role.impostor.troublemaker.menu.cd");
-
-        BountyHunterName = GetString("role.impostor.bounty-hunter.name");
-        BountyHunterDescription = GetString("role.impostor.bounty-hunter.description");
-        BountyHunterDefaultCd = GetString("role.impostor.bounty-hunter.menu.cd");
-        BountyHunterRefreshTargetTime = GetString("role.impostor.bounty-hunter.menu.target-refresh-time");
-        BountyHunterHasArrowToTarget = GetString("role.impostor.bounty-hunter.menu.has-arrow");
-        BountyHunterKillCorrectCd = GetString("role.impostor.bounty-hunter.menu.cd-kill-target");
-        BountyHunterKillIncorrectCd = GetString("role.impostor.bounty-hunter.menu.cd-kill-non-target");
-        BountyHunterCantSelectTargetError = GetString("role.impostor.bounty-hunter.error.select-target-error");
-
-        EraserName = GetString("role.impostor.eraser.name");
-        EraserDescription = GetString("role.impostor.eraser.description");
-        EraserInitialEraseCd = GetString("role.impostor.eraser.menu.initial-erase-cd");
-        EraserIncreaseCdAfterErasing = GetString("role.impostor.eraser.menu.increase-cd-after-erasing");
-        EraserCanEraseImpostors = GetString("role.impostor.eraser.menu.can-erase-imps");
-
-        MadmanName = GetString("role.impostor.madman.name");
-        MadmanDescription = GetString("role.impostor.madman.description");
-
-        // Neutral
-        JesterName = GetString("role.neutral.jester.name");
-        JesterDescription = GetString("role.neutral.jester.description");
-
-        OpportunistName = GetString("role.neutral.opportunist.name");
-        OpportunistDescription = GetString("role.neutral.opportunist.description");
-
-        JackalName = GetString("role.neutral.jackal.name");
-        JackalDescription = GetString("role.neutral.jackal.description");
-        JackalCreateSidekickCd = GetString("role.neutral.jackal.create-sidekick-cd");
-        JackalKillCd = GetString("role.neutral.jackal.kill-cd");
-
-        SidekickName = GetString("role.neutral.sidekick.name");
-        SidekickDescription = GetString("role.neutral.sidekick.description");
-        SidekickCanCreateSidekick = GetString("role.neutral.sidekick.can-create-sidekick");
-
-        VultureName = GetString("role.neutral.vulture.name");
-        VultureDescription = GetString("role.neutral.vulture.description");
-        VultureEatCooldown = GetString("role.neutral.vulture.eat-cd");
-        VultureEatenCountToWin = GetString("role.neutral.vulture.count-to-win");
-        VultureHasArrowToBodies = GetString("role.neutral.vulture.has-arrow");
-
-        GuesserDescription = GetString("role.sub-roles.guesser.description");
-        GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
-        GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
-
-        LighterName = GetString("role.sub-roles.lighter.name");
-        LighterDescription = GetString("role.sub-roles.lighter.description");
-
-        Enable = GetString("option.enable");
-        Disable = GetString("option.disable");
-        CogOptions = GetString("option.main.cog-options");
-        LoadCustomLanguage = GetString("option.main.load-custom-lang");
-        Github = GetString("option.main.github");
-        QQ = GetString("option.main.qq");
-        Discord = GetString("option.main.discord");
-        UpdateButtonString = GetString("option.main.update-button-string");
-
-        MaxNumMessage = GetString("role.global.max-num");
-        AllowStartMeeting = GetString("role.global.allow-start-meeting");
-        AllowReportDeadBody = GetString("role.global.allow-report-body");
-        KillCooldown = GetString("role.global.kill-cooldown");
-
-        SidebarTextOriginal = GetString("sidebar-text.original");
-        SidebarTextNeutral = GetString("sidebar-text.neutral");
-        SidebarTextMod = GetString("sidebar-text.mod");
-        SidebarTextAddons = GetString("sidebar-text.addons");
-        SidebarTextImpostor = GetString("sidebar-text.impostor");
-        SidebarTextCrewmate = GetString("sidebar-text.crewmate");
-
-        UnknownCamp = GetString("camp.unknown.name");
-        ImpostorCamp = GetString("camp.impostor.name");
-        NeutralCamp = GetString("camp.neutral.name");
-        CrewmateCamp = GetString("camp.crewmate.name");
-
-        UnknownCampDescription = GetString("camp.unknown.description");
-        ImpostorCampDescription = GetString("camp.impostor.description");
-        NeutralCampDescription = GetString("camp.neutral.description");
-        CrewmateCampDescription = GetString("camp.crewmate.description");
-
-        KillAction = GetString("action.kill");
-        CleanAction = GetString("action.clean");
-        MakeTrouble = GetString("action.make-trouble");
-        CreateSidekick = GetString("action.create-sidekick");
-        EraseAction = GetString("action.erase-action");
-        AnnihilateAction = GetString("action.annihilate");
-
-        ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
-
-        Alive = GetString("game.survival-data.alive");
-        Disconnected = GetString("game.survival-data.disconnected");
-        DefaultKillReason = GetString("game.survival-data.default");
-        UnknownKillReason = GetString("game.survival-data.unknown");
-
-        UnloadModButtonName = GetString("option.main.unload-mod.name");
-        UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
-        UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
-
-        UpToDate = GetString("option.main.update.up-to-date");
-        NonCheck = GetString("option.main.update.non-check");
-        FetchedString = GetString("option.main.update.fetched");
-
-        ImpostorsWinText = GetString("game.end.wins.impostor");
-        CrewmatesWinText = GetString("game.end.wins.crewmate");
-        NeutralsWinText = GetString("game.end.wins.neutral");
-
-        DefaultEjectText = GetString("game.exile.default");
-        AlivePlayerInfo = GetString("game.exile.alive-player-info");
-    }
-
     public static LanguageConfig Instance { get; private set; }
     public string MessageForNextPage { get; private set; } = null!;
     public string MakePublicMessage { get; private set; } = null!;
@@ -353,6 +197,162 @@ public class LanguageConfig : Config
 
     public string DefaultEjectText { get; private set; } = null!;
     public string AlivePlayerInfo { get; private set; } = null!;
+
+    private void SetTranslations()
+    {
+        MessageForNextPage = GetString("lobby.message-for-next-page");
+        MakePublicMessage = GetString("lobby.make-public-message");
+        VanillaRoleDisabled = GetString("lobby.vanilla-role-disabled");
+
+        GeneralSetting = GetString("menu.general.name");
+        ImpostorRolesSetting = GetString("menu.impostor.name");
+        NeutralRolesSetting = GetString("menu.neutral.name");
+        CrewmateRolesSetting = GetString("menu.crewmate.name");
+        AddonsSetting = GetString("menu.addons.name");
+
+        LoadPreset = GetString("menu.general.load-preset");
+        SavePreset = GetString("menu.general.save-preset");
+        DebugMode = GetString("menu.general.debug-mode");
+        MaxSubRoleNumber = GetString("menu.general.max-sub-role-number");
+
+        // Unknown
+        UnknownName = GetString("role.unknown.name");
+        UnknownDescription = GetString("role.unknown.description");
+
+        // Crewmate
+        CrewmateName = GetString("role.crewmate.crewmate.name");
+        CrewmateDescription = GetString("role.crewmate.crewmate.description");
+
+        BaitName = GetString("role.crewmate.bait.name");
+        BaitDescription = GetString("role.crewmate.bait.description");
+
+        SheriffName = GetString("role.crewmate.sheriff.name");
+        SheriffDescription = GetString("role.crewmate.sheriff.description");
+        SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");
+
+        SpyName = GetString("role.crewmate.spy.name");
+        SpyDescription = GetString("role.crewmate.spy.description");
+
+        // Impostors
+        ImpostorName = GetString("role.impostor.impostor.name");
+        ImpostorDescription = GetString("role.impostor.impostor.description");
+
+        CleanerName = GetString("role.impostor.cleaner.name");
+        CleanerDescription = GetString("role.impostor.cleaner.description");
+        CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
+
+        TroublemakerName = GetString("role.impostor.troublemaker.name");
+        TroublemakerDescription = GetString("role.impostor.troublemaker.description");
+        TroublemakerDuration = GetString("role.impostor.troublemaker.menu.duration");
+        TroublemakerCooldown = GetString("role.impostor.troublemaker.menu.cd");
+
+        BountyHunterName = GetString("role.impostor.bounty-hunter.name");
+        BountyHunterDescription = GetString("role.impostor.bounty-hunter.description");
+        BountyHunterDefaultCd = GetString("role.impostor.bounty-hunter.menu.cd");
+        BountyHunterRefreshTargetTime = GetString("role.impostor.bounty-hunter.menu.target-refresh-time");
+        BountyHunterHasArrowToTarget = GetString("role.impostor.bounty-hunter.menu.has-arrow");
+        BountyHunterKillCorrectCd = GetString("role.impostor.bounty-hunter.menu.cd-kill-target");
+        BountyHunterKillIncorrectCd = GetString("role.impostor.bounty-hunter.menu.cd-kill-non-target");
+        BountyHunterCantSelectTargetError = GetString("role.impostor.bounty-hunter.error.select-target-error");
+
+        EraserName = GetString("role.impostor.eraser.name");
+        EraserDescription = GetString("role.impostor.eraser.description");
+        EraserInitialEraseCd = GetString("role.impostor.eraser.menu.initial-erase-cd");
+        EraserIncreaseCdAfterErasing = GetString("role.impostor.eraser.menu.increase-cd-after-erasing");
+        EraserCanEraseImpostors = GetString("role.impostor.eraser.menu.can-erase-imps");
+
+        MadmanName = GetString("role.impostor.madman.name");
+        MadmanDescription = GetString("role.impostor.madman.description");
+
+        // Neutral
+        JesterName = GetString("role.neutral.jester.name");
+        JesterDescription = GetString("role.neutral.jester.description");
+
+        OpportunistName = GetString("role.neutral.opportunist.name");
+        OpportunistDescription = GetString("role.neutral.opportunist.description");
+
+        JackalName = GetString("role.neutral.jackal.name");
+        JackalDescription = GetString("role.neutral.jackal.description");
+        JackalCreateSidekickCd = GetString("role.neutral.jackal.create-sidekick-cd");
+        JackalKillCd = GetString("role.neutral.jackal.kill-cd");
+
+        SidekickName = GetString("role.neutral.sidekick.name");
+        SidekickDescription = GetString("role.neutral.sidekick.description");
+        SidekickCanCreateSidekick = GetString("role.neutral.sidekick.can-create-sidekick");
+
+        VultureName = GetString("role.neutral.vulture.name");
+        VultureDescription = GetString("role.neutral.vulture.description");
+        VultureEatCooldown = GetString("role.neutral.vulture.eat-cd");
+        VultureEatenCountToWin = GetString("role.neutral.vulture.count-to-win");
+        VultureHasArrowToBodies = GetString("role.neutral.vulture.has-arrow");
+
+        GuesserDescription = GetString("role.sub-roles.guesser.description");
+        GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
+        GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
+
+        LighterName = GetString("role.sub-roles.lighter.name");
+        LighterDescription = GetString("role.sub-roles.lighter.description");
+
+        Enable = GetString("option.enable");
+        Disable = GetString("option.disable");
+        CogOptions = GetString("option.main.cog-options");
+        LoadCustomLanguage = GetString("option.main.load-custom-lang");
+        Github = GetString("option.main.github");
+        QQ = GetString("option.main.qq");
+        Discord = GetString("option.main.discord");
+        UpdateButtonString = GetString("option.main.update-button-string");
+
+        MaxNumMessage = GetString("role.global.max-num");
+        AllowStartMeeting = GetString("role.global.allow-start-meeting");
+        AllowReportDeadBody = GetString("role.global.allow-report-body");
+        KillCooldown = GetString("role.global.kill-cooldown");
+
+        SidebarTextOriginal = GetString("sidebar-text.original");
+        SidebarTextNeutral = GetString("sidebar-text.neutral");
+        SidebarTextMod = GetString("sidebar-text.mod");
+        SidebarTextAddons = GetString("sidebar-text.addons");
+        SidebarTextImpostor = GetString("sidebar-text.impostor");
+        SidebarTextCrewmate = GetString("sidebar-text.crewmate");
+
+        UnknownCamp = GetString("camp.unknown.name");
+        ImpostorCamp = GetString("camp.impostor.name");
+        NeutralCamp = GetString("camp.neutral.name");
+        CrewmateCamp = GetString("camp.crewmate.name");
+
+        UnknownCampDescription = GetString("camp.unknown.description");
+        ImpostorCampDescription = GetString("camp.impostor.description");
+        NeutralCampDescription = GetString("camp.neutral.description");
+        CrewmateCampDescription = GetString("camp.crewmate.description");
+
+        KillAction = GetString("action.kill");
+        CleanAction = GetString("action.clean");
+        MakeTrouble = GetString("action.make-trouble");
+        CreateSidekick = GetString("action.create-sidekick");
+        EraseAction = GetString("action.erase-action");
+        AnnihilateAction = GetString("action.annihilate");
+
+        ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
+
+        Alive = GetString("game.survival-data.alive");
+        Disconnected = GetString("game.survival-data.disconnected");
+        DefaultKillReason = GetString("game.survival-data.default");
+        UnknownKillReason = GetString("game.survival-data.unknown");
+
+        UnloadModButtonName = GetString("option.main.unload-mod.name");
+        UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
+        UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
+
+        UpToDate = GetString("option.main.update.up-to-date");
+        NonCheck = GetString("option.main.update.non-check");
+        FetchedString = GetString("option.main.update.fetched");
+
+        ImpostorsWinText = GetString("game.end.wins.impostor");
+        CrewmatesWinText = GetString("game.end.wins.crewmate");
+        NeutralsWinText = GetString("game.end.wins.neutral");
+
+        DefaultEjectText = GetString("game.exile.default");
+        AlivePlayerInfo = GetString("game.exile.alive-player-info");
+    }
 
 
     private string GetString(string location)

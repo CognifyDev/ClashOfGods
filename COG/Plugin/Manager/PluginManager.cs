@@ -17,7 +17,7 @@ public static class PluginManager
     }
 
     /// <summary>
-    /// Get a new instance of plugin list
+    ///     Get a new instance of plugin list
     /// </summary>
     /// <returns>The list instance after cloning</returns>
     public static List<IPlugin> GetPlugins()
@@ -26,7 +26,7 @@ public static class PluginManager
     }
 
     /// <summary>
-    /// Load a plugin
+    ///     Load a plugin
     /// </summary>
     /// <param name="path">the path of the plugin</param>
     /// <returns>the result of the plugin loaded</returns>

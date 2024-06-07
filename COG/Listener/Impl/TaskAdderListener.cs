@@ -21,7 +21,7 @@ public class TaskAdderListener : IListener
         var folder = @event.GetTaskFolder();
         if (taskAdderGame.Root == folder && RoleFolder == null)
         {
-            RoleFolder = UnityEngine.Object.Instantiate(taskAdderGame.RootFolderPrefab, taskAdderGame.transform);
+            RoleFolder = Object.Instantiate(taskAdderGame.RootFolderPrefab, taskAdderGame.transform);
             RoleFolder.gameObject.SetActive(false);
             RoleFolder.FolderName = Main.DisplayName;
 
@@ -43,7 +43,7 @@ public class TaskAdderListener : IListener
             foreach (var role in CustomRoleManager.GetManager().GetRoles())
             {
                 if (role is Unknown or Crewmate or Impostor) continue;
-                var button = UnityEngine.Object.Instantiate(taskAdderGame.RoleButton);
+                var button = Object.Instantiate(taskAdderGame.RoleButton);
                 button.Text.text = role.Name;
                 taskAdderGame.AddFileAsChild(RoleFolder, button, ref xCursor, ref yCursor, ref maxHeight);
 

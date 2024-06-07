@@ -4,17 +4,16 @@ using System.Reflection;
 namespace COG.Listener.Event;
 
 /// <summary>
-/// 监听器注册实例
+///     监听器注册实例
 /// </summary>
 public class Handler
 {
+    public readonly EventHandlerType EventHandlerType;
     public readonly Type EventType;
 
     public readonly IListener Listener;
 
     public readonly MethodInfo Method;
-
-    public readonly EventHandlerType EventHandlerType;
 
     public Handler(IListener listener, MethodInfo method, EventHandlerType type)
     {

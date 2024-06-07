@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
@@ -8,23 +10,14 @@ using COG.UI.Arrow;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 namespace COG.Role.Impl.Neutral;
 
 public class Vulture : CustomRole, IListener, IWinnable
 {
-    public CustomOption EatingCooldown { get; }
-    public CustomOption WinningEatenCount { get; }
-    public CustomOption HasArrowToBodies { get; }
-    public CustomButton EatButton { get; }
-    public static int EatenCount { get; private set; }
-    private static DeadBody? ClosestBody { get; set; }
-    public static List<Arrow> Arrows { get; private set; } = new();
-
-    public Vulture() : base(LanguageConfig.Instance.VultureName, new(139, 69, 19), CampType.Neutral)
+    public Vulture() : base(LanguageConfig.Instance.VultureName, new Color(139, 69, 19), CampType.Neutral)
     {
         Description = LanguageConfig.Instance.VultureDescription;
 
@@ -54,7 +47,7 @@ public class Vulture : CustomRole, IListener, IWinnable
                 RpcEatBody(ClosestBody!);
             },
             () => EatButton?.ResetCooldown(),
-            couldUse: () => ClosestBody,
+            () => ClosestBody,
             () => true,
             null!,
             2,
@@ -66,6 +59,33 @@ public class Vulture : CustomRole, IListener, IWinnable
         AddButton(EatButton);
 
         EatenCount = 0;
+    }
+
+    public CustomOption EatingCooldown { get; }
+    public CustomOption WinningEatenCount { get; }
+    public CustomOption HasArrowToBodies { get; }
+    public CustomButton EatButton { get; }
+    public static int EatenCount { get; private set; }
+    private static DeadBody? ClosestBody { get; set; }
+    public static List<Arrow> Arrows { get; } = new();
+
+    public ulong GetWeight()
+    {
+        return IWinnable.GetOrder(6);
+    }
+
+    public bool CanWin() // 只有房主会判断游戏胜利，因此玩家之间需要同步数据
+    {
+        if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
+        {
+            CustomWinnerManager.RegisterWinningPlayers(Players);
+            CustomWinnerManager.SetWinColor(Color);
+            CustomWinnerManager.SetWinText("Vulture wins");
+            GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
+            return true;
+        }
+
+        return false;
     }
 
     public void RpcEatBody(DeadBody body)
@@ -91,7 +111,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
         var reader = @event.MessageReader;
 
-        byte pid = reader.ReadByte();
+        var pid = reader.ReadByte();
         var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
         if (!body) return;
 
@@ -112,14 +132,17 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public override bool OnRoleSelection(List<CustomRole> roles)
     {
-        bool disableVulture = new System.Random().Next(2) == 1;
+        var disableVulture = new Random().Next(2) == 1;
         CustomRole roleToDisable =
             disableVulture ? this : CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>();
         roles.RemoveAll(r => r == roleToDisable); // 场上不能同时存在秃鹫和清洁工
         return false;
     }
 
-    public override string HandleAdditionalPlayerName() => $"\n({EatenCount}/{(int)WinningEatenCount.GetFloat()})";
+    public override string HandleAdditionalPlayerName()
+    {
+        return $"\n({EatenCount}/{(int)WinningEatenCount.GetFloat()})";
+    }
 
     public override void ClearRoleGameData()
     {
@@ -128,21 +151,8 @@ public class Vulture : CustomRole, IListener, IWinnable
         Arrows.Clear();
     }
 
-    public ulong GetWeight() => IWinnable.GetOrder(6);
-
-    public bool CanWin() // 只有房主会判断游戏胜利，因此玩家之间需要同步数据
+    public override IListener GetListener()
     {
-        if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
-        {
-            CustomWinnerManager.RegisterWinningPlayers(Players);
-            CustomWinnerManager.SetWinColor(Color);
-            CustomWinnerManager.SetWinText("Vulture wins");
-            GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
-            return true;
-        }
-
-        return false;
+        return this;
     }
-
-    public override IListener GetListener() => this;
 }

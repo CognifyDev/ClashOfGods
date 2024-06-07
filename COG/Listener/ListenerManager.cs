@@ -9,12 +9,17 @@ namespace COG.Listener;
 public class ListenerManager
 {
     /// <summary>
-    /// The instance of listener manager
+    ///     The instance of listener manager
     /// </summary>
     private static ListenerManager? _manager;
 
     /// <summary>
-    /// Get the instance of listener manager
+    ///     The list of listeners
+    /// </summary>
+    private readonly List<Handler> _handlers = new();
+
+    /// <summary>
+    ///     Get the instance of listener manager
     /// </summary>
     /// <returns>instance</returns>
     public static ListenerManager GetManager()
@@ -23,12 +28,7 @@ public class ListenerManager
     }
 
     /// <summary>
-    /// The list of listeners
-    /// </summary>
-    private readonly List<Handler> _handlers = new();
-
-    /// <summary>
-    /// Register a listener
+    ///     Register a listener
     /// </summary>
     /// <param name="listener">the listener</param>
     public void RegisterListener(IListener listener)
@@ -50,19 +50,16 @@ public class ListenerManager
     }
 
     /// <summary>
-    /// Register a listener if it not exists
+    ///     Register a listener if it not exists
     /// </summary>
     /// <param name="listener">the listener</param>
     public void RegisterListenerIfNotExists(IListener listener)
     {
-        if (!GetHandlers(listener).ToList().IsEmpty())
-        {
-            RegisterListener(listener);
-        }
+        if (!GetHandlers(listener).ToList().IsEmpty()) RegisterListener(listener);
     }
 
     /// <summary>
-    /// Unregister handlers
+    ///     Unregister handlers
     /// </summary>
     /// <param name="handlers"></param>
     public void UnRegisterHandlers(Handler[] handlers)
@@ -71,7 +68,7 @@ public class ListenerManager
     }
 
     /// <summary>
-    /// Unregister all handlers
+    ///     Unregister all handlers
     /// </summary>
     public void UnRegisterHandlers()
     {
@@ -79,7 +76,7 @@ public class ListenerManager
     }
 
     /// <summary>
-    /// Register listeners
+    ///     Register listeners
     /// </summary>
     /// <param name="listeners">listeners</param>
     public void RegisterListeners(IListener[] listeners)
@@ -88,7 +85,7 @@ public class ListenerManager
     }
 
     /// <summary>
-    /// Get the list of handlers
+    ///     Get the list of handlers
     /// </summary>
     /// <returns>handler list</returns>
     public IEnumerable<Handler> GetHandlers(IListener? listener = null)
@@ -99,7 +96,7 @@ public class ListenerManager
     }
 
     /// <summary>
-    /// Execute handlers
+    ///     Execute handlers
     /// </summary>
     public bool ExecuteHandlers(Event.Event @event, EventHandlerType type)
     {

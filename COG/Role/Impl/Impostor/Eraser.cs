@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
@@ -9,7 +10,6 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
 using COG.Utils.Coding;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
@@ -26,11 +26,11 @@ public class Eraser : CustomRole, IListener
     public static PlayerControl? CurrentTarget { get; set; }
     public static Dictionary<PlayerControl, CustomRole> TempErasedPlayerRoles { get; set; }
 
-    public Eraser() : base(LanguageConfig.Instance.EraserName, Palette.ImpostorRed, CampType.Impostor, true)
+    public Eraser() : base(LanguageConfig.Instance.EraserName, Palette.ImpostorRed, CampType.Impostor)
     {
         BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.EraserDescription;
-        TempErasedPlayerRoles = new();
+        TempErasedPlayerRoles = new Dictionary<PlayerControl, CustomRole>();
 
         if (ShowInOptions)
         {
@@ -60,9 +60,9 @@ public class Eraser : CustomRole, IListener
                 EraseButton.SetCooldown(currentCd + (IncreaseCooldownAfterErasing?.GetFloat() ?? 10f));
             },
             () => EraseButton?.ResetCooldown(),
-            couldUse: () =>
+            () =>
             {
-                if (!CanEraseImpostors?.GetBool() ?? false && CurrentTarget)
+                if (!CanEraseImpostors?.GetBool() ?? (false && CurrentTarget))
                     return CurrentTarget!.GetMainRole()?.CampType != CampType.Impostor;
                 return CurrentTarget;
             },
@@ -101,7 +101,10 @@ public class Eraser : CustomRole, IListener
         CurrentTarget = null;
     }
 
-    public override IListener GetListener() => this;
+    public override IListener GetListener()
+    {
+        return this;
+    }
 
 #pragma warning restore CS8618
 }

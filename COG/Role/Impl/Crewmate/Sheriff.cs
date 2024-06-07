@@ -13,10 +13,7 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Sheriff : CustomRole, IListener
 {
-    private CustomOption? SheriffKillCd { get; }
-    private CustomButton SheriffKillButton { get; }
-
-    public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate, true)
+    public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate)
     {
         BaseRoleType = RoleTypes.Crewmate;
         Description = LanguageConfig.Instance.SheriffDescription;
@@ -54,6 +51,9 @@ public class Sheriff : CustomRole, IListener
 
         AddButton(SheriffKillButton);
     }
+
+    private CustomOption? SheriffKillCd { get; }
+    private CustomButton SheriffKillButton { get; }
 
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerMurder(PlayerMurderEvent @event)

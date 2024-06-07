@@ -1,7 +1,7 @@
+using System.Linq;
 using COG.Config.Impl;
 using COG.Role;
 using COG.Utils;
-using System.Linq;
 
 namespace COG.Game.CustomWinner.Impl;
 
@@ -34,13 +34,11 @@ public class ImpostorsCustomWinner : IWinnable
             {
                 LifeSuppSystemType o2Sabo = null!;
                 if ((o2Sabo = system.Cast<LifeSuppSystemType>()).Countdown <= 0)
-                {
                     if (o2Sabo.Countdown <= 0f)
                     {
                         SetImpostorTeamWinners(true);
                         return true;
                     }
-                }
             }
         }
 
@@ -50,10 +48,9 @@ public class ImpostorsCustomWinner : IWinnable
                 SystemTypes.Reactor, SystemTypes.Laboratory, SystemTypes.HeliSabotage
             };
             foreach (var type in sabotageTypes)
-            {
                 if (systems.TryGetValueSafeIl2Cpp(type, out var system))
                 {
-                    ICriticalSabotage? sabotage = system.TryCast<ICriticalSabotage>();
+                    var sabotage = system.TryCast<ICriticalSabotage>();
                     if (sabotage is null) return false;
                     if (sabotage.Countdown <= 0)
                     {
@@ -62,10 +59,14 @@ public class ImpostorsCustomWinner : IWinnable
                         return true;
                     }
                 }
-            }
         }
 
         return false;
+    }
+
+    public ulong GetWeight()
+    {
+        return IWinnable.GetOrder(1);
     }
 
     private void SetImpostorTeamWinners(bool isSabo)
@@ -75,10 +76,5 @@ public class ImpostorsCustomWinner : IWinnable
         CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
         GameManager.Instance.RpcEndGame(isSabo ? GameOverReason.ImpostorBySabotage : GameOverReason.ImpostorByKill,
             false);
-    }
-
-    public ulong GetWeight()
-    {
-        return IWinnable.GetOrder(1);
     }
 }

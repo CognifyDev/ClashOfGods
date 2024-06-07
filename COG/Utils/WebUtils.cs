@@ -1,5 +1,4 @@
 using System.Net.Http;
-using System.Net.Http.Headers;
 
 namespace COG.Utils;
 

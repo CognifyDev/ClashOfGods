@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AmongUs.Data;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
@@ -7,12 +11,8 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using InnerNet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
-
 
 namespace COG.Utils;
 
@@ -87,8 +87,10 @@ public static class PlayerUtils
         return player.PlayerId == target.PlayerId;
     }
 
-    public static PlayerRole? GetPlayerRole(this PlayerControl player) =>
-        GameUtils.PlayerRoleData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
+    public static PlayerRole? GetPlayerRole(this PlayerControl player)
+    {
+        return GameUtils.PlayerRoleData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
+    }
 
     public static CustomRole GetMainRole(this PlayerControl player)
     {
@@ -203,7 +205,7 @@ public static class PlayerUtils
     }
 
     /// <summary>
-    /// 设置玩家外观
+    ///     设置玩家外观
     /// </summary>
     /// <param name="poolable"></param>
     /// <param name="player"></param>
@@ -216,7 +218,7 @@ public static class PlayerUtils
         poolable.SetBodyColor(player.cosmetics.ColorId);
         if (data.IsDead) poolable.SetBodyAsGhost();
         poolable.SetBodyType(player.BodyType);
-        if (AmongUs.Data.DataManager.Settings.Accessibility.ColorBlindMode) poolable.SetColorBlindTag();
+        if (DataManager.Settings.Accessibility.ColorBlindMode) poolable.SetColorBlindTag();
 
         poolable.SetSkin(outfit.SkinId, outfit.ColorId);
         poolable.SetHat(outfit.HatId, outfit.ColorId);
@@ -226,13 +228,13 @@ public static class PlayerUtils
         poolable.SetVisor(outfit.VisorId, outfit.ColorId);
 
         var names = poolable.transform.FindChild("Names");
-        names.localPosition = new(0, -0.75f, 0);
-        names.localScale = new(1.5f, 1.5f, 1f);
+        names.localPosition = new Vector3(0, -0.75f, 0);
+        names.localScale = new Vector3(1.5f, 1.5f, 1f);
     }
 
     /// <summary>
-    /// 设置角色外侧的线
-    /// 比如: 击杀时候的红线
+    ///     设置角色外侧的线
+    ///     比如: 击杀时候的红线
     /// </summary>
     /// <param name="pc">目标玩家</param>
     /// <param name="color">颜色</param>
@@ -242,16 +244,20 @@ public static class PlayerUtils
         pc.cosmetics.currentBodySprite.BodySprite.material.SetColor(OutlineColor, color);
     }
 
-    public static void ClearOutline(this PlayerControl pc) =>
+    public static void ClearOutline(this PlayerControl pc)
+    {
         pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
+    }
 
-    public static bool IsRole<T>(this PlayerControl pc) where T : CustomRole =>
-        IsRole(pc, CustomRoleManager.GetManager().GetTypeRoleInstance<T>());
+    public static bool IsRole<T>(this PlayerControl pc) where T : CustomRole
+    {
+        return IsRole(pc, CustomRoleManager.GetManager().GetTypeRoleInstance<T>());
+    }
 
     public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color, bool checkDist = true)
     {
         var target = pc.GetClosestPlayer();
-        PlayerControl.AllPlayerControls.ForEach(new Action<PlayerControl>((p) => p.ClearOutline()));
+        PlayerControl.AllPlayerControls.ForEach(new Action<PlayerControl>(p => p.ClearOutline()));
         if (!target) return null;
         if (GameUtils.GetGameOptions().KillDistance >=
             Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(),

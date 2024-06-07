@@ -1,41 +1,40 @@
 global using Hazel;
 global using HarmonyLib;
 global using Object = UnityEngine.Object;
+using System.IO;
 using System.Linq;
 using BepInEx;
-using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using COG.Command;
 using COG.Command.Impl;
 using COG.Config.Impl;
+using COG.Constant;
+using COG.Game.CustomWinner;
+using COG.Game.CustomWinner.Impl;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Patch;
+using COG.Plugin.Manager;
+using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
+using COG.Role.Impl.SubRole;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
 using COG.Utils;
 using COG.Utils.Version;
+using COG.Utils.WinAPI;
 using InnerNet;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
-using System.IO;
-using COG.Constant;
-using COG.Game.CustomWinner;
-using COG.Game.CustomWinner.Impl;
-using COG.Plugin.Manager;
-using COG.Role.Impl.SubRole;
-using COG.Utils.WinAPI;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using COG.Role;
 
 namespace COG;
 
@@ -74,7 +73,7 @@ public partial class Main : BasePlugin
             ? VersionInfo.Empty
             : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
 
-        Logger = new($"   {DisplayName}");
+        Logger = new StackTraceLogger($"   {DisplayName}");
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
 

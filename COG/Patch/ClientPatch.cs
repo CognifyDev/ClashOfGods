@@ -9,15 +9,13 @@ using UnityEngine;
 namespace COG.Patch;
 
 [HarmonyPatch(typeof(Constants), nameof(Constants.GetBroadcastVersion))]
-class ServerUpdatePatch
+internal class ServerUpdatePatch
 {
-    static void Postfix(ref int __result)
+    private static void Postfix(ref int __result)
     {
         if (GameStates.IsOnlineGame)
-        {
             // Changing server version for AU mods
             __result += 25;
-        }
     }
 }
 
@@ -48,10 +46,7 @@ public static class DestroyUselessButtons
     public static void Postfix()
     {
         var gameObject = GameObject.Find("OptionsMenu/DataTab/TwitchLinkButton");
-        if (gameObject != null && !gameObject.IsDestroyedOrNull())
-        {
-            gameObject.DestroyImmediate();
-        }
+        if (gameObject != null && !gameObject.IsDestroyedOrNull()) gameObject.DestroyImmediate();
     }
 }
 
@@ -60,9 +55,6 @@ public static class NormalModeOnly
 {
     public static void Postfix(GameOptionsManager __instance)
     {
-        if (__instance.currentGameMode != GameModes.Normal)
-        {
-            __instance.SwitchGameMode(GameModes.Normal);
-        }
+        if (__instance.currentGameMode != GameModes.Normal) __instance.SwitchGameMode(GameModes.Normal);
     }
 }

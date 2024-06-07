@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
@@ -17,13 +21,8 @@ using COG.States;
 using COG.UI.Arrow;
 using COG.Utils;
 using Il2CppSystem.Collections;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
-using Convert = System.Convert;
 using Random = System.Random;
 
 namespace COG.Listener.Impl;
@@ -349,7 +348,7 @@ public class GameListener : IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         var manager = @event.Manager;
-        CustomRole? role = GameUtils.GetLocalPlayerRole();
+        var role = GameUtils.GetLocalPlayerRole();
 
         if (role == null) return;
 
@@ -412,12 +411,15 @@ public class GameListener : IListener
         var role = player!.GetMainRole();
         if (role == null) return;
 
-        int GetCount(IEnumerable<PlayerRole> list) => list.Select(p => p.Player)
-            .Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+        int GetCount(IEnumerable<PlayerRole> list)
+        {
+            return list.Select(p => p.Player)
+                .Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+        }
 
-        int crewCount = GetCount(PlayerUtils.AllCrewmates);
-        int impCount = GetCount(PlayerUtils.AllImpostors);
-        int neutralCount = GetCount(PlayerUtils.AllNeutrals);
+        var crewCount = GetCount(PlayerUtils.AllCrewmates);
+        var impCount = GetCount(PlayerUtils.AllImpostors);
+        var neutralCount = GetCount(PlayerUtils.AllNeutrals);
 
         var roleText = controller.completeString = role.HandleEjectText(player!);
         var playerInfoText = controller.ImpostorText.text =
@@ -439,7 +441,7 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnTaskPanelSetText(TaskPanelBehaviourSetTaskTextEvent @event)
     {
-        string originText = @event.GetTaskString();
+        var originText = @event.GetTaskString();
         var localRole = GameUtils.GetLocalPlayerRole();
         if (originText == "None" || localRole == null) return;
 
@@ -453,14 +455,14 @@ public class GameListener : IListener
             <color=#FF1919FF>假任务：</color></color>
         */
 
-        string impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
-        string fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
-        string impTaskTextFull =
+        var impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
+        var fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
+        var impTaskTextFull =
             $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
 
         if (originText.StartsWith(impTaskTextFull))
         {
-            int idx = originText.IndexOf(impTaskTextFull) + impTaskTextFull.Length;
+            var idx = originText.IndexOf(impTaskTextFull) + impTaskTextFull.Length;
             sb.Append($"<color=#FF1919FF>{fakeTaskText}</color>").Append(originText[idx..]);
         }
         else
