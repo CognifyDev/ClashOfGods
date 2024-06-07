@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using BepInEx.Logging;
+using System.Linq;
+using System.Reflection;
 
 namespace COG.Utils;
 
@@ -12,46 +14,54 @@ public class StackTraceLogger
         RegisteredCustomLogger.Add(this);
     }
 
+    public void DisableSource(Type toDisable) => DisabledMethodSource.AddRange(toDisable.GetMethods());
+    public void DisableMethod(MethodInfo toDisable) => DisabledMethodSource.Add(toDisable);
+    public void EnableSource(Type toEnable) => DisabledMethodSource.RemoveAll(m => toEnable.GetMethods().Contains(m));
+    public void EnableMethod(MethodInfo toEnable) => DisabledMethodSource.Remove(toEnable);
+
     public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
-    private ManualLogSource BepInExLogger { get; }
+    public List<MethodInfo> DisabledMethodSource { get; } = new();
+    private BepInEx.Logging.ManualLogSource BepInExLogger { get; }
 
-    public void LogDebug(object? msg)
+    public void LogDebug(object? msg, string? customName = null)
     {
-        BepInExLogger.LogDebug(GetFullString(msg));
+        BepInExLogger.LogDebug(GetFullString(msg, customName));
     }
 
-    public void LogInfo(object? msg)
+    public void LogInfo(object? msg, string? customName = null)
     {
-        BepInExLogger.LogInfo(GetFullString(msg));
+        BepInExLogger.LogInfo(GetFullString(msg, customName));
     }
 
-    public void LogWarning(object? msg)
+    public void LogWarning(object? msg, string? customName = null)
     {
-        BepInExLogger.LogWarning(GetFullString(msg));
+        BepInExLogger.LogWarning(GetFullString(msg, customName));
     }
 
-    public void LogFatal(object? msg)
+    public void LogFatal(object? msg, string? customName = null)
     {
-        BepInExLogger.LogFatal(GetFullString(msg));
+        BepInExLogger.LogFatal(GetFullString(msg, customName));
     }
 
-    public void LogError(object? msg)
+    public void LogError(object? msg, string? customName = null)
     {
-        BepInExLogger.LogError(GetFullString(msg));
+        BepInExLogger.LogError(GetFullString(msg, customName));
     }
 
-    public void LogMessage(object? msg)
+    public void LogMessage(object? msg, string? customName = null)
     {
-        BepInExLogger.LogMessage(GetFullString(msg));
+        BepInExLogger.LogMessage(GetFullString(msg, customName));
     }
 
-    private string GetFullString(object? data)
+    private string GetFullString(object? data, string? customName = null)
     {
         var st = new StackTrace().GetFrame(2);
         var method = st?.GetMethod();
         data ??= "";
 
+        if (customName != null) return $"[{customName}] {data}";
         if (st == null || method == null) return $"[Unknown] {data}";
+        if (DisabledMethodSource.Contains(method)) return "";
         var type = method.DeclaringType;
 
         return $"[{type?.FullName}::{method.Name}] {data}";
