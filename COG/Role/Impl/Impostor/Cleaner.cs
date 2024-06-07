@@ -73,7 +73,7 @@ public class Cleaner : CustomRole, IListener
         AddButton(CleanBodyButton);
     }
 
-    private CustomOption CleanBodyCd { get; }
+    private CustomOption? CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
     private CustomButton KillButton { get; }
     private static PlayerControl? ClosestTarget { get; set; }

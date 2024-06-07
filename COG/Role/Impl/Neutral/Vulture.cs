@@ -61,9 +61,9 @@ public class Vulture : CustomRole, IListener, IWinnable
         EatenCount = 0;
     }
 
-    public CustomOption EatingCooldown { get; }
-    public CustomOption WinningEatenCount { get; }
-    public CustomOption HasArrowToBodies { get; }
+    public CustomOption? EatingCooldown { get; }
+    public CustomOption? WinningEatenCount { get; }
+    public CustomOption? HasArrowToBodies { get; }
     public CustomButton EatButton { get; }
     public static int EatenCount { get; private set; }
     private static DeadBody? ClosestBody { get; set; }

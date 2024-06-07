@@ -19,9 +19,9 @@ namespace COG.Role.Impl.Impostor;
 public class Eraser : CustomRole, IListener
 {
 #pragma warning disable CS8618
-    public CustomOption InitialEraseCooldown { get; }
-    public CustomOption IncreaseCooldownAfterErasing { get; }
-    public CustomOption CanEraseImpostors { get; }
+    public CustomOption? InitialEraseCooldown { get; }
+    public CustomOption? IncreaseCooldownAfterErasing { get; }
+    public CustomOption? CanEraseImpostors { get; }
     public CustomButton EraseButton { get; }
     public static PlayerControl? CurrentTarget { get; set; }
     public static Dictionary<PlayerControl, CustomRole> TempErasedPlayerRoles { get; set; }

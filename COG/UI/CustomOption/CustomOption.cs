@@ -106,7 +106,7 @@ public sealed class CustomOption
         return new CustomOption(type, name, selections, "", parent, isHeader, optionType);
     }
 
-    public static CustomOption Create(TabType type, string name, float defaultValue, float min,
+    public static CustomOption? Create(TabType type, string name, float defaultValue, float min,
         float max, float step, CustomOption? parent = null, bool isHeader = false,
         OptionType optionType = OptionType.Default)
     {
@@ -115,7 +115,7 @@ public sealed class CustomOption
         return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader, optionType);
     }
 
-    public static CustomOption Create(TabType type, string name, bool defaultValue,
+    public static CustomOption? Create(TabType type, string name, bool defaultValue,
         CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
         return new CustomOption(type, name,

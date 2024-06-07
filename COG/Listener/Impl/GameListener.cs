@@ -19,6 +19,7 @@ using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
 using COG.UI.Arrow;
+using COG.UI.CustomOption;
 using COG.Utils;
 using Il2CppSystem.Collections;
 using UnityEngine;

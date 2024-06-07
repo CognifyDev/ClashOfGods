@@ -11,7 +11,8 @@ namespace COG.Role.Impl.SubRole;
 [NotTested]
 public class Guesser : CustomRole, IListener
 {
-    public CustomOption MaxGuessTimeOption, GuesserGuessContinuously;
+    public readonly CustomOption? MaxGuessTimeOption;
+    public readonly CustomOption? GuesserGuessContinuously;
 
     public Guesser() : base(LanguageConfig.Instance.GuesserName, Color.yellow, CampType.Unknown)
     {

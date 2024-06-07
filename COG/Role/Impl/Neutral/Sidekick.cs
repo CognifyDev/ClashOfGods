@@ -26,7 +26,7 @@ public class Sidekick : CustomRole, IListener
                 CustomRoleManager.GetManager().GetTypeRoleInstance<Jackal>().MainRoleOption);
     }
 
-    public CustomOption SidekickCanCreateSidekick { get; }
+    public CustomOption? SidekickCanCreateSidekick { get; }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnPlayerMurder(PlayerMurderEvent @event)

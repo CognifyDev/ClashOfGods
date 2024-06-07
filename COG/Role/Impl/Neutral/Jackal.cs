@@ -80,8 +80,8 @@ public class Jackal : CustomRole, IListener
         AddButton(JackalKillButton);
     }
 
-    private CustomOption CreateSidekickCd { get; } = null!;
-    private CustomOption JackalKillCd { get; } = null!;
+    private CustomOption? CreateSidekickCd { get; } = null!;
+    private CustomOption? JackalKillCd { get; } = null!;
     private CustomButton CreateSidekickButton { get; }
     private CustomButton JackalKillButton { get; }
     private static PlayerControl? CurrentTarget { get; set; }
