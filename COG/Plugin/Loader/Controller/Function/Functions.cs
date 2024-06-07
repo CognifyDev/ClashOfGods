@@ -23,7 +23,7 @@ public class Functions
     [FunctionRegister("logInfo")]
     public static void Info(string param)
     {
-        Main.Logger.LogInfo(param);
+        Main.Logger.LogInfo(param, "Plugin");
     }
 
     [FunctionRegister("info")]
@@ -35,19 +35,19 @@ public class Functions
     [FunctionRegister("logError")]
     public static void Error(string param)
     {
-        Main.Logger.LogError(param);
+        Main.Logger.LogError(param, "Plugin");
     }
 
     [FunctionRegister("logWarning")]
     public static void Warning(string param)
     {
-        Main.Logger.LogWarning(param);
+        Main.Logger.LogWarning(param, "Plugin");
     }
 
     [FunctionRegister("logDebug")]
     public static void Debug(string param)
     {
-        Main.Logger.LogDebug(param);
+        Main.Logger.LogDebug(param, "Plugin");
     }
 
     [FunctionRegister("getAuthor")]
