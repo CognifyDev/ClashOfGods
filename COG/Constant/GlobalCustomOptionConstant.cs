@@ -5,7 +5,8 @@ namespace COG.Constant;
 
 public static class GlobalCustomOptionConstant
 {
-    public static readonly CustomOption DebugMode, MaxSubRoleNumber;
+    public static readonly CustomOption? DebugMode;
+    public static readonly CustomOption? MaxSubRoleNumber;
 
     static GlobalCustomOptionConstant()
     {

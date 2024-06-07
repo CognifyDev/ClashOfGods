@@ -1,5 +1,3 @@
-using BepInEx.Logging;
-using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,10 +8,6 @@ namespace COG.Utils;
 
 public class StackTraceLogger
 {
-    public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
-
-    public List<MethodInfo> DisabledMethodSource { get; } = new();
-    private ManualLogSource BepInExLogger { get; }
     public StackTraceLogger(string name)
     {
         BepInExLogger = BepInEx.Logging.Logger.CreateLogSource(name);
@@ -25,17 +19,39 @@ public class StackTraceLogger
     public void EnableSource(Type toEnable) => DisabledMethodSource.RemoveAll(m => toEnable.GetMethods().Contains(m));
     public void EnableMethod(MethodInfo toEnable) => DisabledMethodSource.Remove(toEnable);
 
-    public void LogDebug(object? msg, string? customName = null) => BepInExLogger.LogDebug(GetFullString(msg, customName));
+    public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
+    public List<MethodInfo> DisabledMethodSource { get; } = new();
+    private BepInEx.Logging.ManualLogSource BepInExLogger { get; }
 
-    public void LogInfo(object? msg, string? customName = null) => BepInExLogger.LogInfo(GetFullString(msg, customName));
+    public void LogDebug(object? msg, string? customName = null)
+    {
+        BepInExLogger.LogDebug(GetFullString(msg, customName));
+    }
 
-    public void LogWarning(object? msg, string? customName = null) => BepInExLogger.LogWarning(GetFullString(msg, customName));
+    public void LogInfo(object? msg, string? customName = null)
+    {
+        BepInExLogger.LogInfo(GetFullString(msg, customName));
+    }
 
-    public void LogFatal(object? msg, string? customName = null) => BepInExLogger.LogFatal(GetFullString(msg, customName));
+    public void LogWarning(object? msg, string? customName = null)
+    {
+        BepInExLogger.LogWarning(GetFullString(msg, customName));
+    }
 
-    public void LogError(object? msg, string? customName = null) => BepInExLogger.LogError(GetFullString(msg, customName));
+    public void LogFatal(object? msg, string? customName = null)
+    {
+        BepInExLogger.LogFatal(GetFullString(msg, customName));
+    }
 
-    public void LogMessage(object? msg, string? customName = null) => BepInExLogger.LogMessage(GetFullString(msg, customName));
+    public void LogError(object? msg, string? customName = null)
+    {
+        BepInExLogger.LogError(GetFullString(msg, customName));
+    }
+
+    public void LogMessage(object? msg, string? customName = null)
+    {
+        BepInExLogger.LogMessage(GetFullString(msg, customName));
+    }
 
     private string GetFullString(object? data, string? customName = null)
     {

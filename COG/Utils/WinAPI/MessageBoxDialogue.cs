@@ -5,8 +5,16 @@ namespace COG.Utils.WinAPI;
 
 public static class MessageBoxDialogue
 {
-    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
+    public enum ClickedButton
+    {
+        IDOK = 1,
+        IDCANCEL = 2,
+        IDABORT = 3,
+        IDRETRY = 4,
+        IDIGNORE = 5,
+        IDYES = 6,
+        IDNO = 7
+    }
 
     // From winuser.h
     public enum OpenTypes : uint
@@ -47,16 +55,8 @@ public static class MessageBoxDialogue
         MB_TYPEMASK = 15
     }
 
-    public enum ClickedButton : int
-    {
-        IDOK = 1,
-        IDCANCEL = 2,
-        IDABORT = 3,
-        IDRETRY = 4,
-        IDIGNORE = 5,
-        IDYES = 6,
-        IDNO = 7
-    }
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
 
     public static ClickedButton OpenMessageBox(string text, string title,
         OpenTypes type = OpenTypes.MB_DEFBUTTON1 | OpenTypes.MB_ICONINFORMATION)

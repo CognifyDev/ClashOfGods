@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
@@ -17,10 +16,10 @@ namespace COG.Role.Impl.Neutral;
 
 public class Opportunist : CustomRole, IListener
 {
-    private readonly CustomOption? _killCooldownOption;
     private readonly CustomButton _killButton;
+    private readonly CustomOption? _killCooldownOption;
 
-    public Opportunist() : base(LanguageConfig.Instance.OpportunistName, Color.yellow, CampType.Neutral, true)
+    public Opportunist() : base(LanguageConfig.Instance.OpportunistName, Color.yellow, CampType.Neutral)
     {
         Description = LanguageConfig.Instance.OpportunistDescription;
         _killCooldownOption = CustomOption.Create(CustomOption.TabType.Neutral,

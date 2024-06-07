@@ -8,7 +8,7 @@ namespace COG.Utils;
 public static class ClassUtils
 {
     /// <summary>
-    /// 获取一个类的所有子类(包括所有次级子类)
+    ///     获取一个类的所有子类(包括所有次级子类)
     /// </summary>
     /// <param name="parentType">父类</param>
     /// <returns></returns>
@@ -26,7 +26,7 @@ public static class ClassUtils
     }
 
     /// <summary>
-    /// 获取一个程序集的所有类
+    ///     获取一个程序集的所有类
     /// </summary>
     /// <param name="assembly">程序集</param>
     /// <returns></returns>

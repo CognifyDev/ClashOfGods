@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 namespace COG.Utils;
 
 /// <summary>
-/// 模组更新类
+///     模组更新类
 /// </summary>
 public static class ModUpdater
 {

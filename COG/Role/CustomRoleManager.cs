@@ -1,6 +1,6 @@
-using COG.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using COG.Utils;
 
 namespace COG.Role;
 
@@ -87,11 +87,14 @@ public class CustomRoleManager
             return toReturn;
         }
 
-        public bool IsEmpty() => _roles.IsEmpty();
-
         public bool HasNext()
         {
             return _selection < _roles.Count;
+        }
+
+        public bool IsEmpty()
+        {
+            return _roles.IsEmpty();
         }
     }
 }

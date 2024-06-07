@@ -1,7 +1,6 @@
 using COG.Role;
 using COG.Utils;
 using NLua;
-using COG.Role;
 
 namespace COG.Plugin.Loader.Controller.Classes.Role;
 

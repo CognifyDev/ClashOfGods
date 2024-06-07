@@ -13,17 +13,17 @@ namespace COG.Plugin.Loader.Controller.Classes.Listener;
 // ReSharper disable UnusedMember.Local
 public class ListenerController
 {
-    private Lua Lua { get; }
-    private IPlugin Plugin { get; }
-
     public ListenerController(Lua lua, IPlugin plugin)
     {
         Lua = lua;
         Plugin = plugin;
     }
 
+    private Lua Lua { get; }
+    private IPlugin Plugin { get; }
+
     /// <summary>
-    /// 注册一个监听器
+    ///     注册一个监听器
     /// </summary>
     /// <param name="eventName">事件名称</param>
     /// <param name="methodName">函数名称</param>

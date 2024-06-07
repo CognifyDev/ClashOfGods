@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-
 namespace COG.Listener.Impl;
 
 internal class ModOptionListener : IListener

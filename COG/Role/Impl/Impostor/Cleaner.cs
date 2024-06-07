@@ -1,36 +1,29 @@
+using System.Linq;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Rpc;
-using COG.UI.CustomButton;
-using COG.UI.CustomOption;
-using COG.Utils;
-using System.Linq;
 using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
+using COG.Rpc;
 using COG.States;
+using COG.UI.CustomButton;
+using COG.UI.CustomOption;
+using COG.Utils;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
 public class Cleaner : CustomRole, IListener
 {
-    private CustomOption CleanBodyCd { get; }
-    private CustomButton CleanBodyButton { get; }
-    private CustomButton KillButton { get; }
-    private static PlayerControl? ClosestTarget { get; set; }
-
-    public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor, true)
+    public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor)
     {
         Description = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
         CanKill = false;
 
         if (ShowInOptions)
-        {
             CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor,
                 LanguageConfig.Instance.CleanBodyCooldown, 30f, 1f, 60f, 1f, MainRoleOption);
-        }
 
         CleanBodyButton = CustomButton.Create(
             () =>
@@ -58,7 +51,7 @@ public class Cleaner : CustomRole, IListener
                 CleanBodyButton?.ResetCooldown();
             },
             () => KillButton?.ResetCooldown(),
-            couldUse: () =>
+            () =>
             {
                 var target = ClosestTarget = PlayerControl.LocalPlayer;
                 if (target == null) return false;
@@ -70,7 +63,7 @@ public class Cleaner : CustomRole, IListener
             },
             () => true,
             ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
-            row: 1,
+            1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             () => CleanBodyCd?.GetFloat() ?? 30f,
@@ -79,6 +72,11 @@ public class Cleaner : CustomRole, IListener
 
         AddButton(CleanBodyButton);
     }
+
+    private CustomOption? CleanBodyCd { get; }
+    private CustomButton CleanBodyButton { get; }
+    private CustomButton KillButton { get; }
+    private static PlayerControl? ClosestTarget { get; set; }
 
     public void RpcCleanDeadBody(DeadBody body)
     {

@@ -18,7 +18,7 @@ public static class OpenFileDialogue
     private static extern bool GetSaveFileName([In] [Out] OPENFILENAME ofn);
 
     /// <summary>
-    /// 更加灵活的打开对话框方法，但运用困难
+    ///     更加灵活的打开对话框方法，但运用困难
     /// </summary>
     public static void Open(OPENFILENAME ofn)
     {
@@ -26,7 +26,7 @@ public static class OpenFileDialogue
     }
 
     /// <summary>
-    /// 更加灵活的保存对话框方法，但运用困难
+    ///     更加灵活的保存对话框方法，但运用困难
     /// </summary>
     public static void Save(OPENFILENAME ofn)
     {
@@ -34,7 +34,7 @@ public static class OpenFileDialogue
     }
 
     /// <summary>
-    /// 更加易用的打开/保存对话框方法，但有一定限制
+    ///     更加易用的打开/保存对话框方法，但有一定限制
     /// </summary>
     /// <param name="mode">对话框模式</param>
     /// <param name="filter">文件筛选器</param>
@@ -66,41 +66,41 @@ public static class OpenFileDialogue
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public class OPENFILENAME
     {
-        public int lStructSize;
-        public IntPtr IntPtrOwner;
-        public IntPtr hInstance;
-        public string stringFilter;
-        public string stringCustomFilter;
-        public int nMaxCustFilter;
-        public int nFilterIndex;
-        public string stringFile = new(new char[256]);
-        public int nMaxFile = 256;
-        public string stringFileTitle = new(new char[64]);
-        public int nMaxFileTitle = 64;
-        public string stringInitialDir;
-        public string stringTitle;
+        public int dwReserved;
         public int Flags = 1 << 3;
-        public short nFileOffset;
-        public short nFileExtension;
-        public string stringDefExt;
+        public int FlagsEx;
+        public IntPtr hInstance;
+        public IntPtr IntPtrOwner;
         public int lCustData;
         public IntPtr lpfnHook;
         public string lpTemplateName;
+        public int lStructSize;
+        public short nFileExtension;
+        public short nFileOffset;
+        public int nFilterIndex;
+        public int nMaxCustFilter;
+        public int nMaxFile = 256;
+        public int nMaxFileTitle = 64;
         public IntPtr pvReserved;
-        public int dwReserved;
-        public int FlagsEx;
+        public string stringCustomFilter;
+        public string stringDefExt;
+        public string stringFile = new(new char[256]);
+        public string stringFileTitle = new(new char[64]);
+        public string stringFilter;
+        public string stringInitialDir;
+        public string stringTitle;
     }
 #nullable enable
 
     public class OpenedFileInfo
     {
-        public string? FilePath { get; }
-        public string? FileName { get; }
-
         public OpenedFileInfo(string? filePath, string? fileName)
         {
             FilePath = filePath;
             FileName = fileName;
         }
+
+        public string? FilePath { get; }
+        public string? FileName { get; }
     }
 }

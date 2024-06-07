@@ -1,19 +1,20 @@
-using AmongUs.GameOptions;
-using COG.Config.Impl;
-using COG.Rpc;
-using COG.UI.SidebarText;
-using COG.Utils;
-using COG.Utils.WinAPI;
-using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using AmongUs.GameOptions;
+using COG.Config.Impl;
+using COG.Rpc;
+using COG.UI.SidebarText;
+using COG.Utils;
 using COG.Utils.Coding;
+using COG.Utils.WinAPI;
+using Reactor.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using static COG.UI.CustomOption.CustomOption;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
@@ -26,6 +27,12 @@ namespace COG.UI.CustomOption;
 [ShitCode]
 public sealed class CustomOption
 {
+    public enum OptionType
+    {
+        Default = 0,
+        Button = 1
+    }
+
     [Serializable]
     public enum TabType
     {
@@ -36,19 +43,13 @@ public sealed class CustomOption
         Addons = 4
     }
 
-    public enum OptionType
-    {
-        Default = 0,
-        Button = 1
-    }
-
     internal static bool FirstOpen = true;
 
     public static readonly List<CustomOption?> Options = new();
 
-    public int Selection;
+    private static int _typeId;
 
-    public OptionBehaviour? OptionBehaviour;
+    public readonly int CharacteristicCode;
 
     public readonly int DefaultSelection;
 
@@ -58,25 +59,19 @@ public sealed class CustomOption
 
     public readonly string Name;
 
+    public readonly TabType Page;
+
     public readonly CustomOption? Parent;
 
     public readonly object[] Selections;
 
-    public readonly TabType Page;
-
-    public readonly int CharacteristicCode;
-
-    public OptionType SpecialOptionType;
-
-    private static int _typeId;
-
     public Action<OptionBehaviour>? OnClickIfButton;
 
-    public static CustomOption? GetCustomOptionByCharacteristicCode(int characteristicCode)
-    {
-        return Options.FirstOrDefault(customOption =>
-            customOption != null && customOption.CharacteristicCode == characteristicCode);
-    }
+    public OptionBehaviour? OptionBehaviour;
+
+    public int Selection;
+
+    public OptionType SpecialOptionType;
 
     // Option creation
     public CustomOption(TabType type, string name, object[] selections,
@@ -84,7 +79,7 @@ public sealed class CustomOption
     {
         ID = _typeId;
         _typeId++;
-        Name = parent == null ? name : ColorUtils.ToColorString(Color.gray, "→ ") + name;
+        Name = parent == null ? name : Color.gray.ToColorString("→ ") + name;
         Selections = selections;
         var index = Array.IndexOf(selections, defaultValue);
         DefaultSelection = index >= 0 ? index : 0;
@@ -99,13 +94,19 @@ public sealed class CustomOption
         CharacteristicCode = GetHashCode();
     }
 
+    public static CustomOption? GetCustomOptionByCharacteristicCode(int characteristicCode)
+    {
+        return Options.FirstOrDefault(customOption =>
+            customOption != null && customOption.CharacteristicCode == characteristicCode);
+    }
+
     public static CustomOption Create(TabType type, string name, string[] selections,
         CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
         return new CustomOption(type, name, selections, "", parent, isHeader, optionType);
     }
 
-    public static CustomOption Create(TabType type, string name, float defaultValue, float min,
+    public static CustomOption? Create(TabType type, string name, float defaultValue, float min,
         float max, float step, CustomOption? parent = null, bool isHeader = false,
         OptionType optionType = OptionType.Default)
     {
@@ -114,7 +115,7 @@ public sealed class CustomOption
         return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader, optionType);
     }
 
-    public static CustomOption Create(TabType type, string name, bool defaultValue,
+    public static CustomOption? Create(TabType type, string name, bool defaultValue,
         CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
     {
         return new CustomOption(type, name,
@@ -261,7 +262,7 @@ public sealed class CustomOption
         {
             var allTypes = Enum.GetValues<TabType>();
             var typeNameDictionary = new Dictionary<TabType, string>();
-            allTypes.ToList().ForEach(t => typeNameDictionary[t] = t.ToString() + "Settings");
+            allTypes.ToList().ForEach(t => typeNameDictionary[t] = t + "Settings");
             var shouldReturn = SetTabDisplayName(
                 new Dictionary<string, string>
                 {
@@ -322,9 +323,15 @@ public sealed class CustomOption
                 return (null, null);
             }
 
-            GameObject? GetTab(TabType tab) => GetTabHighlightPair(tab).Item1;
+            GameObject? GetTab(TabType tab)
+            {
+                return GetTabHighlightPair(tab).Item1;
+            }
 
-            SpriteRenderer? GetHighlight(TabType tab) => GetTabHighlightPair(tab).Item2;
+            SpriteRenderer? GetHighlight(TabType tab)
+            {
+                return GetTabHighlightPair(tab).Item2;
+            }
 
             // Position of Tab Icons
             gameTab.transform.position += Vector3.left * 3f;
@@ -355,7 +362,7 @@ public sealed class CustomOption
                     var index = a; // 如在下方方法调用直接用a会导致问题（值类型的锅）
                     var button = tab.GetComponentInChildren<PassiveButton>();
                     if (!button) continue;
-                    button.OnClick = new();
+                    button.OnClick = new Button.ButtonClickedEvent();
                     button.OnClick.AddListener((Action)(() =>
                     {
                         if (settingsHighlightMap == null!) return;
@@ -380,7 +387,6 @@ public sealed class CustomOption
             foreach (var option in Options.Where(option => option == null || (int)option.Page <= 4))
             {
                 if (option?.OptionBehaviour == null && option != null)
-                {
                     switch (option.SpecialOptionType)
                     {
                         case OptionType.Default:
@@ -413,7 +419,6 @@ public sealed class CustomOption
                         }
                             break;
                     }
-                }
 
                 if (option?.OptionBehaviour != null) option.OptionBehaviour.gameObject.SetActive(true);
             }
@@ -430,13 +435,14 @@ public sealed class CustomOption
         }
 
         /// <summary>
-        /// Open the tab.
+        ///     Open the tab.
         /// </summary>
         /// <param name="settingsHighlightMap">A dictionary that contains setting to open and the highlight of the setting</param>
-        /// <param name="index">The index of the highlight in <param name="settingsHighlightMap"></param>
+        /// <param name="index">The index of the highlight in
+        ///     <param name="settingsHighlightMap"></param>
         private static void SetTabActive(Dictionary<GameObject, SpriteRenderer> settingsHighlightMap, int index)
         {
-            int i = 0;
+            var i = 0;
             foreach (var (setting, highlight) in settingsHighlightMap)
             {
                 setting.SetActive(i == index);
@@ -448,7 +454,7 @@ public sealed class CustomOption
         }
 
         /// <summary>
-        /// Destroy <see cref="OptionBehaviour"/> in the list.
+        ///     Destroy <see cref="OptionBehaviour" /> in the list.
         /// </summary>
         /// <param name="optionBehavioursList"></param>
         private static void DestroyOptions(List<List<OptionBehaviour>> optionBehavioursList)
@@ -458,7 +464,7 @@ public sealed class CustomOption
         }
 
         /// <summary>
-        /// Set the title text of current tab.
+        ///     Set the title text of current tab.
         /// </summary>
         /// <param name="displayNameMap">A dictionary that contains the name and the title of the tabs.</param>
         /// <returns></returns>
@@ -480,7 +486,7 @@ public sealed class CustomOption
         }
 
         /// <summary>
-        /// Get <see cref="GameOptionsMenu"/> component of the setting.
+        ///     Get <see cref="GameOptionsMenu" /> component of the setting.
         /// </summary>
         /// <param name="setting"></param>
         /// <param name="settingName">Name to set</param>
@@ -495,17 +501,19 @@ public sealed class CustomOption
         }
 
         /// <summary>
-        /// Set the icon of the tab.
+        ///     Set the icon of the tab.
         /// </summary>
         /// <param name="tab"></param>
         /// <param name="tabName">Name to set</param>
         /// <param name="tabSprite">The location of the image</param>
         /// <returns>The highlight of the icon</returns>
-        private static SpriteRenderer SetHighlightSprite(GameObject tab, string tabName, string tabSpritePath) =>
-            SetHighlightSprite(tab, tabName, ResourceUtils.LoadSprite(tabSpritePath, 100f)!);
+        private static SpriteRenderer SetHighlightSprite(GameObject tab, string tabName, string tabSpritePath)
+        {
+            return SetHighlightSprite(tab, tabName, ResourceUtils.LoadSprite(tabSpritePath, 100f)!);
+        }
 
         /// <summary>
-        /// Set the icon of the tab.
+        ///     Set the icon of the tab.
         /// </summary>
         /// <param name="tab"></param>
         /// <param name="tabName">Name to set</param>
@@ -522,7 +530,7 @@ public sealed class CustomOption
         }
 
         /// <summary>
-        /// Set up options.
+        ///     Set up options.
         /// </summary>
         /// <param name="menus"></param>
         /// <param name="options"></param>
@@ -553,8 +561,11 @@ public sealed class CustomOption
         {
             __instance.transform.FindChild("Right Panel").gameObject.SetActive(false);
 
-            void SetChildrenInactiveBut(Transform transform, string name) => transform.GetAllChildren()
-                .Where(t => t.name != name).ForEach(t => t.gameObject.SetActive(false));
+            void SetChildrenInactiveBut(Transform transform, string name)
+            {
+                transform.GetAllChildren()
+                    .Where(t => t.name != name).ForEach(t => t.gameObject.SetActive(false));
+            }
 
             SetChildrenInactiveBut(__instance.transform.FindChild("Left Panel"), __instance.RoleChancesSettings.name);
             SetChildrenInactiveBut(__instance.RoleChancesSettings.transform, TitleObjectName);
@@ -564,7 +575,7 @@ public sealed class CustomOption
             var titleText = __instance.RoleChancesSettings.transform.FindChild(TitleObjectName)
                 .GetComponent<TextMeshPro>();
             titleText.alignment = TextAlignmentOptions.Center;
-            titleText.transform.localPosition = new(2.5f, 0, 0);
+            titleText.transform.localPosition = new Vector3(2.5f, 0, 0);
             titleText.text = LanguageConfig.Instance.VanillaRoleDisabled;
         }
     }
@@ -620,8 +631,8 @@ public class StringOptionPatch
 [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Update))]
 internal class GameOptionsMenuUpdatePatch
 {
-    private static float _timer = 1f;
     private const float TimerForBugFix = 1f;
+    private static float _timer = 1f;
 
     public static void Postfix(GameOptionsMenu __instance)
     {
@@ -679,7 +690,7 @@ internal class GameOptionsMenuUpdatePatch
         {
             var toggle = (ToggleOption)option!.OptionBehaviour!;
             toggle.TitleText.text = option.Name;
-            toggle.OnValueChanged = option.OnClickIfButton ?? new Action<OptionBehaviour>((_) => { });
+            toggle.OnValueChanged = option.OnClickIfButton ?? new Action<OptionBehaviour>(_ => { });
         }
     }
 }

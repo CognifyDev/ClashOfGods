@@ -4,12 +4,10 @@ using System.Text;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.Game;
-using COG.Role;
 using COG.States;
 using COG.Utils;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
-
 
 namespace COG.Listener.Impl;
 
@@ -132,9 +130,8 @@ public class CustomWinnerListener : IListener
         {
             var deadPlayer = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
             summary.Append(role.PlayerName).Append(' ')
-                .Append(ColorUtils.ToColorString(role.Role.Color, role.Role.Name));
-            summary.Append(' ').Append(ColorUtils.ToColorString(
-                deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed,
+                .Append(role.Role.Color.ToColorString(role.Role.Name));
+            summary.Append(' ').Append((deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed).ToColorString(
                 deadPlayer == null ? LanguageConfig.Instance.Alive :
                 deadPlayer.DeathReason == null ? LanguageConfig.Instance.UnknownKillReason :
                 deadPlayer.DeathReason.GetLanguageDeathReason()));

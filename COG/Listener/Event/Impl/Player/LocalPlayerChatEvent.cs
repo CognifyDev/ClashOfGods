@@ -10,7 +10,7 @@ public class LocalPlayerChatEvent : PlayerEvent
     }
 
     /// <summary>
-    /// 获取聊天控制器
+    ///     获取聊天控制器
     /// </summary>
     /// <returns>控制器</returns>
     public ChatController GetChatController()

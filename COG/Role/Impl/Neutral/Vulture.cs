@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
@@ -8,32 +10,26 @@ using COG.UI.Arrow;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 namespace COG.Role.Impl.Neutral;
 
 public class Vulture : CustomRole, IListener, IWinnable
 {
-    public CustomOption EatingCooldown { get; }
-    public CustomOption WinningEatenCount { get; }
-    public CustomOption HasArrowToBodies { get; }
-    public CustomButton EatButton { get; }
-    public static int EatenCount { get; private set; }
-    private static DeadBody? ClosestBody { get; set; }
-    public static List<Arrow> Arrows { get; private set; } = new();
-
-    public Vulture() : base(LanguageConfig.Instance.VultureName, new(139, 69, 19), CampType.Neutral)
+    public Vulture() : base(LanguageConfig.Instance.VultureName, new Color(139, 69, 19), CampType.Neutral)
     {
         Description = LanguageConfig.Instance.VultureDescription;
 
         if (ShowInOptions)
         {
             var page = ToCustomOption(this);
-            EatingCooldown = CustomOption.Create(page, LanguageConfig.Instance.VultureEatCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
-            WinningEatenCount = CustomOption.Create(page, LanguageConfig.Instance.VultureEatenCountToWin, 4f, 2f, 6f, 1f, MainRoleOption);
-            HasArrowToBodies = CustomOption.Create(page, LanguageConfig.Instance.VultureHasArrowToBodies, true, MainRoleOption);
+            EatingCooldown = CustomOption.Create(page, LanguageConfig.Instance.VultureEatCooldown, 30f, 10f, 60f, 5f,
+                MainRoleOption);
+            WinningEatenCount = CustomOption.Create(page, LanguageConfig.Instance.VultureEatenCountToWin, 4f, 2f, 6f,
+                1f, MainRoleOption);
+            HasArrowToBodies = CustomOption.Create(page, LanguageConfig.Instance.VultureHasArrowToBodies, true,
+                MainRoleOption);
         }
 
         EatButton = CustomButton.Create(
@@ -41,17 +37,17 @@ public class Vulture : CustomRole, IListener, IWinnable
             {
                 ClosestBody = PlayerUtils.GetClosestBody();
                 var arrow = Arrows.FirstOrDefault(a => a.Target == ClosestBody!.transform.position);
-                
+
                 if (arrow != null)
                 {
                     Arrows.Remove(arrow!);
                     arrow.Destroy();
                 }
-                
+
                 RpcEatBody(ClosestBody!);
             },
             () => EatButton?.ResetCooldown(),
-            couldUse: () => ClosestBody,
+            () => ClosestBody,
             () => true,
             null!,
             2,
@@ -63,6 +59,33 @@ public class Vulture : CustomRole, IListener, IWinnable
         AddButton(EatButton);
 
         EatenCount = 0;
+    }
+
+    public CustomOption? EatingCooldown { get; }
+    public CustomOption? WinningEatenCount { get; }
+    public CustomOption? HasArrowToBodies { get; }
+    public CustomButton EatButton { get; }
+    public static int EatenCount { get; private set; }
+    private static DeadBody? ClosestBody { get; set; }
+    public static List<Arrow> Arrows { get; } = new();
+
+    public ulong GetWeight()
+    {
+        return IWinnable.GetOrder(6);
+    }
+
+    public bool CanWin() // Âè™ÊúâÊàø‰∏ª‰ºöÂà§Êñ≠Ê∏∏ÊàèËÉúÂà©ÔºåÂõ†Ê≠§Áé©ÂÆ∂‰πãÈó¥ÈúÄË¶ÅÂêåÊ≠•Êï∞ÊçÆ
+    {
+        if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
+        {
+            CustomWinnerManager.RegisterWinningPlayers(Players);
+            CustomWinnerManager.SetWinColor(Color);
+            CustomWinnerManager.SetWinText("Vulture wins");
+            GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
+            return true;
+        }
+
+        return false;
     }
 
     public void RpcEatBody(DeadBody body)
@@ -88,7 +111,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
         var reader = @event.MessageReader;
 
-        byte pid = reader.ReadByte();
+        var pid = reader.ReadByte();
         var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
         if (!body) return;
 
@@ -109,13 +132,17 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public override bool OnRoleSelection(List<CustomRole> roles)
     {
-        bool disableVulture = new System.Random().Next(2) == 1;
-        CustomRole roleToDisable = disableVulture ? this : CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>();
-        roles.RemoveAll(r => r == roleToDisable); // ≥°…œ≤ªƒ‹Õ¨ ±¥Ê‘⁄Õ∫’∫Õ«ÂΩ‡π§
+        var disableVulture = new Random().Next(2) == 1;
+        CustomRole roleToDisable =
+            disableVulture ? this : CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>();
+        roles.RemoveAll(r => r == roleToDisable); // Âú∫‰∏ä‰∏çËÉΩÂêåÊó∂Â≠òÂú®ÁßÉÈπ´ÂíåÊ∏ÖÊ¥ÅÂ∑•
         return false;
     }
 
-    public override string HandleAdditionalPlayerName() => $"\n({EatenCount}/{(int)WinningEatenCount.GetFloat()})";
+    public override string HandleAdditionalPlayerName()
+    {
+        return $"\n({EatenCount}/{(int)WinningEatenCount.GetFloat()})";
+    }
 
     public override void ClearRoleGameData()
     {
@@ -124,20 +151,8 @@ public class Vulture : CustomRole, IListener, IWinnable
         Arrows.Clear();
     }
 
-    public ulong GetWeight() => IWinnable.GetOrder(6);
-
-    public bool CanWin() // ÷ª”–∑ø÷˜ª·≈–∂œ”Œœ∑ §¿˚£¨“Ú¥ÀÕÊº“÷Æº‰–Ë“™Õ¨≤Ω ˝æ›
+    public override IListener GetListener()
     {
-        if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
-        {
-            CustomWinnerManager.RegisterWinningPlayers(Players);
-            CustomWinnerManager.SetWinColor(Color);
-            CustomWinnerManager.SetWinText("Vulture wins");
-            GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
-            return true;
-        }
-        return false;
+        return this;
     }
-
-    public override IListener GetListener() => this;
 }
