@@ -10,9 +10,7 @@ namespace COG.Role.Impl.Impostor;
 
 public class Madman : CustomRole, IListener
 {
-    private CustomButton AnnihilateButton { get; }
-    
-    public Madman() : base(LanguageConfig.Instance.MadmanName, Palette.ImpostorRed, CampType.Impostor, true)
+    public Madman() : base(LanguageConfig.Instance.MadmanName, Palette.ImpostorRed, CampType.Impostor)
     {
         Description = LanguageConfig.Instance.MadmanDescription;
         BaseRoleType = RoleTypes.Impostor;
@@ -35,9 +33,11 @@ public class Madman : CustomRole, IListener
             LanguageConfig.Instance.AnnihilateAction,
             () => 1f,
             0);
-        
+
         AddButton(AnnihilateButton);
     }
+
+    private CustomButton AnnihilateButton { get; }
 
     public override IListener GetListener()
     {

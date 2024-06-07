@@ -19,30 +19,24 @@ namespace COG.Plugin.Loader;
 public class LuaPluginLoader : IPlugin
 {
     /// <summary>
-    /// 插件的名字
-    /// </summary>
-    private readonly string _name;
-
-    /// <summary>
-    /// 插件的作者
+    ///     插件的作者
     /// </summary>
     private readonly string _author;
 
     /// <summary>
-    /// 插件的版本
-    /// </summary>
-    private readonly string _version;
-
-    /// <summary>
-    /// 插件的主类
+    ///     插件的主类
     /// </summary>
     private readonly string _mainClass;
 
-    private string ScriptPath { get; }
-    private Lua LuaController { get; }
+    /// <summary>
+    ///     插件的名字
+    /// </summary>
+    private readonly string _name;
 
-    private LuaFunction OnEnableFunction { get; }
-    private LuaFunction OnDisableFunction { get; }
+    /// <summary>
+    ///     插件的版本
+    /// </summary>
+    private readonly string _version;
 
     public LuaPluginLoader(string scriptPath)
     {
@@ -87,6 +81,42 @@ public class LuaPluginLoader : IPlugin
         OnEnableFunction = LuaController.GetFunction("onEnable");
         OnDisableFunction = LuaController.GetFunction("onDisable");
         MakeLanguage();
+    }
+
+    private string ScriptPath { get; }
+    private Lua LuaController { get; }
+
+    private LuaFunction OnEnableFunction { get; }
+    private LuaFunction OnDisableFunction { get; }
+
+    public void OnEnable()
+    {
+        OnEnableFunction.Call();
+    }
+
+    public void OnDisable()
+    {
+        OnDisableFunction.Call();
+    }
+
+    public string GetName()
+    {
+        return _name;
+    }
+
+    public string GetAuthor()
+    {
+        return _author;
+    }
+
+    public string GetVersion()
+    {
+        return _version;
+    }
+
+    public string GetMainClass()
+    {
+        return _mainClass;
     }
 
     private static bool CheckDirectory(FileSystemInfo directoryInfo)
@@ -141,35 +171,5 @@ public class LuaPluginLoader : IPlugin
             if (attributes[0] is FunctionRegisterAttribute functionRegisterAttribute)
                 LuaController.RegisterFunction(functionRegisterAttribute.FunctionName, null, methodInfo);
         }
-    }
-
-    public void OnEnable()
-    {
-        OnEnableFunction.Call();
-    }
-
-    public void OnDisable()
-    {
-        OnDisableFunction.Call();
-    }
-
-    public string GetName()
-    {
-        return _name;
-    }
-
-    public string GetAuthor()
-    {
-        return _author;
-    }
-
-    public string GetVersion()
-    {
-        return _version;
-    }
-
-    public string GetMainClass()
-    {
-        return _mainClass;
     }
 }

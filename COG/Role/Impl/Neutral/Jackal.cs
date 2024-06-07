@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
@@ -9,22 +10,13 @@ using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
 public class Jackal : CustomRole, IListener
 {
-    private CustomOption CreateSidekickCd { get; } = null!;
-    private CustomOption JackalKillCd { get; } = null!;
-    private CustomButton CreateSidekickButton { get; }
-    private CustomButton JackalKillButton { get; }
-    private static PlayerControl? CurrentTarget { get; set; }
-    private bool CreatedSidekick { get; set; }
-    public static Dictionary<PlayerControl, PlayerControl> JackalSidekick { get; set; } = new();
-
-    public Jackal() : base(LanguageConfig.Instance.JackalName, new(0, 180f, 235f), CampType.Neutral, true)
+    public Jackal() : base(LanguageConfig.Instance.JackalName, new Color(0, 180f, 235f), CampType.Neutral)
     {
         Description = LanguageConfig.Instance.JackalDescription;
         BaseRoleType = RoleTypes.Crewmate;
@@ -47,7 +39,7 @@ public class Jackal : CustomRole, IListener
                 CreatedSidekick = true;
             },
             () => CreateSidekickButton?.ResetCooldown(),
-            couldUse: () => CurrentTarget,
+            () => CurrentTarget,
             () =>
             {
                 if (!CustomRoleManager.GetManager().GetTypeRoleInstance<Sidekick>().SidekickCanCreateSidekick.GetBool()
@@ -65,7 +57,7 @@ public class Jackal : CustomRole, IListener
         JackalKillButton = CustomButton.Create(
             () => { PlayerControl.LocalPlayer.CmdCheckMurder(CurrentTarget); },
             () => JackalKillButton?.ResetCooldown(),
-            couldUse: () =>
+            () =>
             {
                 var target = CurrentTarget;
                 if (target == null) return false;
@@ -77,7 +69,7 @@ public class Jackal : CustomRole, IListener
             },
             () => true,
             ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
-            row: 1,
+            1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             () => JackalKillCd?.GetFloat() ?? 30f,
@@ -87,6 +79,14 @@ public class Jackal : CustomRole, IListener
         AddButton(CreateSidekickButton);
         AddButton(JackalKillButton);
     }
+
+    private CustomOption? CreateSidekickCd { get; } = null!;
+    private CustomOption? JackalKillCd { get; } = null!;
+    private CustomButton CreateSidekickButton { get; }
+    private CustomButton JackalKillButton { get; }
+    private static PlayerControl? CurrentTarget { get; set; }
+    private bool CreatedSidekick { get; set; }
+    public static Dictionary<PlayerControl, PlayerControl> JackalSidekick { get; set; } = new();
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnHudUpdate(HudManagerUpdateEvent @event)
@@ -103,12 +103,18 @@ public class Jackal : CustomRole, IListener
         JackalSidekick.Clear();
     }
 
-    public override IListener GetListener() => this;
+    public override IListener GetListener()
+    {
+        return this;
+    }
 }
 
 public static class JackalUtils
 {
-    public static bool IsInJackalTeam(this PlayerControl pc) => pc.IsRole<Jackal>() || pc.IsRole<Sidekick>();
+    public static bool IsInJackalTeam(this PlayerControl pc)
+    {
+        return pc.IsRole<Jackal>() || pc.IsRole<Sidekick>();
+    }
 
     public static void RpcCreateSidekick(this PlayerControl jackal, PlayerControl target)
     {

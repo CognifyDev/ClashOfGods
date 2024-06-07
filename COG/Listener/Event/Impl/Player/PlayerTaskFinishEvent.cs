@@ -1,19 +1,17 @@
-using Il2CppSystem.Collections.Generic;
-
 namespace COG.Listener.Event.Impl.Player;
 
 /// <summary>
-/// Ò»¸öÍæ¼ÒÍê³ÉÈÎÎñÊ±£¬´ËÊÂ¼ş»áÖ´ĞĞ
+///     ä¸€ä¸ªç©å®¶å®Œæˆä»»åŠ¡æ—¶ï¼Œæ­¤äº‹ä»¶ä¼šæ‰§è¡Œ
 /// </summary>
 public class PlayerTaskFinishEvent : PlayerEvent
 {
-    /// <summary>
-    /// Íê³ÉÈÎÎñµÄĞòºÅ
-    /// </summary>
-    public uint Index { get; }
-
     public PlayerTaskFinishEvent(PlayerControl player, uint idx) : base(player)
     {
         Index = idx;
     }
+
+    /// <summary>
+    ///     å®Œæˆä»»åŠ¡çš„åºå·
+    /// </summary>
+    public uint Index { get; }
 }

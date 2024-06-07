@@ -41,6 +41,163 @@ public class LanguageConfig : Config
         }
     }
 
+    public static LanguageConfig Instance { get; private set; }
+    public string MessageForNextPage { get; private set; } = null!;
+    public string MakePublicMessage { get; private set; } = null!;
+    public string VanillaRoleDisabled { get; private set; } = null!;
+
+    public string GeneralSetting { get; private set; } = null!;
+    public string ImpostorRolesSetting { get; private set; } = null!;
+    public string NeutralRolesSetting { get; private set; } = null!;
+    public string CrewmateRolesSetting { get; private set; } = null!;
+    public string AddonsSetting { get; private set; } = null!;
+    public string SavePreset { get; private set; } = null!;
+    public string LoadPreset { get; private set; } = null!;
+    public string DebugMode { get; private set; } = null!;
+    public string MaxSubRoleNumber { get; private set; } = null!;
+
+    // Unknown
+    public string UnknownName { get; private set; } = null!;
+    public string UnknownDescription { get; private set; } = null!;
+
+    // Crewmate
+    public string CrewmateName { get; private set; } = null!;
+    public string CrewmateDescription { get; private set; } = null!;
+
+    public string BaitName { get; private set; } = null!;
+    public string BaitDescription { get; private set; } = null!;
+
+    public string SheriffName { get; private set; } = null!;
+    public string SheriffDescription { get; private set; } = null!;
+    public string SheriffKillCooldown { get; private set; } = null!;
+
+    public string SpyName { get; private set; } = null!;
+    public string SpyDescription { get; private set; } = null!;
+
+    // Impostor
+    public string ImpostorName { get; private set; } = null!;
+    public string ImpostorDescription { get; private set; } = null!;
+
+    public string CleanerName { get; private set; } = null!;
+    public string CleanerDescription { get; private set; } = null!;
+    public string CleanBodyCooldown { get; private set; } = null!;
+
+    public string BountyHunterName { get; private set; } = null!;
+    public string BountyHunterDescription { get; private set; } = null!;
+    public string BountyHunterDefaultCd { get; private set; } = null!;
+    public string BountyHunterRefreshTargetTime { get; private set; } = null!;
+    public string BountyHunterHasArrowToTarget { get; private set; } = null!;
+    public string BountyHunterKillCorrectCd { get; private set; } = null!;
+    public string BountyHunterKillIncorrectCd { get; private set; } = null!;
+    public string BountyHunterCantSelectTargetError { get; private set; } = null!;
+
+    public string TroublemakerName { get; private set; } = null!;
+    public string TroublemakerDescription { get; private set; } = null!;
+    public string TroublemakerDuration { get; private set; } = null!;
+    public string TroublemakerCooldown { get; private set; } = null!;
+
+    public string EraserName { get; private set; } = null!;
+    public string EraserDescription { get; private set; } = null!;
+    public string EraserInitialEraseCd { get; private set; } = null!;
+    public string EraserIncreaseCdAfterErasing { get; private set; } = null!;
+    public string EraserCanEraseImpostors { get; private set; } = null!;
+
+    public string MadmanName { get; private set; } = null!;
+    public string MadmanDescription { get; private set; } = null!;
+
+    // Neutral
+    public string JesterName { get; private set; } = null!;
+    public string JesterDescription { get; private set; } = null!;
+
+    public string OpportunistName { get; private set; } = null!;
+    public string OpportunistDescription { get; private set; } = null!;
+
+    public string JackalName { get; private set; } = null!;
+    public string JackalDescription { get; private set; } = null!;
+    public string JackalCreateSidekickCd { get; private set; } = null!;
+    public string JackalKillCd { get; private set; } = null!;
+
+    public string SidekickName { get; private set; } = null!;
+    public string SidekickDescription { get; private set; } = null!;
+    public string SidekickCanCreateSidekick { get; private set; } = null!;
+
+    public string VultureName { get; private set; } = null!;
+    public string VultureDescription { get; private set; } = null!;
+    public string VultureEatCooldown { get; private set; } = null!;
+    public string VultureEatenCountToWin { get; private set; } = null!;
+    public string VultureHasArrowToBodies { get; private set; } = null!;
+
+    // Sub-roles
+    public string GuesserName { get; private set; } = null!;
+    public string GuesserDescription { get; private set; } = null!;
+    public string GuesserMaxGuessTime { get; private set; } = null!;
+    public string GuesserGuessContinuously { get; private set; } = null!;
+
+    public string LighterName { get; private set; } = null!;
+    public string LighterDescription { get; private set; } = null!;
+
+    public string Enable { get; private set; } = null!;
+    public string Disable { get; private set; } = null!;
+    public string CogOptions { get; private set; } = null!;
+    public string LoadCustomLanguage { get; private set; } = null!;
+    public string Github { get; private set; } = null!;
+    public string UpdateButtonString { get; private set; } = null!;
+
+    public string MaxNumMessage { get; private set; } = null!;
+    public string AllowStartMeeting { get; private set; } = null!;
+    public string AllowReportDeadBody { get; private set; } = null!;
+    public string KillCooldown { get; private set; } = null!;
+
+    public string SidebarTextOriginal { get; private set; } = null!;
+    public string SidebarTextNeutral { get; private set; } = null!;
+    public string SidebarTextMod { get; private set; } = null!;
+    public string SidebarTextAddons { get; private set; } = null!;
+    public string SidebarTextImpostor { get; private set; } = null!;
+    public string SidebarTextCrewmate { get; private set; } = null!;
+    public string QQ { get; private set; } = null!;
+    public string Discord { get; private set; } = null!;
+
+    public string UnknownCamp { get; private set; } = null!;
+    public string ImpostorCamp { get; private set; } = null!;
+    public string NeutralCamp { get; private set; } = null!;
+    public string CrewmateCamp { get; private set; } = null!;
+
+    public string UnknownCampDescription { get; private set; } = null!;
+    public string ImpostorCampDescription { get; private set; } = null!;
+    public string NeutralCampDescription { get; private set; } = null!;
+    public string CrewmateCampDescription { get; private set; } = null!;
+
+    public string KillAction { get; private set; } = null!;
+    public string CleanAction { get; private set; } = null!;
+    public string MakeTrouble { get; private set; } = null!;
+    public string CreateSidekick { get; private set; } = null!;
+    public string EraseAction { get; private set; } = null!;
+    public string AnnihilateAction { get; private set; } = null!;
+    public string EatAction { get; private set; } = null!;
+
+    public string ShowPlayersRolesMessage { get; private set; } = null!;
+
+    public string Alive { get; private set; } = null!;
+    public string Disconnected { get; private set; } = null!;
+    public string DefaultKillReason { get; private set; } = null!;
+    public string UnknownKillReason { get; private set; } = null!;
+
+    public string UnloadModButtonName { get; private set; } = null!;
+    public string UnloadModSuccessfulMessage { get; private set; } = null!;
+    public string UnloadModInGameErrorMsg { get; private set; } = null!;
+
+    // Update
+    public string UpToDate { get; private set; } = null!;
+    public string NonCheck { get; private set; } = null!;
+    public string FetchedString { get; private set; } = null!;
+
+    public string ImpostorsWinText { get; private set; } = null!;
+    public string CrewmatesWinText { get; private set; } = null!;
+    public string NeutralsWinText { get; private set; } = null!;
+
+    public string DefaultEjectText { get; private set; } = null!;
+    public string AlivePlayerInfo { get; private set; } = null!;
+
     private void SetTranslations()
     {
         MessageForNextPage = GetString("lobby.message-for-next-page");
@@ -196,163 +353,6 @@ public class LanguageConfig : Config
         DefaultEjectText = GetString("game.exile.default");
         AlivePlayerInfo = GetString("game.exile.alive-player-info");
     }
-
-    public static LanguageConfig Instance { get; private set; }
-    public string MessageForNextPage { get; private set; } = null!;
-    public string MakePublicMessage { get; private set; } = null!;
-    public string VanillaRoleDisabled { get; private set; } = null!;
-
-    public string GeneralSetting { get; private set; } = null!;
-    public string ImpostorRolesSetting { get; private set; } = null!;
-    public string NeutralRolesSetting { get; private set; } = null!;
-    public string CrewmateRolesSetting { get; private set; } = null!;
-    public string AddonsSetting { get; private set; } = null!;
-    public string SavePreset { get; private set; } = null!;
-    public string LoadPreset { get; private set; } = null!;
-    public string DebugMode { get; private set; } = null!;
-    public string MaxSubRoleNumber { get; private set; } = null!;
-
-    // Unknown
-    public string UnknownName { get; private set; } = null!;
-    public string UnknownDescription { get; private set; } = null!;
-
-    // Crewmate
-    public string CrewmateName { get; private set; } = null!;
-    public string CrewmateDescription { get; private set; } = null!;
-
-    public string BaitName { get; private set; } = null!;
-    public string BaitDescription { get; private set; } = null!;
-
-    public string SheriffName { get; private set; } = null!;
-    public string SheriffDescription { get; private set; } = null!;
-    public string SheriffKillCooldown { get; private set; } = null!;
-
-    public string SpyName { get; private set; } = null!;
-    public string SpyDescription { get; private set; } = null!;
-    
-    // Impostor
-    public string ImpostorName { get; private set; } = null!;
-    public string ImpostorDescription { get; private set; } = null!;
-
-    public string CleanerName { get; private set; } = null!;
-    public string CleanerDescription { get; private set; } = null!;
-    public string CleanBodyCooldown { get; private set; } = null!;
-
-    public string BountyHunterName { get; private set; } = null!;
-    public string BountyHunterDescription { get; private set; } = null!;
-    public string BountyHunterDefaultCd { get; private set; } = null!;
-    public string BountyHunterRefreshTargetTime { get; private set; } = null!;
-    public string BountyHunterHasArrowToTarget { get; private set; } = null!;
-    public string BountyHunterKillCorrectCd { get; private set; } = null!;
-    public string BountyHunterKillIncorrectCd { get; private set; } = null!;
-    public string BountyHunterCantSelectTargetError { get; private set; } = null!;
-
-    public string TroublemakerName { get; private set; } = null!;
-    public string TroublemakerDescription { get; private set; } = null!;
-    public string TroublemakerDuration { get; private set; } = null!;
-    public string TroublemakerCooldown { get; private set; } = null!;
-
-    public string EraserName { get; private set; } = null!;
-    public string EraserDescription { get; private set; } = null!;
-    public string EraserInitialEraseCd { get; private set; } = null!;
-    public string EraserIncreaseCdAfterErasing { get; private set; } = null!;
-    public string EraserCanEraseImpostors { get; private set; } = null!;
-
-    public string MadmanName { get; private set; } = null!;
-    public string MadmanDescription { get; private set; } = null!;
-
-    // Neutral
-    public string JesterName { get; private set; } = null!;
-    public string JesterDescription { get; private set; } = null!;
-
-    public string OpportunistName { get; private set; } = null!;
-    public string OpportunistDescription { get; private set; } = null!;
-
-    public string JackalName { get; private set; } = null!;
-    public string JackalDescription { get; private set; } = null!;
-    public string JackalCreateSidekickCd { get; private set; } = null!;
-    public string JackalKillCd { get; private set; } = null!;
-
-    public string SidekickName { get; private set; } = null!;
-    public string SidekickDescription { get; private set; } = null!;
-    public string SidekickCanCreateSidekick { get; private set; } = null!;
-
-    public string VultureName { get; private set; } = null!;
-    public string VultureDescription { get; private set; } = null!;
-    public string VultureEatCooldown { get; private set; } = null!;
-    public string VultureEatenCountToWin { get; private set; } = null!;
-    public string VultureHasArrowToBodies { get; private set; } = null!;
-
-    // Sub-roles
-    public string GuesserName { get; private set; } = null!;
-    public string GuesserDescription { get; private set; } = null!;
-    public string GuesserMaxGuessTime { get; private set; } = null!;
-    public string GuesserGuessContinuously { get; private set; } = null!;
-
-    public string LighterName { get; private set; } = null!;
-    public string LighterDescription { get; private set; } = null!;
-    
-    public string Enable { get; private set; } = null!;
-    public string Disable { get; private set; } = null!;
-    public string CogOptions { get; private set; } = null!;
-    public string LoadCustomLanguage { get; private set; } = null!;
-    public string Github { get; private set; } = null!;
-    public string UpdateButtonString { get; private set; } = null!;
-
-    public string MaxNumMessage { get; private set; } = null!;
-    public string AllowStartMeeting { get; private set; } = null!;
-    public string AllowReportDeadBody { get; private set; } = null!;
-    public string KillCooldown { get; private set; } = null!;
-
-    public string SidebarTextOriginal { get; private set; } = null!;
-    public string SidebarTextNeutral { get; private set; } = null!;
-    public string SidebarTextMod { get; private set; } = null!;
-    public string SidebarTextAddons { get; private set; } = null!;
-    public string SidebarTextImpostor { get; private set; } = null!;
-    public string SidebarTextCrewmate { get; private set; } = null!;
-    public string QQ { get; private set; } = null!;
-    public string Discord { get; private set; } = null!;
-
-    public string UnknownCamp { get; private set; } = null!;
-    public string ImpostorCamp { get; private set; } = null!;
-    public string NeutralCamp { get; private set; } = null!;
-    public string CrewmateCamp { get; private set; } = null!;
-
-    public string UnknownCampDescription { get; private set; } = null!;
-    public string ImpostorCampDescription { get; private set; } = null!;
-    public string NeutralCampDescription { get; private set; } = null!;
-    public string CrewmateCampDescription { get; private set; } = null!;
-
-    public string KillAction { get; private set; } = null!;
-    public string CleanAction { get; private set; } = null!;
-    public string MakeTrouble { get; private set; } = null!;
-    public string CreateSidekick { get; private set; } = null!;
-    public string EraseAction { get; private set; } = null!;
-    public string AnnihilateAction { get; private set; } = null!;
-    public string EatAction { get; private set; } = null!;
-
-    public string ShowPlayersRolesMessage { get; private set; } = null!;
-
-    public string Alive { get; private set; } = null!;
-    public string Disconnected { get; private set; } = null!;
-    public string DefaultKillReason { get; private set; } = null!;
-    public string UnknownKillReason { get; private set; } = null!;
-
-    public string UnloadModButtonName { get; private set; } = null!;
-    public string UnloadModSuccessfulMessage { get; private set; } = null!;
-    public string UnloadModInGameErrorMsg { get; private set; } = null!;
-
-    // Update
-    public string UpToDate { get; private set; } = null!;
-    public string NonCheck { get; private set; } = null!;
-    public string FetchedString { get; private set; } = null!;
-
-    public string ImpostorsWinText { get; private set; } = null!;
-    public string CrewmatesWinText { get; private set; } = null!;
-    public string NeutralsWinText { get; private set; } = null!;
-
-    public string DefaultEjectText { get; private set; } = null!;
-    public string AlivePlayerInfo { get; private set; } = null!;
 
 
     private string GetString(string location)

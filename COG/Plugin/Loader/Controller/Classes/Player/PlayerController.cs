@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using COG.Role;
 using COG.Utils;
 using NLua;
-using COG.Role;
 
 // ReSharper disable UnusedMember.Global
 
@@ -29,8 +29,11 @@ public class PlayerController
     {
         player.MurderPlayer(player, GameUtils.DefaultFlag);
     }
-    
-    public PlayerControl GetLocalPlayerController() => PlayerControl.LocalPlayer;
+
+    public PlayerControl GetLocalPlayerController()
+    {
+        return PlayerControl.LocalPlayer;
+    }
 
     public bool IsRole(PlayerControl player, CustomRole role)
     {

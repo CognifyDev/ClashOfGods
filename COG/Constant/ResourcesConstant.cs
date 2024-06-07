@@ -1,8 +1,8 @@
 namespace COG.Constant;
 
 /// <summary>
-/// 资源列表常量类
-/// 记录了各种常用资源位置
+///     资源列表常量类
+///     记录了各种常用资源位置
 /// </summary>
 public static class ResourcesConstant
 {

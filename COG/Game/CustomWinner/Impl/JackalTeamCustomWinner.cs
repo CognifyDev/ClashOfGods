@@ -1,6 +1,6 @@
-using COG.Utils;
 using System.Linq;
 using COG.Role.Impl.Neutral;
+using COG.Utils;
 
 namespace COG.Game.CustomWinner.Impl;
 
@@ -19,5 +19,8 @@ public class JackalTeamCustomWinner : IWinnable
         return false;
     }
 
-    public ulong GetWeight() => IWinnable.GetOrder(3);
+    public ulong GetWeight()
+    {
+        return IWinnable.GetOrder(3);
+    }
 }

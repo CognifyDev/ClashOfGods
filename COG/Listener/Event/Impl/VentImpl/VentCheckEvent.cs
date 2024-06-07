@@ -2,7 +2,6 @@ namespace COG.Listener.Event.Impl.VentImpl;
 
 public class VentCheckEvent : VentEvent
 {
-    public GameData.PlayerInfo PlayerInfo { get; }
     private bool _canUse, _couldUse;
     private float _result;
 
@@ -14,6 +13,8 @@ public class VentCheckEvent : VentEvent
         _couldUse = couldUse;
         _result = result;
     }
+
+    public GameData.PlayerInfo PlayerInfo { get; }
 
     public void SetCanUse(bool canUse)
     {

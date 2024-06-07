@@ -9,12 +9,36 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using Debug = System.Diagnostics.Debug;
 
-
 namespace COG.UI.CustomButton;
 
 [ShitCode]
 public class CustomButton
 {
+    internal static List<ActionButton> AllVanillaButtons = new();
+
+    private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
+        Func<bool> hasButton,
+        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Func<float> cooldown,
+        float effectTime,
+        int usesLimit, string hotkeyName)
+    {
+        OnClick = onClick;
+        OnMeetingEnd = onMeetingEnd;
+        OnEffect = onEffect;
+        CouldUse = couldUse;
+        HasButton = hasButton;
+        Sprite = sprite;
+        Position = position ?? Vector3.zero;
+        if (position is null) IsCustomPosition = true;
+        Hotkey = hotkey;
+        Text = text;
+        HasEffect = hasEffect;
+        Cooldown = cooldown;
+        EffectTime = effectTime;
+        UsesLimit = UsesRemaining = usesLimit;
+        HotkeyName = hotkeyName;
+    }
+
     public ActionButton? ActionButton { get; set; }
     public Func<float> Cooldown { get; set; }
     public Func<bool> CouldUse { get; set; }
@@ -46,30 +70,6 @@ public class CustomButton
     public int Order { get; set; }
 
     public static bool Initialized { get; internal set; }
-    internal static List<ActionButton> AllVanillaButtons = new();
-
-    private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool> hasButton,
-        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Func<float> cooldown,
-        float effectTime,
-        int usesLimit, string hotkeyName)
-    {
-        OnClick = onClick;
-        OnMeetingEnd = onMeetingEnd;
-        OnEffect = onEffect;
-        CouldUse = couldUse;
-        HasButton = hasButton;
-        Sprite = sprite;
-        Position = position ?? Vector3.zero;
-        if (position is null) IsCustomPosition = true;
-        Hotkey = hotkey;
-        Text = text;
-        HasEffect = hasEffect;
-        Cooldown = cooldown;
-        EffectTime = effectTime;
-        UsesLimit = UsesRemaining = usesLimit;
-        HotkeyName = hotkeyName;
-    }
 
     /// <summary>
     ///     在游戏中创建一个按钮 (Effect)
@@ -190,14 +190,15 @@ public class CustomButton
 
     public void Update()
     {
-        var hasButton = HasButton.GetInvocationList().All(d=>(bool)d.DynamicInvoke()!);
+        var hasButton = HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
         var isCoolingDown = Timer > 0f;
         var hotkeyText = "";
         if (HotkeyName == "") hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 
-        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || !hasButton || PlayerStates.IsShowingMap())
+        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || !hasButton ||
+            PlayerStates.IsShowingMap())
         {
             SetActive(false);
             return;
@@ -215,7 +216,7 @@ public class CustomButton
             ActionButton.SetInfiniteUses();
 
         var desat = Shader.PropertyToID("_Desat");
-        var couldUse = CouldUse.GetInvocationList().All(d=>(bool)d.DynamicInvoke()!);
+        var couldUse = CouldUse.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
         if (hasButton && !isCoolingDown && couldUse)
         {
             SpriteRenderer!.color = TextMesh!.color = Palette.EnabledColor;
@@ -233,7 +234,10 @@ public class CustomButton
             GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
     }
 
-    public void OnMeetingEndSpawn() => OnMeetingEnd();
+    public void OnMeetingEndSpawn()
+    {
+        OnMeetingEnd();
+    }
 
 
 #nullable disable
@@ -259,7 +263,7 @@ public class CustomButton
                     ResetEffectTime();
                 }
 
-                if (UsesLimit > 0) UsesRemaining --;
+                if (UsesLimit > 0) UsesRemaining--;
                 if (UsesLimit <= 0 || UsesRemaining > 0) ResetCooldown();
             }
         }

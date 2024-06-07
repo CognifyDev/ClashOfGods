@@ -1,22 +1,22 @@
+using System;
+using System.Linq;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Listener;
+using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.Player;
+using COG.States;
+using COG.UI.Arrow;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
-using UnityEngine;
-using COG.States;
-using COG.Listener.Event.Impl.Game;
-using System.Linq;
-using System;
-using AmongUs.GameOptions;
-using COG.Constant;
 using COG.Utils.Coding;
-using Debug = System.Diagnostics.Debug;
-
 using TMPro;
-using COG.Listener.Event.Impl.HManager;
-using COG.UI.Arrow;
+using UnityEngine;
+using Debug = System.Diagnostics.Debug;
+using Random = System.Random;
 
 namespace COG.Role.Impl.Impostor;
 
@@ -24,22 +24,6 @@ namespace COG.Role.Impl.Impostor;
 // ReSharper disable All
 public class BountyHunter : CustomRole, IListener
 {
-    private CustomButton BHunterKillButton { get; set; }
-    private CustomOption? BHunterKillCd { get; set; }
-    private CustomOption? BHunterRefreshTargetTime { get; init; }
-
-    private CustomOption? HasArrowToTarget { get; set; }
-
-    private CustomOption? CdAfterKillingTarget { get; init; }
-    private CustomOption? CdAfterKillingNonTarget { get; init; }
-    private PoolablePlayer? TargetPoolable { get; set; }
-    private float RefreshTargetTimer { get; set; } = float.PositiveInfinity;
-    private bool TimerStarted { get; set; }
-    private PlayerControl? CurrentTarget { get; set; }
-    private PlayerControl? ClosestTarget { get; set; }
-    private TextMeshPro? RefreshTimerText { get; set; }
-    private Arrow? ArrowToTarget { get; set; }
-
     public BountyHunter() : base(LanguageConfig.Instance.BountyHunterName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         CanKill = false; // Disable vanilla kill button
@@ -54,7 +38,8 @@ public class BountyHunter : CustomRole, IListener
             BHunterRefreshTargetTime =
                 CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f,
                     5f, MainRoleOption)!;
-            HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
+            HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget,
+                true, MainRoleOption);
             CdAfterKillingTarget =
                 CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f,
                     MainRoleOption)!;
@@ -87,6 +72,22 @@ public class BountyHunter : CustomRole, IListener
 
         AddButton(BHunterKillButton);
     }
+
+    private CustomButton BHunterKillButton { get; set; }
+    private CustomOption? BHunterKillCd { get; set; }
+    private CustomOption? BHunterRefreshTargetTime { get; init; }
+
+    private CustomOption? HasArrowToTarget { get; set; }
+
+    private CustomOption? CdAfterKillingTarget { get; init; }
+    private CustomOption? CdAfterKillingNonTarget { get; init; }
+    private PoolablePlayer? TargetPoolable { get; set; }
+    private float RefreshTargetTimer { get; set; } = float.PositiveInfinity;
+    private bool TimerStarted { get; set; }
+    private PlayerControl? CurrentTarget { get; set; }
+    private PlayerControl? ClosestTarget { get; set; }
+    private TextMeshPro? RefreshTimerText { get; set; }
+    private Arrow? ArrowToTarget { get; set; }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnHudUpdate(HudManagerUpdateEvent @event)
@@ -169,7 +170,7 @@ public class BountyHunter : CustomRole, IListener
         var selectableTargets = PlayerControl.AllPlayerControls.ToArray().Where(p =>
             p.GetMainRole()!.CampType != CampType.Impostor && p.IsAlive() &&
             !PlayerControl.LocalPlayer.IsSamePlayer(p)).ToList();
-        var r = new System.Random(DateTime.Now.Millisecond);
+        var r = new Random(DateTime.Now.Millisecond);
 
         if (selectableTargets.Count == 0)
         {

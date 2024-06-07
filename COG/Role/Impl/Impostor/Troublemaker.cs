@@ -16,11 +16,6 @@ namespace COG.Role.Impl.Impostor;
 // ReSharper disable All
 public class Troublemaker : CustomRole
 {
-    private CustomOption? MakeTroubleCd { get; }
-    private CustomOption? MakeTroubleDuration { get; }
-
-    private CustomButton MakeTroubleButton { get; }
-
     // private static bool _makeTrouble = false;
 
     private static Thread? _task;
@@ -72,4 +67,9 @@ public class Troublemaker : CustomRole
 
         AddButton(MakeTroubleButton);
     }
+
+    private CustomOption? MakeTroubleCd { get; }
+    private CustomOption? MakeTroubleDuration { get; }
+
+    private CustomButton MakeTroubleButton { get; }
 }

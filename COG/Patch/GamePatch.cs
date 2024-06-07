@@ -7,7 +7,6 @@ using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
 using COG.Listener.Event.Impl.VentImpl;
-using COG.Role;
 using COG.States;
 using Il2CppSystem.Collections.Generic;
 
@@ -342,5 +341,8 @@ public class ExileControllerBeginPatch
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.ExitGame))]
 public static class LocalPlayerExitPatch
 {
-    public static void Postfix()=> GameStates.InGame = false;
+    public static void Postfix()
+    {
+        GameStates.InGame = false;
+    }
 }

@@ -6,6 +6,13 @@ public class TaskPanelBehaviourSetTaskTextEvent : TaskPanelBehaviourEvent
     {
     }
 
-    public string GetTaskString() => Behaviour.taskText.text;
-    public string SetTaskString(string newString) => Behaviour.taskText.text = newString;
+    public string GetTaskString()
+    {
+        return Behaviour.taskText.text;
+    }
+
+    public string SetTaskString(string newString)
+    {
+        return Behaviour.taskText.text = newString;
+    }
 }

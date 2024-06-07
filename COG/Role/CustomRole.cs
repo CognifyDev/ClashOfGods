@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -18,7 +17,7 @@ namespace COG.Role;
 public class CustomRole
 {
     private static int _order;
-    
+
     public CustomRole(string name, Color color, CampType campType, bool showInOptions = true)
     {
         Name = name;
@@ -32,13 +31,13 @@ public class CustomRole
         CanKill = campType == CampType.Impostor;
         CanSabotage = campType == CampType.Impostor;
         Id = _order;
-        _order ++;
+        _order++;
         ShowInOptions = showInOptions;
 
         if (ShowInOptions)
         {
             MainRoleOption = CustomOption.Create(ToCustomOption(this),
-                ColorUtils.ToColorString(Color, Name), false, null, true);
+                Color.ToColorString(Name), false, null, true);
             RoleNumberOption = CustomOption.Create(ToCustomOption(this),
                 LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, MainRoleOption);
         }
@@ -139,20 +138,33 @@ public class CustomRole
             role!.Name.Color(role.Color));
     }
 
-    public virtual string HandleAdditionalPlayerName() => "";
+    public virtual string HandleAdditionalPlayerName()
+    {
+        return "";
+    }
 
     /// <summary>
-    /// 改写在分配该职业时的逻辑
+    ///     改写在分配该职业时的逻辑
     /// </summary>
     /// <param name="roles">职业列表</param>
-    /// <returns>如果返回true，则跳过自动根据 <seealso cref="RoleNumberOption"/> 添加此职业的待分配数量</returns>
-    public virtual bool OnRoleSelection(List<CustomRole> roles) => false;
+    /// <returns>如果返回true，则跳过自动根据 <seealso cref="RoleNumberOption" /> 添加此职业的待分配数量</returns>
+    public virtual bool OnRoleSelection(List<CustomRole> roles)
+    {
+        return false;
+    }
 
-    public virtual void AfterSharingRoles() { }
+    public virtual void AfterSharingRoles()
+    {
+    }
 
-    public virtual void ClearRoleGameData() { }
+    public virtual void ClearRoleGameData()
+    {
+    }
 
-    public string GetColorName() => Name.Color(Color);
+    public string GetColorName()
+    {
+        return Name.Color(Color);
+    }
 
     public static CustomOption.TabType ToCustomOption(CustomRole role)
     {

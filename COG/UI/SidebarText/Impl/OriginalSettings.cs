@@ -12,8 +12,8 @@ public class OriginalSettings : SidebarText
     {
         Objects.Clear();
 
-        string scientistName = TranslationController.Instance.GetString(StringNames.ScientistRole);
-        int idx = result.IndexOf(scientistName);
+        var scientistName = TranslationController.Instance.GetString(StringNames.ScientistRole);
+        var idx = result.IndexOf(scientistName);
 
         if (idx != -1) result = result[..idx] + LanguageConfig.Instance.VanillaRoleDisabled.Color(Palette.ImpostorRed);
 

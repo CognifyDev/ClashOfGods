@@ -13,9 +13,15 @@ public static class ListUtils
     /// <param name="list">欲打乱List</param>
     /// <typeparam name="T">元素类型</typeparam>
     /// <returns>打乱后的List</returns>
-    public static List<T> Disarrange<T>(this IEnumerable<T> list) => list.OrderBy(_ => new Random().Next()).ToList();
+    public static List<T> Disarrange<T>(this IEnumerable<T> list)
+    {
+        return list.OrderBy(_ => new Random().Next()).ToList();
+    }
 
-    public static bool IsEmpty<T>(this List<T> list) => list is not { Count: > 0 };
+    public static bool IsEmpty<T>(this List<T> list)
+    {
+        return list is not { Count: > 0 };
+    }
 
     public static T GetOneAndDelete<T>(this List<T> list)
     {
@@ -24,17 +30,21 @@ public static class ListUtils
         return obj;
     }
 
-    public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action) =>
+    public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
+    {
         collection.ToList().ForEach(action);
+    }
 
     // Using methods that contain arguments with keyword out such as TryGetValue(TKey key, out TValue value) may cause some unexcepted situations happen, because of Il2CppInterop
-    public static bool TryGetValueSafeIl2Cpp<TKey, TValue>(this Il2CppGenericCollections.Dictionary<TKey, TValue> dic, TKey key, out TValue safeValue) where TKey : notnull
+    public static bool TryGetValueSafeIl2Cpp<TKey, TValue>(this Il2CppGenericCollections.Dictionary<TKey, TValue> dic,
+        TKey key, out TValue safeValue) where TKey : notnull
     {
         if (dic.ContainsKey(key))
         {
             safeValue = dic[key];
             return true;
         }
+
         safeValue = default!;
         return false;
     }
