@@ -23,11 +23,12 @@ public class Spy : CustomRole, IListener
         {
             if (!player.IsRole<Spy>()) continue;
             var name = player.Data.PlayerName;
-            player.RpcSetNamePrivately($"<color=#FF0000>{name}</color>", 
-                PlayerUtils.GetAllAlivePlayers().Where(playerControl => playerControl.GetMainRole()?.CampType == CampType.Impostor).ToArray());
+            player.RpcSetNamePrivately($"<color=#FF0000>{name}</color>",
+                PlayerUtils.GetAllAlivePlayers()
+                    .Where(playerControl => playerControl.GetMainRole()?.CampType == CampType.Impostor).ToArray());
         }
     }
-    
+
     public override IListener GetListener()
     {
         return this;

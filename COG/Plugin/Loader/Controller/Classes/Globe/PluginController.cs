@@ -55,7 +55,7 @@ public class PluginController
 
     public KeyCode GetKeyCodeById(int id)
     {
-        return (KeyCode) id;
+        return (KeyCode)id;
     }
 
     public Func<object> GetFuncInstanceWithReturn(string functionName)
@@ -76,10 +76,7 @@ public class PluginController
     public Action GetActionInstance(string functionName)
     {
         var function = _lua.GetFunction(functionName);
-        return () =>
-        {
-            function.Call();
-        };
+        return () => { function.Call(); };
     }
 
     public RpcUtils.RpcWriter GetRpcWriter(string playerId, string callId, string targets)

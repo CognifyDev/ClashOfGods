@@ -11,7 +11,7 @@ namespace COG.Role.Impl.Impostor;
 public class Madman : CustomRole, IListener
 {
     private CustomButton AnnihilateButton { get; }
-    
+
     public Madman() : base(LanguageConfig.Instance.MadmanName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         Description = LanguageConfig.Instance.MadmanDescription;
@@ -35,7 +35,7 @@ public class Madman : CustomRole, IListener
             LanguageConfig.Instance.AnnihilateAction,
             () => 1f,
             0);
-        
+
         AddButton(AnnihilateButton);
     }
 

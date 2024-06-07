@@ -31,9 +31,12 @@ public class Vulture : CustomRole, IListener, IWinnable
         if (ShowInOptions)
         {
             var page = ToCustomOption(this);
-            EatingCooldown = CustomOption.Create(page, LanguageConfig.Instance.VultureEatCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
-            WinningEatenCount = CustomOption.Create(page, LanguageConfig.Instance.VultureEatenCountToWin, 4f, 2f, 6f, 1f, MainRoleOption);
-            HasArrowToBodies = CustomOption.Create(page, LanguageConfig.Instance.VultureHasArrowToBodies, true, MainRoleOption);
+            EatingCooldown = CustomOption.Create(page, LanguageConfig.Instance.VultureEatCooldown, 30f, 10f, 60f, 5f,
+                MainRoleOption);
+            WinningEatenCount = CustomOption.Create(page, LanguageConfig.Instance.VultureEatenCountToWin, 4f, 2f, 6f,
+                1f, MainRoleOption);
+            HasArrowToBodies = CustomOption.Create(page, LanguageConfig.Instance.VultureHasArrowToBodies, true,
+                MainRoleOption);
         }
 
         EatButton = CustomButton.Create(
@@ -41,13 +44,13 @@ public class Vulture : CustomRole, IListener, IWinnable
             {
                 ClosestBody = PlayerUtils.GetClosestBody();
                 var arrow = Arrows.FirstOrDefault(a => a.Target == ClosestBody!.transform.position);
-                
+
                 if (arrow != null)
                 {
                     Arrows.Remove(arrow!);
                     arrow.Destroy();
                 }
-                
+
                 RpcEatBody(ClosestBody!);
             },
             () => EatButton?.ResetCooldown(),
@@ -110,8 +113,9 @@ public class Vulture : CustomRole, IListener, IWinnable
     public override bool OnRoleSelection(List<CustomRole> roles)
     {
         bool disableVulture = new System.Random().Next(2) == 1;
-        CustomRole roleToDisable = disableVulture ? this : CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>();
-        roles.RemoveAll(r => r == roleToDisable); // ≥°…œ≤ªƒ‹Õ¨ ±¥Ê‘⁄Õ∫’∫Õ«ÂΩ‡π§
+        CustomRole roleToDisable =
+            disableVulture ? this : CustomRoleManager.GetManager().GetTypeRoleInstance<Cleaner>();
+        roles.RemoveAll(r => r == roleToDisable); // Âú∫‰∏ä‰∏çËÉΩÂêåÊó∂Â≠òÂú®ÁßÉÈπ´ÂíåÊ∏ÖÊ¥ÅÂ∑•
         return false;
     }
 
@@ -126,7 +130,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public ulong GetWeight() => IWinnable.GetOrder(6);
 
-    public bool CanWin() // ÷ª”–∑ø÷˜ª·≈–∂œ”Œœ∑ §¿˚£¨“Ú¥ÀÕÊº“÷Æº‰–Ë“™Õ¨≤Ω ˝æ›
+    public bool CanWin() // Âè™ÊúâÊàø‰∏ª‰ºöÂà§Êñ≠Ê∏∏ÊàèËÉúÂà©ÔºåÂõ†Ê≠§Áé©ÂÆ∂‰πãÈó¥ÈúÄË¶ÅÂêåÊ≠•Êï∞ÊçÆ
     {
         if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
         {
@@ -136,6 +140,7 @@ public class Vulture : CustomRole, IListener, IWinnable
             GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
             return true;
         }
+
         return false;
     }
 

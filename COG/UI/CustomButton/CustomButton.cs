@@ -190,14 +190,15 @@ public class CustomButton
 
     public void Update()
     {
-        var hasButton = HasButton.GetInvocationList().All(d=>(bool)d.DynamicInvoke()!);
+        var hasButton = HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
         var isCoolingDown = Timer > 0f;
         var hotkeyText = "";
         if (HotkeyName == "") hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 
-        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || !hasButton || PlayerStates.IsShowingMap())
+        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || !hasButton ||
+            PlayerStates.IsShowingMap())
         {
             SetActive(false);
             return;
@@ -215,7 +216,7 @@ public class CustomButton
             ActionButton.SetInfiniteUses();
 
         var desat = Shader.PropertyToID("_Desat");
-        var couldUse = CouldUse.GetInvocationList().All(d=>(bool)d.DynamicInvoke()!);
+        var couldUse = CouldUse.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
         if (hasButton && !isCoolingDown && couldUse)
         {
             SpriteRenderer!.color = TextMesh!.color = Palette.EnabledColor;
@@ -259,7 +260,7 @@ public class CustomButton
                     ResetEffectTime();
                 }
 
-                if (UsesLimit > 0) UsesRemaining --;
+                if (UsesLimit > 0) UsesRemaining--;
                 if (UsesLimit <= 0 || UsesRemaining > 0) ResetCooldown();
             }
         }

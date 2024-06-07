@@ -33,7 +33,7 @@ public static class GameStates
     /// 是否处于会议中
     /// </summary>
     public static bool IsMeeting => InGame && MeetingHud.Instance;
-    
+
     public static bool IsOnlineGame => AmongUsClient.Instance.NetworkMode == NetworkModes.OnlineGame;
 
     /// <summary>

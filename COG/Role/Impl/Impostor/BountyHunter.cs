@@ -13,7 +13,6 @@ using AmongUs.GameOptions;
 using COG.Constant;
 using COG.Utils.Coding;
 using Debug = System.Diagnostics.Debug;
-
 using TMPro;
 using COG.Listener.Event.Impl.HManager;
 using COG.UI.Arrow;
@@ -54,7 +53,8 @@ public class BountyHunter : CustomRole, IListener
             BHunterRefreshTargetTime =
                 CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f,
                     5f, MainRoleOption)!;
-            HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget, true, MainRoleOption);
+            HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget,
+                true, MainRoleOption);
             CdAfterKillingTarget =
                 CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f,
                     MainRoleOption)!;

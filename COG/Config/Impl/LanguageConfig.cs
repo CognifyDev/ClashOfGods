@@ -229,7 +229,7 @@ public class LanguageConfig : Config
 
     public string SpyName { get; private set; } = null!;
     public string SpyDescription { get; private set; } = null!;
-    
+
     // Impostor
     public string ImpostorName { get; private set; } = null!;
     public string ImpostorDescription { get; private set; } = null!;
@@ -291,7 +291,7 @@ public class LanguageConfig : Config
 
     public string LighterName { get; private set; } = null!;
     public string LighterDescription { get; private set; } = null!;
-    
+
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;

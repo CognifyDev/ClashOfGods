@@ -18,7 +18,7 @@ namespace COG.Role;
 public class CustomRole
 {
     private static int _order;
-    
+
     public CustomRole(string name, Color color, CampType campType, bool showInOptions = true)
     {
         Name = name;
@@ -32,7 +32,7 @@ public class CustomRole
         CanKill = campType == CampType.Impostor;
         CanSabotage = campType == CampType.Impostor;
         Id = _order;
-        _order ++;
+        _order++;
         ShowInOptions = showInOptions;
 
         if (ShowInOptions)
@@ -148,9 +148,13 @@ public class CustomRole
     /// <returns>如果返回true，则跳过自动根据 <seealso cref="RoleNumberOption"/> 添加此职业的待分配数量</returns>
     public virtual bool OnRoleSelection(List<CustomRole> roles) => false;
 
-    public virtual void AfterSharingRoles() { }
+    public virtual void AfterSharingRoles()
+    {
+    }
 
-    public virtual void ClearRoleGameData() { }
+    public virtual void ClearRoleGameData()
+    {
+    }
 
     public string GetColorName() => Name.Color(Color);
 

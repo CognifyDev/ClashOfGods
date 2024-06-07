@@ -9,6 +9,7 @@ public class StackTraceLogger
 {
     public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
     private ManualLogSource BepInExLogger { get; }
+
     public StackTraceLogger(string name)
     {
         BepInExLogger = BepInEx.Logging.Logger.CreateLogSource(name);

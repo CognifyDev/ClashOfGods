@@ -14,12 +14,12 @@ namespace COG.Role.Impl.SubRole;
 public class Guesser : CustomRole, IListener
 {
     public CustomOption MaxGuessTimeOption, GuesserGuessContinuously;
-    
+
     public Guesser() : base(LanguageConfig.Instance.GuesserName, Color.yellow, CampType.Unknown, true)
     {
         Description = LanguageConfig.Instance.GuesserDescription;
         IsSubRole = true;
-        
+
         MaxGuessTimeOption = CustomOption.Create(CustomOption.TabType.Addons,
             LanguageConfig.Instance.GuesserMaxGuessTime, 5, 1, 99, 1, MainRoleOption);
         GuesserGuessContinuously = CustomOption.Create(CustomOption.TabType.Addons,

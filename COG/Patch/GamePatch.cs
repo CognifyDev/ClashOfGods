@@ -342,5 +342,5 @@ public class ExileControllerBeginPatch
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.ExitGame))]
 public static class LocalPlayerExitPatch
 {
-    public static void Postfix()=> GameStates.InGame = false;
+    public static void Postfix() => GameStates.InGame = false;
 }

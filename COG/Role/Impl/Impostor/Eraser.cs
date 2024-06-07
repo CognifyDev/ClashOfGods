@@ -59,7 +59,7 @@ public class Eraser : CustomRole, IListener
                 var currentCd = EraseButton!.Cooldown();
                 EraseButton.SetCooldown(currentCd + (IncreaseCooldownAfterErasing?.GetFloat() ?? 10f));
             },
-            ()=> EraseButton?.ResetCooldown(),
+            () => EraseButton?.ResetCooldown(),
             couldUse: () =>
             {
                 if (!CanEraseImpostors?.GetBool() ?? false && CurrentTarget)

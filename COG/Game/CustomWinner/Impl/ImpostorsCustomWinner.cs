@@ -14,11 +14,11 @@ public class ImpostorsCustomWinner : IWinnable
         var aliveNeutrals = PlayerUtils.AllNeutrals.Select(pair => pair.Player).Where
             (p => p && p.IsAlive()).ToList();
         GameUtils.PlayerRoleData.Where
-            (pair => pair.Role.CampType == CampType.Impostor).ToList()
+                (pair => pair.Role.CampType == CampType.Impostor).ToList()
             .ForEach(pair => aliveImpostors.Add(pair.Player));
         if (aliveImpostors.Count >= PlayerUtils.AllCrewmates
                 .Select(pair => pair.Player).Where
-                (p => p && p.IsAlive())
+                    (p => p && p.IsAlive())
                 .ToList().Count
             && aliveNeutrals.Where
                 (p => p.GetMainRole().CanKill).ToList().Count <= 0)
@@ -63,7 +63,6 @@ public class ImpostorsCustomWinner : IWinnable
                     }
                 }
             }
-
         }
 
         return false;
@@ -74,7 +73,8 @@ public class ImpostorsCustomWinner : IWinnable
         CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllImpostors.Select(pr => pr.Player));
         CustomWinnerManager.SetWinText(LanguageConfig.Instance.ImpostorsWinText);
         CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
-        GameManager.Instance.RpcEndGame(isSabo ? GameOverReason.ImpostorBySabotage : GameOverReason.ImpostorByKill, false);
+        GameManager.Instance.RpcEndGame(isSabo ? GameOverReason.ImpostorBySabotage : GameOverReason.ImpostorByKill,
+            false);
     }
 
     public ulong GetWeight()

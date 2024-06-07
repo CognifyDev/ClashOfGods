@@ -2,6 +2,7 @@
 using COG.States;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
+
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantAssignment
 

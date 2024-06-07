@@ -290,6 +290,7 @@ internal class AdjustLightPatch
 
     public static void Postfix(PlayerControl __instance)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerAdjustLightingEvent(__instance), EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerAdjustLightingEvent(__instance), EventHandlerType.Postfix);
     }
 }

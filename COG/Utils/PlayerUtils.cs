@@ -44,7 +44,8 @@ public static class PlayerUtils
     /// <param name="target">目标玩家</param>
     /// <param name="mustAlive">是否必须为活着的玩家</param>
     /// <returns>最近位置的玩家</returns>
-    public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true, float closestDistance = float.MaxValue)
+    public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true,
+        float closestDistance = float.MaxValue)
     {
         var targetLocation = target.GetTruePosition();
         var players = mustAlive ? GetAllAlivePlayers() : GetAllPlayers();
@@ -408,7 +409,9 @@ public class PlayerRole
         Role = role;
         PlayerName = player.name;
         PlayerId = player.PlayerId;
-        SubRoles = subRoles != null ? subRoles.Where(subRole => subRole.IsSubRole).ToArray() : Array.Empty<CustomRole>();
+        SubRoles = subRoles != null
+            ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
+            : Array.Empty<CustomRole>();
     }
 
     public PlayerControl Player { get; }

@@ -23,7 +23,7 @@ public class Lighter : CustomRole, IListener
         {
             return true;
         }
-        
+
         player.SetFlashlightInputMethod();
         player.lightSource.SetupLightingForGameplay(false, 0.75f, player.TargetFlashlight.transform);
         return false;

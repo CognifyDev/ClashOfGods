@@ -101,10 +101,10 @@ public class GameListener : IListener
 
             var adtnalTextBuilder = new StringBuilder();
             foreach (var (color, text) in subRoles.ToList()
-                    .Select(r => (
-                            r.Color,
-                            r.HandleAdditionalPlayerName()
-                     )))
+                         .Select(r => (
+                             r.Color,
+                             r.HandleAdditionalPlayerName()
+                         )))
                 adtnalTextBuilder.Append(' ').Append(text.Color(color));
 
             nameTextBuilder.Append(adtnalTextBuilder);
@@ -445,7 +445,8 @@ public class GameListener : IListener
 
         var sb = new StringBuilder();
 
-        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.Description.Color(localRole.Color)).Append("\r\n\r\n");
+        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.Description.Color(localRole.Color))
+            .Append("\r\n\r\n");
 
         /*
             <color=#FF0000FF>进行破坏，将所有人杀死。
@@ -454,7 +455,8 @@ public class GameListener : IListener
 
         string impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
         string fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
-        string impTaskTextFull = $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
+        string impTaskTextFull =
+            $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
 
         if (originText.StartsWith(impTaskTextFull))
         {
@@ -467,6 +469,5 @@ public class GameListener : IListener
         }
 
         @event.SetTaskString(sb.ToString());
-        return;
     }
 }
