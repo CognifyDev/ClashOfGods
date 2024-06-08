@@ -17,6 +17,7 @@ namespace COG.Role.Impl.Neutral;
 public class Opportunist : CustomRole, IListener
 {
     private readonly CustomButton _killButton;
+    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private readonly CustomOption? _killCooldownOption;
 
     public Opportunist() : base(LanguageConfig.Instance.OpportunistName, Color.yellow, CampType.Neutral)
