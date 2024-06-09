@@ -62,14 +62,23 @@ public class Lover : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerMurder(PlayerMurderEvent @event)
+    public void OnPlayerMurderLoverSuicide(PlayerMurderEvent @event)
     {
         var victim = @event.Target;
         if (!victim.IsInLove()) return;
 
         var lover = victim.GetLover()!;
-        DeadPlayerManager.DeadPlayers.Add(new(DateTime.UtcNow, Utils.DeathReason.LoverSuicide, lover, null));
-        lover.MurderPlayer(lover, GameUtils.DefaultFlag); // Everyone will know that another lover is dead, so calling local murdering method is OK
+        lover.LocalDieWithReason(lover, Utils.DeathReason.LoverSuicide); // Everyone will know that another lover is dead, so calling local murdering method is OK
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnEjectionLoverSuicide(PlayerExileBeginEvent @event)
+    {
+        var exiled = @event.Exiled?.Object;
+        if (!(exiled && exiled!.IsInLove())) return;
+
+        var lover = exiled!.GetLover()!;
+        lover.LocalDieWithReason(lover, Utils.DeathReason.LoverSuicide, false);
     }
 
 
@@ -77,7 +86,6 @@ public class Lover : CustomRole, IListener
     {
         for (int i = 0; i < (RoleNumberOption?.GetQuantity() ?? 1) * 2; i++) 
             roles.Add(this);
-        
         return true;
     }
 

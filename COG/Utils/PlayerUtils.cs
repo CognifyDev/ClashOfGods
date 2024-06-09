@@ -313,6 +313,15 @@ public static class PlayerUtils
     }
 
     public static CustomRole[] GetSubRoles(this PlayerControl pc) => pc.GetPlayerRole()!.SubRoles;
+
+    public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason, bool showCorpse = true)
+    {
+        DeadPlayerManager.DeadPlayers.Add(new(DateTime.UtcNow, reason, target, pc));
+        if (showCorpse)
+            pc.MurderPlayer(target, GameUtils.DefaultFlag);
+        else
+            pc.Exiled();
+    }
 }
 
 public enum DeathReason
