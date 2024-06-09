@@ -31,7 +31,7 @@ public class Lover : CustomRole, IListener
         }
     }
 
-    public static void RpcSyncLovers()
+    public void RpcSyncLovers()
     {
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.SyncLovers);
 
@@ -68,7 +68,8 @@ public class Lover : CustomRole, IListener
         if (!victim.IsInLove()) return;
 
         var lover = victim.GetLover()!;
-        
+        DeadPlayerManager.DeadPlayers.Add(new(DateTime.UtcNow, Utils.DeathReason.LoverSuicide, lover, null));
+        lover.MurderPlayer(lover, GameUtils.DefaultFlag); // Everyone will know that another lover is dead, so calling local murdering method is OK
     }
 
 
