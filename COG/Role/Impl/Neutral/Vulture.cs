@@ -141,7 +141,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public override string HandleAdditionalPlayerName()
     {
-        return $"\n({EatenCount}/{(int)WinningEatenCount.GetFloat()})";
+        return $"\n({EatenCount}/{(int)(WinningEatenCount?.GetFloat() ?? 4f)})";
     }
 
     public override void ClearRoleGameData()

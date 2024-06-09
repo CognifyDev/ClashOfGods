@@ -42,7 +42,7 @@ public class Jackal : CustomRole, IListener
             () => CurrentTarget,
             () =>
             {
-                if (!CustomRoleManager.GetManager().GetTypeRoleInstance<Sidekick>().SidekickCanCreateSidekick.GetBool()
+                if (!CustomRoleManager.GetManager().GetTypeRoleInstance<Sidekick>().SidekickCanCreateSidekick?.GetBool() ?? true
                     && JackalSidekick.ContainsValue(PlayerControl.LocalPlayer)) return false;
                 return !CreatedSidekick;
             },
@@ -109,7 +109,7 @@ public class Jackal : CustomRole, IListener
     }
 }
 
-public static class JackalUtils
+public static partial class RoleUtils
 {
     public static bool IsInJackalTeam(this PlayerControl pc)
     {

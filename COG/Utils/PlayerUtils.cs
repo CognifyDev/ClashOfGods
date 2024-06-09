@@ -209,7 +209,7 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="poolable"></param>
     /// <param name="player"></param>
-    public static void SetPlayerAppearance(this PlayerControl player, PoolablePlayer poolable)
+    public static void SetPoolableAppearance(this PlayerControl player, PoolablePlayer poolable)
     {
         if (!poolable || !player) return;
 
@@ -310,6 +310,8 @@ public static class PlayerUtils
         writer.Finish();
         SetCustomRole(pc, role);
     }
+
+    public static CustomRole[] GetSubRoles(this PlayerControl pc) => pc.GetPlayerRole()!.SubRoles;
 }
 
 public enum DeathReason

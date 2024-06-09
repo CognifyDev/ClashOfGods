@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
@@ -134,8 +135,12 @@ public class CustomRole
     public virtual string HandleEjectText(PlayerControl player)
     {
         var role = player.GetMainRole();
-        return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName,
-            role!.Name.Color(role.Color));
+        var sb = new StringBuilder(role!.GetColorName());
+
+        foreach (var subRole in player.GetSubRoles())
+            sb.Append(' ').Append(subRole.GetColorName());
+        
+        return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, sb.ToString());
     }
 
     public virtual string HandleAdditionalPlayerName()
@@ -147,7 +152,7 @@ public class CustomRole
     ///     改写在分配该职业时的逻辑
     /// </summary>
     /// <param name="roles">职业列表</param>
-    /// <returns>如果返回true，则跳过自动根据 <seealso cref="RoleNumberOption" /> 添加此职业的待分配数量</returns>
+    /// <returns>如果返回true，则跳过根据 <seealso cref="RoleNumberOption" /> 添加此职业待分配数量而仅执行该方法的逻辑</returns>
     public virtual bool OnRoleSelection(List<CustomRole> roles)
     {
         return false;
@@ -176,4 +181,6 @@ public class CustomRole
     {
         return IListener.EmptyListener;
     }
+
+    ~CustomRole() => ClearRoleGameData();
 }

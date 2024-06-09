@@ -197,7 +197,7 @@ public class BountyHunter : CustomRole, IListener
          *
          */
 
-        CurrentTarget.SetPlayerAppearance(TargetPoolable);
+        CurrentTarget.SetPoolableAppearance(TargetPoolable);
 
         if (HasArrowToTarget?.GetBool() ?? false)
         {
