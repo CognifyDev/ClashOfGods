@@ -19,7 +19,7 @@ public class Cleaner : CustomRole, IListener
     {
         Description = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
-        CanKill = false;
+        CanKill = true;
 
         if (ShowInOptions)
             CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor,

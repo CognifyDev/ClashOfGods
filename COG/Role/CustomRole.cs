@@ -126,7 +126,7 @@ public class CustomRole
         {
             var player = PlayerControl.LocalPlayer;
             var role = player.GetMainRole();
-            return role != null && role.Name.Equals(Name);
+            return role.Name.Equals(Name);
         };
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
@@ -155,6 +155,11 @@ public class CustomRole
 
     public virtual void AfterSharingRoles()
     {
+    }
+
+    public virtual bool CanBeGiven(PlayerControl target)
+    {
+        return true;
     }
 
     public virtual void ClearRoleGameData()

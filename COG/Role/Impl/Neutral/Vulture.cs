@@ -17,7 +17,7 @@ namespace COG.Role.Impl.Neutral;
 
 public class Vulture : CustomRole, IListener, IWinnable
 {
-    public Vulture() : base(LanguageConfig.Instance.VultureName, new Color(139, 69, 19), CampType.Neutral)
+    public Vulture() : base(LanguageConfig.Instance.VultureName, Color.blue, CampType.Neutral)
     {
         Description = LanguageConfig.Instance.VultureDescription;
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.States;
+using COG.Utils;
 using COG.Utils.Coding;
 using TMPro;
 using UnityEngine;
@@ -216,7 +217,7 @@ public class CustomButton
             ActionButton.SetInfiniteUses();
 
         var desat = Shader.PropertyToID("_Desat");
-        var couldUse = CouldUse.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
+        var couldUse = CouldUse.GetInvocationList().All(d => (bool)d.DynamicInvoke()!) && PlayerControl.LocalPlayer.IsAlive();
         if (hasButton && !isCoolingDown && couldUse)
         {
             SpriteRenderer!.color = TextMesh!.color = Palette.EnabledColor;
@@ -243,7 +244,7 @@ public class CustomButton
 #nullable disable
     private void CheckClick()
     {
-        if (Timer <= 0f && CouldUse())
+        if (Timer <= 0f && CouldUse() && PlayerControl.LocalPlayer.IsAlive())
         {
             if (HasEffect && IsEffectActive)
             {

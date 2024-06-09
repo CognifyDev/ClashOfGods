@@ -21,6 +21,7 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
+using COG.UI.CustomButton;
 using COG.UI.ModOption;
 using COG.UI.SidebarText;
 using COG.UI.SidebarText.Impl;
@@ -174,13 +175,14 @@ public partial class Main : BasePlugin
             
             /* 下方职业未完成
             new Troublemaker(),
-            new Jackal(),
-            new Sidekick(),
              */
 
             // Sub-roles
             new Lighter()
         });
+        
+        // Register custom buttons
+        CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
 
         // Register listeners from role
         foreach (var role in CustomRoleManager.GetManager().GetRoles())

@@ -61,13 +61,6 @@ public class RpcListener : IListener
                 PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
                 break;
             }
-            case KnownRpc.CreateSidekick:
-            {
-                var jackalId = reader.ReadByte();
-                var sidekickId = reader.ReadByte();
-                PlayerUtils.GetPlayerById(jackalId)!.CreateSidekick(PlayerUtils.GetPlayerById(sidekickId)!);
-                break;
-            }
         }
     }
 }

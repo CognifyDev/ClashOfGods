@@ -4,6 +4,7 @@ using System.Text;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.Game;
+using COG.Role;
 using COG.States;
 using COG.Utils;
 using Reactor.Utilities.Extensions;
@@ -27,7 +28,6 @@ public class CustomWinnerListener : IListener
     }
 
     // FIXME：小人没有身体，只有名字
-
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
         manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList()

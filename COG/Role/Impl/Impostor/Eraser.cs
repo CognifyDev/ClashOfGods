@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.Meeting;
@@ -46,7 +47,7 @@ public class Eraser : CustomRole, IListener
         EraseButton = CustomButton.Create(() =>
             {
                 var role = CurrentTarget!.GetMainRole();
-                CustomRole? newRole = role!.CampType switch
+                CustomRole? newRole = role.CampType switch
                 {
                     CampType.Crewmate => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
                     CampType.Neutral => CustomRoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),
@@ -62,17 +63,18 @@ public class Eraser : CustomRole, IListener
             () => EraseButton?.ResetCooldown(),
             () =>
             {
-                if (!CanEraseImpostors?.GetBool() ?? (false && CurrentTarget))
-                    return CurrentTarget!.GetMainRole()?.CampType != CampType.Impostor;
+                if (!CanEraseImpostors?.GetBool() ?? CurrentTarget)
+                    return CurrentTarget != null && CurrentTarget.GetMainRole().CampType != CampType.Impostor;
                 return CurrentTarget;
             },
             () => true,
-            null!,
+            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.EraseButton, 100f)!,
             2,
             KeyCode.E,
             LanguageConfig.Instance.EraseAction,
             () => InitialEraseCooldown?.GetFloat() ?? 30f,
             -1);
+        AddButton(EraseButton);
     }
 
     [EventHandler(EventHandlerType.Postfix)]

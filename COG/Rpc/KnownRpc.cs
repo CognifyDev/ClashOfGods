@@ -7,6 +7,5 @@ public enum KnownRpc : uint
     CleanDeadBody = 62,
     UpdateOption = 63,
     SetRole = 64,
-    CreateSidekick = 65,
     EatBody = 66
 }
