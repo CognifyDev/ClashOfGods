@@ -115,7 +115,7 @@ public class CustomRole
     public CustomOption? RoleNumberOption { get; }
 
     public ReadOnlyCollection<PlayerControl> Players =>
-        new(GameUtils.PlayerRoleData.Where(pr => pr.Role == this).Select(pr => pr.Player).ToList());
+        new(GameUtils.PlayerRoleData.Where(pr => pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
 
     /// <summary>
     ///     添加一个按钮

@@ -174,7 +174,7 @@ public class BountyHunter : CustomRole, IListener
 
         if (selectableTargets.Count == 0)
         {
-            Main.Logger.LogError("[Bounty Hunter] Couldn't select a new target.");
+            Main.Logger.LogError("Couldn't select a new target.");
             GameUtils.SendGameMessage(LanguageConfig.Instance.BountyHunterCantSelectTargetError);
             Debug.Assert(TargetPoolable != null, nameof(TargetPoolable) + " != null");
             TargetPoolable.gameObject.SetActive(false);

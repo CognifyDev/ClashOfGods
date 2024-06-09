@@ -1,15 +1,21 @@
 ﻿using COG.Listener;
+using COG.Listener.Event.Impl.Player;
+using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.Utils;
+using COG.Utils.Coding;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace COG.Role.Impl.SubRole;
 
+[NotTested]
+[NotUsed]
 public class Lover : CustomRole, IListener
 {
-    public static Dictionary<PlayerControl, PlayerControl>? Couples { get; private set; }
+    public static Dictionary<PlayerControl, PlayerControl> Couples { get; private set; }
     private CustomOption LoversDieTogetherOption { get; }
     private CustomOption EnablePrivateChatOption { get; }
     public Lover() : base("Lover", UnityEngine.Color.magenta, CampType.Unknown)
@@ -25,12 +31,72 @@ public class Lover : CustomRole, IListener
         }
     }
 
+    public static void RpcSyncLovers()
+    {
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.SyncLovers);
+
+        writer.WritePacked(Lover.Couples.Count);
+        foreach (var (p1, p2) in Lover.Couples!)
+            writer.Write(p1.PlayerId).Write(p2.PlayerId);
+
+        writer.Finish();
+    }
+
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnReceiveRpc(PlayerHandleRpcEvent @event)
+    {
+        var id = (KnownRpc)@event.CallId;
+        var reader = @event.MessageReader;
+        if (id != KnownRpc.SyncLovers) return;
+
+        Couples.Clear();
+        int count = reader.ReadPackedInt32();
+
+        for (int i = 0; i < count; i++)
+        {
+            var p1 = PlayerUtils.GetPlayerById(reader.ReadByte())!;
+            var p2 = PlayerUtils.GetPlayerById(reader.ReadByte())!;
+            Couples.Add(p1, p2);
+        }
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerMurder(PlayerMurderEvent @event)
+    {
+        var victim = @event.Target;
+        if (!victim.IsInLove()) return;
+
+        var lover = victim.GetLover()!;
+        
+    }
+
+
     public override bool OnRoleSelection(List<CustomRole> roles)
     {
         for (int i = 0; i < (RoleNumberOption?.GetQuantity() ?? 1) * 2; i++) 
             roles.Add(this);
         
         return true;
+    }
+
+    public override void AfterSharingRoles()
+    {
+        var players = Players.Disarrange();
+        if (players.Count % 2 != 0)
+        {
+            Main.Logger.LogError("Couldn't assign lovers, game will end now.");
+            return;
+        }
+
+        for (int i = 0; i < players.Count / 2; i+=2)
+        {
+            var p1 = players[i];
+            var p2 = players[i + 1];
+            Couples!.Add(p1, p2);
+        }
+
+        RpcSyncLovers();
     }
 
     public override string HandleAdditionalPlayerName()
@@ -59,7 +125,7 @@ public class Lover : CustomRole, IListener
 
     public override void ClearRoleGameData()
     {
-        Couples?.Clear();
+        Couples.Clear();
     }
 
     public override IListener GetListener() => this;

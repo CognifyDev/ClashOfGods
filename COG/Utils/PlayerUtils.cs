@@ -12,6 +12,7 @@ using COG.Role.Impl;
 using COG.Rpc;
 using InnerNet;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 using GameStates = COG.States.GameStates;
 
 namespace COG.Utils;
@@ -319,7 +320,8 @@ public enum DeathReason
     Unknown = -1,
     Disconnected,
     Default,
-    Exiled
+    Exiled,
+    LoverSuicide
 }
 
 public class DeadPlayerListener : IListener
@@ -330,7 +332,9 @@ public class DeadPlayerListener : IListener
         var target = @event.Target;
         var killer = @event.Player;
         if (!(target.Data.IsDead && killer && target)) return;
-
+        
+        if (DeadPlayerManager.DeadPlayers.Select(dp => dp.Player).Contains(target)) return;
+        
         var reason = DeadPlayerManager.GetDeathReason(killer, target);
         _ = new DeadPlayer(DateTime.Now, reason, target, killer);
     }
@@ -352,9 +356,10 @@ public class DeadPlayerListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     private void OnPlayerExile(PlayerExileEndEvent @event)
     {
-        var controller = @event.ExileController;
-        if (controller.exiled == null) return;
-        _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, controller.exiled.Object, null);
+        var exiled = @event.ExileController.exiled;
+        if (exiled == null) return;
+        if (DeadPlayerManager.DeadPlayers.Select(dp => dp.Player).Contains(exiled.Object)) return;
+        _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, exiled.Object, null);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
