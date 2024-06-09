@@ -102,9 +102,6 @@ public class LanguageConfig : Config
     public string EraserIncreaseCdAfterErasing { get; private set; } = null!;
     public string EraserCanEraseImpostors { get; private set; } = null!;
 
-    public string MadmanName { get; private set; } = null!;
-    public string MadmanDescription { get; private set; } = null!;
-
     // Neutral
     public string JesterName { get; private set; } = null!;
     public string JesterDescription { get; private set; } = null!;
@@ -260,9 +257,6 @@ public class LanguageConfig : Config
         EraserInitialEraseCd = GetString("role.impostor.eraser.menu.initial-erase-cd");
         EraserIncreaseCdAfterErasing = GetString("role.impostor.eraser.menu.increase-cd-after-erasing");
         EraserCanEraseImpostors = GetString("role.impostor.eraser.menu.can-erase-imps");
-
-        MadmanName = GetString("role.impostor.madman.name");
-        MadmanDescription = GetString("role.impostor.madman.description");
 
         // Neutral
         JesterName = GetString("role.neutral.jester.name");

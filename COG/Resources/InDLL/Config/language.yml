@@ -43,9 +43,6 @@ role:
         initial-erase-cd: "初始擦除冷却"
         increase-cd-after-erasing: "擦除后增加冷却"
         can-erase-imps: "可擦除内鬼职业"
-    madman:
-      name: "狂徒"
-      description: "彻底疯狂！"
   crewmate:
     crewmate:
       name: "船员"

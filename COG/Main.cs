@@ -166,7 +166,6 @@ public partial class Main : BasePlugin
             new Cleaner(),
             new BountyHunter(),
             new Eraser(),
-            new Madman(),
 
             // Neutral
             new Jester(),
