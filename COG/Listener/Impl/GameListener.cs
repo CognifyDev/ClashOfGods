@@ -18,8 +18,7 @@ using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
-using COG.UI.Arrow;
-using COG.UI.CustomOption;
+using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
 using Il2CppSystem.Collections;
 using UnityEngine;
@@ -339,7 +338,7 @@ public class GameListener : IListener
             @event.SetCanUse(ventAble);
             @event.SetCouldUse(ventAble);
             @event.SetResult(float.MaxValue);
-            return false;
+            return ventAble;
         }
 
         return true;
@@ -374,7 +373,7 @@ public class GameListener : IListener
             manager.SabotageButton.gameObject.SetActive(false);
         }
 
-        Arrow.CreatedArrows.RemoveAll(a => a == null || !a.ArrowObject);
+        Arrow.CreatedArrows.RemoveAll(a => !a.ArrowObject);
         Arrow.CreatedArrows.ForEach(a => a.Update());
     }
 
