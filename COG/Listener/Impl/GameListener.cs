@@ -323,18 +323,15 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnCheckGameEnd(GameCheckEndEvent @event)
     {
-        return !GlobalCustomOptionConstant.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
+        return GlobalCustomOptionConstant.DebugMode != null && !GlobalCustomOptionConstant.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerVent(VentCheckEvent @event)
     {
-        // FIXME 可能是内鬼无法跳管的根源
         var playerInfo = @event.PlayerInfo;
-        foreach (var playerRole in GameUtils.PlayerRoleData)
+        foreach (var ventAble in from playerRole in GameUtils.PlayerRoleData where playerRole.Player.Data.IsSamePlayer(playerInfo) select playerRole.Role.CanVent)
         {
-            if (!playerRole.Player.Data.IsSamePlayer(playerInfo)) continue;
-            var ventAble = playerRole.Role.CanVent;
             @event.SetCanUse(ventAble);
             @event.SetCouldUse(ventAble);
             @event.SetResult(float.MaxValue);

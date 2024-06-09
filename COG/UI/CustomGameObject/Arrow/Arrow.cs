@@ -5,7 +5,7 @@ using COG.Utils;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
 
-namespace COG.UI.Arrow;
+namespace COG.UI.CustomGameObject.Arrow;
 
 public class Arrow
 {
@@ -38,7 +38,7 @@ public class Arrow
     public SpriteRenderer Renderer { get; set; }
     public Vector3 Target { get; set; }
     public Color? Color { get; set; }
-    public GameObject ArrowObject { get; }
+    public UnityEngine.GameObject ArrowObject { get; }
 
     public void Update()
     {
