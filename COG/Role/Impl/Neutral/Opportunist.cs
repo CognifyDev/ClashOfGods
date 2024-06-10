@@ -25,7 +25,6 @@ public class Opportunist : CustomRole, IListener
         Description = LanguageConfig.Instance.OpportunistDescription;
         _killCooldownOption = CustomOption.Create(CustomOption.TabType.Neutral,
             LanguageConfig.Instance.KillCooldown, 45f, 20f, 200f, 1f, MainRoleOption);
-        BaseRoleType = RoleTypes.Impostor;
         _killButton = CustomButton.Create(
             () =>
             {
