@@ -57,6 +57,9 @@ role:
     spy:
       name: "间谍"
       description: "我是内鬼！"
+    vigilante:
+      name: "侠客"
+      description: "行侠仗义！"
   neutral:
     jester:
       name: "小丑"

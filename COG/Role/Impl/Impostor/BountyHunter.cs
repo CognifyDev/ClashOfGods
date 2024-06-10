@@ -207,4 +207,8 @@ public class BountyHunter : CustomRole, IListener
     }
 
     public override IListener GetListener() => this;
+    public override CustomRole NewInstance()
+    {
+        return new BountyHunter();
+    }
 }

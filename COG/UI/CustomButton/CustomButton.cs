@@ -330,7 +330,6 @@ public class CustomButton
                     .FirstOrDefault(b => b.GameObject!.name == gameObject.name) is null)
             {
                 AllVanillaButtons.Add(gameObject.GetComponent<ActionButton>());
-                Main.Logger.LogInfo(gameObject.GetComponent<ActionButton>().name);
             }
         }));
         

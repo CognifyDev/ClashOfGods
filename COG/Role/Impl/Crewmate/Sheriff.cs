@@ -72,4 +72,9 @@ public class Sheriff : CustomRole, IListener
     {
         return this;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Sheriff();
+    }
 }

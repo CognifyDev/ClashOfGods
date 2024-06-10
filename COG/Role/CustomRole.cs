@@ -14,7 +14,7 @@ namespace COG.Role;
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
-public class CustomRole
+public abstract class CustomRole
 {
     private static int _order;
 
@@ -181,4 +181,6 @@ public class CustomRole
     {
         return IListener.EmptyListener;
     }
+
+    public abstract CustomRole NewInstance();
 }

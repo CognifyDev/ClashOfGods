@@ -236,7 +236,6 @@ public class GameListener : IListener
         Main.Logger.LogInfo("Setup role text for the player...");
 
         var myRole = GameUtils.GetLocalPlayerRole();
-        if (myRole == null) return true;
 
         var list = new List<IEnumerator>();
 
@@ -313,7 +312,6 @@ public class GameListener : IListener
         var intro = @event.IntroCutscene;
         var role = GameUtils.GetLocalPlayerRole();
 
-        if (role == null) return;
         var camp = role.CampType;
 
         intro.BackgroundBar.material.color = camp.GetColor();
@@ -350,8 +348,6 @@ public class GameListener : IListener
         var manager = @event.Manager;
         var role = GameUtils.GetLocalPlayerRole();
 
-        if (role == null) return;
-        
         manager.KillButton.SetDisabled();
         manager.KillButton.ToggleVisible(false);
         manager.KillButton.gameObject.SetActive(false);

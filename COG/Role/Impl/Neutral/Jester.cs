@@ -62,4 +62,9 @@ public class Jester : CustomRole, IListener, IWinnable
     {
         return this;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Jester();
+    }
 }

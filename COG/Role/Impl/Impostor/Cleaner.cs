@@ -109,4 +109,9 @@ public class Cleaner : CustomRole, IListener
     {
         return this;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Cleaner();
+    }
 }

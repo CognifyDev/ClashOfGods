@@ -14,4 +14,9 @@ public class Impostor : CustomRole
         BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.ImpostorDescription;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Impostor();
+    }
 }

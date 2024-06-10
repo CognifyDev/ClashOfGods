@@ -160,6 +160,7 @@ public partial class Main : BasePlugin
             new Bait(),
             new Sheriff(),
             new Spy(),
+            new Vigilante(),
 
             // Impostor
             new Impostor(),

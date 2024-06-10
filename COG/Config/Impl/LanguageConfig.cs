@@ -74,6 +74,9 @@ public class LanguageConfig : Config
     public string SpyName { get; private set; } = null!;
     public string SpyDescription { get; private set; } = null!;
 
+    public string VigilanteName { get; private set; } = null!;
+    public string VigilanteDescription { get; private set; } = null!;
+
     // Impostor
     public string ImpostorName { get; private set; } = null!;
     public string ImpostorDescription { get; private set; } = null!;
@@ -229,6 +232,9 @@ public class LanguageConfig : Config
 
         SpyName = GetString("role.crewmate.spy.name");
         SpyDescription = GetString("role.crewmate.spy.description");
+
+        VigilanteName = GetString("role.crewmate.vigilante.name");
+        VigilanteDescription = GetString("role.crewmate.vigilante.description");
 
         // Impostors
         ImpostorName = GetString("role.impostor.impostor.name");

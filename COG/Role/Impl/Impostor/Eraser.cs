@@ -80,4 +80,9 @@ public class Eraser : CustomRole, IListener
     {
         return this;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Eraser();
+    }
 }

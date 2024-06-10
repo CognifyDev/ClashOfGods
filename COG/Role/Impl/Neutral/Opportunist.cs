@@ -61,6 +61,11 @@ public class Opportunist : CustomRole, IListener
         return this;
     }
 
+    public override CustomRole NewInstance()
+    {
+        return new Opportunist();
+    }
+
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMurderPlayer(PlayerMurderEvent @event)
     {

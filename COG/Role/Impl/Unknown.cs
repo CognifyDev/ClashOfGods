@@ -17,4 +17,9 @@ public class Unknown : CustomRole
     {
         return IListener.EmptyListener;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Unknown();
+    }
 }

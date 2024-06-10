@@ -1,6 +1,7 @@
 using COG.Role;
 using COG.Utils;
 using NLua;
+using UnityEngine;
 
 namespace COG.Plugin.Loader.Controller.Classes.Role;
 
@@ -17,11 +18,33 @@ public class RoleController
 
     public CustomRole StartRoleInstance(string name, string color, int campType, bool showInOptions)
     {
-        return new CustomRole(name, ColorUtils.AsColor(color), (CampType)campType, showInOptions);
+        return new CustomRoleImplement(name, ColorUtils.AsColor(color), (CampType)campType, showInOptions);
     }
 
     public void RegisterRole(CustomRole role)
     {
         CustomRoleManager.GetManager().RegisterRole(role);
+    }
+
+    private class CustomRoleImplement : CustomRole
+    {
+        private new string Name { get; }
+        private new Color Color { get; }
+        private new CampType CampType { get; }
+        private new bool ShowInOptions { get; }
+        
+        public CustomRoleImplement(string name, Color color, CampType campType, bool showInOptions = true) : base(name,
+            color, campType, showInOptions)
+        {
+            Name = name;
+            Color = color;
+            CampType = campType;
+            ShowInOptions = showInOptions;
+        }
+
+        public override CustomRole NewInstance()
+        {
+            return new CustomRoleImplement(Name, Color, CampType, ShowInOptions);
+        }
     }
 }

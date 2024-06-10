@@ -31,4 +31,9 @@ public class Spy : CustomRole, IListener
     {
         return this;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Spy();
+    }
 }

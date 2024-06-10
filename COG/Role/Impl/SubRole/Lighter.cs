@@ -30,4 +30,9 @@ public class Lighter : CustomRole, IListener
     {
         return this;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Lighter();
+    }
 }
