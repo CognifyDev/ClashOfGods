@@ -191,7 +191,7 @@ public class CustomButton
 
     public void Update()
     {
-        var hasButton = HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
+        var hasButton = !GameStates.IsMeeting && PlayerControl.LocalPlayer.IsAlive() && HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
         var isCoolingDown = Timer > 0f;
         var hotkeyText = "";
         if (HotkeyName == "") hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
@@ -217,7 +217,7 @@ public class CustomButton
             ActionButton.SetInfiniteUses();
 
         var desat = Shader.PropertyToID("_Desat");
-        var couldUse = CouldUse.GetInvocationList().All(d => (bool)d.DynamicInvoke()!) && PlayerControl.LocalPlayer.IsAlive();
+        var couldUse = CouldUse.GetInvocationList().All(d => (bool)d.DynamicInvoke()!) && !GameStates.IsMeeting && PlayerControl.LocalPlayer.IsAlive();
         if (hasButton && !isCoolingDown && couldUse)
         {
             SpriteRenderer!.color = TextMesh!.color = Palette.EnabledColor;
@@ -251,13 +251,16 @@ public class CustomButton
                 IsEffectActive = false;
                 if (ActionButton != null) ActionButton.cooldownTimerText.color = Palette.EnabledColor;
                 Debug.Assert(OnEffect != null, $"{nameof(OnEffect)} != null");
-                OnEffect();
                 ResetCooldown();
+                OnEffect();
             }
             else
             {
                 if (UsesRemaining <= 0 && UsesLimit > 0) return;
+                
+                ResetCooldown();
                 OnClick();
+                
                 if (HasEffect && !IsEffectActive)
                 {
                     IsEffectActive = true;
@@ -325,12 +328,17 @@ public class CustomButton
         {
             if (CustomButtonManager.GetManager().GetButtons()
                     .FirstOrDefault(b => b.GameObject!.name == gameObject.name) is null)
+            {
                 AllVanillaButtons.Add(gameObject.GetComponent<ActionButton>());
+                Main.Logger.LogInfo(gameObject.GetComponent<ActionButton>().name);
+            }
         }));
+        
     }
 
     internal static void ArrangePosition()
     {
+        if (GameStates.IsMeeting || (MapBehaviour.Instance != null && MapBehaviour.Instance.IsOpen)) return;
         var vectors = AllVanillaButtons.Where(b => b.isActiveAndEnabled).Select(b => b.transform.localPosition);
         var idx1 = 0;
         var idx2 = 0;

@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.HManager;
-using COG.Listener.Event.Impl.Meeting;
 using COG.Role.Impl.Neutral;
 using COG.States;
 using COG.UI.CustomButton;
@@ -12,6 +10,7 @@ using COG.UI.CustomOption;
 using COG.Utils;
 using COG.Utils.Coding;
 using UnityEngine;
+// ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 
 namespace COG.Role.Impl.Impostor;
 
@@ -19,94 +18,66 @@ namespace COG.Role.Impl.Impostor;
 [Unfinished]
 public class Eraser : CustomRole, IListener
 {
-#pragma warning disable CS8618
-    public CustomOption? InitialEraseCooldown { get; }
-    public CustomOption? IncreaseCooldownAfterErasing { get; }
-    public CustomOption? CanEraseImpostors { get; }
-    public CustomButton EraseButton { get; }
-    public static PlayerControl? CurrentTarget { get; set; }
-    public static Dictionary<PlayerControl, CustomRole> TempErasedPlayerRoles { get; set; }
+    private readonly CustomButton _eraseButton;
+
+    private PlayerControl? _currentPlayer;
+
+    private readonly CustomOption _initialEraseCooldown, _increaseCooldownAfterErasing, _canEraseImpostors;
+
+    public override void ClearRoleGameData()
+    {
+        _currentPlayer = null;
+    }
 
     public Eraser() : base(LanguageConfig.Instance.EraserName, Palette.ImpostorRed, CampType.Impostor)
     {
         BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.EraserDescription;
-        TempErasedPlayerRoles = new Dictionary<PlayerControl, CustomRole>();
 
-        if (ShowInOptions)
-        {
-            var type = ToCustomOption(this);
-            InitialEraseCooldown = CustomOption.Create(type, LanguageConfig.Instance.EraserInitialEraseCd, 30f, 10f,
-                60f, 5f, MainRoleOption);
-            IncreaseCooldownAfterErasing = CustomOption.Create(type,
-                LanguageConfig.Instance.EraserIncreaseCdAfterErasing, 10f, 5f, 15f, 5f, MainRoleOption);
-            CanEraseImpostors = CustomOption.Create(type, LanguageConfig.Instance.EraserCanEraseImpostors, false,
-                MainRoleOption);
-        }
+        var type = ToCustomOption(this);
+        _initialEraseCooldown = CustomOption.Create(type, LanguageConfig.Instance.EraserInitialEraseCd, 30f, 10f,
+            60f, 5f, MainRoleOption);
+        _increaseCooldownAfterErasing = CustomOption.Create(type,
+            LanguageConfig.Instance.EraserIncreaseCdAfterErasing, 10f, 5f, 15f, 5f, MainRoleOption);
+        _canEraseImpostors = CustomOption.Create(type, LanguageConfig.Instance.EraserCanEraseImpostors, false,
+            MainRoleOption);
 
-        EraseButton = CustomButton.Create(() =>
+        _eraseButton = CustomButton.Create(() =>
             {
-                var role = CurrentTarget!.GetMainRole();
-                CustomRole? newRole = role.CampType switch
+                var target = _currentPlayer!;
+                var targetRole = target.GetMainRole();
+
+                var camp = targetRole.CampType;
+
+                CustomRole setToRole = camp switch
                 {
                     CampType.Crewmate => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
                     CampType.Neutral => CustomRoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),
                     CampType.Impostor => CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>(),
-                    _ => null
+                    _ => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>()
                 };
 
-                if (newRole != null) TempErasedPlayerRoles.Add(CurrentTarget!, newRole);
-
-                var currentCd = EraseButton!.Cooldown();
-                EraseButton.SetCooldown(currentCd + (IncreaseCooldownAfterErasing?.GetFloat() ?? 10f));
-            },
-            () => EraseButton?.ResetCooldown(),
-            () =>
-            {
-                if (!CanEraseImpostors?.GetBool() ?? CurrentTarget)
-                    return CurrentTarget != null && CurrentTarget.GetMainRole().CampType != CampType.Impostor;
-                return CurrentTarget;
-            },
-            () => true,
-            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.EraseButton, 100f)!,
-            2,
-            KeyCode.E,
-            LanguageConfig.Instance.EraseAction,
-            () => InitialEraseCooldown?.GetFloat() ?? 30f,
-            -1);
-        AddButton(EraseButton);
+                target.SetCustomRole(setToRole);
+                var currentCd = _eraseButton!.Cooldown();
+                _eraseButton.SetCooldown(currentCd + _increaseCooldownAfterErasing.GetFloat());
+            }, () => _eraseButton!.ResetCooldown(),
+            () => !(_currentPlayer == null || (!_canEraseImpostors.GetBool() &&
+                                               _currentPlayer.GetMainRole().CampType == CampType.Impostor)),
+            () => true, ResourceUtils.LoadSpriteFromResources(ResourcesConstant.EraseButton, 100f)!,
+            3,
+            KeyCode.E, LanguageConfig.Instance.EraseAction, () => _initialEraseCooldown.GetFloat(), -1);
+        AddButton(_eraseButton);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
-        if (!(GameStates.InGame && PlayerControl.LocalPlayer.IsRole(this))) return;
-        CurrentTarget = PlayerControl.LocalPlayer.SetClosestPlayerOutline(Color);
-    }
-
-    [EventHandler(EventHandlerType.Prefix)]
-    public bool OnMeetingEnd(MeetingVotingCompleteEvent @event)
-    {
-        TempErasedPlayerRoles.ForEach(kvp =>
-        {
-            var (player, role) = kvp;
-            player.RpcSetCustomRole(role);
-        });
-
-        TempErasedPlayerRoles.Clear();
-        return true;
-    }
-
-    public override void ClearRoleGameData()
-    {
-        TempErasedPlayerRoles.Clear();
-        CurrentTarget = null;
+        if (!GameStates.InGame) return;
+        _currentPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance);
     }
 
     public override IListener GetListener()
     {
         return this;
     }
-
-#pragma warning restore CS8618
 }

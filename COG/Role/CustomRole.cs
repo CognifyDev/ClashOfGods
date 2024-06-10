@@ -135,7 +135,7 @@ public class CustomRole
     {
         var role = player.GetMainRole();
         return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName,
-            role!.Name.Color(role.Color));
+            role.Name.Color(role.Color));
     }
 
     public virtual string HandleAdditionalPlayerName()

@@ -1,6 +1,5 @@
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Listener;
 
 namespace COG.Role.Impl.Impostor;
 
@@ -14,10 +13,5 @@ public class Impostor : CustomRole
         CanSabotage = true;
         BaseRoleType = RoleTypes.Impostor;
         Description = LanguageConfig.Instance.ImpostorDescription;
-    }
-
-    public override IListener GetListener()
-    {
-        return IListener.EmptyListener;
     }
 }

@@ -12,7 +12,7 @@ public static class ButtonConstant
         {
             var target = PlayerControl.LocalPlayer.GetClosestPlayer();
             if (target == null) return;
-            PlayerControl.LocalPlayer.MurderPlayer(target, MurderResultFlags.Succeeded);
+            PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
         },
         () => KillButton.ResetCooldown(),
         () => PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance) != null,
@@ -23,7 +23,7 @@ public static class ButtonConstant
         },
         ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
         1,
-        KeyCode.C,
+        KeyCode.Q,
         LanguageConfig.Instance.KillAction,
         () => GameUtils.GetGameOptions().KillCooldown,
         0);

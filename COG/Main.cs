@@ -164,7 +164,6 @@ public partial class Main : BasePlugin
             // Impostor
             new Impostor(),
             new Cleaner(),
-            new BountyHunter(),
             new Eraser(),
 
             // Neutral

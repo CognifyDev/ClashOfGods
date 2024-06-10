@@ -48,7 +48,7 @@ public class Cleaner : CustomRole, IListener
             () =>
             {
                 PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget);
-                CleanBodyButton?.ResetCooldown();
+                CleanBodyButton.ResetCooldown();
             },
             () => KillButton?.ResetCooldown(),
             () =>
