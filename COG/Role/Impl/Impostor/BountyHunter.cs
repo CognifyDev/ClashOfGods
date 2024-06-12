@@ -8,8 +8,8 @@ using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
-using COG.UI.Arrow;
 using COG.UI.CustomButton;
+using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomOption;
 using COG.Utils;
 using COG.Utils.Coding;
@@ -207,4 +207,8 @@ public class BountyHunter : CustomRole, IListener
     }
 
     public override IListener GetListener() => this;
+    public override CustomRole NewInstance()
+    {
+        return new BountyHunter();
+    }
 }

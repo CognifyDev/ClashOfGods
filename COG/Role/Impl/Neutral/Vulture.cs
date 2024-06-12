@@ -6,8 +6,8 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Role.Impl.Impostor;
 using COG.Rpc;
-using COG.UI.Arrow;
 using COG.UI.CustomButton;
+using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomOption;
 using COG.Utils;
 using UnityEngine;
@@ -17,7 +17,7 @@ namespace COG.Role.Impl.Neutral;
 
 public class Vulture : CustomRole, IListener, IWinnable
 {
-    public Vulture() : base(LanguageConfig.Instance.VultureName, new Color(139, 69, 19), CampType.Neutral)
+    public Vulture() : base(LanguageConfig.Instance.VultureName, Color.blue, CampType.Neutral)
     {
         Description = LanguageConfig.Instance.VultureDescription;
 
@@ -154,5 +154,10 @@ public class Vulture : CustomRole, IListener, IWinnable
     public override IListener GetListener()
     {
         return this;
+    }
+
+    public override CustomRole NewInstance()
+    {
+        return new Vulture();
     }
 }

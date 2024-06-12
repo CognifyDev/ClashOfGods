@@ -19,11 +19,16 @@ public class Bait : CustomRole, IListener
         var target = @event.Target;
         if (killer == null || target == null) return;
         var role = target.GetMainRole();
-        if (role != null && role.Name.Equals(Name)) killer.CmdReportDeadBody(target.Data);
+        if (role.Name.Equals(Name)) killer.CmdReportDeadBody(target.Data);
     }
 
     public override IListener GetListener()
     {
         return this;
+    }
+
+    public override CustomRole NewInstance()
+    {
+        return new Bait();
     }
 }

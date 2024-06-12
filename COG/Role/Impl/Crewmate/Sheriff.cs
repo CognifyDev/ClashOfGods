@@ -27,7 +27,7 @@ public class Sheriff : CustomRole, IListener
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
                 if (!target) return;
-                PlayerControl.LocalPlayer.CmdCheckMurder(target);
+                PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
             },
             () => SheriffKillButton?.ResetCooldown(),
             () =>
@@ -64,12 +64,17 @@ public class Sheriff : CustomRole, IListener
         if (killer == null || target == null) return true;
         if (!killer.IsRole(this)) return true;
         if (target.GetMainRole()!.CampType != CampType.Crewmate) return true;
-        killer.MurderPlayer(killer, GameUtils.DefaultFlag);
+        killer.RpcMurderPlayer(killer, true);
         return false;
     }
 
     public override IListener GetListener()
     {
         return this;
+    }
+
+    public override CustomRole NewInstance()
+    {
+        return new Sheriff();
     }
 }

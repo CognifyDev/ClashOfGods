@@ -36,4 +36,9 @@ public class Guesser : CustomRole, IListener
     {
         return this;
     }
+
+    public override CustomRole NewInstance()
+    {
+        return new Guesser();
+    }
 }

@@ -19,7 +19,7 @@ public class Cleaner : CustomRole, IListener
     {
         Description = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
-        CanKill = false;
+        CanKill = true;
 
         if (ShowInOptions)
             CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor,
@@ -48,7 +48,7 @@ public class Cleaner : CustomRole, IListener
             () =>
             {
                 PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget);
-                CleanBodyButton?.ResetCooldown();
+                CleanBodyButton.ResetCooldown();
             },
             () => KillButton?.ResetCooldown(),
             () =>
@@ -108,5 +108,10 @@ public class Cleaner : CustomRole, IListener
     public override IListener GetListener()
     {
         return this;
+    }
+
+    public override CustomRole NewInstance()
+    {
+        return new Cleaner();
     }
 }

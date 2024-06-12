@@ -48,7 +48,7 @@ public static class GameUtils
         return impostorsNum;
     }
 
-    public static CustomRole? GetLocalPlayerRole()
+    public static CustomRole GetLocalPlayerRole()
     {
         return PlayerControl.LocalPlayer.GetMainRole();
     }

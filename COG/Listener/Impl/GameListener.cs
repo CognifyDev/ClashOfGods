@@ -18,12 +18,13 @@ using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
-using COG.UI.Arrow;
-using COG.UI.CustomOption;
+using COG.UI.CustomButton;
+using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
 using Il2CppSystem.Collections;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
+using Debug = System.Diagnostics.Debug;
 using Random = System.Random;
 
 namespace COG.Listener.Impl;
@@ -93,7 +94,7 @@ public class GameListener : IListener
 
             if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
                 foreach (var role in subRoles)
-                    subRoleNameBuilder.Append(' ').Append(role);
+                    subRoleNameBuilder.Append(' ').Append(role.GetColorName());
 
             nameTextBuilder.Append(mainRole.Name)
                 .Append(subRoleNameBuilder)
@@ -109,7 +110,7 @@ public class GameListener : IListener
 
             nameTextBuilder.Append(adtnalTextBuilder);
 
-            nameText.text = adtnalTextBuilder.ToString();
+            nameText.text = nameTextBuilder + adtnalTextBuilder.ToString();
         }
     }
 
@@ -163,6 +164,7 @@ public class GameListener : IListener
             // 接下来分配副职业
             var random = new Random();
             var option = GlobalCustomOptionConstant.MaxSubRoleNumber;
+            Debug.Assert(option != null, nameof(option) + " != null");
             var subRoleNumber = random.Next(0, (int)option.GetFloat()); // 获取这个玩家应当被给予的副职业数量
             var subRoles = new List<CustomRole>();
             var givenNumber = 0;
@@ -234,7 +236,6 @@ public class GameListener : IListener
         Main.Logger.LogInfo("Setup role text for the player...");
 
         var myRole = GameUtils.GetLocalPlayerRole();
-        if (myRole == null) return true;
 
         var list = new List<IEnumerator>();
 
@@ -316,7 +317,6 @@ public class GameListener : IListener
         var intro = @event.IntroCutscene;
         var role = GameUtils.GetLocalPlayerRole();
 
-        if (role == null) return;
         var camp = role.CampType;
 
         intro.BackgroundBar.material.color = camp.GetColor();
@@ -329,22 +329,19 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnCheckGameEnd(GameCheckEndEvent @event)
     {
-        return !GlobalCustomOptionConstant.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
+        return GlobalCustomOptionConstant.DebugMode != null && !GlobalCustomOptionConstant.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerVent(VentCheckEvent @event)
     {
-        // FIXME 可能是内鬼无法跳管的根源
         var playerInfo = @event.PlayerInfo;
-        foreach (var playerRole in GameUtils.PlayerRoleData)
+        foreach (var ventAble in from playerRole in GameUtils.PlayerRoleData where playerRole.Player.Data.IsSamePlayer(playerInfo) select playerRole.Role.CanVent)
         {
-            if (!playerRole.Player.Data.IsSamePlayer(playerInfo)) continue;
-            var ventAble = playerRole.Role.CanVent;
             @event.SetCanUse(ventAble);
             @event.SetCouldUse(ventAble);
             @event.SetResult(float.MaxValue);
-            return false;
+            return ventAble;
         }
 
         return true;
@@ -356,14 +353,9 @@ public class GameListener : IListener
         var manager = @event.Manager;
         var role = GameUtils.GetLocalPlayerRole();
 
-        if (role == null) return;
-
-        if (!role.CanKill)
-        {
-            manager.KillButton.SetDisabled();
-            manager.KillButton.ToggleVisible(false);
-            manager.KillButton.gameObject.SetActive(false);
-        }
+        manager.KillButton.SetDisabled();
+        manager.KillButton.ToggleVisible(false);
+        manager.KillButton.gameObject.SetActive(false);
 
         if (!role.CanVent)
         {
@@ -379,7 +371,7 @@ public class GameListener : IListener
             manager.SabotageButton.gameObject.SetActive(false);
         }
 
-        Arrow.CreatedArrows.RemoveAll(a => a == null || !a.ArrowObject);
+        Arrow.CreatedArrows.RemoveAll(a => !a.ArrowObject);
         Arrow.CreatedArrows.ForEach(a => a.Update());
     }
 
@@ -414,8 +406,7 @@ public class GameListener : IListener
         var player = @event.Player;
         if (!player) return;
 
-        var role = player!.GetMainRole();
-        if (role == null) return;
+        var role = player.GetMainRole();
 
         int GetCount(IEnumerable<PlayerRole> list)
         {
@@ -427,7 +418,7 @@ public class GameListener : IListener
         var impCount = GetCount(PlayerUtils.AllImpostors);
         var neutralCount = GetCount(PlayerUtils.AllNeutrals);
 
-        var roleText = controller.completeString = role.HandleEjectText(player!);
+        var roleText = controller.completeString = role.HandleEjectText(player);
         var playerInfoText = controller.ImpostorText.text =
             LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
 
@@ -468,7 +459,7 @@ public class GameListener : IListener
 
         if (originText.StartsWith(impTaskTextFull))
         {
-            var idx = originText.IndexOf(impTaskTextFull) + impTaskTextFull.Length;
+            var idx = originText.IndexOf(impTaskTextFull, StringComparison.Ordinal) + impTaskTextFull.Length;
             sb.Append($"<color=#FF1919FF>{fakeTaskText}</color>").Append(originText[idx..]);
         }
         else

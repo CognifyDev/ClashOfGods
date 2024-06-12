@@ -27,7 +27,7 @@ public class PlayerController
 
     public void KillPlayer(PlayerControl player)
     {
-        player.MurderPlayer(player, GameUtils.DefaultFlag);
+        player.RpcMurderPlayer(player, true);
     }
 
     public PlayerControl GetLocalPlayerController()

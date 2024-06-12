@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.Utils;
@@ -57,6 +58,13 @@ public class CustomRoleManager
     public static CustomRoleManager GetManager()
     {
         return Manager;
+    }
+
+    public void ReloadRoles()
+    {
+        var newInstanceRoles = _roles.Select(customRole => customRole.NewInstance()).ToList();
+        _roles.Clear();
+        _roles.AddRange(newInstanceRoles);
     }
 
     public class RoleGetter : IGetter<CustomRole?>
