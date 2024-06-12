@@ -70,7 +70,7 @@ public static class PlayerUtils
 
     public static List<PlayerControl> GetAllPlayers()
     {
-        return new List<PlayerControl>(PlayerControl.AllPlayerControls.ToArray());
+        return new List<PlayerControl>(PlayerControl.AllPlayerControls.ToArray().Where(p => p));
     }
 
     public static List<PlayerControl> GetAllAlivePlayers()

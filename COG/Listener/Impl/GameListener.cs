@@ -243,7 +243,12 @@ public class GameListener : IListener
             if (GameOptionsManager.Instance.currentGameMode != GameModes.Normal) return;
             intro.RoleText.text = myRole.Name;
             intro.RoleText.color = myRole.Color;
-            intro.RoleBlurbText.text = myRole.Description;
+
+            var sb = new StringBuilder(myRole.GetColorName());
+            foreach (var sub in PlayerControl.LocalPlayer.GetSubRoles())
+                sb.Append('\n').Append(sub.GetColorName());
+
+            intro.RoleBlurbText.text = sb.ToString();
             intro.RoleBlurbText.color = myRole.Color;
             intro.YouAreText.color = myRole.Color;
 

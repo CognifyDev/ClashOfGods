@@ -136,6 +136,12 @@ public class LanguageConfig : Config
     public string LighterName { get; private set; } = null!;
     public string LighterDescription { get; private set; } = null!;
 
+    public string LoverName { get; private set; } = null!;
+    public string LoverDescription { get; private set; } = null!;
+    public string LoverCountOptionName { get; private set; } = null!;
+    public string LoversDieTogetherOptionName { get; private set; } = null!;
+    public string LoverEnablePrivateChat { get; private set; } = null!;
+
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;
@@ -197,6 +203,7 @@ public class LanguageConfig : Config
 
     public string DefaultEjectText { get; private set; } = null!;
     public string AlivePlayerInfo { get; private set; } = null!;
+    public string LoverEjectText { get; private set; }
 
     private void SetTranslations()
     {
@@ -293,6 +300,12 @@ public class LanguageConfig : Config
         LighterName = GetString("role.sub-roles.lighter.name");
         LighterDescription = GetString("role.sub-roles.lighter.description");
 
+        LoverName = GetString("role.sub-roles.lover.name");
+        LoverDescription = GetString("role.sub-roles.lover.description");
+        LoverCountOptionName = GetString("role.sub-roles.lover.count-option");
+        LoversDieTogetherOptionName = GetString("role.sub-roles.lover.die-together");
+        LoverEnablePrivateChat = GetString("role.sub-roles.lover.private-chat");
+
         Enable = GetString("option.enable");
         Disable = GetString("option.disable");
         CogOptions = GetString("option.main.cog-options");
@@ -352,6 +365,7 @@ public class LanguageConfig : Config
 
         DefaultEjectText = GetString("game.exile.default");
         AlivePlayerInfo = GetString("game.exile.alive-player-info");
+        LoverEjectText = GetString("game.exile.lover-message");
     }
 
 

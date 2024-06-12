@@ -1,4 +1,7 @@
-﻿using COG.Listener;
+﻿using COG.Config.Impl;
+using COG.Game.CustomWinner;
+using COG.Listener;
+using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
 using COG.UI.CustomOption;
@@ -18,16 +21,17 @@ public class Lover : CustomRole, IListener
     public static Dictionary<PlayerControl, PlayerControl> Couples { get; private set; }
     private CustomOption LoversDieTogetherOption { get; }
     private CustomOption EnablePrivateChatOption { get; }
-    public Lover() : base("Lover", UnityEngine.Color.magenta, CampType.Unknown)
+    public Lover() : base(LanguageConfig.Instance.LoverName, UnityEngine.Color.magenta, CampType.Unknown)
     {
+        Description = "";
         IsSubRole = true;
         Couples = new();
         if (ShowInOptions)
         {
             var tab = ToCustomOption(this);
-            RoleNumberOption!.Name = "LoverCountOption";
-            LoversDieTogetherOption = CustomOption.Create(tab, "LoversDieTogether", true, MainRoleOption);
-            EnablePrivateChatOption = CustomOption.Create(tab, "EnablePrivateChat", true, MainRoleOption);
+            RoleNumberOption!.Name = LanguageConfig.Instance.LoverCountOptionName;
+            LoversDieTogetherOption = CustomOption.Create(tab, LanguageConfig.Instance.LoversDieTogetherOptionName, true, MainRoleOption);
+            EnablePrivateChatOption = CustomOption.Create(tab, LanguageConfig.Instance.LoverEnablePrivateChat, true, MainRoleOption);
         }
     }
 
@@ -66,6 +70,7 @@ public class Lover : CustomRole, IListener
     {
         var victim = @event.Target;
         if (!victim.IsInLove()) return;
+        if (!(LoversDieTogetherOption?.GetBool() ?? true)) return;
 
         var lover = victim.GetLover()!;
         lover.LocalDieWithReason(lover, Utils.DeathReason.LoverSuicide); // Everyone will know that another lover is dead, so calling local murdering method is OK
@@ -79,6 +84,12 @@ public class Lover : CustomRole, IListener
 
         var lover = exiled!.GetLover()!;
         lover.LocalDieWithReason(lover, Utils.DeathReason.LoverSuicide, false);
+    }
+
+    [EventHandler(EventHandlerType.Prefix)]
+    public void OnIntroBegin(IntroCutsceneShowRoleEvent @event)
+    {
+        Description = LanguageConfig.Instance.LoverDescription.CustomFormat(PlayerControl.LocalPlayer.GetLover()!.Data.PlayerName);
     }
 
 
@@ -95,6 +106,10 @@ public class Lover : CustomRole, IListener
         if (players.Count % 2 != 0)
         {
             Main.Logger.LogError("Couldn't assign lovers, game will end now.");
+            CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.GetAllPlayers());
+            CustomWinnerManager.SetWinColor(UnityEngine.Color.grey);
+            CustomWinnerManager.SetWinText("Bug Wins");
+            GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
             return;
         }
 
@@ -124,7 +139,7 @@ public class Lover : CustomRole, IListener
             var sb = new StringBuilder(player.GetMainRole().GetColorName()).Append(' ');
             foreach (var sub in player.GetSubRoles()) sb.Append(sub.GetColorName()).Append(' ');
 
-            msg = "LoverDiedTogetherMessage %exiled% %roles% %loverSuicide%".CustomFormat(player, sb.ToString(), player.GetLover()!.Data.PlayerName);
+            msg = LanguageConfig.Instance.LoverEjectText.CustomFormat(player, sb.ToString(), player.GetLover()!.Data.PlayerName);
         }
         else
             msg = base.HandleEjectText(player);
@@ -135,6 +150,7 @@ public class Lover : CustomRole, IListener
     public override void ClearRoleGameData()
     {
         Couples.Clear();
+        Description = "";
     }
 
     public override IListener GetListener() => this;

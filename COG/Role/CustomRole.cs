@@ -67,7 +67,7 @@ public class CustomRole
     /// <summary>
     ///     角色介绍
     /// </summary>
-    public string Description { get; protected init; }
+    public string Description { get; protected set; }
 
     /// <summary>
     ///     角色阵营
