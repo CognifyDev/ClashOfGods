@@ -9,6 +9,5 @@ public enum KnownRpc : uint
     SetRole = 64,
     
     EatBody = 66,
-    SyncLovers = 67 
-    EatBody = 66
+    SyncLovers = 67,
 }
