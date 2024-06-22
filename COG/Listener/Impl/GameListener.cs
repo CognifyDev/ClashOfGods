@@ -204,7 +204,10 @@ public class GameListener : IListener
         Main.Logger.LogInfo("Share roles for players...");
         ShareRoles();
 
-        foreach (var availableRole in GameUtils.PlayerRoleData.Select(pr => pr.Role)) availableRole.AfterSharingRoles();
+        var roleList = GameUtils.PlayerRoleData.Select(pr => pr.Role).ToList();
+        roleList.AddRange(GameUtils.PlayerRoleData.SelectMany(pr => pr.SubRoles));
+
+        foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -244,7 +247,12 @@ public class GameListener : IListener
             if (GameOptionsManager.Instance.currentGameMode != GameModes.Normal) return;
             intro.RoleText.text = myRole.Name;
             intro.RoleText.color = myRole.Color;
-            intro.RoleBlurbText.text = myRole.Description;
+
+            var sb = new StringBuilder(myRole.GetColorName());
+            foreach (var sub in PlayerControl.LocalPlayer.GetSubRoles())
+                sb.Append('\n').Append(sub.GetColorName());
+
+            intro.RoleBlurbText.text = sb.ToString();
             intro.RoleBlurbText.color = myRole.Color;
             intro.YouAreText.color = myRole.Color;
 
@@ -455,7 +463,7 @@ public class GameListener : IListener
         if (originText.StartsWith(impTaskTextFull))
         {
             var idx = originText.IndexOf(impTaskTextFull, StringComparison.Ordinal) + impTaskTextFull.Length;
-            sb.Append($"<color=#FF1919FF>{fakeTaskText}</color>").Append(originText[idx..]);
+            sb.Append($"<color=#FF1919FF>{fakeTaskText}</color\r\n>").Append(originText[idx..]);
         }
         else
         {

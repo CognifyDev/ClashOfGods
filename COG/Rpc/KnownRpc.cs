@@ -7,5 +7,7 @@ public enum KnownRpc : uint
     CleanDeadBody = 62,
     UpdateOption = 63,
     SetRole = 64,
-    EatBody = 66
+    
+    EatBody = 66,
+    SyncLovers = 67,
 }

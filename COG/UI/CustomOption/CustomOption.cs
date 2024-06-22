@@ -57,7 +57,7 @@ public sealed class CustomOption
 
     public readonly bool IsHeader;
 
-    public readonly string Name;
+    public string Name;
 
     public readonly TabType Page;
 

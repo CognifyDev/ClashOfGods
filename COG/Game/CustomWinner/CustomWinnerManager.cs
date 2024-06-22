@@ -61,4 +61,12 @@ public static class CustomWinnerManager
         CustomWinners.Sort((first, second) => second.GetWeight().CompareTo(first.GetWeight()));
         return CustomWinners.All(customWinner => !customWinner.CanWin());
     }
+
+    public static void EndGame(PlayerControl[]? winners = null, string? text = null, Color? color = null, GameOverReason reason = GameOverReason.HumansByVote)
+    {
+        if (text != null) SetWinText(text);
+        if (color != null) SetWinColor(WinColor);
+        if (winners != null) RegisterWinningPlayers(winners);
+        GameManager.Instance.RpcEndGame(reason, false);
+    }
 }

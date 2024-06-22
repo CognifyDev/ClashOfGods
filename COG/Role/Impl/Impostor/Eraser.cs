@@ -15,7 +15,7 @@ using UnityEngine;
 namespace COG.Role.Impl.Impostor;
 
 [NotUsed]
-[Unfinished]
+[WorkInProgress]
 public class Eraser : CustomRole, IListener
 {
     private readonly CustomButton _eraseButton;

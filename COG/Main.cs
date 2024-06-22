@@ -78,7 +78,7 @@ public partial class Main : BasePlugin
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
 
-        // Add depends to core directory
+        // Add dependencies to core directory
         ResourceUtils.WriteToFileFromResource(
             "BepInEx/core/YamlDotNet.dll",
             "COG.Resources.InDLL.Depends.YamlDotNet.dll");

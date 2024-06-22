@@ -20,7 +20,7 @@ using Random = System.Random;
 
 namespace COG.Role.Impl.Impostor;
 
-[Unfinished]
+[WorkInProgress]
 // ReSharper disable All
 public class BountyHunter : CustomRole, IListener
 {
@@ -174,7 +174,7 @@ public class BountyHunter : CustomRole, IListener
 
         if (selectableTargets.Count == 0)
         {
-            Main.Logger.LogError("[Bounty Hunter] Couldn't select a new target.");
+            Main.Logger.LogError("Couldn't select a new target.");
             GameUtils.SendGameMessage(LanguageConfig.Instance.BountyHunterCantSelectTargetError);
             Debug.Assert(TargetPoolable != null, nameof(TargetPoolable) + " != null");
             TargetPoolable.gameObject.SetActive(false);
@@ -197,7 +197,7 @@ public class BountyHunter : CustomRole, IListener
          *
          */
 
-        CurrentTarget.SetPlayerAppearance(TargetPoolable);
+        CurrentTarget.SetPoolableAppearance(TargetPoolable);
 
         if (HasArrowToTarget?.GetBool() ?? false)
         {

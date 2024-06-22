@@ -91,6 +91,12 @@ role:
     lighter:
       name: "灯人"
       description: "要相信光！"
+    lover:
+      name: "恋人"
+      description: "你与 %lover% 坠入了爱河"
+      count-option: "恋人对数"
+      die-together: "恋人共死"
+      private-chat: "启用私聊频道"
 camp:
   unknown:
     name: "未知阵营"
@@ -167,3 +173,4 @@ game:
   exile:
     default: "%player% 是 %role%。"
     alive-player-info: "剩余 %crew% 个船员， %neutral% 个中立， %imp% 个内鬼。"
+    lover-message: "%player% 是 %role%。\n%lover% 似乎由于伤心过度殉情了。"
