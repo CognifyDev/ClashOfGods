@@ -7,7 +7,7 @@ namespace COG.Listener.Event.Impl.Player;
 /// </summary>
 public class PlayerCoSetTasksEvent : PlayerEvent
 {
-    public PlayerCoSetTasksEvent(PlayerControl player, List<GameData.TaskInfo> tasks) : base(player)
+    public PlayerCoSetTasksEvent(PlayerControl player, List<NetworkedPlayerInfo> tasks) : base(player)
     {
         TasksList = tasks;
     }
@@ -15,5 +15,5 @@ public class PlayerCoSetTasksEvent : PlayerEvent
     /// <summary>
     ///     任务列表
     /// </summary>
-    public List<GameData.TaskInfo> TasksList { get; set; }
+    public List<NetworkedPlayerInfo> TasksList { get; set; }
 }

@@ -11,7 +11,7 @@ using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace COG.Listener.Impl;
-
+#if false
 public class CustomWinnerListener : IListener
 {
     private static readonly int Color1 = Shader.PropertyToID("_Color");
@@ -141,3 +141,4 @@ public class CustomWinnerListener : IListener
         roleSummary.text = summary.ToString();
     }
 }
+#endif

@@ -249,7 +249,7 @@ public sealed class CustomOption
         writer.Write(ID + "|" + newSelection);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
-
+#if false
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
     private class GameOptionsMenuStartPatch
     {
@@ -783,3 +783,4 @@ public static class GameOptionsNextPagePatch
         }
     }
 }
+#endif

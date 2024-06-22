@@ -21,7 +21,7 @@ public static class GameUtils
     public static void SendGameMessage(string text)
     {
         if (DestroyableSingleton<HudManager>.Instance is { } hud)
-            hud.Notifier.AddItem(text);
+            hud.Notifier.AddDisconnectMessage(text);
     }
 
     public static int GetImpostorsNum()
@@ -64,7 +64,7 @@ public static class GameUtils
         if (gameManager != null) gameManager.EndGame();
     }
 
-    public static NormalGameOptionsV07 GetGameOptions()
+    public static NormalGameOptionsV08 GetGameOptions()
     {
         return GameOptionsManager.Instance.currentNormalGameOptions;
     }

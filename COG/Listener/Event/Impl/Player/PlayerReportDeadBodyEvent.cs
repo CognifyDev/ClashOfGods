@@ -5,7 +5,7 @@ namespace COG.Listener.Event.Impl.Player;
 /// </summary>
 public class PlayerReportDeadBodyEvent : PlayerEvent
 {
-    public PlayerReportDeadBodyEvent(PlayerControl player, GameData.PlayerInfo? target) : base(player)
+    public PlayerReportDeadBodyEvent(PlayerControl player, NetworkedPlayerInfo? target) : base(player)
     {
         Target = target;
     }
@@ -14,5 +14,5 @@ public class PlayerReportDeadBodyEvent : PlayerEvent
     ///     如果为报告实体而启动的会议，那么这一项会是被报告实体的PlayerInfo
     ///     如果是紧急会议，那么这个会为null
     /// </summary>
-    public GameData.PlayerInfo? Target { get; }
+    public NetworkedPlayerInfo? Target { get; }
 }

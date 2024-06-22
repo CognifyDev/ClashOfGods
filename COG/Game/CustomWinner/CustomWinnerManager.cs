@@ -14,7 +14,7 @@ public static class CustomWinnerManager
 
     public static void RegisterWinningPlayer(PlayerControl winner)
     {
-        AllWinners.Add(new WinningPlayerData(winner.Data));
+        //AllWinners.Add(new WinningPlayerData(winner.Data));
     }
 
     public static void UnregisterWinningPlayer(PlayerControl playerControl)

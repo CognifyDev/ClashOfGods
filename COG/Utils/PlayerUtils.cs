@@ -78,7 +78,7 @@ public static class PlayerUtils
         return GetAllPlayers().ToArray().Where(player => player != null && player.IsAlive()).ToList();
     }
 
-    public static bool IsSamePlayer(this GameData.PlayerInfo info, GameData.PlayerInfo target)
+    public static bool IsSamePlayer(this NetworkedPlayerInfo info, NetworkedPlayerInfo target)
     {
         return IsSamePlayer(info.Object, target.Object);
     }
