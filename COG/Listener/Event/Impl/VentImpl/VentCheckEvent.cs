@@ -5,7 +5,7 @@ public class VentCheckEvent : VentEvent
     private bool _canUse, _couldUse;
     private float _result;
 
-    public VentCheckEvent(Vent vent, GameData.PlayerInfo playerInfo, bool canUse, bool couldUse, float result) :
+    public VentCheckEvent(Vent vent, NetworkedPlayerInfo playerInfo, bool canUse, bool couldUse, float result) :
         base(vent)
     {
         PlayerInfo = playerInfo;
@@ -14,7 +14,7 @@ public class VentCheckEvent : VentEvent
         _result = result;
     }
 
-    public GameData.PlayerInfo PlayerInfo { get; }
+    public NetworkedPlayerInfo PlayerInfo { get; }
 
     public void SetCanUse(bool canUse)
     {

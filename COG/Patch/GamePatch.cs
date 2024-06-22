@@ -150,7 +150,7 @@ public static class PlayerVentPatch
 {
     [HarmonyPrefix]
     public static bool Prefix(Vent __instance,
-        [HarmonyArgument(0)] GameData.PlayerInfo playerInfo,
+        [HarmonyArgument(0)] NetworkedPlayerInfo playerInfo,
         [HarmonyArgument(1)] ref bool canUse,
         [HarmonyArgument(2)] ref bool couldUse,
         ref float __result)
@@ -166,7 +166,7 @@ public static class PlayerVentPatch
 
     [HarmonyPostfix]
     public static void Postfix(Vent __instance,
-        [HarmonyArgument(0)] GameData.PlayerInfo playerInfo,
+        [HarmonyArgument(0)] NetworkedPlayerInfo playerInfo,
         [HarmonyArgument(1)] ref bool canUse,
         [HarmonyArgument(2)] ref bool couldUse,
         ref float __result)
@@ -236,7 +236,7 @@ internal class SabotageMapOpen
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CoSetTasks))]
 internal class TaskPatch
 {
-    public static bool Prefix(PlayerControl __instance, ref List<GameData.TaskInfo> tasks)
+    public static bool Prefix(PlayerControl __instance, ref List<NetworkedPlayerInfo> tasks)
     {
         var typeTasks = tasks;
         var result = ListenerManager.GetManager()
@@ -245,7 +245,7 @@ internal class TaskPatch
         return result;
     }
 
-    public static void Postfix(PlayerControl __instance, ref List<GameData.TaskInfo> tasks)
+    public static void Postfix(PlayerControl __instance, ref List<NetworkedPlayerInfo> tasks)
     {
         var typeTasks = tasks;
         ListenerManager.GetManager()
@@ -323,14 +323,14 @@ public class PlayerControlCompleteTaskPatch
 [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
 public class ExileControllerBeginPatch
 {
-    public static bool Prefix(ExileController __instance, GameData.PlayerInfo exiled, bool tie)
+    public static bool Prefix(ExileController __instance, NetworkedPlayerInfo exiled, bool tie)
     {
         return ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie),
                 EventHandlerType.Prefix);
     }
 
-    public static void Postfix(ExileController __instance, [HarmonyArgument(0)] GameData.PlayerInfo exiled,
+    public static void Postfix(ExileController __instance, [HarmonyArgument(0)] NetworkedPlayerInfo exiled,
         [HarmonyArgument(1)] bool tie)
     {
         ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie),

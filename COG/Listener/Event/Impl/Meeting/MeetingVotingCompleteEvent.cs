@@ -5,7 +5,7 @@ namespace COG.Listener.Event.Impl.Meeting;
 /// </summary>
 public class MeetingVotingCompleteEvent : MeetingEvent
 {
-    public MeetingVotingCompleteEvent(MeetingHud meetingHud, MeetingHud.VoterState[] states, GameData.PlayerInfo exiled,
+    public MeetingVotingCompleteEvent(MeetingHud meetingHud, MeetingHud.VoterState[] states, NetworkedPlayerInfo exiled,
         bool tie) : base(meetingHud)
     {
         States = states;
@@ -14,6 +14,6 @@ public class MeetingVotingCompleteEvent : MeetingEvent
     }
 
     public MeetingHud.VoterState[] States { get; }
-    public GameData.PlayerInfo Exiled { get; }
+    public NetworkedPlayerInfo Exiled { get; }
     public bool Tie { get; }
 }

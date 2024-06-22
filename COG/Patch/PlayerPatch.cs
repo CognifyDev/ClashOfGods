@@ -251,13 +251,13 @@ internal class OnSpawnPlayerPatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ReportDeadBody))]
 internal class ReportDeadBodyPatch
 {
-    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo? target)
+    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo? target)
     {
         return ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerReportDeadBodyEvent(__instance, target), EventHandlerType.Prefix);
     }
 
-    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo? target)
+    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo? target)
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerReportDeadBodyEvent(__instance, target), EventHandlerType.Postfix);

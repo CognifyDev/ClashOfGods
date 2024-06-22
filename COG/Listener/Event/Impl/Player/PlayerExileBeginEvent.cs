@@ -2,7 +2,7 @@ namespace COG.Listener.Event.Impl.Player;
 
 public class PlayerExileBeginEvent : PlayerEvent
 {
-    public PlayerExileBeginEvent(PlayerControl? player, ExileController controller, GameData.PlayerInfo? exiled,
+    public PlayerExileBeginEvent(PlayerControl? player, ExileController controller, NetworkedPlayerInfo? exiled,
         bool tie) : base(player!)
     {
         ExileController = controller;
@@ -15,6 +15,6 @@ public class PlayerExileBeginEvent : PlayerEvent
     /// </summary>
     public ExileController ExileController { get; }
 
-    public GameData.PlayerInfo? Exiled { get; }
+    public NetworkedPlayerInfo? Exiled { get; }
     public bool Tie { get; }
 }

@@ -7,7 +7,7 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Rpc;
-using COG.UI.SidebarText;
+//using COG.UI.SidebarText;
 using COG.Utils;
 using COG.Utils.Coding;
 using COG.Utils.WinAPI;
@@ -139,10 +139,10 @@ public sealed class CustomOption
         var sb = new StringBuilder();
 
         foreach (var option in from option in Options
-                 where option != null
-                 where option.SpecialOptionType != OptionType.Button
-                 where option.Selection != option.DefaultSelection
-                 select option)
+                               where option != null
+                               where option.SpecialOptionType != OptionType.Button
+                               where option.Selection != option.DefaultSelection
+                               select option)
         {
             sb.Append(option.ID + "|" + option.Selection);
             sb.Append(',');
@@ -249,7 +249,17 @@ public sealed class CustomOption
         writer.Write(ID + "|" + newSelection);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Start))]
+    private static class GameOptionPatch
+    {
+        public static void Postfix(RolesSettingsMenu __instance)
+        {
+            //__instance.RoleChancesSettings
 
+        }
+    }
+}
+#if false
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
     private class GameOptionsMenuStartPatch
     {
@@ -782,4 +792,5 @@ public static class GameOptionsNextPagePatch
             if (Input.GetKeyDown(keycode)) TypePage = page;
         }
     }
-}
+
+#endif
