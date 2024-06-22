@@ -11,6 +11,8 @@ using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace COG.Listener.Impl;
+
+// possible solution: set winners to imp, set others dead, end game
 #if false
 public class CustomWinnerListener : IListener
 {
@@ -35,7 +37,7 @@ public class CustomWinnerListener : IListener
 
         var num = 0;
         var ceiling = Mathf.CeilToInt(7.5f);
-
+        manager.
         TempData.winners.Clear();
 
         foreach (var winningPlayerData in CustomWinnerManager.AllWinners) TempData.winners.Add(winningPlayerData);

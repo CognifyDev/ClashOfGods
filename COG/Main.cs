@@ -23,8 +23,6 @@ using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
 using COG.UI.CustomButton;
 using COG.UI.ModOption;
-using COG.UI.SidebarText;
-using COG.UI.SidebarText.Impl;
 using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
@@ -129,7 +127,7 @@ public partial class Main : BasePlugin
             new PlayerListener(),
             new DeadPlayerListener(),
             new CustomButtonListener(),
-            new CustomWinnerListener(),
+            //new CustomWinnerListener(),
             new GameListener(),
             new ModOptionListener(),
             new RpcListener(),
@@ -139,15 +137,15 @@ public partial class Main : BasePlugin
 
 
         // Register sidebar texts
-        SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
-        {
-            new OriginalSettings(),
-            new NeutralSettings(),
-            new ModSettings(),
-            new AddonsSettings(),
-            new ImpostorSettings(),
-            new CrewmateSettings()
-        });
+        //SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
+        //{
+        //    new OriginalSettings(),
+        //    new NeutralSettings(),
+        //    new ModSettings(),
+        //    new AddonsSettings(),
+        //    new ImpostorSettings(),
+        //    new CrewmateSettings()
+        //});
 
         // Register roles
         CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
@@ -252,7 +250,7 @@ public partial class Main : BasePlugin
         ModOptionManager.GetManager().GetOptions().Clear();
         CustomRoleManager.GetManager().GetRoles().Clear();
         ListenerManager.GetManager().UnRegisterHandlers();
-        SidebarTextManager.GetManager().GetSidebarTexts().Clear();
+        //SidebarTextManager.GetManager().GetSidebarTexts().Clear();
         CustomWinnerManager.AllWinners.Clear();
         CustomWinnerManager.CustomWinners.Clear();
         Harmony.UnpatchAll();

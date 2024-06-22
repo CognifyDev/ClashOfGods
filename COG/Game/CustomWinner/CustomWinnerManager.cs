@@ -7,7 +7,7 @@ namespace COG.Game.CustomWinner;
 public static class CustomWinnerManager
 {
     internal static readonly List<IWinnable> CustomWinners = new();
-    public static Il2CppSystem.Collections.Generic.List<WinningPlayerData> AllWinners { get; } = new();
+    public static Il2CppSystem.Collections.Generic.List<object> AllWinners { get; } = new();
 
     public static string WinText { get; private set; } = "";
     public static Color WinColor { get; private set; } = Color.white;
@@ -19,14 +19,14 @@ public static class CustomWinnerManager
 
     public static void UnregisterWinningPlayer(PlayerControl playerControl)
     {
-        foreach (var winningPlayerData in AllWinners)
-            if (playerControl.Data.PlayerName.Equals(winningPlayerData.PlayerName))
-                AllWinners.Remove(winningPlayerData);
+        //foreach (var winningPlayerData in AllWinners)
+        //    if (playerControl.Data.PlayerName.Equals(winningPlayerData.PlayerName))
+        //        AllWinners.Remove(winningPlayerData);
     }
 
     public static void RegisterWinningPlayers(IEnumerable<PlayerControl> winners)
     {
-        winners.ToList().ForEach(w => AllWinners.Add(new WinningPlayerData(w.Data)));
+        //winners.ToList().ForEach(w => AllWinners.Add(new WinningPlayerData(w.Data)));
     }
 
     public static void ResetWinningPlayers()
