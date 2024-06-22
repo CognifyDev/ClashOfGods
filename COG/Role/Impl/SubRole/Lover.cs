@@ -15,8 +15,8 @@ using System.Text;
 namespace COG.Role.Impl.SubRole;
 
 [NotTested]
-[NotUsed]
-public class Lover : CustomRole, IListener
+[WorkInProgress]
+public class Lover : CustomRole, IListener, IWinnable
 {
     public static Dictionary<PlayerControl, PlayerControl> Couples { get; private set; }
     private CustomOption LoversDieTogetherOption { get; }
@@ -95,7 +95,7 @@ public class Lover : CustomRole, IListener
 
     public override bool OnRoleSelection(List<CustomRole> roles)
     {
-        for (int i = 0; i < (RoleNumberOption?.GetQuantity() ?? 1) * 2; i++) 
+        for (int i = 0; i < (RoleNumberOption?.GetQuantity() ?? 1) * 2; i++)
             roles.Add(this);
         return true;
     }
@@ -113,7 +113,7 @@ public class Lover : CustomRole, IListener
             return;
         }
 
-        for (int i = 0; i < players.Count / 2; i+=2)
+        for (int i = 0; i < players.Count / 2; i += 2)
         {
             var p1 = players[i];
             var p2 = players[i + 1];
@@ -143,7 +143,7 @@ public class Lover : CustomRole, IListener
         }
         else
             msg = base.HandleEjectText(player);
-        
+
         return msg;
     }
 
@@ -154,6 +154,25 @@ public class Lover : CustomRole, IListener
     }
 
     public override IListener GetListener() => this;
+
+    public ulong GetWeight() => IWinnable.GetOrder(0);
+
+    public bool CanWin()
+    {
+        if (PlayerUtils.GetAllAlivePlayers().Count == 2
+            && PlayerUtils.GetAllAlivePlayers().SequenceEqual(GetCKCouples().SelectMany(lover => new[] { lover.Item1, lover.Item2 }))) return true; ;
+        return false;
+    }
+
+    public List<(PlayerControl, PlayerControl)> GetCKCouples() // CK = Crewmate + Killer
+        => Couples.Where(couple =>
+        {
+            var (p1, p2) = couple;
+            return p1.CanKill() != p2.CanKill();
+        })
+        .Select(kvp => (kvp.Key, kvp.Value)).ToList();
+
+    public override CustomRole NewInstance() => new Lover();
 }
 
 public static partial class RoleUtils

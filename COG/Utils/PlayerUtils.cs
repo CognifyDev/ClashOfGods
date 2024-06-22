@@ -316,12 +316,14 @@ public static class PlayerUtils
 
     public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason, bool showCorpse = true)
     {
-        DeadPlayerManager.DeadPlayers.Add(new(DateTime.UtcNow, reason, target, pc));
+        _ = new DeadPlayer(DateTime.Now, reason, target, pc);
         if (showCorpse)
             pc.MurderPlayer(target, GameUtils.DefaultFlag);
         else
             pc.Exiled();
     }
+
+    public static bool CanKill(this PlayerControl pc) => pc.GetMainRole().CanKill;
 }
 
 public enum DeathReason
@@ -345,7 +347,7 @@ public class DeadPlayerListener : IListener
         if (DeadPlayerManager.DeadPlayers.Select(dp => dp.Player).Contains(target)) return;
         
         var reason = DeadPlayerManager.GetDeathReason(killer, target);
-        _ = new DeadPlayer(DateTime.UtcNow, reason, target, killer);
+        _ = new DeadPlayer(DateTime.Now, reason, target, killer);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -353,7 +355,7 @@ public class DeadPlayerListener : IListener
     {
         var data = @event.ClientData;
         if (DeadPlayerManager.DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
-        _ = new DeadPlayer(DateTime.UtcNow, DeathReason.Disconnected, data.Character, null);
+        _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -368,7 +370,7 @@ public class DeadPlayerListener : IListener
         var exiled = @event.ExileController.exiled;
         if (exiled == null) return;
         if (DeadPlayerManager.DeadPlayers.Select(dp => dp.Player).Contains(exiled.Object)) return;
-        _ = new DeadPlayer(DateTime.UtcNow, DeathReason.Exiled, exiled.Object, null);
+        _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, exiled.Object, null);
     }
 
     [EventHandler(EventHandlerType.Postfix)]

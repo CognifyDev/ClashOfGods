@@ -187,5 +187,7 @@ public abstract class CustomRole
         return IListener.EmptyListener;
     }
 
+    public abstract CustomRole NewInstance();
+
     ~CustomRole() => ClearRoleGameData();
 }

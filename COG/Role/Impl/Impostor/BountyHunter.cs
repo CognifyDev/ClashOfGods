@@ -20,7 +20,7 @@ using Random = System.Random;
 
 namespace COG.Role.Impl.Impostor;
 
-[Unfinished]
+[WorkInProgress]
 // ReSharper disable All
 public class BountyHunter : CustomRole, IListener
 {
