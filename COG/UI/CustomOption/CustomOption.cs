@@ -249,14 +249,15 @@ public sealed class CustomOption
         writer.Write(ID + "|" + newSelection);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
-    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Start))]
-    private static class GameOptionPatch
-    {
-        public static void Postfix(RolesSettingsMenu __instance)
-        {
-            //__instance.RoleChancesSettings
+}
 
-        }
+
+[HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Start))]
+public static class GameOptionPatch
+{
+    public static void Postfix(RolesSettingsMenu __instance)
+    {
+        
     }
 }
 #if false

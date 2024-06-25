@@ -12,8 +12,6 @@ using UnityEngine;
 
 namespace COG.Listener.Impl;
 
-// possible solution: set winners to imp, set others dead, end game
-#if false
 public class CustomWinnerListener : IListener
 {
     private static readonly int Color1 = Shader.PropertyToID("_Color");
@@ -37,14 +35,11 @@ public class CustomWinnerListener : IListener
 
         var num = 0;
         var ceiling = Mathf.CeilToInt(7.5f);
-        manager.
-        TempData.winners.Clear();
 
-        foreach (var winningPlayerData in CustomWinnerManager.AllWinners) TempData.winners.Add(winningPlayerData);
+        var winners = EndGameResult.CachedWinners;
+        Main.Logger.LogInfo($"Winners number => {winners.Count}");
 
-        Main.Logger.LogInfo($"Winners number => {TempData.winners.Count}");
-
-        foreach (var winner in TempData.winners.ToArray().OrderBy(b => b.IsYou ? -1 : 0))
+        foreach (var winner in winners.ToArray().OrderBy(b => b.IsYou ? -1 : 0))
         {
             if (!(manager.PlayerPrefab && manager.transform)) break;
 
@@ -71,7 +66,7 @@ public class CustomWinnerListener : IListener
             var scale = new Vector3(scaleValue, scaleValue, 1f);
 
             winnerPoolable.transform.localScale = scale;
-            winnerPoolable.UpdateFromPlayerOutfit(winner, PlayerMaterial.MaskType.ComplexUI, winner.IsDead, true);
+            winnerPoolable.UpdateFromPlayerOutfit(winner.Outfit, PlayerMaterial.MaskType.ComplexUI, winner.IsDead, true);
 
             if (winner.IsDead)
             {
@@ -143,4 +138,3 @@ public class CustomWinnerListener : IListener
         roleSummary.text = summary.ToString();
     }
 }
-#endif
