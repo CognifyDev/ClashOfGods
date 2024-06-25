@@ -6,6 +6,7 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
+using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.GSManager;
 using COG.Listener.Event.Impl.HManager;
@@ -471,5 +472,12 @@ public class GameListener : IListener
         }
 
         @event.SetTaskString(sb.ToString());
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameEnd(AmongUsClientGameEndEvent @event)
+    {
+        EndGameResult.CachedWinners.Clear();
+        CustomWinnerManager.AllWinners.ToArray().ForEach(p => EndGameResult.CachedWinners.Add(new(p.Data)));
     }
 }
