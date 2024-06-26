@@ -70,7 +70,7 @@ public class ListenerManager
     /// <summary>
     ///     Unregister all handlers
     /// </summary>
-    public void UnRegisterHandlers()
+    public void UnregisterHandlers()
     {
         _handlers.Clear();
     }

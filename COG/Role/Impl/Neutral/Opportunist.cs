@@ -4,6 +4,7 @@ using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Listener;
+using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.GSManager;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
@@ -11,6 +12,7 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.Utils;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace COG.Role.Impl.Neutral;
 
@@ -74,14 +76,23 @@ public class Opportunist : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameStartWithMovement(GameStartManagerStartEvent @event)
+    public void OnExilePlayer(PlayerExileEndEvent @event) => HandleExile(@event.Player);
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnAirshipExilePlayer(PlayerExileEndOnAirshipEvent @event) => HandleExile(@event.Player);
+    
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameStartWithMovement(GameStartEvent @event)
     {
         if (!GameStates.InGame) return;
-        var thread = new Thread(() =>
-        {
-            Thread.Sleep(500);
-            CustomWinnerManager.RegisterWinningPlayers(Players);
-        });
-        thread.Start();
+        CustomWinnerManager.RegisterWinningPlayers(Players);
+        CustomWinnerManager.SetWinText("OpportunistRoleWinningText");
+        CustomWinnerManager.SetWinColor(Color);
+    }
+
+    public void HandleExile(PlayerControl exiled)
+    {
+        if (!exiled) return;
+        if (exiled.IsRole(this)) CustomWinnerManager.UnregisterWinningPlayer(exiled);
     }
 }

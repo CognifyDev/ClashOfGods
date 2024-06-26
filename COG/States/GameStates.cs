@@ -20,7 +20,6 @@ public static class GameStates
         set
         {
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-            // CustomRoleManager.GetManager().ReloadRoles();
             
             _inGame = value;
         }

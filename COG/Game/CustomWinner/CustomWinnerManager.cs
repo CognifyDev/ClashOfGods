@@ -1,3 +1,4 @@
+using COG.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,7 +21,7 @@ public static class CustomWinnerManager
     public static void UnregisterWinningPlayer(PlayerControl playerControl)
     {
         foreach (var winner in AllWinners)
-            if (playerControl.Data.PlayerName.Equals(winner.Data.PlayerName))
+            if (playerControl.IsSamePlayer(winner))
                 AllWinners.Remove(winner);
     }
 
@@ -62,11 +63,12 @@ public static class CustomWinnerManager
         return CustomWinners.All(customWinner => !customWinner.CanWin());
     }
 
-    public static void EndGame(PlayerControl[]? winners = null, string? text = null, Color? color = null, GameOverReason reason = GameOverReason.HumansByVote)
+    public static void EndGame(IEnumerable<PlayerControl> winners, string? text = null, Color? color = null)
     {
         if (text != null) SetWinText(text);
         if (color != null) SetWinColor(WinColor);
-        if (winners != null) RegisterWinningPlayers(winners);
-        GameManager.Instance.RpcEndGame(reason, false);
+        RegisterWinningPlayers(winners);
+        const GameOverReason modCustom = (GameOverReason)4673347; // String "COG " (4 characters) to byte array to integer
+        GameManager.Instance.RpcEndGame(modCustom, false);
     }
 }

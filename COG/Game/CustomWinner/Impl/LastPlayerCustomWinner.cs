@@ -8,14 +8,12 @@ public class LastPlayerCustomWinner : IWinnable
 {
     public bool CanWin()
     {
-        if (PlayerUtils.GetAllAlivePlayers().Count > 1) return false;
+        if (PlayerUtils.GetAllAlivePlayers().Count != 1) return false;
         var lastPlayer = PlayerUtils.GetAllAlivePlayers().FirstOrDefault();
         if (!lastPlayer) return false;
-        CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.GetAllAlivePlayers());
-        CustomWinnerManager.SetWinText(
-            LanguageConfig.Instance.NeutralsWinText.CustomFormat(lastPlayer!.Data.PlayerName));
-        CustomWinnerManager.SetWinColor(lastPlayer.GetMainRole()!.Color);
-        GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
+        CustomWinnerManager.EndGame(PlayerUtils.GetAllAlivePlayers(),
+            LanguageConfig.Instance.NeutralsWinText.CustomFormat(lastPlayer!.Data.PlayerName),
+            lastPlayer.GetMainRole()!.Color);
         return true;
     }
 

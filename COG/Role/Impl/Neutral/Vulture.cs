@@ -78,10 +78,7 @@ public class Vulture : CustomRole, IListener, IWinnable
     {
         if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
         {
-            CustomWinnerManager.RegisterWinningPlayers(Players);
-            CustomWinnerManager.SetWinColor(Color);
-            CustomWinnerManager.SetWinText("Vulture wins");
-            GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
+            CustomWinnerManager.EndGame(Players, "Vulture wins", Color);
             return true;
         }
 
