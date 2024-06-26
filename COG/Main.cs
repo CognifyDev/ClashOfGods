@@ -249,9 +249,9 @@ public partial class Main : BasePlugin
         CommandManager.GetManager().GetCommands().Clear();
         ModOptionManager.GetManager().GetOptions().Clear();
         CustomRoleManager.GetManager().GetRoles().Clear();
-        ListenerManager.GetManager().UnRegisterHandlers();
-        //SidebarTextManager.GetManager().GetSidebarTexts().Clear();
+        ListenerManager.GetManager().UnregisterHandlers();
         CustomWinnerManager.AllWinners.Clear();
+        EndGameResult.CachedWinners?.Clear();
         CustomWinnerManager.CustomWinners.Clear();
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
