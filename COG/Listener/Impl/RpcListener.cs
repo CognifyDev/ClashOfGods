@@ -4,6 +4,7 @@ using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.Utils;
+using System.Linq;
 
 namespace COG.Listener.Impl;
 
@@ -20,40 +21,40 @@ public class RpcListener : IListener
         switch (knownRpc)
         {
             case KnownRpc.UpdateOption:
-                var originalUpdateOptionString = reader.ReadString()!;
-                var contextsList = originalUpdateOptionString.Split("|");
-                for (var i = 0; i < CustomOption.Options.Count; i++)
                 {
-                    var option = CustomOption.Options[i];
-                    if (option == null) continue;
-                    if (option.ID != int.Parse(contextsList[0])) continue;
-                    option.Selection = int.Parse(contextsList[1]);
-                    CustomOption.Options[i] = option;
-                }
+                    var id = reader.ReadPackedInt32();
+                    var selection = reader.ReadPackedInt32();
 
-                break;
+                    var option = CustomOption.Options.FirstOrDefault(o => o != null && o.ID == id);
+                    if (option == null) return;
+
+                    option.Selection = selection;
+                    HudManager.Instance.Notifier.AddSettingsChangeMessage(StringNames.None, selection.ToString()); // 临时写法
+                    break;
+                }
             case KnownRpc.ShareOptions:
-                var originalString = reader.ReadString();
-                Main.Logger.LogInfo("Received options string => " + originalString);
-                foreach (var s in originalString.Split(","))
                 {
-                    var contexts = s.Split("|");
-                    var id = int.Parse(contexts[0]);
-                    var selection = int.Parse(contexts[1]);
-
-                    for (var i = 0; i < CustomOption.Options.Count; i++)
+                    var originalString = reader.ReadString();
+                    Main.Logger.LogInfo("Received options string => " + originalString);
+                    foreach (var s in originalString.Split(","))
                     {
-                        var option = CustomOption.Options[i];
-                        if (option == null) continue;
-                        if (option.ID != id) continue;
-                        Main.Logger.LogInfo(
-                            $"Changed {option.Name}({option.ID})'s selection to {selection}(before: {option.Selection})");
-                        option.Selection = selection;
-                        CustomOption.Options[i] = option;
-                    }
-                }
+                        var contexts = s.Split("|");
+                        var id = int.Parse(contexts[0]);
+                        var selection = int.Parse(contexts[1]);
 
-                break;
+                        for (var i = 0; i < CustomOption.Options.Count; i++)
+                        {
+                            var option = CustomOption.Options[i];
+                            if (option == null) continue;
+                            if (option.ID != id) continue;
+                            Main.Logger.LogInfo(
+                                $"Changed {option.Name}({option.ID})'s selection to {selection}(before: {option.Selection})");
+                            option.Selection = selection;
+                            CustomOption.Options[i] = option;
+                        }
+                    }
+                    break;
+                }
             case KnownRpc.SetRole:
             {
                 var playerId = reader.ReadByte();

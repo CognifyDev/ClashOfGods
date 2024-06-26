@@ -106,10 +106,7 @@ public class Lover : CustomRole, IListener, IWinnable
         if (players.Count % 2 != 0)
         {
             Main.Logger.LogError("Couldn't assign lovers, game will end now.");
-            CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.GetAllPlayers());
-            CustomWinnerManager.SetWinColor(UnityEngine.Color.grey);
-            CustomWinnerManager.SetWinText("Bug Wins");
-            GameManager.Instance.RpcEndGame(GameOverReason.ImpostorByKill, false);
+            CustomWinnerManager.EndGame(PlayerUtils.GetAllPlayers(), "Bug Wins", UnityEngine.Color.grey);
             return;
         }
 

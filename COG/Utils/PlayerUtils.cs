@@ -374,7 +374,7 @@ public class DeadPlayerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    private void OnAirshipPlayerExile(PlayerExileOnAirshipEvent @event)
+    private void OnAirshipPlayerExile(PlayerExileEndOnAirshipEvent @event)
     {
         OnPlayerExile(new PlayerExileEndEvent(@event.Player, @event.Controller));
     }

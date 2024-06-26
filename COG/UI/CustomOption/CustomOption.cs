@@ -244,10 +244,10 @@ public sealed class CustomOption
 
     public void ShareOptionChange(int newSelection)
     {
-        var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId,
-            (byte)KnownRpc.UpdateOption, SendOption.Reliable);
-        writer.Write(ID + "|" + newSelection);
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.UpdateOption)
+            .WritePacked(ID)
+            .WritePacked(newSelection)
+            .Finish();
     }
 }
 

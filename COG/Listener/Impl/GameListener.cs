@@ -219,9 +219,8 @@ public class GameListener : IListener
             GameUtils.ForceClearGameData();
         else
             HasStartedRoom = true;
-        // 改变按钮颜色
-        manager.HostPrivateButton.activeTextColor = Palette.DisabledClear;
-        manager.privatePublicPanelText.color = Palette.DisabledClear;
+        // TODO: 改变按钮颜色
+        
     }
 
     [EventHandler(EventHandlerType.Prefix)]

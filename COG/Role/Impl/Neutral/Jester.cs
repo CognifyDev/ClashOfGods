@@ -31,12 +31,10 @@ public class Jester : CustomRole, IListener, IWinnable
     public bool CanWin()
     {
         var jester = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp =>
-            dp.Role == CustomRoleManager.GetManager().GetTypeRoleInstance<Jester>() &&
-            dp.DeathReason == Utils.DeathReason.Exiled);
+            dp.Player.IsRole(this) && dp.DeathReason == Utils.DeathReason.Exiled);
         if (jester == null) return false;
 
-        CustomWinnerManager.RegisterWinningPlayer(jester.Player);
-        GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);
+        CustomWinnerManager.EndGame(new[] { jester.Player }, "Jester wins", Color);
         return true;
     }
 
@@ -46,16 +44,19 @@ public class Jester : CustomRole, IListener, IWinnable
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnPlayerReportDeadBody(PlayerReportDeadBodyEvent @event)
+    public bool OnCheckStartMeeting(PlayerReportDeadBodyEvent @event)
     {
         if (!GameStates.InGame) return true;
-        var reportedPlayer = @event.Target;
+        var victim = @event.Target;
         var player = @event.Player;
-        if (!Id.Equals(player.GetMainRole()?.Id)) return true;
-        var result1 = _allowStartMeeting.GetBool();
-        var result2 = _allowReportDeadBody.GetBool();
-        if (!result1 && reportedPlayer == null) return false;
-        return result2 || reportedPlayer == null;
+        if (!player.IsRole(this)) return true;
+
+        var allowMeeting = _allowStartMeeting.GetBool();
+        var allowReport = _allowReportDeadBody.GetBool();
+
+        if (!allowMeeting && !victim) return false; // Reject if meeting is unallowed (It's a meeting when victim is null)
+        if (!allowReport && victim) return false; // Reject if reporting is unallowed
+        return true;
     }
 
     public override IListener GetListener()

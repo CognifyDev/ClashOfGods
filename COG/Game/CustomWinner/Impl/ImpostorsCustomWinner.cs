@@ -23,7 +23,7 @@ public class ImpostorsCustomWinner : IWinnable
             && aliveNeutrals.Where
                 (p => p.GetMainRole().CanKill).ToList().Count <= 0)
         {
-            SetImpostorTeamWinners(false);
+            CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player), LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
             return true;
         }
 
@@ -36,7 +36,7 @@ public class ImpostorsCustomWinner : IWinnable
                 if ((o2Sabo = system.Cast<LifeSuppSystemType>()).Countdown <= 0)
                     if (o2Sabo.Countdown <= 0f)
                     {
-                        SetImpostorTeamWinners(true);
+                        CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player), LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
                         return true;
                     }
             }
@@ -54,7 +54,7 @@ public class ImpostorsCustomWinner : IWinnable
                     if (sabotage is null) return false;
                     if (sabotage.Countdown <= 0)
                     {
-                        SetImpostorTeamWinners(true);
+                        CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player), LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
                         sabotage.ClearSabotage();
                         return true;
                     }
@@ -67,14 +67,5 @@ public class ImpostorsCustomWinner : IWinnable
     public ulong GetWeight()
     {
         return IWinnable.GetOrder(1);
-    }
-
-    private void SetImpostorTeamWinners(bool isSabo)
-    {
-        CustomWinnerManager.RegisterWinningPlayers(PlayerUtils.AllImpostors.Select(pr => pr.Player));
-        CustomWinnerManager.SetWinText(LanguageConfig.Instance.ImpostorsWinText);
-        CustomWinnerManager.SetWinColor(Palette.ImpostorRed);
-        GameManager.Instance.RpcEndGame(isSabo ? GameOverReason.ImpostorBySabotage : GameOverReason.ImpostorByKill,
-            false);
     }
 }
