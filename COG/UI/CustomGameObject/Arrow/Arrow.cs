@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using COG.Constant;
 using COG.States;
 using COG.Utils;
-using Reactor.Utilities.Extensions;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace COG.UI.CustomGameObject.Arrow;

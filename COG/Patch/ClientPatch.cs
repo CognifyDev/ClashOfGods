@@ -1,6 +1,6 @@
 ﻿using AmongUs.GameOptions;
 using COG.States;
-using Reactor.Utilities.Extensions;
+using COG.Utils;
 using UnityEngine;
 
 // ReSharper disable InconsistentNaming
@@ -36,17 +36,17 @@ public static class DestroyQuickButton
     {
         var gameObject = __instance.quickChatButton.gameObject;
         if (gameObject == null || gameObject.IsDestroyedOrNull())
-            gameObject!.DestroyImmediate();
+            gameObject!.Destroy();
     }
 }
 
 [HarmonyPatch(typeof(OptionsMenuBehaviour), nameof(OptionsMenuBehaviour.Update))]
-public static class DestroyUselessButtons
+public static class HideUselessButtons
 {
     public static void Postfix()
     {
         var gameObject = GameObject.Find("OptionsMenu/DataTab/TwitchLinkButton");
-        if (gameObject != null && !gameObject.IsDestroyedOrNull()) gameObject.DestroyImmediate();
+        if (gameObject != null && !gameObject.IsDestroyedOrNull()) gameObject.SetActive(false);
     }
 }
 
