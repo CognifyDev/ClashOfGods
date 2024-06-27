@@ -1,23 +1,16 @@
+using COG.Config.Impl;
+using COG.Rpc;
+using COG.Utils;
+using COG.Utils.Coding;
+using COG.Utils.WinAPI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using AmongUs.GameOptions;
-using COG.Config.Impl;
-using COG.Rpc;
-//using COG.UI.SidebarText;
-using COG.Utils;
-using COG.Utils.Coding;
-using COG.Utils.WinAPI;
-using Reactor.Utilities.Extensions;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using static COG.UI.CustomOption.CustomOption;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-
 
 namespace COG.UI.CustomOption;
 
