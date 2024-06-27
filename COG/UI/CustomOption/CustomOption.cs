@@ -1,4 +1,5 @@
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Rpc;
 using COG.Utils;
 using COG.Utils.Coding;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Events;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG.UI.CustomOption;
@@ -195,7 +197,7 @@ public sealed class CustomOption
         SaveCurrentOption(file.FilePath);
     }
 
-    public static void OpenPresetWithDialogue()
+    public static void LoadPresetWithDialogue()
     {
         var file = OpenFileDialogue.Open(Mode.Open, "Preset File(*.cog)\0*.cog\0\0");
         if (file.FilePath is null or "") return;
@@ -244,9 +246,56 @@ public sealed class CustomOption
     }
 }
 
+[HarmonyPatch(typeof(GamePresetsTab), nameof(GamePresetsTab.OpenMenu))]
+public static class PresetsButtonsPatch
+{
+    public static void Postfix(GamePresetsTab __instance)
+    {
+        var std = __instance.StandardPresetButton;
+        var alter = __instance.SecondPresetButton;
+
+        // Destroy selectable background
+        DestroySelectableSprite(std.gameObject);
+        DestroySelectableSprite(alter.gameObject);
+
+        void DestroySelectableSprite(GameObject go)
+        {
+            var trans = go.transform;
+            trans.transform.FindChild("Active").FindChild("SelectionBackground").Destroy();
+            trans.transform.FindChild("Selected").FindChild("SelectionBackground").Destroy();
+        }
+
+        // Set button text
+        __instance.StandardRulesText.text = LanguageConfig.Instance.LoadPreset;
+        __instance.AlternateRulesText.text = LanguageConfig.Instance.SavePreset;
+
+        // Set button OnClick action
+        std.OnClick = new();
+        std.OnClick.AddListener((UnityAction)new Action(() =>
+        {
+            ResetActiveState(std.transform);
+            CustomOption.LoadPresetWithDialogue();
+        }));
+
+        alter.OnClick = new();
+        alter.OnClick.AddListener((UnityAction)new Action(() =>
+        {
+            ResetActiveState(alter.transform);
+            CustomOption.SaveOptionWithDialogue();
+        }));
+
+        void ResetActiveState(Transform transform)
+        {
+            transform.FindChild("Active").gameObject.SetActive(false);
+            transform.FindChild("Inactive").gameObject.SetActive(true);
+            __instance.ClickPresetButton(AmongUs.GameOptions.RulesPresets.Custom);
+        }
+    }
+}
+
 
 [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Start))]
-public static class GameOptionPatch
+public static class RoleOptionPatch
 {
     public static void Postfix(RolesSettingsMenu __instance)
     {
