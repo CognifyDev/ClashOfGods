@@ -171,14 +171,14 @@ internal class OnGameJoinedPatch
 {
     public static bool Prefix(AmongUsClient __instance, [HarmonyArgument(0)] string gameIdString)
     {
-        return ListenerManager.GetManager().ExecuteHandlers(new LocalAmongUsClientJoinEvent(__instance, gameIdString),
+        return ListenerManager.GetManager().ExecuteHandlers(new AmongUsClientJoinLobbyEvent(__instance, gameIdString),
             EventHandlerType.Prefix);
     }
 
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] string gameIdString)
     {
         ListenerManager.GetManager()
-            .ExecuteHandlers(new LocalAmongUsClientJoinEvent(__instance, gameIdString), EventHandlerType.Postfix);
+            .ExecuteHandlers(new AmongUsClientJoinLobbyEvent(__instance, gameIdString), EventHandlerType.Postfix);
     }
 }
 
@@ -206,13 +206,13 @@ internal class OnPlayerJoinedPatch
     public static bool Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data)
     {
         return ListenerManager.GetManager()
-            .ExecuteHandlers(new AmongUsClientJoinEvent(__instance, data), EventHandlerType.Prefix);
+            .ExecuteHandlers(new AmongUsClientPlayerJoinEvent(__instance, data), EventHandlerType.Prefix);
     }
 
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data)
     {
         ListenerManager.GetManager()
-            .ExecuteHandlers(new AmongUsClientJoinEvent(__instance, data), EventHandlerType.Postfix);
+            .ExecuteHandlers(new AmongUsClientPlayerJoinEvent(__instance, data), EventHandlerType.Postfix);
     }
 }
 
@@ -292,5 +292,21 @@ internal class AdjustLightPatch
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerAdjustLightingEvent(__instance), EventHandlerType.Postfix);
+    }
+}
+
+[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.Start))]
+internal class AUClientStartPatch
+{
+    public static bool Prefix(AmongUsClient __instance)
+    {
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new AmongUsClientStartEvent(__instance), EventHandlerType.Prefix);
+    }
+
+    public static void Postfix(AmongUsClient __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new AmongUsClientStartEvent(__instance), EventHandlerType.Postfix);
     }
 }

@@ -12,7 +12,7 @@ namespace COG.Listener.Impl;
 public class PlayerListener : IListener
 {
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnJoinPlayer(AmongUsClientJoinEvent @event)
+    public void OnJoinPlayer(AmongUsClientPlayerJoinEvent @event)
     {
         var instance = @event.AmongUsClient;
 
