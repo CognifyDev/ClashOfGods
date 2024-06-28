@@ -63,32 +63,34 @@ public static class OpenFileDialogue
 
 #nullable disable
     // Class(Struct) from commdlg.h
+    // 这玩意最好一点都别动，包括成员顺序！！！！！！名字随便改但顺序不能改！！！！！！
+    // Windows 底层的东西可不能乱来！
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public class OPENFILENAME
+    public class OPENFILENAME // 这玩意最好一点都别动，包括成员顺序！！！！！！名字随便改但顺序不能改！！！！！！
     {
-        public int dwReserved;
-        public int Flags = 1 << 3;
-        public int FlagsEx;
-        public IntPtr hInstance;
+        public int lStructSize;
         public IntPtr IntPtrOwner;
+        public IntPtr hInstance;
+        public string stringFilter;
+        public string stringCustomFilter;
+        public int nMaxCustFilter;
+        public int nFilterIndex;
+        public string stringFile = new(new char[256]);
+        public int nMaxFile = 256;
+        public string stringFileTitle = new(new char[64]);
+        public int nMaxFileTitle = 64;
+        public string stringInitialDir;
+        public string stringTitle;
+        public int Flags = 1 << 3;
+        public short nFileOffset;
+        public short nFileExtension;
+        public string stringDefExt;
         public int lCustData;
         public IntPtr lpfnHook;
         public string lpTemplateName;
-        public int lStructSize;
-        public short nFileExtension;
-        public short nFileOffset;
-        public int nFilterIndex;
-        public int nMaxCustFilter;
-        public int nMaxFile = 256;
-        public int nMaxFileTitle = 64;
         public IntPtr pvReserved;
-        public string stringCustomFilter;
-        public string stringDefExt;
-        public string stringFile = new(new char[256]);
-        public string stringFileTitle = new(new char[64]);
-        public string stringFilter;
-        public string stringInitialDir;
-        public string stringTitle;
+        public int dwReserved;
+        public int FlagsEx;
     }
 #nullable enable
 
