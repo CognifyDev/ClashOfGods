@@ -1,5 +1,5 @@
+using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Constant;
 using COG.Rpc;
 using COG.Utils;
 using COG.Utils.Coding;
@@ -246,10 +246,12 @@ public sealed class CustomOption
     }
 }
 
-[HarmonyPatch(typeof(GamePresetsTab), nameof(GamePresetsTab.OpenMenu))]
+[HarmonyPatch(typeof(GamePresetsTab))]
 public static class PresetsButtonsPatch
 {
-    public static void Postfix(GamePresetsTab __instance)
+    [HarmonyPatch(nameof(GamePresetsTab.Start))]
+    [HarmonyPostfix]
+    public static void PresetButtonHook(GamePresetsTab __instance)
     {
         var std = __instance.StandardPresetButton;
         var alter = __instance.SecondPresetButton;
@@ -261,8 +263,8 @@ public static class PresetsButtonsPatch
         void DestroySelectableSprite(GameObject go)
         {
             var trans = go.transform;
-            trans.transform.FindChild("Active").FindChild("SelectionBackground").Destroy();
-            trans.transform.FindChild("Selected").FindChild("SelectionBackground").Destroy();
+            trans.transform.FindChild("Active").FindChild("SelectionBackground").gameObject.Destroy();
+            trans.transform.FindChild("Selected").FindChild("SelectionBackground").gameObject.Destroy();
         }
 
         // Set button text
@@ -288,18 +290,21 @@ public static class PresetsButtonsPatch
         {
             transform.FindChild("Active").gameObject.SetActive(false);
             transform.FindChild("Inactive").gameObject.SetActive(true);
-            __instance.ClickPresetButton(AmongUs.GameOptions.RulesPresets.Custom);
+            __instance.ClickPresetButton(RulesPresets.Custom);
         }
     }
-}
 
+    [HarmonyPatch(nameof(GamePresetsTab.ClickPresetButton))]
+    [HarmonyPrefix]
+    public static void OnButtonClickAlwaysCustomPreset(ref RulesPresets preset) => preset = RulesPresets.Custom;
+}
 
 [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Start))]
 public static class RoleOptionPatch
 {
     public static void Postfix(RolesSettingsMenu __instance)
     {
-        
+
     }
 }
 #if false

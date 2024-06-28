@@ -29,6 +29,5 @@ public class VersionShowerListener : IListener
         var tmp = modVersionShower.GetComponent<TextMeshPro>();
         tmp.text = VersionMsg;
         tmp.alignment = TextAlignmentOptions.TopRight;
-        tmp.horizontalAlignment = HorizontalAlignmentOptions.Right;
     }
 }
