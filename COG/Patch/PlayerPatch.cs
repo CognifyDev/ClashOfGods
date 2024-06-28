@@ -294,19 +294,3 @@ internal class AdjustLightPatch
             .ExecuteHandlers(new PlayerAdjustLightingEvent(__instance), EventHandlerType.Postfix);
     }
 }
-
-[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.Start))]
-internal class AUClientStartPatch
-{
-    public static bool Prefix(AmongUsClient __instance)
-    {
-        return ListenerManager.GetManager()
-            .ExecuteHandlers(new AmongUsClientStartEvent(__instance), EventHandlerType.Prefix);
-    }
-
-    public static void Postfix(AmongUsClient __instance)
-    {
-        ListenerManager.GetManager()
-            .ExecuteHandlers(new AmongUsClientStartEvent(__instance), EventHandlerType.Postfix);
-    }
-}
