@@ -1,8 +1,6 @@
-global using Hazel;
 global using HarmonyLib;
+global using Hazel;
 global using Object = UnityEngine.Object;
-using System.IO;
-using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Command;
@@ -27,11 +25,8 @@ using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
 using InnerNet;
-using Reactor;
-using Reactor.Networking;
-using Reactor.Networking.Attributes;
-using Reactor.Utilities;
-using Reactor.Utilities.Extensions;
+using System.IO;
+using System.Linq;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
@@ -43,9 +38,7 @@ namespace COG;
 [BepInIncompatibility("me.yukieiji.extremeroles")]
 [BepInIncompatibility("jp.ykundesu.supernewroles")]
 [BepInIncompatibility("com.tugaru.TownOfPlus")]
-[BepInDependency(ReactorPlugin.Id)]
 [BepInProcess("Among Us.exe")]
-[ReactorModFlags(ModFlags.RequireOnAllClients)]
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public partial class Main : BasePlugin
@@ -256,7 +249,6 @@ public partial class Main : BasePlugin
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
         MainMenuPatch.CustomBG!.Destroy();
-        PluginSingleton<ReactorPlugin>.Instance.Unload();
         return false;
     }
 }

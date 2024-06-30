@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace COG.Utils;
 
-public class ResourceUtils
+public static class ResourceUtils
 {
     private static readonly Dictionary<string, Sprite> CachedSprites = new();
 
@@ -81,5 +80,12 @@ public class ResourceUtils
         stream?.CopyTo(ms);
         ImageConversion.LoadImage(texture, ms.ToArray(), false);
         return texture;
+    }
+
+    public static byte[] ReadFully(this Stream input)
+    {
+        using var ms = new MemoryStream();
+        input.CopyTo(ms);
+        return ms.ToArray();
     }
 }
