@@ -10,15 +10,6 @@ public static class GlobalCustomOptionConstant
 
     static GlobalCustomOptionConstant()
     {
-        var loadPreset = CustomOption.Create(CustomOption.TabType.General,
-            LanguageConfig.Instance.LoadPreset, false, null, true, CustomOption.OptionType.Button);
-
-        var savePreset = CustomOption.Create(CustomOption.TabType.General,
-            LanguageConfig.Instance.SavePreset, false, null, true, CustomOption.OptionType.Button);
-
-        loadPreset.OnClickIfButton = _ => CustomOption.LoadPresetWithDialogue();
-        savePreset.OnClickIfButton = _ => CustomOption.SaveOptionWithDialogue();
-
         DebugMode = CustomOption.Create(CustomOption.TabType.General,
             LanguageConfig.Instance.DebugMode, false, null, true);
 

@@ -7,6 +7,12 @@ namespace COG.Utils;
 
 public abstract class RpcUtils
 {
+    public static RpcWriter StartRpcImmediately(PlayerControl playerControl, RpcCalls callId,
+        PlayerControl[]? targets = null)
+    {
+        return StartRpcImmediately(playerControl, (byte)callId, targets);
+    }
+
     public static RpcWriter StartRpcImmediately(PlayerControl playerControl, KnownRpc callId,
         PlayerControl[]? targets = null)
     {

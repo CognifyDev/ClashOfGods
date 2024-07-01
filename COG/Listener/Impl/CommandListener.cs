@@ -10,13 +10,13 @@ public class CommandListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnLocalPlayerChat(LocalPlayerChatEvent @event)
     {
-        var text = @event.GetChatController().freeChatField.textArea.text;
-        if (!text.ToLower().StartsWith("/")) return true;
+        var text = @event.GetChatController().freeChatField.textArea.text.ToLower();
+        if (!text.StartsWith("/")) return true;
 
         var cancellable = false;
         foreach (var command in CommandManager.GetManager().GetCommands())
         {
-            if (text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) || ContainAliases(text, command))
+            if (text.Split(" ")[0].Equals("/" + command.Name.ToLower()) || ContainAliases(text, command))
                 command.OnExecute(PlayerControl.LocalPlayer, AsCommandStringArray(text));
             if (command.Cancellable) cancellable = true;
         }
