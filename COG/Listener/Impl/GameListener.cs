@@ -74,10 +74,15 @@ public class GameListener : IListener
         if (player == null! || !PlayerControl.LocalPlayer) return;
         if (GameStates.IsLobby && AmongUsClient.Instance.AmHost)
         {
-            GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
-            GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Engineer, 0, 0);
-            GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
-            GameOptionsManager.Instance.currentNormalGameOptions.RoleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
+            var mainOption = GameUtils.GetGameOptions();
+            var roleOption = mainOption.RoleOptions;
+
+            foreach (var role in Enum.GetValues<RoleTypes>())
+                if (roleOption.GetNumPerGame(role) != 0 || roleOption.GetChancePerGame(role) != 0) 
+                    roleOption.SetRoleRate(role, 0, 0);
+            
+            if (mainOption.RulesPreset != RulesPresets.Custom) 
+                mainOption.RulesPreset = RulesPresets.Custom;
         }
 
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)

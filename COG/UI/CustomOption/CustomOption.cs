@@ -286,6 +286,8 @@ public static class PresetsButtonsPatch
             CustomOption.SaveOptionWithDialogue();
         }));
 
+        __instance.PresetDescriptionText.gameObject.SetActive(false); // Hide preset introduction text
+
         void ResetActiveState(Transform transform)
         {
             transform.FindChild("Active").gameObject.SetActive(false);
