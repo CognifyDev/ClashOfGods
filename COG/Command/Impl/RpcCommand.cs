@@ -1,5 +1,9 @@
-using System.Text;
+using COG.Rpc;
 using COG.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace COG.Command.Impl;
 
@@ -10,26 +14,102 @@ public class RpcCommand : Command
         HostOnly = true;
     }
 
+    private RpcUtils.RpcWriter Writer = null;
+
     public override void OnExecute(PlayerControl player, string[] args)
     {
         // /rpc <CallId> <string>
         try
         {
-            var callId = byte.Parse(args[0]);
-            var sb = new StringBuilder();
-            for (var i = 1; i < args.Length; i++)
+            var sign = args.FirstOrDefault();
+            var chat = HudManager.Instance.Chat;
+            switch (sign)
             {
-                sb.Append(args[i]);
-                if (i < args.Length - 1) sb.Append(' ');
-            }
+                case "start":
+                    {
+                        if (int.TryParse(args[1], out var result))
+                        {
+                            if (Enum.IsDefined((RpcCalls)result))
+                                Writer = RpcUtils.StartRpcImmediately(player, (RpcCalls)result);
+                            else if (Enum.IsDefined((KnownRpc)result))
+                                Writer = RpcUtils.StartRpcImmediately(player, (KnownRpc)result);
+                            else
+                            {
+                                throw null!; // 直接跳到catch块中
+                            }
+                        }
+                        chat.AddChat(player, "一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。", false);
+                    }
+                    break;
+                case "help":
+                    {
+                        StringBuilder sb = new();
+                        sb.Append("/rpc add %dataType% %context%\n")
+                            .Append("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player\n")
+                            .Append("例：\n /rpc add bool true\n /rpc add vector2 3 -1.2\n /rpc add player 3（玩家Id）\n /rpc add player 玩家名字")
+                            .Append("/rpc start %callId%\n/rpc send");
+                        chat.AddChat(player, sb.ToString(), false);
+                    }
+                    break;
+                case "add":
+                    {
+                        var typeName = args[1];
+                        if (string.IsNullOrEmpty(typeName) || Writer == null) throw null!;
 
-            foreach (var playerControl in PlayerUtils.GetAllPlayers())
-            {
-                var writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, callId, SendOption.Reliable,
-                    playerControl.GetClientID());
-                writer.Write(sb.ToString());
-                AmongUsClient.Instance.FinishRpcImmediately(writer);
-                GameUtils.SendGameMessage("成功向" + playerControl.name + "发送Rpc " + callId + " " + sb);
+                        List<(string, string)> nameToClass = new()
+                        {
+                            ("sbyte", "SByte"),
+                            ("int", "Int32"),
+                            ("ushort", "UInt16"),
+                            ("uint", "UInt32"),
+                            ("ulong", "UInt64"),
+                            ("float", "Single"),
+                        };
+                        if (typeName != "player")
+                        {
+                            typeName = typeName[0].ToString().ToUpper() + typeName[1..];
+                            var assembly = typeof(int).Assembly;
+                            var typeLocation = "System." + typeName;
+                            var type = assembly.GetType(typeLocation);
+                            if (type == null) throw null!;
+
+                            object[] array = new object[] { args[2], new object() };
+                            var method = type.GetMethod("TryParse", new Type[] { typeof(string), assembly.GetType(typeLocation + "&")! });
+                            if (method == null) throw null!;
+
+                            bool success = (bool)method.Invoke(null, array)!;
+                            if (success)
+                            {
+                                dynamic result = array[1];
+                                Writer.Write(result);
+                            }
+                            else 
+                                throw null!;
+                        }
+                        else
+                        {
+                            var nameOrId = args[2];
+                            PlayerControl? pc = null;
+
+                            if (byte.TryParse(nameOrId, out var result))
+                                pc = PlayerUtils.GetPlayerById(result);
+                            else
+                                pc = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(p => p.Data.PlayerName == nameOrId);
+                            
+                            if (!pc) throw null!;
+                            Writer.WriteNetObject(pc!);
+                        }
+
+                        chat.AddChat(player, "写入成功！", false);
+                    }
+                    break;
+                case "send":
+                    {
+                        if (Writer == null) throw null!;
+                        Writer.Finish();
+                        chat.AddChat(player, "Rpc已发送！", false);
+                    }
+                    break;
             }
         }
         catch

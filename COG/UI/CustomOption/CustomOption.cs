@@ -440,31 +440,4 @@ internal class HudStringPatch
     }
 }
 
-[HarmonyPatch(typeof(KeyboardJoystick), nameof(KeyboardJoystick.Update))]
-public static class GameOptionsNextPagePatch
-{
-    internal static int TypePage = 1;
-
-    public static void Postfix(KeyboardJoystick __instance)
-    {
-        if (HudManager.Instance.Chat.freeChatField.textArea.hasFocus) return; // 忽略正在聊天时的按键操作
-        if (Input.GetKeyDown(KeyCode.Tab)) TypePage += 1;
-
-        // from Alpha1 to Alpha9
-        for (var num = (int)KeyCode.Alpha1; num <= (int)KeyCode.Alpha9; num++)
-        {
-            var page = num - ((int)KeyCode.Alpha1 - 1); // 指代的page
-            var keycode = (KeyCode)num;
-            if (Input.GetKeyDown(keycode)) TypePage = page;
-        }
-
-        // from Keypad1 to Keypad9
-        for (var num = (int)KeyCode.Keypad1; num <= (int)KeyCode.Keypad9; num++)
-        {
-            var page = num - ((int)KeyCode.Keypad1 - 1);
-            var keycode = (KeyCode)num;
-            if (Input.GetKeyDown(keycode)) TypePage = page;
-        }
-    }
-
 #endif
