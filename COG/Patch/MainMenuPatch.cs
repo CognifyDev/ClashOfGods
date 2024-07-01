@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Utils;
 using COG.Utils.Version;
@@ -130,7 +131,7 @@ public static class MainMenuPatch
     [HarmonyPatch(nameof(MainMenuManager.OpenCredits))]
     [HarmonyPatch(nameof(MainMenuManager.OpenGameModeMenu))]
     [HarmonyPostfix]
-    private static void Hide()
+    private static void HideModBG()
     {
         if (CustomBG != null) CustomBG.SetActive(false);
         foreach (var btn in Buttons) btn.gameObject.SetActive(false);
@@ -138,7 +139,7 @@ public static class MainMenuPatch
 
     [HarmonyPatch(nameof(MainMenuManager.ResetScreen))]
     [HarmonyPostfix]
-    private static void Show()
+    private static void ShowModBG()
     {
         if (CustomBG != null) CustomBG.SetActive(true);
         foreach (var btn in Buttons.Where(btn => btn != null && btn.gameObject != null)) btn.gameObject.SetActive(true);
