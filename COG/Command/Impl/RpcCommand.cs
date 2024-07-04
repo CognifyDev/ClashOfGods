@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace COG.Command.Impl;
 
@@ -14,7 +15,7 @@ public class RpcCommand : Command
         HostOnly = true;
     }
 
-    private RpcUtils.RpcWriter Writer = null;
+    private RpcUtils.RpcWriter? Writer = null;
 
     public override void OnExecute(PlayerControl player, string[] args)
     {
@@ -45,8 +46,8 @@ public class RpcCommand : Command
                     {
                         StringBuilder sb = new();
                         sb.Append("/rpc add %dataType% %context%\n")
-                            .Append("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player\n")
-                            .Append("例：\n /rpc add bool true\n /rpc add vector2 3 -1.2\n /rpc add player 3（玩家Id）\n /rpc add player 玩家名字")
+                            .Append("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player, vector\n")
+                            .Append("例：\n /rpc add bool true\n /rpc add vector2 3 -1.2\n /rpc add player 3（玩家Id）\n /rpc add player 玩家名字\n /rpc add vector 1 -3")
                             .Append("/rpc start %callId%\n/rpc send");
                         chat.AddChat(player, sb.ToString(), false);
                     }
@@ -65,7 +66,7 @@ public class RpcCommand : Command
                             ("ulong", "UInt64"),
                             ("float", "Single"),
                         };
-                        if (typeName != "player")
+                        if (typeName != "player" || typeName != "string" || typeName != "vector")
                         {
                             typeName = typeName[0].ToString().ToUpper() + typeName[1..];
                             var assembly = typeof(int).Assembly;
@@ -88,16 +89,49 @@ public class RpcCommand : Command
                         }
                         else
                         {
-                            var nameOrId = args[2];
-                            PlayerControl? pc = null;
+                            switch (typeName)
+                            {
+                                case "player":
+                                    {
+                                        var nameOrId = args[2];
+                                        PlayerControl? pc = null;
 
-                            if (byte.TryParse(nameOrId, out var result))
-                                pc = PlayerUtils.GetPlayerById(result);
-                            else
-                                pc = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(p => p.Data.PlayerName == nameOrId);
-                            
-                            if (!pc) throw null!;
-                            Writer.WriteNetObject(pc!);
+                                        if (byte.TryParse(nameOrId, out var result))
+                                            pc = PlayerUtils.GetPlayerById(result);
+                                        else
+                                            pc = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(p => p.Data.PlayerName == nameOrId);
+
+                                        if (!pc) throw null!;
+                                        Writer.WriteNetObject(pc!);
+                                    }
+                                    break;
+                                case "string":
+                                    {
+                                        List<string> strList = new(args);
+                                        strList.RemoveAt(0);
+                                        StringBuilder sb = new();
+                                        int i = 0;
+                                        foreach (var str in strList)
+                                        {
+                                            if (i != 0) sb.Append(' ');
+                                            sb.Append(str);
+                                            i++;
+                                        }
+                                        Writer.Write(sb.ToString());
+                                    }
+                                    break;
+                                case "vector":
+                                    {
+                                        var (xStr, yStr) = (args[2], args[3]);
+                                        var (x, y) = (-1, -1);
+                                        if (int.TryParse(xStr, out x) && int.TryParse(yStr, out y))
+                                        {
+                                            var vector = new Vector2(x, y);
+                                            Writer.WriteVector2(vector);
+                                        }
+                                    }
+                                    break;
+                            }
                         }
 
                         chat.AddChat(player, "写入成功！", false);
