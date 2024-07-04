@@ -29,6 +29,7 @@ public class RpcCommand : Command
             {
                 case "start":
                     {
+                        if (Writer != null) chat.StartCoroutine(CoSendChatMessage("当前仍存在一个RpcWriter实例！").WrapToIl2Cpp());
                         var value = args[1];
                         if (int.TryParse(value, out var result))
                         {
@@ -51,6 +52,7 @@ public class RpcCommand : Command
                         chat.StartCoroutine(CoSendChatMessage("一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。").WrapToIl2Cpp());
                     }
                     break;
+                default:
                 case "help":
                     {
                         StringBuilder sb = new();
@@ -75,13 +77,13 @@ public class RpcCommand : Command
                             ("ulong", "UInt64"),
                             ("float", "Single"),
                         };
-                        if (typeName != "player" || typeName != "string" || typeName != "vector")
+                        if (typeName is not ("player" or "string" or "vector"))
                         {
                             typeName = typeName[0].ToString().ToUpper() + typeName[1..];
                             var assembly = typeof(int).Assembly;
                             var typeLocation = "System." + typeName;
                             var type = assembly.GetType(typeLocation);
-                            if (type == null) throw new NotSupportedException($"The data type {typeName} is null. (Normally, you aren't able to see this message.)");
+                            if (type == null) throw new NotSupportedException($"The data type {typeName} is null.");
 
                             object[] array = new object[] { args[2], new object() };
                             var method = type.GetMethod("TryParse", new Type[] { typeof(string), assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer. */ });
@@ -149,6 +151,7 @@ public class RpcCommand : Command
                     {
                         if (Writer == null) throw new NullReferenceException("Writer is null.");
                         Writer.Finish();
+                        Writer = null;
                         chat.StartCoroutine(CoSendChatMessage("Rpc已发送！").WrapToIl2Cpp());
                     }
                     break;
@@ -156,7 +159,7 @@ public class RpcCommand : Command
         }
         catch (System.Exception e)
         {
-            GameUtils.SendGameMessage("出现异常，请检查是否已开启实例或数据格式正确！\n要了解更多详细情况，请阅读日志。");
+            GameUtils.SendGameMessage("出现异常，请检查是否已开启实例或数据格式正确！\n要了解更多详细信息，请阅读日志。");
             Main.Logger.LogError(e);
         }
 
