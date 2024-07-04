@@ -1,6 +1,8 @@
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Rpc;
 using COG.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,12 +14,11 @@ public class RpcCommand : Command
 {
     public RpcCommand() : base("rpc")
     {
-        HostOnly = true;
     }
 
     private RpcUtils.RpcWriter? Writer = null;
 
-    public override void OnExecute(PlayerControl player, string[] args)
+    public override bool OnExecute(PlayerControl player, string[] args)
     {
         // /rpc <CallId> <string>
         try
@@ -28,18 +29,26 @@ public class RpcCommand : Command
             {
                 case "start":
                     {
-                        if (int.TryParse(args[1], out var result))
+                        var value = args[1];
+                        if (int.TryParse(value, out var result))
                         {
                             if (Enum.IsDefined((RpcCalls)result))
                                 Writer = RpcUtils.StartRpcImmediately(player, (RpcCalls)result);
                             else if (Enum.IsDefined((KnownRpc)result))
                                 Writer = RpcUtils.StartRpcImmediately(player, (KnownRpc)result);
                             else
-                            {
-                                throw null!; // 直接跳到catch块中
-                            }
+                                Writer = RpcUtils.StartRpcImmediately(player, (byte)result);
                         }
-                        chat.AddChat(player, "一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。", false);
+                        else
+                        {
+                            if (Enum.TryParse<RpcCalls>(value, true, out var vanillaRpc))
+                                Writer = RpcUtils.StartRpcImmediately(player, vanillaRpc);
+                            else if (Enum.TryParse<KnownRpc>(value, false, out var modRpc))
+                                Writer = RpcUtils.StartRpcImmediately(player, modRpc);
+                            else
+                                throw new NotSupportedException("The RPC you request to send is not supported.");
+                        }
+                        chat.StartCoroutine(CoSendChatMessage("一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。").WrapToIl2Cpp());
                     }
                     break;
                 case "help":
@@ -47,15 +56,15 @@ public class RpcCommand : Command
                         StringBuilder sb = new();
                         sb.Append("/rpc add %dataType% %context%\n")
                             .Append("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player, vector\n")
-                            .Append("例：\n /rpc add bool true\n /rpc add vector2 3 -1.2\n /rpc add player 3（玩家Id）\n /rpc add player 玩家名字\n /rpc add vector 1 -3")
+                            .Append("例：\n /rpc add bool true\n /rpc add vector2 3 -1.2\n /rpc add player 3（玩家Id）\n /rpc add player 玩家名字\n /rpc add vector 1 -3\n")
                             .Append("/rpc start %callId%\n/rpc send");
-                        chat.AddChat(player, sb.ToString(), false);
+                        chat.StartCoroutine(CoSendChatMessage(sb.ToString()).WrapToIl2Cpp());
                     }
                     break;
                 case "add":
                     {
                         var typeName = args[1];
-                        if (string.IsNullOrEmpty(typeName) || Writer == null) throw null!;
+                        if (string.IsNullOrEmpty(typeName) || Writer == null) throw new NullReferenceException("You haven't started a RpcWriter instance yet or the name of the type you entered is null. (Normally, the second situation won't be happened.)");
 
                         List<(string, string)> nameToClass = new()
                         {
@@ -72,11 +81,11 @@ public class RpcCommand : Command
                             var assembly = typeof(int).Assembly;
                             var typeLocation = "System." + typeName;
                             var type = assembly.GetType(typeLocation);
-                            if (type == null) throw null!;
+                            if (type == null) throw new NotSupportedException($"The data type {typeName} is null. (Normally, you aren't able to see this message.)");
 
                             object[] array = new object[] { args[2], new object() };
-                            var method = type.GetMethod("TryParse", new Type[] { typeof(string), assembly.GetType(typeLocation + "&")! });
-                            if (method == null) throw null!;
+                            var method = type.GetMethod("TryParse", new Type[] { typeof(string), assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer. */ });
+                            if (method == null) throw new NotSupportedException("The parsing method is null. (Normally, you aren't able to see this message.)");
 
                             bool success = (bool)method.Invoke(null, array)!;
                             if (success)
@@ -84,8 +93,8 @@ public class RpcCommand : Command
                                 dynamic result = array[1];
                                 Writer.Write(result);
                             }
-                            else 
-                                throw null!;
+                            else
+                                throw new NotSupportedException("Error parsing data.");
                         }
                         else
                         {
@@ -101,14 +110,14 @@ public class RpcCommand : Command
                                         else
                                             pc = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(p => p.Data.PlayerName == nameOrId);
 
-                                        if (!pc) throw null!;
+                                        if (!pc) throw new NullReferenceException("Error getting player to write.");
                                         Writer.WriteNetObject(pc!);
                                     }
                                     break;
                                 case "string":
                                     {
                                         List<string> strList = new(args);
-                                        strList.RemoveAt(0);
+                                        if (strList.Count > 1) strList.RemoveAt(0);
                                         StringBuilder sb = new();
                                         int i = 0;
                                         foreach (var str in strList)
@@ -124,31 +133,39 @@ public class RpcCommand : Command
                                     {
                                         var (xStr, yStr) = (args[2], args[3]);
                                         var (x, y) = (-1, -1);
+
                                         if (int.TryParse(xStr, out x) && int.TryParse(yStr, out y))
-                                        {
-                                            var vector = new Vector2(x, y);
-                                            Writer.WriteVector2(vector);
-                                        }
+                                            Writer.WriteVector2(new Vector2(x, y));
+                                        else
+                                            throw new InvalidCastException("The position of the vector is invalid.");
                                     }
                                     break;
                             }
                         }
-
-                        chat.AddChat(player, "写入成功！", false);
+                        chat.StartCoroutine(CoSendChatMessage("写入成功！").WrapToIl2Cpp());
                     }
                     break;
                 case "send":
                     {
-                        if (Writer == null) throw null!;
+                        if (Writer == null) throw new NullReferenceException("Writer is null.");
                         Writer.Finish();
-                        chat.AddChat(player, "Rpc已发送！", false);
+                        chat.StartCoroutine(CoSendChatMessage("Rpc已发送！").WrapToIl2Cpp());
                     }
                     break;
             }
         }
-        catch
+        catch (System.Exception e)
         {
-            GameUtils.SendGameMessage("发送失败，检查数据格式");
+            GameUtils.SendGameMessage("出现异常，请检查是否已开启实例或数据格式正确！\n要了解更多详细情况，请阅读日志。");
+            Main.Logger.LogError(e);
         }
+
+        return false;
+    }
+
+    public IEnumerator CoSendChatMessage(string text)
+    {
+        yield return new WaitForSeconds(0.2f);
+        HudManager.Instance?.Chat?.AddChat(PlayerControl.LocalPlayer, text, false);
     }
 }

@@ -38,7 +38,7 @@ public class GameListener : IListener
     public void OnRPCReceived(PlayerHandleRpcEvent @event)
     {
         var callId = @event.CallId;
-        var reader = @event.MessageReader;
+        var reader = @event.Reader;
         if (AmongUsClient.Instance.AmHost) return; // 是房主就返回
         var knownRpc = (KnownRpc)callId;
 

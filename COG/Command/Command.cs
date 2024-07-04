@@ -24,11 +24,6 @@ public abstract class Command
     public string Name { get; }
 
     /// <summary>
-    ///     是否取消玩家发送命令到公屏
-    /// </summary>
-    public bool Cancellable { get; set; }
-
-    /// <summary>
     ///     命令其他形式
     /// </summary>
     public string[] Aliases { get; set; } = Array.Empty<string>();
@@ -38,5 +33,6 @@ public abstract class Command
     /// </summary>
     /// <param name="player">运行命令玩家</param>
     /// <param name="args">命令字符串集</param>
-    public abstract void OnExecute(PlayerControl player, string[] args);
+    /// <returns>是否取消执行</returns>
+    public abstract bool OnExecute(PlayerControl player, string[] args);
 }

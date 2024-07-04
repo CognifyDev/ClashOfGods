@@ -2,19 +2,10 @@ namespace COG.Listener.Event.Impl.Player;
 
 public class LocalPlayerChatEvent : PlayerEvent
 {
-    private readonly ChatController _chatController;
+    public string Text { get; }
 
-    public LocalPlayerChatEvent(PlayerControl host, ChatController chatController) : base(host)
+    public LocalPlayerChatEvent(PlayerControl sender, string text) : base(sender)
     {
-        _chatController = chatController;
-    }
-
-    /// <summary>
-    ///     获取聊天控制器
-    /// </summary>
-    /// <returns>控制器</returns>
-    public ChatController GetChatController()
-    {
-        return _chatController;
+        Text = text;
     }
 }

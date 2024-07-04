@@ -97,7 +97,7 @@ public class Cleaner : CustomRole, IListener
     {
         if (!GameStates.InGame) return;
         var callId = @event.CallId;
-        var reader = @event.MessageReader;
+        var reader = @event.Reader;
         if (callId != (byte)KnownRpc.CleanDeadBody) return;
         var pid = reader.ReadByte();
         var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);

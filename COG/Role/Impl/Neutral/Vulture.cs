@@ -106,7 +106,7 @@ public class Vulture : CustomRole, IListener, IWinnable
     {
         if ((KnownRpc)@event.CallId != KnownRpc.EatBody) return;
 
-        var reader = @event.MessageReader;
+        var reader = @event.Reader;
 
         var pid = reader.ReadByte();
         var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
