@@ -119,17 +119,18 @@ public sealed class CustomOption
             optionType);
     }
 
-    public static void ShareConfigs(PlayerControl target)
+    public static void ShareConfigs(PlayerControl? target = null)
     {
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
 
         // 当游戏选项更改的时候调用
 
         var localPlayer = PlayerControl.LocalPlayer;
+        PlayerControl[]? targetArr = null;
+        if (target) targetArr = new[] { target! };
 
         // 新建写入器
-        var writer = AmongUsClient.Instance.StartRpcImmediately(localPlayer.NetId, (byte)KnownRpc.ShareOptions,
-            SendOption.Reliable, target.GetClientID());
+        var writer = RpcUtils.StartRpcImmediately(localPlayer, KnownRpc.ShareOptions, targetArr);
 
         var sb = new StringBuilder();
 
@@ -143,12 +144,9 @@ public sealed class CustomOption
             sb.Append(',');
         }
 
-        writer.Write(sb.ToString().RemoveLast());
+        writer.Write(sb.ToString().RemoveLast()).Finish();
 
         // id|selection,id|selection
-
-        // OK 现在进行一个结束
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
 
     public static void LoadOptionFromPreset(string path)
@@ -232,9 +230,9 @@ public sealed class CustomOption
         {
             stringOption.oldValue = stringOption.Value = Selection;
             stringOption.ValueText.text = Selections[Selection].ToString();
-
-            ShareOptionChange(newSelection);
         }
+
+        ShareOptionChange(newSelection);
     }
 
     public void ShareOptionChange(int newSelection)

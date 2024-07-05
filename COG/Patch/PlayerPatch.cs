@@ -294,3 +294,19 @@ internal class AdjustLightPatch
             .ExecuteHandlers(new PlayerAdjustLightingEvent(__instance), EventHandlerType.Postfix);
     }
 }
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Awake))]
+internal class PlayerControlAwakePatch
+{
+    public static bool Prefix(PlayerControl __instance)
+    {
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerControlAwakeEvent(__instance), EventHandlerType.Prefix);
+    }
+
+    public static void Postfix(PlayerControl __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerControlAwakeEvent(__instance), EventHandlerType.Postfix);
+    }
+}

@@ -68,6 +68,7 @@ public partial class Main : BasePlugin
         Logger = new StackTraceLogger($"   {DisplayName}");
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
+        Logger.LogInfo($"GitInfo: {ThisAssembly.Git.Commit} ({ThisAssembly.Git.CommitDate})")
 
         // Add dependencies to core directory
         ResourceUtils.WriteToFileFromResource(
@@ -212,7 +213,8 @@ public partial class Main : BasePlugin
         // Register Commands
         CommandManager.GetManager().RegisterCommands(new Command.Command[]
         {
-            new RpcCommand()
+            new RpcCommand(),
+            new OptionCommand()
         });
 
         // Register CustomWinners
