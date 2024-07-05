@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using COG.Rpc;
 using InnerNet;
+using UnityEngine;
 
 namespace COG.Utils;
 
@@ -106,6 +107,12 @@ public abstract class RpcUtils
         public RpcWriter WriteNetObject(InnerNetObject obj)
         {
             foreach (var messageWriter in _writers) messageWriter.WriteNetObject(obj);
+            return this;
+        }
+
+        public RpcWriter WriteVector2(Vector2 vec)
+        {
+            foreach (var messageWriter in _writers) NetHelpers.WriteVector2(vec, messageWriter);
             return this;
         }
 

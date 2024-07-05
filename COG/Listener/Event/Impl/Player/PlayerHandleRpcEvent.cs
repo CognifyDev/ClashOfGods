@@ -1,3 +1,5 @@
+using Hazel;
+
 namespace COG.Listener.Event.Impl.Player;
 
 /// <summary>
@@ -9,7 +11,7 @@ public class PlayerHandleRpcEvent : PlayerEvent
     public PlayerHandleRpcEvent(PlayerControl player, byte callId, MessageReader reader) : base(player)
     {
         CallId = callId;
-        MessageReader = reader;
+        Reader = MessageReader.Get(reader);
     }
 
     /// <summary>
@@ -20,5 +22,5 @@ public class PlayerHandleRpcEvent : PlayerEvent
     /// <summary>
     ///     Rpc读取操作器
     /// </summary>
-    public MessageReader MessageReader { get; }
+    public MessageReader Reader { get; }
 }

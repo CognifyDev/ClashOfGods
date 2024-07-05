@@ -51,7 +51,7 @@ public class Lover : CustomRole, IListener, IWinnable
     public void OnReceiveRpc(PlayerHandleRpcEvent @event)
     {
         var id = (KnownRpc)@event.CallId;
-        var reader = @event.MessageReader;
+        var reader = @event.Reader;
         if (id != KnownRpc.SyncLovers) return;
 
         Couples.Clear();

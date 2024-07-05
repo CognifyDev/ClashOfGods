@@ -10,32 +10,32 @@ public class CommandListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnLocalPlayerChat(LocalPlayerChatEvent @event)
     {
-        var text = @event.GetChatController().freeChatField.textArea.text.ToLower();
+        var text = @event.Text.ToLower();
         if (!text.StartsWith("/")) return true;
 
-        var cancellable = false;
-        foreach (var command in CommandManager.GetManager().GetCommands())
-        {
-            if (text.Split(" ")[0].Equals("/" + command.Name.ToLower()) || ContainAliases(text, command))
-                command.OnExecute(PlayerControl.LocalPlayer, AsCommandStringArray(text));
-            if (command.Cancellable) cancellable = true;
-        }
+        var enteredName = text.Split(" ").FirstOrDefault();
+        if (enteredName == null) return false;
 
-        return !cancellable;
+        var result = CommandManager.GetManager().GetCommands().FirstOrDefault(c => "/" + c.Name.ToLower() == enteredName || ContainAliases(text, c));
+        if (result == null) return false;
+
+        return !result.OnExecute(PlayerControl.LocalPlayer, AsCommandStringArray(text));
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerChat(PlayerChatEvent @event)
-    {
-        var text = @event.Text;
-        var player = @event.Player;
-        if (!text.ToLower().StartsWith("/")) return;
+    // Handling other players' chat command and executing aren't necessary
 
-        foreach (var command in CommandManager.GetManager().GetCommands().Where(command => !command.HostOnly)
-                     .Where(command => text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) ||
-                                       ContainAliases(text, command)))
-            command.OnExecute(player, AsCommandStringArray(text));
-    }
+    //[EventHandler(EventHandlerType.Postfix)]
+    //public void OnPlayerChat(PlayerChatEvent @event)
+    //{
+    //    var text = @event.Text;
+    //    var player = @event.Player;
+    //    if (!text.ToLower().StartsWith("/")) return;
+
+    //    foreach (var command in CommandManager.GetManager().GetCommands().Where(command => !command.HostOnly)
+    //                 .Where(command => text.Split(" ")[0].ToLower().Equals("/" + command.Name.ToLower()) ||
+    //                                   ContainAliases(text, command)))
+    //        command.OnExecute(player, AsCommandStringArray(text));
+    //}
 
     private string[] AsCommandStringArray(string text)
     {

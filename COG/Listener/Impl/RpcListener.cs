@@ -14,7 +14,7 @@ public class RpcListener : IListener
     public void AfterRPCReceived(PlayerHandleRpcEvent @event)
     {
         var callId = @event.CallId;
-        var reader = @event.MessageReader;
+        var reader = @event.Reader;
         if (AmongUsClient.Instance.AmHost) return; // 是房主就返回
         var knownRpc = (KnownRpc)callId;
 

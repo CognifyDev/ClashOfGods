@@ -21,14 +21,14 @@ internal class RPCHandlerPatch
     {
         var result = ListenerManager.GetManager().ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader),
             EventHandlerType.Prefix);
-        var rpcType = (RpcCalls)callId;
-        var subReader = MessageReader.Get(reader);
-        if (RpcCalls.SendChat.Equals(rpcType))
-        {
-            var text = subReader.ReadString();
-            ListenerManager.GetManager()
-                .ExecuteHandlers(new PlayerChatEvent(__instance, text!), EventHandlerType.Postfix);
-        }
+        //var rpcType = (RpcCalls)callId;
+        //var subReader = MessageReader.Get(reader);
+        //if (RpcCalls.SendChat.Equals(rpcType))
+        //{
+        //    var text = subReader.ReadString();
+        //    ListenerManager.GetManager()
+        //        .ExecuteHandlers(new PlayerChatEvent(__instance, text!), EventHandlerType.Prefix);
+        //}
 
         return result;
     }

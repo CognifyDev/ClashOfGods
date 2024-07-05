@@ -10,22 +10,22 @@ using UnityEngine;
 
 namespace COG.Patch;
 
-[HarmonyPatch(typeof(ChatController), nameof(ChatController.SendChat))]
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSendChat))]
 internal class LocalPlayerChatPatch
 {
-    public static bool Prefix(ChatController __instance)
+    public static bool Prefix(PlayerControl __instance, string chatText)
     {
-        return __instance.freeChatField.textArea.text is not (null or "")
-               && ListenerManager.GetManager().ExecuteHandlers(
-                   new LocalPlayerChatEvent(PlayerControl.LocalPlayer, __instance),
+        if (chatText is "" or null || !__instance.IsSamePlayer(PlayerControl.LocalPlayer)) return false;
+        return ListenerManager.GetManager().ExecuteHandlers(
+                   new LocalPlayerChatEvent(__instance, chatText),
                    EventHandlerType.Prefix);
     }
 
-    public static void Postfix(ChatController __instance)
+    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] string chatText)
     {
-        if (__instance.freeChatField.textArea.text is null or "") return;
+        if (chatText is null or "" || __instance.IsSamePlayer(PlayerControl.LocalPlayer)) return;
         ListenerManager.GetManager().ExecuteHandlers(
-            new LocalPlayerChatEvent(PlayerControl.LocalPlayer, __instance),
+            new LocalPlayerChatEvent(__instance, chatText),
             EventHandlerType.Postfix);
     }
 }
