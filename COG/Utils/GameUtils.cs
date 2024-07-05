@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using AmongUs.GameOptions;
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Role;
 using COG.States;
 using UnityEngine;
@@ -75,5 +77,20 @@ public static class GameUtils
         for (var i = 0; i < transform.childCount; i++)
             result.Add(transform.GetChild(i));
         return result;
+    }
+
+    public static void SendSystemMessage(string text, float delay = 0.2f)
+    {
+        HudManager.Instance?.Chat?.StartCoroutine(CoSendChatMessage().WrapToIl2Cpp());
+
+        IEnumerator CoSendChatMessage()
+        {
+            yield return new WaitForSeconds(delay);
+            PlayerControl host = AmongUsClient.Instance.GetHost().Character;
+            string tempName = host.Data.PlayerName;
+            host.SetName("<b>【System Message】</b>");
+            HudManager.Instance?.Chat?.AddChat(host, text, false);
+            host.SetName(tempName);
+        }
     }
 }

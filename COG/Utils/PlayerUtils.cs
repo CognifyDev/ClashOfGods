@@ -326,21 +326,6 @@ public static class PlayerUtils
     }
 
     public static bool CanKill(this PlayerControl pc) => pc.GetMainRole().CanKill;
-
-    public static void SendSystemMessage(string text, float delay = 0.2f)
-    {
-        HudManager.Instance?.Chat?.StartCoroutine(CoSendChatMessage().WrapToIl2Cpp());
-
-        IEnumerator CoSendChatMessage()
-        {
-            yield return new WaitForSeconds(delay);
-            PlayerControl host = AmongUsClient.Instance.GetHost().Character;
-            string tempName = host.Data.PlayerName;
-            host.SetName("<b>【System Message】</b>");
-            HudManager.Instance?.Chat?.AddChat(host, text, false);
-            host.SetName(tempName);
-        }
-    }
 }
 
 public enum DeathReason

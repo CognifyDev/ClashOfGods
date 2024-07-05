@@ -307,6 +307,16 @@ public static class RoleOptionPatch
 
     }
 }
+
+[HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Initialize))]
+public static class GameOptionsMenuPatch
+{
+    public static void Postfix(GameOptionsMenu __instance)
+    {
+        GameUtils.SendGameMessage("新模组菜单正在开发中，请使用 /option help 命令了解详细信息。");
+    }
+}
+
 #if false
 
 

@@ -40,7 +40,7 @@ public class OptionCommand : Command
                         optionBuilder.Append(')');
                     }
 
-                    PlayerUtils.SendSystemMessage(optionBuilder.ToString());
+                    GameUtils.SendSystemMessage(optionBuilder.ToString());
                 }
                 break;
             case "set":
@@ -53,13 +53,13 @@ public class OptionCommand : Command
                     if (!int.TryParse(args[2], out var selection)) return true;
                     option.UpdateSelection(selection - 1);
 
-                    PlayerUtils.SendSystemMessage($"The selection of {option.Name} has set to {option.Selections[selection]}.");
+                    GameUtils.SendSystemMessage($"The selection of {option.Name} has set to {option.Selections[selection]}.");
                 }
                 break;
             case "share":
                 {
                     CustomOption.ShareConfigs();
-                    PlayerUtils.SendSystemMessage("Successfully shared!");
+                    GameUtils.SendSystemMessage("Successfully shared!");
                 }
                 break;
             default:
@@ -72,7 +72,7 @@ public class OptionCommand : Command
                         .Append(" %selection% : The ID of the new selection.\n")
                         .Append("/option share - Share all option to other clients immediately.");
 
-                    PlayerUtils.SendSystemMessage(sb.ToString());
+                    GameUtils.SendSystemMessage(sb.ToString());
                 }
                 break;
         }

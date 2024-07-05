@@ -29,7 +29,7 @@ public class RpcCommand : Command
             {
                 case "start":
                     {
-                        if (Writer != null) PlayerUtils.SendSystemMessage("当前仍存在一个RpcWriter实例！");
+                        if (Writer != null) GameUtils.SendSystemMessage("当前仍存在一个RpcWriter实例！");
                         var value = args[1];
                         if (int.TryParse(value, out var result))
                         {
@@ -49,7 +49,7 @@ public class RpcCommand : Command
                             else
                                 throw new NotSupportedException("The RPC you request to send is not supported.");
                         }
-                        PlayerUtils.SendSystemMessage("一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。");
+                        GameUtils.SendSystemMessage("一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。");
                     }
                     break;
                 default:
@@ -60,7 +60,7 @@ public class RpcCommand : Command
                             .Append("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player, vector\n")
                             .Append("例：\n /rpc add bool true\n /rpc add vector2 3 -1.2\n /rpc add player 3（玩家Id）\n /rpc add player 玩家名字\n /rpc add vector 1 -3\n")
                             .Append("/rpc start %callId%\n/rpc send\n/rpc close");
-                        PlayerUtils.SendSystemMessage(sb.ToString());
+                        GameUtils.SendSystemMessage(sb.ToString());
                     }
                     break;
                 case "add":
@@ -144,7 +144,7 @@ public class RpcCommand : Command
                                     break;
                             }
                         }
-                        PlayerUtils.SendSystemMessage("写入成功！");
+                        GameUtils.SendSystemMessage("写入成功！");
                     }
                     break;
                 case "send":
@@ -152,7 +152,7 @@ public class RpcCommand : Command
                         if (Writer == null) throw new NullReferenceException("Writer is null.");
                         Writer.Finish();
                         Writer = null;
-                        PlayerUtils.SendSystemMessage("Rpc已发送！");
+                        GameUtils.SendSystemMessage("Rpc已发送！");
                     }
                     break;
                 case "close":
