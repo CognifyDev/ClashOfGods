@@ -1,6 +1,7 @@
 global using HarmonyLib;
 global using Hazel;
 global using Object = UnityEngine.Object;
+global using GitInfo = ThisAssembly.Git;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Command;
@@ -68,6 +69,7 @@ public partial class Main : BasePlugin
         Logger = new StackTraceLogger($"   {DisplayName}");
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
+        Logger.LogInfo($"GitInfo: {GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})");
 
         // Add dependencies to core directory
         ResourceUtils.WriteToFileFromResource(
@@ -212,7 +214,8 @@ public partial class Main : BasePlugin
         // Register Commands
         CommandManager.GetManager().RegisterCommands(new Command.Command[]
         {
-            new RpcCommand()
+            new RpcCommand(),
+            new OptionCommand()
         });
 
         // Register CustomWinners
