@@ -22,12 +22,6 @@ namespace COG.UI.CustomOption;
 [ShitCode]
 public sealed class CustomOption
 {
-    public enum OptionType
-    {
-        Default = 0,
-        Button = 1
-    }
-
     [Serializable]
     public enum TabType
     {
@@ -66,11 +60,9 @@ public sealed class CustomOption
 
     public int Selection;
 
-    public OptionType SpecialOptionType;
-
     // Option creation
     public CustomOption(TabType type, string name, object[] selections,
-        object defaultValue, CustomOption? parent, bool isHeader, OptionType specialOptionType)
+        object defaultValue, CustomOption? parent, bool isHeader)
     {
         ID = _typeId;
         _typeId++;
@@ -83,7 +75,6 @@ public sealed class CustomOption
         IsHeader = isHeader;
         Page = type;
         Selection = 0;
-        SpecialOptionType = specialOptionType;
         Options.Add(this);
 
         CharacteristicCode = GetHashCode();
@@ -96,27 +87,25 @@ public sealed class CustomOption
     }
 
     public static CustomOption Create(TabType type, string name, string[] selections,
-        CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
+        CustomOption? parent = null, bool isHeader = false)
     {
-        return new CustomOption(type, name, selections, "", parent, isHeader, optionType);
+        return new CustomOption(type, name, selections, "", parent, isHeader);
     }
 
     public static CustomOption Create(TabType type, string name, float defaultValue, float min,
-        float max, float step, CustomOption? parent = null, bool isHeader = false,
-        OptionType optionType = OptionType.Default)
+        float max, float step, CustomOption? parent = null, bool isHeader = false)
     {
         List<object> selections = new();
         for (var s = min; s <= max; s += step) selections.Add(s);
-        return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader, optionType);
+        return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader);
     }
 
     public static CustomOption Create(TabType type, string name, bool defaultValue,
-        CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
+        CustomOption? parent = null, bool isHeader = false)
     {
         return new CustomOption(type, name,
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
-            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader,
-            optionType);
+            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
 
     public static void ShareConfigs(PlayerControl? target = null)
@@ -136,7 +125,6 @@ public sealed class CustomOption
 
         foreach (var option in from option in Options
                                where option != null
-                               where option.SpecialOptionType != OptionType.Button
                                where option.Selection != option.DefaultSelection
                                select option)
         {
@@ -178,7 +166,7 @@ public sealed class CustomOption
         {
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
-            foreach (var option in Options.Where(o => o is { SpecialOptionType: OptionType.Default })
+            foreach (var option in Options.Where(o => o is not null)
                          .OrderBy(o => o!.ID))
                 writer.WriteLine(option!.ID + " " + option.Selection);
         }

@@ -122,7 +122,7 @@ public partial class Main : BasePlugin
             new PlayerListener(),
             new DeadPlayerListener(),
             new CustomButtonListener(),
-            //new CustomWinnerListener(),
+            new CustomWinnerListener(),
             new GameListener(),
             new ModOptionListener(),
             new RpcListener(),
