@@ -22,12 +22,6 @@ namespace COG.UI.CustomOption;
 [ShitCode]
 public sealed class CustomOption
 {
-    public enum OptionType
-    {
-        Default = 0,
-        Button = 1
-    }
-
     [Serializable]
     public enum TabType
     {
@@ -37,8 +31,6 @@ public sealed class CustomOption
         Crewmate = 3,
         Addons = 4
     }
-
-    internal static bool FirstOpen = true;
 
     public static readonly List<CustomOption?> Options = new();
 
@@ -66,11 +58,9 @@ public sealed class CustomOption
 
     public int Selection;
 
-    public OptionType SpecialOptionType;
-
     // Option creation
     public CustomOption(TabType type, string name, object[] selections,
-        object defaultValue, CustomOption? parent, bool isHeader, OptionType specialOptionType)
+        object defaultValue, CustomOption? parent, bool isHeader)
     {
         ID = _typeId;
         _typeId++;
@@ -83,7 +73,6 @@ public sealed class CustomOption
         IsHeader = isHeader;
         Page = type;
         Selection = 0;
-        SpecialOptionType = specialOptionType;
         Options.Add(this);
 
         CharacteristicCode = GetHashCode();
@@ -96,27 +85,25 @@ public sealed class CustomOption
     }
 
     public static CustomOption Create(TabType type, string name, string[] selections,
-        CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
+        CustomOption? parent = null, bool isHeader = false)
     {
-        return new CustomOption(type, name, selections, "", parent, isHeader, optionType);
+        return new CustomOption(type, name, selections, "", parent, isHeader);
     }
 
     public static CustomOption Create(TabType type, string name, float defaultValue, float min,
-        float max, float step, CustomOption? parent = null, bool isHeader = false,
-        OptionType optionType = OptionType.Default)
+        float max, float step, CustomOption? parent = null, bool isHeader = false)
     {
         List<object> selections = new();
         for (var s = min; s <= max; s += step) selections.Add(s);
-        return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader, optionType);
+        return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader);
     }
 
     public static CustomOption Create(TabType type, string name, bool defaultValue,
-        CustomOption? parent = null, bool isHeader = false, OptionType optionType = OptionType.Default)
+        CustomOption? parent = null, bool isHeader = false)
     {
         return new CustomOption(type, name,
             new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
-            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader,
-            optionType);
+            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
     }
 
     public static void ShareConfigs(PlayerControl? target = null)
@@ -136,7 +123,6 @@ public sealed class CustomOption
 
         foreach (var option in from option in Options
                                where option != null
-                               where option.SpecialOptionType != OptionType.Button
                                where option.Selection != option.DefaultSelection
                                select option)
         {
@@ -178,7 +164,7 @@ public sealed class CustomOption
         {
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
-            foreach (var option in Options.Where(o => o is { SpecialOptionType: OptionType.Default })
+            foreach (var option in Options.Where(o => o is not null)
                          .OrderBy(o => o!.ID))
                 writer.WriteLine(option!.ID + " " + option.Selection);
         }
@@ -188,7 +174,7 @@ public sealed class CustomOption
         }
     }
 
-    public static void SaveOptionWithDialogue()
+    public static void SavePresetWithDialogue()
     {
         var file = OpenFileDialogue.Open(Mode.Save, "Preset File(*.cog)\0*.cog\0\0");
         if (file.FilePath is null or "") return;
@@ -258,6 +244,10 @@ public static class PresetsButtonsPatch
         DestroySelectableSprite(std.gameObject);
         DestroySelectableSprite(alter.gameObject);
 
+        std.transform.localPosition = new(-1.5f, 0.2f, 0);
+        alter.transform.localPosition = new(2.1f, 0.2f, 0);
+        std.transform.localScale = alter.transform.localScale = new(1.1f, 1.1f, 1);
+
         void DestroySelectableSprite(GameObject go)
         {
             var trans = go.transform;
@@ -281,10 +271,11 @@ public static class PresetsButtonsPatch
         alter.OnClick.AddListener((UnityAction)new Action(() =>
         {
             ResetActiveState(alter.transform);
-            CustomOption.SaveOptionWithDialogue();
+            CustomOption.SavePresetWithDialogue();
         }));
 
         __instance.PresetDescriptionText.gameObject.SetActive(false); // Hide preset introduction text
+        __instance.transform.Find("DividerImage").gameObject.Destroy();
 
         void ResetActiveState(Transform transform)
         {
@@ -313,8 +304,14 @@ public static class GameOptionsMenuPatch
 {
     public static void Postfix(GameOptionsMenu __instance)
     {
-        GameUtils.SendGameMessage("新模组菜单正在开发中，请使用 /option help 命令了解详细信息。");
+        //GameUtils.SendGameMessage("新模组菜单正在开发中，请使用 /option help 命令了解详细信息。");
     }
+}
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
+public static class SyncVanillaSettingsPatch
+{
+    public static void Postfix() => CustomOption.ShareConfigs();
 }
 
 #if false

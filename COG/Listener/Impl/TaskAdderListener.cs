@@ -68,13 +68,15 @@ public class TaskAdderListener : IListener
             if (button.Text.text.StartsWith("Be_")) return;
             var role = button.Role;
             var type = 99;
-            if (!role && !((type = (ushort)role.Role) > 100)) return;
-            if (type is > 7 and not 99)
+            if (!role || !((type = (ushort)role.Role) > 100)) return;
+            if (type > 99)
                 button.Overlay.gameObject.SetActive(LastClicked!.Role.Role == button.Role.Role);
+            else
+                button.Overlay.gameObject.SetActive(false);
         }
         catch
         {
-            // Ignored (There isn't any problems with this)
+            // Ignored (There aren't any problems with this)
         }
     }
 
@@ -85,11 +87,15 @@ public class TaskAdderListener : IListener
         var role = button.Role;
         var type = 99;
         if (button.Text.text.StartsWith("Be_")) return true;
-        if (!role && !((type = (ushort)role.Role) > 100)) return true;
-        if (type is > 7 and not 99)
+        if (!role || !((type = (ushort)role.Role) > 100)) return true;
+        if (type > 99)
         {
             PlayerControl.LocalPlayer.SetCustomRole(CustomRoleManager.GetManager().GetRoles()[type - 100]);
             LastClicked = button;
+        }
+        else
+        {
+            LastClicked?.Overlay.gameObject.SetActive(false);
         }
 
         return false;
