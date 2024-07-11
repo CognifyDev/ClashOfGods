@@ -174,7 +174,7 @@ public sealed class CustomOption
         }
     }
 
-    public static void SaveOptionWithDialogue()
+    public static void SavePresetWithDialogue()
     {
         var file = OpenFileDialogue.Open(Mode.Save, "Preset File(*.cog)\0*.cog\0\0");
         if (file.FilePath is null or "") return;
@@ -244,6 +244,10 @@ public static class PresetsButtonsPatch
         DestroySelectableSprite(std.gameObject);
         DestroySelectableSprite(alter.gameObject);
 
+        std.transform.localPosition = new(-1.5f, 0.2f, 0);
+        alter.transform.localPosition = new(2.1f, 0.2f, 0);
+        std.transform.localScale = alter.transform.localScale = new(1.1f, 1.1f, 1);
+
         void DestroySelectableSprite(GameObject go)
         {
             var trans = go.transform;
@@ -267,10 +271,11 @@ public static class PresetsButtonsPatch
         alter.OnClick.AddListener((UnityAction)new Action(() =>
         {
             ResetActiveState(alter.transform);
-            CustomOption.SaveOptionWithDialogue();
+            CustomOption.SavePresetWithDialogue();
         }));
 
         __instance.PresetDescriptionText.gameObject.SetActive(false); // Hide preset introduction text
+        __instance.transform.Find("DividerImage").gameObject.Destroy();
 
         void ResetActiveState(Transform transform)
         {
@@ -301,6 +306,12 @@ public static class GameOptionsMenuPatch
     {
         //GameUtils.SendGameMessage("新模组菜单正在开发中，请使用 /option help 命令了解详细信息。");
     }
+}
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
+public static class SyncVanillaSettingsPatch
+{
+    public static void Postfix() => CustomOption.ShareConfigs();
 }
 
 #if false
