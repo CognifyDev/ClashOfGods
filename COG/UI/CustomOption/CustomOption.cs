@@ -32,8 +32,6 @@ public sealed class CustomOption
         Addons = 4
     }
 
-    internal static bool FirstOpen = true;
-
     public static readonly List<CustomOption?> Options = new();
 
     private static int _typeId;
@@ -301,7 +299,7 @@ public static class GameOptionsMenuPatch
 {
     public static void Postfix(GameOptionsMenu __instance)
     {
-        GameUtils.SendGameMessage("新模组菜单正在开发中，请使用 /option help 命令了解详细信息。");
+        //GameUtils.SendGameMessage("新模组菜单正在开发中，请使用 /option help 命令了解详细信息。");
     }
 }
 
