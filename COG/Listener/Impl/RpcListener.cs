@@ -65,7 +65,8 @@ public class RpcListener : IListener
                 {
                     var versionStr = reader.ReadString();
                     var commitTime = reader.ReadString();
-                    var result = HandshakeManager.Instance.AddInfo(@event.Player, versionStr, commitTime);
+                    HandshakeManager.Instance.AddInfo(@event.Player, versionStr, commitTime);
+                    HandshakeManager.Instance.CheckPlayersAndDisplay();
                     break;
                 }
         }

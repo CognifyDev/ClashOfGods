@@ -20,22 +20,20 @@ public class HandshakeManager
     public static HandshakeManager Instance => _instance ??= new();
     public Dictionary<PlayerControl, (VersionInfo, DateTime)> PlayerVersionInfo { get; } = new();
     
-    public HandshakeResultFlag AddInfo(PlayerControl pc, string verStr, string timeStr)
+    public void AddInfo(PlayerControl pc, string verStr, string timeStr)
     {
-        VersionInfo version = null!;
+        VersionInfo version;
         try
         {
             version = VersionInfo.Parse(verStr);
         }
         catch
         {
-            return HandshakeResultFlag.InvalidVersion;
+            version = new(verStr);
         }
 
-        if (!DateTime.TryParse(timeStr, out var time)) return HandshakeResultFlag.InvalidCommitTime;
-        if (!(pc && PlayerVersionInfo.TryAdd(pc, (version, time)))) return HandshakeResultFlag.InvalidPlayer;
-
-        return HandshakeResultFlag.Success;
+        if (!DateTime.TryParse(timeStr, out var time)) return;
+        if (!(pc && PlayerVersionInfo.TryAdd(pc, (version, time)))) return;
     }
 
     public void RpcHandshake()
@@ -128,14 +126,6 @@ public class HandshakeManager
     }
 
     public static IListener GetListener() => new Listener();
-
-    public enum HandshakeResultFlag
-    {
-        Success = 0,
-        InvalidVersion = 1,
-        InvalidCommitTime = 2,
-        InvalidPlayer = 3
-    }
 
     private class Listener : IListener
     {
