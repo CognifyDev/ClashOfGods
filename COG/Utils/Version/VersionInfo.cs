@@ -84,7 +84,7 @@ public class VersionInfo
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     public static VersionInfo
-        NewVersionInfoInstanceByString(string version)
+        Parse(string version)
     {
         if (!IsVersionString(version)) throw new ArgumentException("It must be a version string!");
 

@@ -214,6 +214,8 @@ public class GameListener : IListener
         roleList.AddRange(GameUtils.PlayerRoleData.SelectMany(pr => pr.SubRoles));
 
         foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
+
+        LobbyBehaviour.Instance?.Despawn(); // Help innersloth solve a bug lol
     }
 
     [EventHandler(EventHandlerType.Postfix)]

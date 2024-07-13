@@ -1,6 +1,5 @@
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
-using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -56,12 +55,19 @@ public class RpcListener : IListener
                     break;
                 }
             case KnownRpc.SetRole:
-            {
-                var playerId = reader.ReadByte();
-                var roleId = reader.ReadPackedInt32();
-                PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
-                break;
-            }
+                {
+                    var playerId = reader.ReadByte();
+                    var roleId = reader.ReadPackedInt32();
+                    PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
+                    break;
+                }
+            case KnownRpc.Handshake:
+                {
+                    var versionStr = reader.ReadString();
+                    var commitTime = reader.ReadString();
+                    var result = HandshakeManager.Instance.AddInfo(@event.Player, versionStr, commitTime);
+                    break;
+                }
         }
     }
 }

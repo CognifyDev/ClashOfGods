@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
@@ -34,6 +35,8 @@ public abstract class CustomRole
         Id = _order;
         _order++;
         ShowInOptions = showInOptions;
+        if (this is IWinnable winnable && !CustomWinnerManager.CustomWinners.Contains(winnable))
+            CustomWinnerManager.RegisterWinnableInstance(winnable);
 
         if (ShowInOptions)
         {

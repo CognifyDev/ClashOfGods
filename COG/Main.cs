@@ -30,6 +30,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
+using COG.Rpc;
 
 namespace COG;
 
@@ -64,7 +65,7 @@ public partial class Main : BasePlugin
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
         VersionInfo = PluginVersion.Equals("Unknown")
             ? VersionInfo.Empty
-            : VersionInfo.NewVersionInfoInstanceByString(PluginVersion);
+            : VersionInfo.Parse(PluginVersion);
 
         Logger = new StackTraceLogger($"   {DisplayName}");
         Logger.LogInfo("Loading...");
@@ -127,7 +128,8 @@ public partial class Main : BasePlugin
             new ModOptionListener(),
             new RpcListener(),
             new TaskAdderListener(),
-            new VersionShowerListener()
+            new VersionShowerListener(),
+            HandshakeManager.GetListener()
         });
 
 
