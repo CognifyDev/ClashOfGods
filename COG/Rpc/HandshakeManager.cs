@@ -18,7 +18,7 @@ public class HandshakeManager
 {
     private static HandshakeManager? _instance;
     public static HandshakeManager Instance => _instance ??= new();
-    public Dictionary<PlayerControl, (VersionInfo, DateTime)> PlayerVersionInfo { get; } = new();
+    public Dictionary<PlayerControl, (VersionInfo, DateTime)> PlayerVersionInfo { get; private set; } = new();
     
     public void AddInfo(PlayerControl pc, string verStr, string timeStr)
     {
@@ -32,7 +32,7 @@ public class HandshakeManager
             version = new(verStr);
         }
 
-        if (!DateTime.TryParse(timeStr, out var time)) return;
+        if (!DateTime.TryParse(timeStr, out var time)) time = default;
         if (!(pc && PlayerVersionInfo.TryAdd(pc, (version, time)))) return;
     }
 
@@ -50,7 +50,7 @@ public class HandshakeManager
         var version = hostInfo.Item1;
         var dateHost = hostInfo.Item2;
         var invalidMsgBuilder = new StringBuilder();
-        if (!DateTime.TryParse(GitInfo.CommitDate, out var myDate)) return "";
+        if (!DateTime.TryParse(GitInfo.CommitDate, out var myDate)) return "InvalidLocalCommitDateMessage";
 
         if (AmongUsClient.Instance.AmHost)
         {
@@ -93,6 +93,7 @@ public class HandshakeManager
 
     public string CheckUnmoddedClients()
     {
+        PlayerVersionInfo = PlayerVersionInfo.Where(pair => pair.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         var allPlayers = new List<PlayerControl>(PlayerControl.AllPlayerControls.ToArray());
         var unmodded = allPlayers.Concat(PlayerVersionInfo.Keys).Distinct();
         var unmoddedBuilder = new StringBuilder();
@@ -102,7 +103,7 @@ public class HandshakeManager
     }
 
     public const string ShowerObjectName = "COGErrorMsgShower";
-    public bool HasCreatedShower => HudManager.Instance.transform.Find(ShowerObjectName);
+    public bool HasCreatedShower => HudManager.Instance?.transform.Find(ShowerObjectName);
     public TextMeshPro? TextShower { get; private set; }
 
     public void CheckPlayersAndDisplay()
@@ -125,6 +126,18 @@ public class HandshakeManager
         TextShower!.text = fullString;
     }
 
+    public void Init()
+    {
+        if (!DateTime.TryParse(GitInfo.CommitDate, out var date)) date = default;
+        PlayerVersionInfo.TryAdd(PlayerControl.LocalPlayer, (Main.VersionInfo, date));
+    }
+
+    public void Reset()
+    {
+        PlayerVersionInfo.Clear();
+        TextShower = null;
+    }
+
     public static IListener GetListener() => new Listener();
 
     private class Listener : IListener
@@ -133,8 +146,11 @@ public class HandshakeManager
         
         private IEnumerator CoCheckHandshake()
         {
+            Instance.Init();
+
             yield return new WaitForSeconds(0.5f + ((float)PlayerControl.LocalPlayer.PlayerId / 10)); // Wait for initializing
             Instance.RpcHandshake();
+
             yield return new WaitForSeconds(0.25f);
             Instance.CheckPlayersAndDisplay();
         }
