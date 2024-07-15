@@ -50,7 +50,6 @@ public class HandshakeManager
         var version = hostInfo.Item1;
         var dateHost = hostInfo.Item2;
         var invalidMsgBuilder = new StringBuilder();
-        if (!DateTime.TryParse(GitInfo.CommitDate, out var myDate)) return "InvalidLocalCommitDateMessage";
 
         if (AmongUsClient.Instance.AmHost)
         {
@@ -58,7 +57,7 @@ public class HandshakeManager
             {
                 if (pVersion.Equals(Main.VersionInfo))
                 {
-                    if (myDate.CompareTo(time) != 0)
+                    if (Main.CommitTime.CompareTo(time) != 0)
                     {
                         invalidMsgBuilder.Append("InvalidModCommitDateHost %player% %version% (at %commitDate%)\n".CustomFormat(player.Data.PlayerName, pVersion, time));
                         Main.Logger.LogWarning($"Invalid modded client version: {player} ({player.PlayerId}) {pVersion} {time}");
@@ -75,7 +74,7 @@ public class HandshakeManager
         {
             if (version.Equals(Main.VersionInfo))
             {
-                if (myDate.CompareTo(dateHost) != 0)
+                if (Main.CommitTime.CompareTo(dateHost) != 0)
                 {
                     invalidMsgBuilder.Append("InvalidModCommitDateClient %version% (at %commitDate%)\n".CustomFormat(version.ToString(), dateHost.ToString()));
                     Main.Logger.LogWarning($"Invalid modded host commit date: {version} {dateHost}");
@@ -128,8 +127,7 @@ public class HandshakeManager
 
     public void Init()
     {
-        if (!DateTime.TryParse(GitInfo.CommitDate, out var date)) date = default;
-        PlayerVersionInfo.TryAdd(PlayerControl.LocalPlayer, (Main.VersionInfo, date));
+        PlayerVersionInfo.TryAdd(PlayerControl.LocalPlayer, (Main.VersionInfo, Main.CommitTime));
     }
 
     public void Reset()
