@@ -39,7 +39,7 @@ public static class ModUpdater
 
         LatestVersion = latestVersionString == null
             ? VersionInfo.Empty
-            : VersionInfo.NewVersionInfoInstanceByString(latestVersionString);
+            : VersionInfo.Parse(latestVersionString);
 
         LatestDescription = description;
     }

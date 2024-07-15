@@ -5,9 +5,9 @@ namespace COG.Utils.Version;
 
 public class VersionInfo
 {
-    public static readonly VersionInfo Empty = new(string.Empty);
+    public static VersionInfo Empty => new(string.Empty);
 
-    private VersionInfo(string parent, bool beta = false, ulong? betaVersion = null)
+    internal VersionInfo(string parent, bool beta = false, ulong? betaVersion = null)
     {
         Parent = parent;
         Beta = beta;
@@ -83,8 +83,7 @@ public class VersionInfo
     /// <param name="version"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public static VersionInfo
-        NewVersionInfoInstanceByString(string version)
+    public static VersionInfo Parse(string version)
     {
         if (!IsVersionString(version)) throw new ArgumentException("It must be a version string!");
 

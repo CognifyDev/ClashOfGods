@@ -1,5 +1,6 @@
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Listener.Event.Impl.Player;
+using COG.Rpc;
 using COG.States;
 using COG.UI.CustomOption;
 using COG.Utils;
@@ -25,7 +26,7 @@ public class PlayerListener : IListener
             yield return new WaitForSeconds(0.1f);
             if (!target.IsSamePlayer(PlayerControl.LocalPlayer))
             {
-                Main.Logger.LogInfo("Sent options info to " + target.Data.PlayerName);
+                Main.Logger.LogInfo("Option info has sent to " + target.Data.PlayerName);
                 CustomOption.ShareConfigs(target);
             }
         }
