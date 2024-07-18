@@ -339,7 +339,7 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnCheckGameEnd(GameCheckEndEvent @event)
     {
-        return GlobalCustomOptionConstant.DebugMode != null && !GlobalCustomOptionConstant.DebugMode.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
+        return !GlobalCustomOptionConstant.DebugMode!.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     [EventHandler(EventHandlerType.Prefix)]

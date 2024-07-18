@@ -51,7 +51,7 @@ public class OptionCommand : Command
                     if (option == null) return true;
 
                     if (!int.TryParse(args[2], out var selection)) return true;
-                    option.UpdateSelection(selection - 1);
+                    option.UpdateSelection(selection);
 
                     GameUtils.SendSystemMessage($"The selection of {option.Name} has set to {option.Selections[selection]}.");
                 }

@@ -174,3 +174,5 @@ game:
     default: "%player% 是 %role%。"
     alive-player-info: "剩余 %crew% 个船员， %neutral% 个中立， %imp% 个内鬼。"
     lover-message: "%player% 是 %role%。\n%lover% 似乎由于伤心过度殉情了。"
+  chat:
+    system-message: "<b>【系统消息】</b>\0"
