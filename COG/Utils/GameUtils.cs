@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
+using COG.Config.Impl;
 using COG.Role;
 using COG.States;
 using UnityEngine;
@@ -88,7 +89,7 @@ public static class GameUtils
             yield return new WaitForSeconds(delay);
             PlayerControl host = AmongUsClient.Instance.GetHost().Character;
             string tempName = host.Data.PlayerName;
-            host.SetName("<b>【System Message】</b>");
+            host.SetName(LanguageConfig.Instance.SystemMessage);
             HudManager.Instance?.Chat?.AddChat(host, text, false);
             host.SetName(tempName);
         }

@@ -131,20 +131,9 @@ public partial class Main : BasePlugin
             new RpcListener(),
             new TaskAdderListener(),
             new VersionShowerListener(),
-            HandshakeManager.GetListener()
+            HandshakeManager.GetListener(),
+            new VanillaBugFixListener()
         });
-
-
-        // Register sidebar texts
-        //SidebarTextManager.GetManager().RegisterSidebarTexts(new SidebarText[]
-        //{
-        //    new OriginalSettings(),
-        //    new NeutralSettings(),
-        //    new ModSettings(),
-        //    new AddonsSettings(),
-        //    new ImpostorSettings(),
-        //    new CrewmateSettings()
-        //});
 
         // Register roles
         CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]

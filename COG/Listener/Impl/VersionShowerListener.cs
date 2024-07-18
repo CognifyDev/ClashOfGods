@@ -12,7 +12,7 @@ public class VersionShowerListener : IListener
     public static readonly string VersionMsg =
         $"<color=#DD1717>Clash</color> <color=#690B0B>Of</color> <color=#12EC3D>Gods</color> {Main.PluginVersion}\n"
 #if DEBUG
-        + $"{GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})"
+        + $"{GitInfo.Branch} ({GitInfo.Commit} at {Main.CommitTime})"
 #endif
         ;
 

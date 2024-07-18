@@ -1,3 +1,4 @@
+using BepInEx;
 using COG.Utils;
 using COG.Utils.Coding;
 
@@ -203,7 +204,9 @@ public class LanguageConfig : Config
 
     public string DefaultEjectText { get; private set; } = null!;
     public string AlivePlayerInfo { get; private set; } = null!;
-    public string LoverEjectText { get; private set; }
+    public string LoverEjectText { get; private set; } = null!;
+
+    public string SystemMessage { get; private set; } = null!;
 
     private void SetTranslations()
     {
@@ -366,15 +369,17 @@ public class LanguageConfig : Config
         DefaultEjectText = GetString("game.exile.default");
         AlivePlayerInfo = GetString("game.exile.alive-player-info");
         LoverEjectText = GetString("game.exile.lover-message");
+
+        SystemMessage = GetString("game.chat.system-message");
     }
 
 
     private string GetString(string location)
     {
         var toReturn = YamlReader!.GetString(location);
-        if (toReturn is null or "" or " ")
+        if (string.IsNullOrWhiteSpace(toReturn))
         {
-            Main.Logger.LogInfo($"Error getting string (location: {location})");
+            Main.Logger.LogError($"Error getting string (location: {location})");
             toReturn = location;
         }
 
