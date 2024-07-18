@@ -83,6 +83,8 @@ public class GameListener : IListener
             
             if (mainOption.RulesPreset != RulesPresets.Custom) 
                 mainOption.RulesPreset = RulesPresets.Custom;
+
+
         }
 
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
@@ -214,8 +216,6 @@ public class GameListener : IListener
         roleList.AddRange(GameUtils.PlayerRoleData.SelectMany(pr => pr.SubRoles));
 
         foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
-
-        LobbyBehaviour.Instance?.Despawn(); // Help innersloth solve a bug lol
     }
 
     [EventHandler(EventHandlerType.Postfix)]
