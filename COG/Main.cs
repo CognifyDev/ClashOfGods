@@ -131,7 +131,8 @@ public partial class Main : BasePlugin
             new RpcListener(),
             new TaskAdderListener(),
             new VersionShowerListener(),
-            HandshakeManager.GetListener()
+            HandshakeManager.GetListener(),
+            new VanillaBugFixListener()
         });
 
 
