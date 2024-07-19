@@ -55,6 +55,7 @@
 
     <ItemGroup>
         <Folder Include="Listener\Event\Impl\TPBehaviour\" />
+        <Folder Include="UI\CustomOption\ValueRules\" />
     </ItemGroup>
 
 
