@@ -8,6 +8,7 @@ using COG.Rpc;
 using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
 
@@ -22,8 +23,8 @@ public class Cleaner : CustomRole, IListener
         CanKill = true;
 
         if (ShowInOptions)
-            CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor,
-                LanguageConfig.Instance.CleanBodyCooldown, 30f, 1f, 60f, 1f, MainRoleOption);
+            CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor, () => LanguageConfig.Instance.CleanBodyCooldown, 
+            new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
 
         CleanBodyButton = CustomButton.Create(
             () =>

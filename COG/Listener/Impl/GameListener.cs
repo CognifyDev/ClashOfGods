@@ -182,7 +182,7 @@ public class GameListener : IListener
             var random = new Random();
             var option = GlobalCustomOptionConstant.MaxSubRoleNumber;
             Debug.Assert(option != null, nameof(option) + " != null");
-            var subRoleNumber = random.Next(0, (int)option.GetFloat()); // 获取这个玩家应当被给予的副职业数量
+            var subRoleNumber = random.Next(0, option.GetInt()); // 获取这个玩家应当被给予的副职业数量
             var subRoles = new List<CustomRole>();
             var givenNumber = 0;
 

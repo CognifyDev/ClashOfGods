@@ -152,7 +152,7 @@ internal class AirshipExileControllerPatch
     {
         return ListenerManager.GetManager()
             .ExecuteHandlers(
-                new PlayerExileEndOnAirshipEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance),
+                new PlayerExileEndOnAirshipEvent(__instance.exiled, __instance),
                 EventHandlerType.Prefix);
     }
 
@@ -160,7 +160,7 @@ internal class AirshipExileControllerPatch
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(
-                new PlayerExileEndOnAirshipEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance),
+                new PlayerExileEndOnAirshipEvent(__instance.exiled, __instance),
                 EventHandlerType.Postfix);
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
     }

@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
@@ -9,7 +8,11 @@ using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = System.Random;
 
@@ -24,12 +27,12 @@ public class Vulture : CustomRole, IListener, IWinnable
         if (ShowInOptions)
         {
             var page = ToCustomOption(this);
-            EatingCooldown = CustomOption.Create(page, LanguageConfig.Instance.VultureEatCooldown, 30f, 10f, 60f, 5f,
-                MainRoleOption);
-            WinningEatenCount = CustomOption.Create(page, LanguageConfig.Instance.VultureEatenCountToWin, 4f, 2f, 6f,
-                1f, MainRoleOption);
-            HasArrowToBodies = CustomOption.Create(page, LanguageConfig.Instance.VultureHasArrowToBodies, true,
-                MainRoleOption);
+            EatingCooldown = CustomOption.Create(page, () => LanguageConfig.Instance.VultureEatCooldown,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
+            WinningEatenCount = CustomOption.Create(page, () => LanguageConfig.Instance.VultureEatenCountToWin,
+                new IntOptionValueRule(2, 1, 6, 4), MainRoleOption);
+            HasArrowToBodies = CustomOption.Create(page, () => LanguageConfig.Instance.VultureHasArrowToBodies,
+                new BoolOptionValueRule(true), MainRoleOption);
         }
 
         EatButton = CustomButton.Create(
@@ -76,7 +79,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public bool CanWin() // 只有房主会判断游戏胜利，因此玩家之间需要同步数据
     {
-        if (EatenCount >= (WinningEatenCount?.GetFloat() ?? 4))
+        if (EatenCount >= (WinningEatenCount?.GetInt() ?? 4))
         {
             CustomWinnerManager.EndGame(Players, "Vulture wins", Color);
             return true;
@@ -93,7 +96,17 @@ public class Vulture : CustomRole, IListener, IWinnable
         EatBody(body);
     }
 
-    // TODO: Show flash when someone dies
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerDeath(PlayerMurderEvent _)
+    {
+        HudManager.Instance.StartCoroutine(CoFadeDeath().WrapToIl2Cpp());
+    }
+
+    public IEnumerator CoFadeDeath()
+    {
+        yield return HudManager.Instance.CoFadeFullScreen(new(0, 0, 0, 0), Palette.CrewmateBlue);
+        yield return HudManager.Instance.CoFadeFullScreen(Palette.CrewmateBlue, new(0, 0, 0, 0));
+    }
 
     public void EatBody(DeadBody body)
     {
@@ -138,7 +151,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public override string HandleAdditionalPlayerName()
     {
-        return $"\n({EatenCount}/{(int)(WinningEatenCount?.GetFloat() ?? 4f)})";
+        return $"\n({EatenCount}/{(WinningEatenCount?.GetInt() ?? 4f)})";
     }
 
     public override void ClearRoleGameData()

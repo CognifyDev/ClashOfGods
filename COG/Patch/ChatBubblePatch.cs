@@ -7,7 +7,7 @@ internal static class ChatBubbleSetRightPatch
 {
     static bool Prefix(ChatBubble __instance)
     {
-        if (__instance.NameText.text == LanguageConfig.Instance.SystemMessage)
+        if (__instance.playerInfo.PlayerName == LanguageConfig.Instance.SystemMessage)
         {
             __instance.SetLeft();
             return false;

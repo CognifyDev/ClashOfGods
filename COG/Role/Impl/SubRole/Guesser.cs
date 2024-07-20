@@ -2,6 +2,7 @@
 using COG.Listener;
 using COG.Listener.Event.Impl.Meeting;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils.Coding;
 using UnityEngine;
 
@@ -19,16 +20,16 @@ public class Guesser : CustomRole, IListener
         Description = LanguageConfig.Instance.GuesserDescription;
         IsSubRole = true;
 
-        MaxGuessTimeOption = CustomOption.Create(CustomOption.TabType.Addons,
-            LanguageConfig.Instance.GuesserMaxGuessTime, 5, 1, 99, 1, MainRoleOption);
-        GuesserGuessContinuously = CustomOption.Create(CustomOption.TabType.Addons,
-            LanguageConfig.Instance.GuesserGuessContinuously, true, MainRoleOption);
+        MaxGuessTimeOption = CustomOption.Create(CustomOption.TabType.Addons, () => LanguageConfig.Instance.GuesserMaxGuessTime,
+            new FloatOptionValueRule(1, 1, 99, 5), MainRoleOption);
+        GuesserGuessContinuously = CustomOption.Create(CustomOption.TabType.Addons, () => LanguageConfig.Instance.GuesserGuessContinuously,
+            new BoolOptionValueRule(true), MainRoleOption);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMeetingStart(MeetingStartEvent @event)
     {
-        var buttonStaff = GameObject.Find("Main Camera/Hud/MeetingHub/MeetingContents/ButtonStuff/");
+        var buttonStuff = GameObject.Find("Main Camera/Hud/MeetingHub/MeetingContents/ButtonStuff/");
         // ui here
     }
 

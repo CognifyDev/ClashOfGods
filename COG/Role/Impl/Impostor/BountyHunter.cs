@@ -11,6 +11,7 @@ using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using TMPro;
@@ -33,19 +34,16 @@ public class BountyHunter : CustomRole, IListener
         if (ShowInOptions)
         {
             var optionType = ToCustomOption(this);
-            BHunterKillCd = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterDefaultCd, 30f, 10f,
-                60f, 5f, MainRoleOption)!;
-            BHunterRefreshTargetTime =
-                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterRefreshTargetTime, 30f, 10f, 60f,
-                    5f, MainRoleOption)!;
-            HasArrowToTarget = CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterHasArrowToTarget,
-                true, MainRoleOption);
-            CdAfterKillingTarget =
-                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillCorrectCd, 10f, 10f, 60f, 5f,
-                    MainRoleOption)!;
-            CdAfterKillingNonTarget =
-                CustomOption.Create(optionType, LanguageConfig.Instance.BountyHunterKillIncorrectCd, 60f, 60f, 120f, 5f,
-                    MainRoleOption)!;
+            BHunterKillCd = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterDefaultCd,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
+            BHunterRefreshTargetTime = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterRefreshTargetTime,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
+            HasArrowToTarget = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterHasArrowToTarget,
+                new BoolOptionValueRule(true), MainRoleOption);
+            CdAfterKillingTarget = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterKillCorrectCd,
+                new FloatOptionValueRule(10f, 5f, 60f, 10f), MainRoleOption);
+            CdAfterKillingNonTarget = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterKillIncorrectCd,
+                new FloatOptionValueRule(60f, 5f, 120f, 60f), MainRoleOption);
         }
 
         BHunterKillButton = CustomButton.Create(

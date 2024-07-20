@@ -10,7 +10,9 @@ public class IntOptionValueRule : INumberValueRule<int>
     public int Max { get; }
     public int Default { get; }
 
+    public int DefaultSelection { get; }
     public int[] Selections { get; }
+    object[] IValueRule.Selections => Selections.Select(s => (object)s).ToArray();
 
     public bool IsValid(int obj) => obj > Min && obj < Max && (obj - Min) % Step == 0;
     public bool IsValid(object obj)
@@ -38,6 +40,7 @@ public class IntOptionValueRule : INumberValueRule<int>
         Max = max;
         Default = defaultValue;
         Selections = Enumerable.Range(0, (Max - Min) / Step + 1).Select(n => Min + n * Step).ToArray();
+        DefaultSelection = Selections.ToList().IndexOf(Default);
     }
 }
 
@@ -48,7 +51,9 @@ public class FloatOptionValueRule : INumberValueRule<float>
     public float Max { get; }
     public float Default { get; }
 
+    public int DefaultSelection { get; }
     public float[] Selections { get; }
+    object[] IValueRule.Selections => Selections.Select(s => (object)s).ToArray();
 
     public bool IsValid(float obj) => obj > Min && obj < Max && (obj - Min) % Step == 0;
     public bool IsValid(object obj)
@@ -78,5 +83,6 @@ public class FloatOptionValueRule : INumberValueRule<float>
         Max = max;
         Default = defaultValue;
         Selections = Enumerable.Range(0, (int)((Max - Min) / Step + 1f)).Select(n => Min + n * Step).ToArray();
+        DefaultSelection = Selections.ToList().IndexOf(Default);
     }
 }
