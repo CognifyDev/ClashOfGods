@@ -23,7 +23,7 @@ public class OptionCommand : Command
                     StringBuilder optionBuilder = new("Current Options:");
                     foreach (var option in CustomOption.Options.Where(o => o != null))
                     {
-                        optionBuilder.Append("\nId: ").Append(option!.ID).Append(' ').Append(option.Name)
+                        optionBuilder.Append("\nId: ").Append(option!.ID).Append(' ').Append(option.NameGetter)
                             .Append(": ");
                         optionBuilder.Append('(');
 
@@ -51,9 +51,9 @@ public class OptionCommand : Command
                     if (option == null) return true;
 
                     if (!int.TryParse(args[2], out var selection)) return true;
-                    option.UpdateSelection(selection);
+                    option.UpdateSelection(selection - 1);
 
-                    GameUtils.SendSystemMessage($"The selection of {option.Name} has set to {option.Selections[selection]}.");
+                    GameUtils.SendSystemMessage($"The selection of {option.NameGetter} has set to {option.Selections[selection - 1]}.");
                 }
                 break;
             case "share":

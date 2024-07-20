@@ -47,7 +47,7 @@ public class RpcListener : IListener
                             if (option == null) continue;
                             if (option.ID != id) continue;
                             Main.Logger.LogInfo(
-                                $"Changed {option.Name}({option.ID})'s selection to {selection}(before: {option.Selection})");
+                                $"Changed {option.NameGetter}({option.ID})'s selection to {selection}(before: {option.Selection})");
                             option.Selection = selection;
                             CustomOption.Options[i] = option;
                         }

@@ -6,6 +6,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ public class Sheriff : CustomRole, IListener
 
         if (ShowInOptions)
             SheriffKillCd = CustomOption.Create(CustomOption.TabType.Crewmate,
-                LanguageConfig.Instance.SheriffKillCooldown, 30f, 10f, 60f, 5f, MainRoleOption);
+                () => LanguageConfig.Instance.SheriffKillCooldown, new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
 
         SheriffKillButton = CustomButton.Create(
             () =>

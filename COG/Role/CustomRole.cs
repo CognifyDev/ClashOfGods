@@ -8,6 +8,7 @@ using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
 
@@ -41,9 +42,9 @@ public abstract class CustomRole
         if (ShowInOptions)
         {
             MainRoleOption = CustomOption.Create(ToCustomOption(this),
-                Color.ToColorString(Name), false, null, true);
+                () => Color.ToColorString(Name), new BoolOptionValueRule(false), null, true);
             RoleNumberOption = CustomOption.Create(ToCustomOption(this),
-                LanguageConfig.Instance.MaxNumMessage, 1, 1, 15, 1, MainRoleOption);
+                () => LanguageConfig.Instance.MaxNumMessage, new IntOptionValueRule(1, 1, 15, 1), MainRoleOption);
         }
     }
 

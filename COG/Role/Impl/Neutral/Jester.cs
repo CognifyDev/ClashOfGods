@@ -5,6 +5,7 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
 
@@ -19,11 +20,11 @@ public class Jester : CustomRole, IListener, IWinnable
     {
         Description = LanguageConfig.Instance.JesterDescription;
         _allowStartMeeting = CustomOption.Create(
-            ToCustomOption(this), LanguageConfig.Instance.AllowStartMeeting, true,
-            MainRoleOption);
+            ToCustomOption(this), () => LanguageConfig.Instance.AllowStartMeeting,
+            new BoolOptionValueRule(true), MainRoleOption);
         _allowReportDeadBody = CustomOption.Create(
-            ToCustomOption(this), LanguageConfig.Instance.AllowReportDeadBody, true,
-            MainRoleOption);
+            ToCustomOption(this), () => LanguageConfig.Instance.AllowReportDeadBody, 
+            new BoolOptionValueRule(true), MainRoleOption);
 
         CustomWinnerManager.RegisterWinnableInstance(this);
     }

@@ -7,6 +7,7 @@ using COG.Role.Impl.Neutral;
 using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using UnityEngine;
@@ -35,12 +36,12 @@ public class Eraser : CustomRole, IListener
         Description = LanguageConfig.Instance.EraserDescription;
 
         var type = ToCustomOption(this);
-        _initialEraseCooldown = CustomOption.Create(type, LanguageConfig.Instance.EraserInitialEraseCd, 30f, 10f,
-            60f, 5f, MainRoleOption);
-        _increaseCooldownAfterErasing = CustomOption.Create(type,
-            LanguageConfig.Instance.EraserIncreaseCdAfterErasing, 10f, 5f, 15f, 5f, MainRoleOption);
-        _canEraseImpostors = CustomOption.Create(type, LanguageConfig.Instance.EraserCanEraseImpostors, false,
-            MainRoleOption);
+        _initialEraseCooldown = CustomOption.Create(type, () => LanguageConfig.Instance.EraserInitialEraseCd,
+            new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
+        _increaseCooldownAfterErasing = CustomOption.Create(type, () => LanguageConfig.Instance.EraserIncreaseCdAfterErasing,
+            new FloatOptionValueRule(5f, 5f, 15f, 10f), MainRoleOption);
+        _canEraseImpostors = CustomOption.Create(type, () => LanguageConfig.Instance.EraserCanEraseImpostors,
+            new BoolOptionValueRule(false), MainRoleOption);
 
         _eraseButton = CustomButton.Create(() =>
             {

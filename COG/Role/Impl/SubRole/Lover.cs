@@ -5,6 +5,7 @@ using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using System;
@@ -29,9 +30,9 @@ public class Lover : CustomRole, IListener, IWinnable
         if (ShowInOptions)
         {
             var tab = ToCustomOption(this);
-            RoleNumberOption!.Name = LanguageConfig.Instance.LoverCountOptionName;
-            LoversDieTogetherOption = CustomOption.Create(tab, LanguageConfig.Instance.LoversDieTogetherOptionName, true, MainRoleOption);
-            EnablePrivateChatOption = CustomOption.Create(tab, LanguageConfig.Instance.LoverEnablePrivateChat, true, MainRoleOption);
+            RoleNumberOption!.NameGetter = () => LanguageConfig.Instance.LoverCountOptionName;
+            LoversDieTogetherOption = CustomOption.Create(tab, () => LanguageConfig.Instance.LoversDieTogetherOptionName, new BoolOptionValueRule(true), MainRoleOption);
+            EnablePrivateChatOption = CustomOption.Create(tab, () => LanguageConfig.Instance.LoverEnablePrivateChat, new BoolOptionValueRule(true), MainRoleOption);
         }
     }
 

@@ -1,6 +1,8 @@
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Rpc;
+using COG.UI.CustomOption.ValueRules;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using COG.Utils.WinAPI;
@@ -36,74 +38,38 @@ public sealed class CustomOption
 
     private static int _typeId;
 
-    public readonly int CharacteristicCode;
-
-    public readonly int DefaultSelection;
-
-    public readonly int ID;
-
-    public readonly bool IsHeader;
-
-    public string Name;
-
-    public readonly TabType Page;
-
-    public readonly CustomOption? Parent;
-
-    public readonly object[] Selections;
-
-    public Action<OptionBehaviour>? OnClickIfButton;
-
-    public OptionBehaviour? OptionBehaviour;
+    public int DefaultSelection => ValueRule.DefaultSelection;
+    public int ID { get; }
+    public bool IsHeader { get; }
+    public Func<string> NameGetter { get; set; }
+    public string Name => Parent == null ? NameGetter() : Color.gray.ToColorString("→ ") + NameGetter();
+    public TabType Page { get; }
+    public CustomOption? Parent { get; }
+    public object[] Selections => ValueRule.Selections;
+    public IValueRule ValueRule { get; }
+    public OptionBehaviour? OptionBehaviour { get; set; }
 
     public int Selection;
 
     // Option creation
-    public CustomOption(TabType type, string name, object[] selections,
-        object defaultValue, CustomOption? parent, bool isHeader)
+    public CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
     {
         ID = _typeId;
         _typeId++;
-        Name = parent == null ? name : Color.gray.ToColorString("→ ") + name;
-        Selections = selections;
-        var index = Array.IndexOf(selections, defaultValue);
-        DefaultSelection = index >= 0 ? index : 0;
-        Selection = DefaultSelection;
+        NameGetter = nameGetter;
+        ValueRule = rule;
+        Selection = rule.DefaultSelection;
         Parent = parent;
         IsHeader = isHeader;
         Page = type;
         Selection = 0;
         Options.Add(this);
-
-        CharacteristicCode = GetHashCode();
     }
 
-    public static CustomOption? GetCustomOptionByCharacteristicCode(int characteristicCode)
-    {
-        return Options.FirstOrDefault(customOption =>
-            customOption != null && customOption.CharacteristicCode == characteristicCode);
-    }
-
-    public static CustomOption Create(TabType type, string name, string[] selections,
+    public static CustomOption Create(TabType type, Func<string> nameGetter, IValueRule rule,
         CustomOption? parent = null, bool isHeader = false)
     {
-        return new CustomOption(type, name, selections, "", parent, isHeader);
-    }
-
-    public static CustomOption Create(TabType type, string name, float defaultValue, float min,
-        float max, float step, CustomOption? parent = null, bool isHeader = false)
-    {
-        List<object> selections = new();
-        for (var s = min; s <= max; s += step) selections.Add(s);
-        return new CustomOption(type, name, selections.ToArray(), defaultValue, parent, isHeader);
-    }
-
-    public static CustomOption Create(TabType type, string name, bool defaultValue,
-        CustomOption? parent = null, bool isHeader = false)
-    {
-        return new CustomOption(type, name,
-            new object[] { LanguageConfig.Instance.Disable, LanguageConfig.Instance.Enable },
-            defaultValue ? LanguageConfig.Instance.Enable : LanguageConfig.Instance.Disable, parent, isHeader);
+        return new CustomOption(type, nameGetter, rule, parent, isHeader);
     }
 
     public static void ShareConfigs(PlayerControl? target = null)
@@ -188,19 +154,20 @@ public sealed class CustomOption
         LoadOptionFromPreset(file.FilePath);
     }
 
-    public int GetSelection()
-    {
-        return Selection;
-    }
+    public dynamic GetDynamicValue() => ValueRule.Selections[Selection];
 
     public bool GetBool()
     {
-        return Selection > 0;
+        if (ValueRule is BoolOptionValueRule rule)
+            return rule.Selections[Selection];
+        throw new NotSupportedException();
     }
 
     public float GetFloat()
     {
-        return (float)Selections[Selection];
+        if (ValueRule is FloatOptionValueRule rule)
+            return rule.Selections[Selection];
+        throw new NotSupportedException();
     }
 
     public int GetQuantity()
@@ -211,12 +178,13 @@ public sealed class CustomOption
     // Option changes
     public void UpdateSelection(int newSelection)
     {
-        Selection = Mathf.Clamp((newSelection + Selections.Length) % Selections.Length, 0, Selections.Length - 1);
-        if (OptionBehaviour != null && OptionBehaviour is StringOption stringOption)
-        {
-            stringOption.oldValue = stringOption.Value = Selection;
-            stringOption.ValueText.text = Selections[Selection].ToString();
-        }
+        var selections = ValueRule.Selections;
+        Selection = Mathf.Clamp((newSelection + selections.Length) % selections.Length, 0, selections.Length - 1);
+        //if (OptionBehaviour != null && OptionBehaviour is StringOption stringOption)
+        //{
+        //    stringOption.oldValue = stringOption.Value = Selection;
+        //    stringOption.ValueText.text = ValueRule.Selections[Selection].ToString();
+        //}
 
         ShareOptionChange(newSelection);
     }

@@ -10,6 +10,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
@@ -25,8 +26,8 @@ public class Opportunist : CustomRole, IListener
     public Opportunist() : base(LanguageConfig.Instance.OpportunistName, Color.yellow, CampType.Neutral)
     {
         Description = LanguageConfig.Instance.OpportunistDescription;
-        _killCooldownOption = CustomOption.Create(CustomOption.TabType.Neutral,
-            LanguageConfig.Instance.KillCooldown, 45f, 20f, 200f, 1f, MainRoleOption);
+        _killCooldownOption = CustomOption.Create(CustomOption.TabType.Neutral, () => LanguageConfig.Instance.KillCooldown,
+           new FloatOptionValueRule(20f, 5f, 200f, 45f), MainRoleOption);
         _killButton = CustomButton.Create(
             () =>
             {
