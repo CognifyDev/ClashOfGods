@@ -15,6 +15,11 @@ public class PlayerExileBeginEvent : PlayerEvent
     /// </summary>
     public ExileController ExileController { get; }
 
+
+    /// <summary>
+    ///     被驱逐的玩家，如果有玩家被驱逐此项一定不为null<br/>
+    ///     被驱逐的玩家退出游戏后，<see cref="ExileController.exiled"/>的<see cref="NetworkedPlayerInfo.Object"/>必定为null
+    /// </summary>
     public NetworkedPlayerInfo? Exiled { get; }
     public bool Tie { get; }
 }

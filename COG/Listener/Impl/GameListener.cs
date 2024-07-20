@@ -77,14 +77,23 @@ public class GameListener : IListener
             var mainOption = GameUtils.GetGameOptions();
             var roleOption = mainOption.RoleOptions;
 
+            bool changed = false;
+
             foreach (var role in Enum.GetValues<RoleTypes>())
-                if (roleOption.GetNumPerGame(role) != 0 || roleOption.GetChancePerGame(role) != 0) 
+            {
+                if (roleOption.GetNumPerGame(role) != 0 || roleOption.GetChancePerGame(role) != 0)
                     roleOption.SetRoleRate(role, 0, 0);
-            
-            if (mainOption.RulesPreset != RulesPresets.Custom) 
+                changed = true;
+            }
+                
+            if (mainOption.RulesPreset != RulesPresets.Custom)
+            {
                 mainOption.RulesPreset = RulesPresets.Custom;
+                changed = true;
+            }
 
-
+            if (changed) 
+                Object.FindObjectsOfType<RoleOptionSetting>().ForEach(o => o.UpdateValuesAndText(roleOption));
         }
 
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
