@@ -170,6 +170,13 @@ public sealed class CustomOption
         throw new NotSupportedException();
     }
 
+    public int GetInt()
+    {
+        if (ValueRule is IntOptionValueRule rule)
+            return rule.Selections[Selection];
+        throw new NotSupportedException();
+    }
+
     public int GetQuantity()
     {
         return Selection + 1;

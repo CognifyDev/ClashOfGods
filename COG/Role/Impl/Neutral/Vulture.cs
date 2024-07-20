@@ -77,10 +77,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public bool CanWin() // 只有房主会判断游戏胜利，因此玩家之间需要同步数据
     {
-        var winningEaten = 4;
-        if (WinningEatenCount != null && WinningEatenCount.GetDynamicValue() is int value)
-            winningEaten = value;
-        if (EatenCount >= winningEaten)
+        if (EatenCount >= (WinningEatenCount?.GetInt() ?? 4))
         {
             CustomWinnerManager.EndGame(Players, "Vulture wins", Color);
             return true;
@@ -142,7 +139,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public override string HandleAdditionalPlayerName()
     {
-        return $"\n({EatenCount}/{(int)(WinningEatenCount?.GetFloat() ?? 4f)})";
+        return $"\n({EatenCount}/{(WinningEatenCount?.GetInt() ?? 4f)})";
     }
 
     public override void ClearRoleGameData()
