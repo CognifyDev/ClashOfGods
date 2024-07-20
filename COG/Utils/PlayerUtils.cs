@@ -114,7 +114,7 @@ public static class PlayerUtils
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
 
-    public static PlayerControl? GetPlayerById(byte playerId)
+    public static PlayerControl? GetPlayerById(byte? playerId)
     {
         return GetAllPlayers().FirstOrDefault(playerControl => playerControl.PlayerId == playerId);
     }

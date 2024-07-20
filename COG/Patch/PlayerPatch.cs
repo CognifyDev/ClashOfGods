@@ -152,7 +152,7 @@ internal class AirshipExileControllerPatch
     {
         return ListenerManager.GetManager()
             .ExecuteHandlers(
-                new PlayerExileEndOnAirshipEvent(PlayerUtils.GetPlayerById(__instance.exiled.PlayerId)!, __instance),
+                new PlayerExileEndOnAirshipEvent(PlayerUtils.GetPlayerById(__instance.exiled?.PlayerId)!, __instance),
                 EventHandlerType.Prefix);
     }
 

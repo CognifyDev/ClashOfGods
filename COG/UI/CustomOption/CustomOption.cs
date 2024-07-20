@@ -32,7 +32,7 @@ public sealed class CustomOption
         Addons = 4
     }
 
-    public static readonly List<CustomOption?> Options = new();
+    public static List<CustomOption?> Options { get; } = new();
 
     private static int _typeId;
 
