@@ -1,3 +1,4 @@
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
@@ -9,6 +10,7 @@ using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -94,7 +96,17 @@ public class Vulture : CustomRole, IListener, IWinnable
         EatBody(body);
     }
 
-    // TODO: Show flash when someone dies
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerDeath(PlayerMurderEvent _)
+    {
+        HudManager.Instance.StartCoroutine(CoFadeDeath().WrapToIl2Cpp());
+    }
+
+    public IEnumerator CoFadeDeath()
+    {
+        yield return HudManager.Instance.CoFadeFullScreen(new(0, 0, 0, 0), Palette.CrewmateBlue);
+        yield return HudManager.Instance.CoFadeFullScreen(Palette.CrewmateBlue, new(0, 0, 0, 0));
+    }
 
     public void EatBody(DeadBody body)
     {
