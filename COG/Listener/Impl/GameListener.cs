@@ -92,7 +92,7 @@ public class GameListener : IListener
             }
 
             if (changed) 
-                Object.FindObjectOfType<RolesSettingsMenu>().roleChances.ToArray().ForEach(o => o.UpdateValuesAndText(roleOption));
+                Object.FindObjectOfType<RolesSettingsMenu>()?.roleChances.ToArray().ForEach(o => o.UpdateValuesAndText(roleOption));
         }
 
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
