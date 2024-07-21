@@ -92,7 +92,7 @@ public class GameListener : IListener
             }
 
             if (changed) 
-                Object.FindObjectsOfType<RoleOptionSetting>().ForEach(o => o.UpdateValuesAndText(roleOption));
+                Object.FindObjectOfType<RolesSettingsMenu>().roleChances.ToArray().ForEach(o => o.UpdateValuesAndText(roleOption));
         }
 
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
@@ -208,8 +208,6 @@ public class GameListener : IListener
     {
         if (!AmongUsClient.Instance.AmHost) return;
 
-        GameStates.InGame = true;
-
         Main.Logger.LogInfo("Shhhhhh!");
 
         if (!AmongUsClient.Instance.AmHost) return;
@@ -265,11 +263,12 @@ public class GameListener : IListener
 
             var sb = new StringBuilder(myRole.GetColorName());
             foreach (var sub in PlayerControl.LocalPlayer.GetSubRoles())
-                sb.Append('\n').Append(sub.GetColorName());
+                sb.Append(" + ").Append(sub.GetColorName());
 
-            intro.RoleBlurbText.text = sb.ToString();
-            intro.RoleBlurbText.color = myRole.Color;
+            intro.YouAreText.text = sb.ToString();
             intro.YouAreText.color = myRole.Color;
+            intro.RoleBlurbText.color = myRole.Color;
+            intro.RoleBlurbText.text = myRole.Description;
 
             intro.YouAreText.gameObject.SetActive(true);
             intro.RoleText.gameObject.SetActive(true);
@@ -347,7 +346,7 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnCheckGameEnd(GameCheckEndEvent @event)
     {
-        return !GlobalCustomOptionConstant.DebugMode!.GetBool() && CustomWinnerManager.CheckEndForCustomWinners();
+        return CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -447,6 +446,8 @@ public class GameListener : IListener
     public void OnGameStart(GameStartEvent @event)
     {
         Main.Logger.LogInfo("Game started!");
+
+        GameStates.InGame = true;
 
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
             foreach (var player in PlayerControl.AllPlayerControls)
