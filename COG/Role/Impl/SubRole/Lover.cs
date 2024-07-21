@@ -30,7 +30,7 @@ public class Lover : CustomRole, IListener, IWinnable
         if (ShowInOptions)
         {
             var tab = ToCustomOption(this);
-            RoleNumberOption!.NameGetter = () => LanguageConfig.Instance.LoverCountOptionName;
+            RoleNumberOption!.RealNameDelegate = () => LanguageConfig.Instance.LoverCountOptionName;
             LoversDieTogetherOption = CustomOption.Create(tab, () => LanguageConfig.Instance.LoversDieTogetherOptionName, new BoolOptionValueRule(true), MainRoleOption);
             EnablePrivateChatOption = CustomOption.Create(tab, () => LanguageConfig.Instance.LoverEnablePrivateChat, new BoolOptionValueRule(true), MainRoleOption);
         }
@@ -96,7 +96,7 @@ public class Lover : CustomRole, IListener, IWinnable
 
     public override bool OnRoleSelection(List<CustomRole> roles)
     {
-        for (int i = 0; i < (RoleNumberOption?.GetQuantity() ?? 1) * 2; i++)
+        for (int i = 0; i < (RoleNumberOption?.GetInt() ?? 1) * 2; i++)
             roles.Add(this);
         return true;
     }

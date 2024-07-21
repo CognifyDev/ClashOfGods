@@ -280,7 +280,7 @@ public static class PlayerUtils
         GameUtils.PlayerRoleData.Add(new PlayerRole(pc, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
 
-        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} was set to {role.GetType().Name}");
+        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has set to {role.GetType().Name}");
     }
 
     public static void SetCustomRole<T>(this PlayerControl pc) where T : CustomRole

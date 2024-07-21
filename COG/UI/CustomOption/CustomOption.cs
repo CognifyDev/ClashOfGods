@@ -41,8 +41,8 @@ public sealed class CustomOption
     public int DefaultSelection => ValueRule.DefaultSelection;
     public int ID { get; }
     public bool IsHeader { get; }
-    public Func<string> NameGetter { get; set; }
-    public string Name => Parent == null ? NameGetter() : Color.gray.ToColorString("→ ") + NameGetter();
+    public Func<string> RealNameDelegate { get; set; }
+    public string FullName => Parent == null ? RealNameDelegate() : Color.gray.ToColorString("→ ") + RealNameDelegate();
     public TabType Page { get; }
     public CustomOption? Parent { get; }
     public object[] Selections => ValueRule.Selections;
@@ -56,7 +56,7 @@ public sealed class CustomOption
     {
         ID = _typeId;
         _typeId++;
-        NameGetter = nameGetter;
+        RealNameDelegate = nameGetter;
         ValueRule = rule;
         Selection = rule.DefaultSelection;
         Parent = parent;
@@ -173,6 +173,13 @@ public sealed class CustomOption
     public int GetInt()
     {
         if (ValueRule is IntOptionValueRule rule)
+            return rule.Selections[Selection];
+        throw new NotSupportedException();
+    }
+
+    public string GetString()
+    {
+        if (ValueRule is StringOptionValueRule rule)
             return rule.Selections[Selection];
         throw new NotSupportedException();
     }
