@@ -35,9 +35,9 @@ public class VanillaBugFixListener : IListener
 
     public IEnumerator CoFixBlackout()
     {
-        yield return new WaitForSeconds(0.5f);
-
         Main.Logger.LogInfo("Checking if blackout occured...");
+
+        yield return new WaitForSeconds(0.5f);
 
         var hud = HudManager.Instance;
         var fullScr = hud.FullScreen.gameObject;
@@ -52,13 +52,13 @@ public class VanillaBugFixListener : IListener
         {
             var ship = ShipStatus.Instance;
             ship.StartCoroutine(ship.PrespawnStep());
-            Main.Logger.LogInfo("Fixed successfully! Now fix SpawnInMiniGame...");
+            Main.Logger.LogInfo("Fixed successfully! Now fix SpawnInMiniGame and FollowerCamera...");
             OccuredBlackoutOnAirship = true;
         }
         else
         {
             hud.StartCoroutine(hud.CoFadeFullScreen(new(0, 0, 0, 1), new(0, 0, 0, 0)));
-            Camera.main.GetComponent<FollowerCamera>().Locked = false;
+            hud.PlayerCam.Locked = false;
             Main.Logger.LogInfo("Fixed successfully!");
         }
     }

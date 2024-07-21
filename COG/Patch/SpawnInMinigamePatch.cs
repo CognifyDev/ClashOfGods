@@ -9,7 +9,10 @@ internal class SpawnInMinigameBlackoutFixPatch
     public static void Postfix(bool __result)
     {
         var hud = HudManager.Instance;
-        if(VanillaBugFixListener.OccuredBlackoutOnAirship&&!__result)
+        if (VanillaBugFixListener.OccuredBlackoutOnAirship && !__result)
+        {
             hud.StartCoroutine(hud.CoFadeFullScreen(new(0, 0, 0, 1), new(0, 0, 0, 0)));
+            hud.PlayerCam.Locked = false;
+        }
     }
 }
