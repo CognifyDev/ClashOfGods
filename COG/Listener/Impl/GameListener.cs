@@ -19,7 +19,6 @@ using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.States;
-using COG.UI.CustomButton;
 using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
 using Il2CppSystem.Collections;

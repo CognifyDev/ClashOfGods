@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using BepInEx.Logging;
 
 namespace COG.Utils;
 
@@ -21,7 +22,7 @@ public class StackTraceLogger
 
     public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
     public List<MethodInfo> DisabledMethodSource { get; } = new();
-    private BepInEx.Logging.ManualLogSource BepInExLogger { get; }
+    private ManualLogSource BepInExLogger { get; }
 
     public void LogDebug(object? msg, string? customName = null)
     {

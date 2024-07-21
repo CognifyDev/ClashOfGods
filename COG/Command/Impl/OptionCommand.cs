@@ -1,7 +1,7 @@
-using COG.UI.CustomOption;
-using COG.Utils;
 using System.Linq;
 using System.Text;
+using COG.UI.CustomOption;
+using COG.Utils;
 
 namespace COG.Command.Impl;
 

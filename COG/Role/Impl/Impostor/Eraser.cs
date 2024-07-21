@@ -11,6 +11,7 @@ using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using UnityEngine;
+
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 
 namespace COG.Role.Impl.Impostor;

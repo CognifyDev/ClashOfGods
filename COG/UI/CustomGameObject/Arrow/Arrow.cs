@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using COG.Constant;
 using COG.States;
 using COG.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace COG.UI.CustomGameObject.Arrow;
@@ -37,7 +37,7 @@ public class Arrow
     public SpriteRenderer Renderer { get; set; }
     public Vector3 Target { get; set; }
     public Color? Color { get; set; }
-    public UnityEngine.GameObject ArrowObject { get; }
+    public GameObject ArrowObject { get; }
 
     public void Update()
     {

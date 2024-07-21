@@ -1,4 +1,7 @@
-﻿using COG.Config.Impl;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Listener.Event.Impl.ICutscene;
@@ -8,10 +11,7 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using UnityEngine;
 
 namespace COG.Role.Impl.SubRole;
 
@@ -22,7 +22,7 @@ public class Lover : CustomRole, IListener, IWinnable
     public static Dictionary<PlayerControl, PlayerControl> Couples { get; private set; }
     private CustomOption LoversDieTogetherOption { get; }
     private CustomOption EnablePrivateChatOption { get; }
-    public Lover() : base(LanguageConfig.Instance.LoverName, UnityEngine.Color.magenta, CampType.Unknown)
+    public Lover() : base(LanguageConfig.Instance.LoverName, Color.magenta, CampType.Unknown)
     {
         Description = "";
         IsSubRole = true;
@@ -40,8 +40,8 @@ public class Lover : CustomRole, IListener, IWinnable
     {
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.SyncLovers);
 
-        writer.WritePacked(Lover.Couples.Count);
-        foreach (var (p1, p2) in Lover.Couples!)
+        writer.WritePacked(Couples.Count);
+        foreach (var (p1, p2) in Couples!)
             writer.Write(p1.PlayerId).Write(p2.PlayerId);
 
         writer.Finish();
@@ -107,7 +107,7 @@ public class Lover : CustomRole, IListener, IWinnable
         if (players.Count % 2 != 0)
         {
             Main.Logger.LogError("Couldn't assign lovers, game will end now.");
-            CustomWinnerManager.EndGame(PlayerUtils.GetAllPlayers(), "Bug Wins", UnityEngine.Color.grey);
+            CustomWinnerManager.EndGame(PlayerUtils.GetAllPlayers(), "Bug Wins", Color.grey);
             return;
         }
 
@@ -173,14 +173,13 @@ public class Lover : CustomRole, IListener, IWinnable
     public override CustomRole NewInstance() => new Lover();
 }
 
-public static partial class RoleUtils
+public static class RoleUtils
 {
     public static bool IsInLove(this PlayerControl player, PlayerControl? other = null)
     {
         if (!other)
             return Lover.Couples!.Any(c => c.Key.IsSamePlayer(player) || c.Value.IsSamePlayer(player));
-        else
-            return Lover.Couples!.Any(c => c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(player, other!)) || c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(other!, player)));
+        return Lover.Couples!.Any(c => c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(player, other!)) || c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(other!, player)));
     }
 
     public static PlayerControl? GetLover(this PlayerControl player)

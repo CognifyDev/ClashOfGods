@@ -1,11 +1,8 @@
-using System.Threading;
-using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Listener.Event.Impl.Game;
-using COG.Listener.Event.Impl.GSManager;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
 using COG.UI.CustomButton;
@@ -13,7 +10,6 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 namespace COG.Role.Impl.Neutral;
 

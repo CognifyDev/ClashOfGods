@@ -1,11 +1,9 @@
-using BepInEx.Unity.IL2CPP.Utils.Collections;
-using COG.Rpc;
-using COG.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using COG.Rpc;
+using COG.Utils;
 using UnityEngine;
 
 namespace COG.Command.Impl;
@@ -16,7 +14,7 @@ public class RpcCommand : Command
     {
     }
 
-    private RpcUtils.RpcWriter? Writer = null;
+    private RpcUtils.RpcWriter? Writer;
 
     public override bool OnExecute(PlayerControl player, string[] args)
     {
@@ -85,8 +83,8 @@ public class RpcCommand : Command
                             var type = assembly.GetType(typeLocation);
                             if (type == null) throw new NotSupportedException($"The data type {typeName} is null.");
 
-                            object[] array = new object[] { args[2], new object() };
-                            var method = type.GetMethod("TryParse", new Type[] { typeof(string), assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer. */ });
+                            object[] array = { args[2], new object() };
+                            var method = type.GetMethod("TryParse", new[] { typeof(string), assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer. */ });
                             if (method == null) throw new NotSupportedException("The parsing method is null. (Normally, you aren't able to see this message.)");
 
                             bool success = (bool)method.Invoke(null, array)!;

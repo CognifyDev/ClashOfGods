@@ -2,6 +2,9 @@ global using HarmonyLib;
 global using Hazel;
 global using Object = UnityEngine.Object;
 global using GitInfo = ThisAssembly.Git;
+using System;
+using System.IO;
+using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Command;
@@ -20,18 +23,15 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
+using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.ModOption;
 using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
 using InnerNet;
-using System.IO;
-using System.Linq;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using COG.Rpc;
-using System;
 
 namespace COG;
 
@@ -119,7 +119,7 @@ public partial class Main : BasePlugin
             Logger.LogError(e.Message);
         }
 
-        ListenerManager.GetManager().RegisterListeners(new IListener[]
+        ListenerManager.GetManager().RegisterListeners(new[]
         {
             new CommandListener(),
             new PlayerListener(),

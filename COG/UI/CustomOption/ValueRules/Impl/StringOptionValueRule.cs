@@ -1,6 +1,6 @@
-using COG.Config.Impl;
 using System;
 using System.Linq;
+using COG.Config.Impl;
 
 namespace COG.UI.CustomOption.ValueRules.Impl;
 

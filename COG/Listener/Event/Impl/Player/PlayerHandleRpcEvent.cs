@@ -1,5 +1,3 @@
-using Hazel;
-
 namespace COG.Listener.Event.Impl.Player;
 
 /// <summary>

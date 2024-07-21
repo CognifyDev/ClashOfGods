@@ -1,14 +1,14 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Impl;
 using COG.Utils;
 using COG.Utils.Version;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using TMPro;
 using UnityEngine;
 

@@ -1,15 +1,17 @@
-﻿namespace COG.UI.CustomGameObject;
+﻿using UnityEngine;
+
+namespace COG.UI.CustomGameObject;
 
 public class CustomGameObject
 {
     public string Name { get; }
     
-    public UnityEngine.GameObject GameObject { get; }
+    public GameObject GameObject { get; }
 
     public CustomGameObject(string name)
     {
         Name = name;
-        GameObject = new UnityEngine.GameObject(Name);
+        GameObject = new GameObject(Name);
     }
 
     public void Update()

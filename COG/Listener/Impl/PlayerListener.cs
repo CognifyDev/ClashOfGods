@@ -1,13 +1,10 @@
+using System.Collections;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Listener.Event.Impl.Player;
-using COG.Rpc;
 using COG.States;
 using COG.UI.CustomOption;
 using COG.Utils;
-using Il2CppSystem;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace COG.Listener.Impl;
 

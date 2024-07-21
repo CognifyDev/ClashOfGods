@@ -1,11 +1,11 @@
-﻿using COG.Config.Impl;
+﻿using System;
+using System.Linq;
+using System.Text;
+using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.Game;
 using COG.States;
 using COG.Utils;
-using System;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace COG.Listener.Impl;

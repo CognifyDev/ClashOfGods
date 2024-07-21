@@ -1,9 +1,9 @@
+using System.Linq;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.Utils;
-using System.Linq;
 
 namespace COG.Listener.Impl;
 
