@@ -2,7 +2,7 @@ namespace COG.Listener.Event.Impl.Player;
 
 public class PlayerExileEndOnAirshipEvent : PlayerEvent
 {
-    public PlayerExileEndOnAirshipEvent(NetworkedPlayerInfo? player, ExileController controller) : base(player!.Object!)
+    public PlayerExileEndOnAirshipEvent(NetworkedPlayerInfo? player, ExileController controller) : base(player?.Object!)
     {
         Exiled = player;
         Controller = controller;

@@ -10,6 +10,8 @@ namespace COG.Listener.Impl;
 
 public class VanillaBugFixListener : IListener
 {
+    public static bool OccuredBlackoutOnAirship { get; private set; }
+
     public void OnSelectRole(RoleManagerSelectRolesEvent _)
     {
         var lobby = LobbyBehaviour.Instance;
@@ -20,34 +22,42 @@ public class VanillaBugFixListener : IListener
         }
     }
 
-    public void OnEjectionEnd(ExileController controller)
+    public void OnEjectionEnd()
     {
-        controller.StartCoroutine(CoFixBlackout().WrapToIl2Cpp());
+        HudManager.Instance.StartCoroutine(CoFixBlackout().WrapToIl2Cpp());
     }
 
-    public void OnAirshipEjectionEnd(PlayerExileEndOnAirshipEvent @event) => OnEjectionEnd(@event.Controller);
-    public void OnOtherMapEjectionEnd(PlayerExileEndEvent @event) => OnEjectionEnd(@event.ExileController);
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnAirshipEjectionEnd(PlayerExileEndOnAirshipEvent @event) => OnEjectionEnd();
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnOtherMapEjectionEnd(PlayerExileEndEvent @event) => OnEjectionEnd();
 
     public IEnumerator CoFixBlackout()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
+
+        Main.Logger.LogInfo("Checking if blackout occured...");
 
         var hud = HudManager.Instance;
         var fullScr = hud.FullScreen.gameObject;
+        
         if (!fullScr.active) yield break;
 
-        Main.Logger.LogInfo("After-meeting blackout bug has occured. Trying to fix...");
+        Main.Logger.LogWarning("After-meeting blackout bug has occured. Trying to fix...");
         var auClient = AmongUsClient.Instance;
         var mapId = (MapNames)(auClient.NetworkMode == NetworkModes.FreePlay ? auClient.TutorialMapId : GameUtils.GetGameOptions().MapId);
         
         if (mapId is MapNames.Airship)
         {
-            Main.Logger.LogError("The game will end now because you're playing in Airship and we can't fix blackout bug in Airship.");
-            CustomWinnerManager.EndGame(PlayerControl.AllPlayerControls.ToArray(), "Force End Due to Bug", Palette.White);
+            var ship = ShipStatus.Instance;
+            ship.StartCoroutine(ship.PrespawnStep());
+            Main.Logger.LogInfo("Fixed successfully! Now fix SpawnInMiniGame...");
+            OccuredBlackoutOnAirship = true;
         }
         else
         {
-            fullScr.SetActive(false);
+            hud.StartCoroutine(hud.CoFadeFullScreen(new(0, 0, 0, 1), new(0, 0, 0, 0)));
             Camera.main.GetComponent<FollowerCamera>().Locked = false;
             Main.Logger.LogInfo("Fixed successfully!");
         }

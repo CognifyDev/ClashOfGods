@@ -18,8 +18,9 @@ public class VersionShowerListener : IListener
     public bool HasCreatedShower => HudManager.Instance.transform.Find(ShowerObjectName);
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnAUClientStart(PingTrackerUpdateEvent @event)
+    public void OnPingTrackerUpdate(PingTrackerUpdateEvent @event)
     {
+        if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay) return;
         if (HasCreatedShower) return;
         var prefab = Object.FindObjectOfType<PingTracker>();
         var modVersionShower = Object.Instantiate(prefab, HudManager.Instance.transform);
