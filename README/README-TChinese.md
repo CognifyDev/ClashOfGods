@@ -1,5 +1,5 @@
 ﻿# ClashOfGods
-#### 一個我們之中的模組
+#### 一個劃時代Among Us模組，帶有挿件系統，使用簡單的電腦語言Lua來製作你專屬的模組
 
 > [English](README-English.md) | [简体中文](README-English.md) | 繁體中文
 
