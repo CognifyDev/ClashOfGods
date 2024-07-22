@@ -1,3 +1,4 @@
+/*
 using COG.Config.Impl;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -19,4 +20,4 @@ public static class GlobalCustomOptionConstant
             () => LanguageConfig.Instance.MaxSubRoleNumber,
             new IntOptionValueRule(0, 1, 10, 1), null, true);
     }
-}
+}*/
