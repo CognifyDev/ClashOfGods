@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
+using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -41,8 +42,7 @@ public sealed class CustomOption
     public int DefaultSelection => ValueRule.DefaultSelection;
     public int ID { get; }
     public bool IsHeader { get; }
-    public Func<string> RealNameDelegate { get; set; }
-    public string FullName => Parent == null ? RealNameDelegate() : Color.gray.ToColorString("→ ") + RealNameDelegate();
+    public Func<string> RealName { get; set; }
     public TabType Page { get; }
     public CustomOption? Parent { get; }
     public object[] Selections => ValueRule.Selections;
@@ -56,7 +56,7 @@ public sealed class CustomOption
     {
         ID = _typeId;
         _typeId++;
-        RealNameDelegate = nameGetter;
+        RealName = nameGetter;
         ValueRule = rule;
         Selection = rule.DefaultSelection;
         Parent = parent;
@@ -203,6 +203,13 @@ public sealed class CustomOption
         ShareOptionChange(newSelection);
     }
 
+    public void UpdateSelection(object newValue)
+    {
+        if (newValue == null) return;
+        var index = ValueRule.Selections.ToList().IndexOf(newValue);
+        if (index != -1) UpdateSelection(index);
+    }
+
     public void ShareOptionChange(int newSelection)
     {
         RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.UpdateOption)
@@ -277,7 +284,75 @@ public static class RoleOptionPatch
 {
     public static void Postfix(RolesSettingsMenu __instance)
     {
+        var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
+        chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(t => t.gameObject.SetActive(false));
+        SetUpCustomRoleTab(__instance, chanceTab, CampType.Crewmate);
+        
+        //Empty label: Palette.ImpostorRoleHeaderDarkRed
+    }
 
+    //TODO: TAB FOR EVERY CAMP
+    public static void SetUpCustomRoleTab(RolesSettingsMenu __instance, Transform chanceTab, CampType camp)
+    {
+        var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
+        var header = Object.Instantiate(__instance.categoryHeaderEditRoleOrigin, chanceTab);
+        header.transform.localPosition = initialHeaderPos;
+        header.SetHeader(StringNames.None, 20);
+        header.Title.text = "test";
+        var initialX = RolesSettingsMenu.X_START_CHANCE;
+        var initialY = 0.14f;
+        var offsetY = RolesSettingsMenu.Y_OFFSET;
+        var vanillaType = camp switch
+        {
+            CampType.Crewmate => RoleTeamTypes.Crewmate,
+            CampType.Impostor => RoleTeamTypes.Impostor,
+            CampType.Neutral => (RoleTeamTypes)99,
+            _ or CampType.Unknown => (RoleTeamTypes)100
+        };
+
+        int i = 0;
+        foreach (var role in CustomRoleManager.GetManager().GetRoles().Where(r => r.CampType == camp))
+        {
+            var chanceSetting = Object.Instantiate(__instance.roleOptionSettingOrigin, chanceTab);
+            var numberOption = role.RoleNumberOption;
+            if (numberOption == null) continue;
+            numberOption.OptionBehaviour = chanceSetting;
+            chanceSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
+                new()
+                {
+                    StringName = StringNames.None,
+                    TeamType = vanillaType,
+                    Role = (RoleTypes)role.Id
+                }, 20);
+            chanceSetting.transform.localPosition = new(initialX, initialY + offsetY * i, -2f);
+            chanceSetting.titleText.text = role.Name;
+            chanceSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
+            {
+                var setting = ob.Cast<RoleOptionSetting>();
+                var numberOption = role.RoleNumberOption!;
+                var playerCount = setting.RoleMaxCount;
+                numberOption.UpdateSelection(newValue: playerCount);
+                role.MainRoleOption!.UpdateSelection(playerCount != 0);
+            });
+            i++;
+        }
+    }
+}
+
+[HarmonyPatch(typeof(RoleOptionSetting))]
+public static class RoleOptionSettingPatch
+{
+    [HarmonyPatch(nameof(RoleOptionSetting.UpdateValuesAndText))]
+    [HarmonyPrefix]
+    public static bool UpdateValuePatch(RoleOptionSetting __instance)
+    {
+        var option = CustomOption.Options.FirstOrDefault(o => o.OptionBehaviour == __instance);
+        if (option == null) return true;
+        __instance.roleMaxCount = option.GetInt();
+        __instance.roleChance = 100;
+        __instance.countText.text = __instance.roleMaxCount.ToString();
+        __instance.chanceText.text = __instance.roleChance.ToString();
+        return false;
     }
 }
 
