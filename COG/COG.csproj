@@ -19,7 +19,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\InDLL\Images\Setting\*.*" />
+        <EmbeddedResource Include="Resources\InDLL\Images\Settings\*.*" />
     </ItemGroup>
 
     <ItemGroup>

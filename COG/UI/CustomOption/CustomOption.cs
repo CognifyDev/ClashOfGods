@@ -287,7 +287,12 @@ public static class RoleOptionPatch
         var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
         chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(t => t.gameObject.SetActive(false));
 
-        __instance.transform.FindChild("HeaderButtons").GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.Destroy());
+        var headers = __instance.transform.FindChild("HeaderButtons");
+        headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.Destroy());
+        headers.FindChild("AllButton").GetComponent<PassiveButton>().OnClick.AddListener((UnityAction)(() =>
+        {
+            Tabs.ForEach(go => go.SetActive(false));
+        }));
 
         int i = 0;
         foreach (var team in Enum.GetValues<CampType>())
@@ -295,15 +300,20 @@ public static class RoleOptionPatch
         
     }
 
+    public static List<GameObject> Tabs { get; } = new();
+
     public static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
     {
         var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
+        Tabs.Add(tab.gameObject);
 
+        tab.gameObject.SetActive(false);
         tab.localPosition = chanceTabTemplate.localPosition;
-        tab.name = camp + "Tab";
-        SetUpTabButton(menu, tab.gameObject, index);
+        var trueName = camp != CampType.Unknown ? camp.ToString() : "Addon";
+        tab.name = trueName + "Tab";
+        SetUpTabButton(menu, tab.gameObject, index, trueName);
 
         var header = Object.Instantiate(menu.categoryHeaderEditRoleOrigin, tab);
         var layer = RolesSettingsMenu.MASK_LAYER;
@@ -348,7 +358,7 @@ public static class RoleOptionPatch
         int i = 0;
         foreach (var role in CustomRoleManager.GetManager().GetRoles().Where(r => r.CampType == camp && !r.IsBaseRole))
         {
-            var chanceSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
+            var chanceSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab); // FIXME: 莫名多了一个选项
             var numberOption = role.RoleNumberOption;
             if (numberOption == null) continue;
             numberOption.OptionBehaviour = chanceSetting;
@@ -383,7 +393,7 @@ public static class RoleOptionPatch
 
     public static GameObject? CurrentTab { get; set; }
 
-    public static void SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index)
+    public static void SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName)
     {
         var headerParent = menu.transform.FindChild("HeaderButtons");
         var offset = RolesSettingsMenu.X_OFFSET;
@@ -396,10 +406,17 @@ public static class RoleOptionPatch
         button.OnClick = new();
         button.OnClick.AddListener((UnityAction)(() =>
         {
+            menu.RoleChancesSettings.SetActive(false);
             CurrentTab?.SetActive(false);
             CurrentTab = tab;
             tab.SetActive(true);
         }));
+
+        var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
+        const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
+
+        //renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 0.01f);
+        //FIXME: 淳平突脸的sprite
     }
 }
 
