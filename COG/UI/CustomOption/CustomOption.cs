@@ -286,19 +286,54 @@ public static class RoleOptionPatch
     {
         var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
         chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(t => t.gameObject.SetActive(false));
-        SetUpCustomRoleTab(__instance, chanceTab, CampType.Crewmate);
+
+        __instance.transform.FindChild("HeaderButtons").GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.Destroy());
+
+        int i = 0;
+        foreach (var team in Enum.GetValues<CampType>())
+            SetUpCustomRoleTab(__instance, chanceTab, team, i++);
         
-        //Empty label: Palette.ImpostorRoleHeaderDarkRed
     }
 
-    //TODO: TAB FOR EVERY CAMP
-    public static void SetUpCustomRoleTab(RolesSettingsMenu __instance, Transform chanceTab, CampType camp)
+    public static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
     {
         var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
-        var header = Object.Instantiate(__instance.categoryHeaderEditRoleOrigin, chanceTab);
+        var sliderInner = chanceTabTemplate.parent;
+        var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
+
+        tab.localPosition = chanceTabTemplate.localPosition;
+        tab.name = camp + "Tab";
+        SetUpTabButton(menu, tab.gameObject, index);
+
+        var header = Object.Instantiate(menu.categoryHeaderEditRoleOrigin, tab);
+        var layer = RolesSettingsMenu.MASK_LAYER;
         header.transform.localPosition = initialHeaderPos;
-        header.SetHeader(StringNames.None, 20);
-        header.Title.text = "test";
+        header.SetHeader(StringNames.None, layer);
+        header.Title.text = camp switch
+        {
+            CampType.Crewmate => LanguageConfig.Instance.CrewmateCamp,
+            CampType.Impostor => LanguageConfig.Instance.ImpostorCamp,
+            CampType.Neutral => LanguageConfig.Instance.NeutralCamp,
+            _ => "Setting"
+        };
+        header.Background.color = camp switch
+        {
+            CampType.Crewmate => Palette.CrewmateRoleHeaderBlue,
+            CampType.Impostor => Palette.ImpostorRoleHeaderRed,
+            _ => Color.grey
+        };
+        header.blankLabel.color = camp switch
+        {
+            CampType.Crewmate => Palette.CrewmateRoleHeaderVeryDarkBlue,
+            CampType.Impostor => Palette.ImpostorRoleHeaderVeryDarkRed,
+            _ => Color.grey
+        };
+        header.countLabel.color = header.chanceLabel.color = camp switch
+        {
+            CampType.Crewmate => Palette.CrewmateRoleHeaderDarkBlue,
+            CampType.Impostor => Palette.ImpostorRoleHeaderDarkRed,
+            _ => Color.grey
+        };
         var initialX = RolesSettingsMenu.X_START_CHANCE;
         var initialY = 0.14f;
         var offsetY = RolesSettingsMenu.Y_OFFSET;
@@ -311,9 +346,9 @@ public static class RoleOptionPatch
         };
 
         int i = 0;
-        foreach (var role in CustomRoleManager.GetManager().GetRoles().Where(r => r.CampType == camp))
+        foreach (var role in CustomRoleManager.GetManager().GetRoles().Where(r => r.CampType == camp && !r.IsBaseRole))
         {
-            var chanceSetting = Object.Instantiate(__instance.roleOptionSettingOrigin, chanceTab);
+            var chanceSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
             var numberOption = role.RoleNumberOption;
             if (numberOption == null) continue;
             numberOption.OptionBehaviour = chanceSetting;
@@ -322,10 +357,16 @@ public static class RoleOptionPatch
                 {
                     StringName = StringNames.None,
                     TeamType = vanillaType,
-                    Role = (RoleTypes)role.Id
-                }, 20);
+                    Role = (RoleTypes)role.Id + 100
+                }, layer);
             chanceSetting.transform.localPosition = new(initialX, initialY + offsetY * i, -2f);
             chanceSetting.titleText.text = role.Name;
+            chanceSetting.labelSprite.color = camp switch
+            {
+                CampType.Crewmate => Palette.CrewmateRoleBlue,
+                CampType.Impostor => Palette.ImpostorRoleRed,
+                _ => Color.grey
+            };
             chanceSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
             {
                 var setting = ob.Cast<RoleOptionSetting>();
@@ -333,9 +374,32 @@ public static class RoleOptionPatch
                 var playerCount = setting.RoleMaxCount;
                 numberOption.UpdateSelection(newValue: playerCount);
                 role.MainRoleOption!.UpdateSelection(playerCount != 0);
+                setting.UpdateValuesAndText(null);
+                HudManager.Instance.Notifier.AddRoleSettingsChangeMessage(StringNames.Roles, playerCount, 100, vanillaType);
             });
             i++;
         }
+    }
+
+    public static GameObject? CurrentTab { get; set; }
+
+    public static void SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index)
+    {
+        var headerParent = menu.transform.FindChild("HeaderButtons");
+        var offset = RolesSettingsMenu.X_OFFSET;
+        var xStart = RolesSettingsMenu.X_START;
+        var yStart = RolesSettingsMenu.TAB_Y_START;
+        var button = Object.Instantiate(menu.roleSettingsTabButtonOrigin, headerParent).GetComponent<PassiveButton>();
+        
+        button.transform.localPosition = new(xStart + index * offset, yStart, -2);
+        button.DestroyComponent<RoleSettingsTabButton>();
+        button.OnClick = new();
+        button.OnClick.AddListener((UnityAction)(() =>
+        {
+            CurrentTab?.SetActive(false);
+            CurrentTab = tab;
+            tab.SetActive(true);
+        }));
     }
 }
 
