@@ -34,16 +34,16 @@ public class BountyHunter : CustomRole, IListener
         if (ShowInOptions)
         {
             var optionType = ToCustomOption(this);
-            BHunterKillCd = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterDefaultCd,
-                new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
-            BHunterRefreshTargetTime = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterRefreshTargetTime,
-                new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
-            HasArrowToTarget = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterHasArrowToTarget,
-                new BoolOptionValueRule(true), MainRoleOption);
-            CdAfterKillingTarget = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterKillCorrectCd,
-                new FloatOptionValueRule(10f, 5f, 60f, 10f), MainRoleOption);
-            CdAfterKillingNonTarget = CustomOption.Create(optionType, () => LanguageConfig.Instance.BountyHunterKillIncorrectCd,
-                new FloatOptionValueRule(60f, 5f, 120f, 60f), MainRoleOption);
+            BHunterKillCd = CreateOption(() => LanguageConfig.Instance.BountyHunterDefaultCd,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f));
+            BHunterRefreshTargetTime = CreateOption(() => LanguageConfig.Instance.BountyHunterRefreshTargetTime,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f));
+            HasArrowToTarget = CreateOption(() => LanguageConfig.Instance.BountyHunterHasArrowToTarget,
+                new BoolOptionValueRule(true));
+            CdAfterKillingTarget = CreateOption(() => LanguageConfig.Instance.BountyHunterKillCorrectCd, 
+                new FloatOptionValueRule(10f, 5f, 60f, 10f));
+            CdAfterKillingNonTarget = CreateOption(() => LanguageConfig.Instance.BountyHunterKillIncorrectCd, 
+                new FloatOptionValueRule(60f, 5f, 120f, 60f));
         }
 
         BHunterKillButton = CustomButton.Create(

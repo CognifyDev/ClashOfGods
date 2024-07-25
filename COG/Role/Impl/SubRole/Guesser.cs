@@ -20,10 +20,10 @@ public class Guesser : CustomRole, IListener
         Description = LanguageConfig.Instance.GuesserDescription;
         IsSubRole = true;
 
-        MaxGuessTimeOption = CustomOption.Create(CustomOption.TabType.Addons, () => LanguageConfig.Instance.GuesserMaxGuessTime,
-            new FloatOptionValueRule(1, 1, 99, 5), MainRoleOption);
-        GuesserGuessContinuously = CustomOption.Create(CustomOption.TabType.Addons, () => LanguageConfig.Instance.GuesserGuessContinuously,
-            new BoolOptionValueRule(true), MainRoleOption);
+        MaxGuessTimeOption = CreateOption(() => LanguageConfig.Instance.GuesserMaxGuessTime,
+            new FloatOptionValueRule(1, 1, 99, 5));
+        GuesserGuessContinuously = CreateOption(() => LanguageConfig.Instance.GuesserGuessContinuously,
+            new BoolOptionValueRule(true));
     }
 
     [EventHandler(EventHandlerType.Postfix)]

@@ -13,8 +13,10 @@ using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using COG.Utils.WinAPI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using YamlDotNet.Core.Tokens;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG.UI.CustomOption;
@@ -52,7 +54,7 @@ public sealed class CustomOption
     public int Selection;
 
     // Option creation
-    public CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
+    private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
     {
         ID = _typeId;
         _typeId++;
@@ -194,12 +196,8 @@ public sealed class CustomOption
     {
         var selections = ValueRule.Selections;
         Selection = Mathf.Clamp((newSelection + selections.Length) % selections.Length, 0, selections.Length - 1);
-        //if (OptionBehaviour != null && OptionBehaviour is StringOption stringOption)
-        //{
-        //    stringOption.oldValue = stringOption.Value = Selection;
-        //    stringOption.ValueText.text = ValueRule.Selections[Selection].ToString();
-        //}
 
+        NotifySettingChange();
         ShareOptionChange(newSelection);
     }
 
@@ -216,6 +214,28 @@ public sealed class CustomOption
             .WritePacked(ID)
             .WritePacked(newSelection)
             .Finish();
+    }
+
+    public void NotifySettingChange()
+    {
+        if (OptionBehaviour is RoleOptionSetting setting)
+        {
+            var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.RoleOptions.Contains(this));
+            if (role == null) return;
+
+            var color = (int)setting.Role.TeamType switch
+            {
+                (int)CampType.Crewmate => Palette.CrewmateSettingChangeText,
+                (int)CampType.Impostor => Palette.ImpostorRed,
+                _ => Color.grey
+            };
+            var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotificationRole,
+                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{role.Name.Color(color)}</font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount.ToString() + "</font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance.ToString() + "%"
+            );
+            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue, item, true);
+        }
     }
 }
 
@@ -284,26 +304,42 @@ public static class RoleOptionPatch
 {
     public static void Postfix(RolesSettingsMenu __instance)
     {
+        Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
+
+        Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")?.GetComponent<PassiveButton>()?.SelectButton(true); // Fix button is unselected when open at the first time
+
         var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
         chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(t => t.gameObject.SetActive(false));
 
         var headers = __instance.transform.FindChild("HeaderButtons");
         headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.Destroy());
-        headers.FindChild("AllButton").GetComponent<PassiveButton>().OnClick.AddListener((UnityAction)(() =>
+        
+        (AllButton = headers.FindChild("AllButton").GetComponent<PassiveButton>()).OnClick.AddListener((UnityAction)(() =>
         {
-            Tabs.ForEach(go => go.SetActive(false));
+            Tabs.Where(go => go).ForEach(go => go.SetActive(false));
+            if (AllButton) SetButtonActive(CurrentButton!, false, true);
+            if (CurrentTab) CurrentTab!.SetActive(false);
         }));
+
+        Main.Logger.LogInfo("Creating tabs...");
 
         int i = 0;
         foreach (var team in Enum.GetValues<CampType>())
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
-        
+
+        chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.Destroy();
     }
 
-    public static List<GameObject> Tabs { get; } = new();
+    public static List<GameObject> Tabs => _tabs.Where(tab => tab).ToList();
+
+    private static readonly List<GameObject> _tabs = new();
+
+    public static PassiveButton? AllButton { get; set; }
 
     public static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
     {
+        Main.Logger.LogInfo($"Creating tab for team {camp}...");
+
         var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
@@ -324,7 +360,7 @@ public static class RoleOptionPatch
             CampType.Crewmate => LanguageConfig.Instance.CrewmateCamp,
             CampType.Impostor => LanguageConfig.Instance.ImpostorCamp,
             CampType.Neutral => LanguageConfig.Instance.NeutralCamp,
-            _ => "Setting"
+            _ => "Addon"
         };
         header.Background.color = camp switch
         {
@@ -344,6 +380,9 @@ public static class RoleOptionPatch
             CampType.Impostor => Palette.ImpostorRoleHeaderDarkRed,
             _ => Color.grey
         };
+
+        Main.Logger.LogInfo("Role header has created. Now set up role buttons...");
+
         var initialX = RolesSettingsMenu.X_START_CHANCE;
         var initialY = 0.14f;
         var offsetY = RolesSettingsMenu.Y_OFFSET;
@@ -356,45 +395,56 @@ public static class RoleOptionPatch
         };
 
         int i = 0;
-        foreach (var role in CustomRoleManager.GetManager().GetRoles().Where(r => r.CampType == camp && !r.IsBaseRole))
+        foreach (var role in CustomRoleManager.GetManager().GetTypeCampRoles(camp).Where(r => !r.IsBaseRole))
         {
-            var chanceSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab); // FIXME: 莫名多了一个选项
-            var numberOption = role.RoleNumberOption;
-            if (numberOption == null) continue;
-            numberOption.OptionBehaviour = chanceSetting;
-            chanceSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
+            if ((camp == CampType.Unknown && !role.IsSubRole) || !role.ShowInOptions) continue;
+            var roleSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
+            var numberOption = role.RoleNumberOption!;
+            var chanceOption = role.RoleChanceOption!;
+            numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
+            roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
                 new()
                 {
                     StringName = StringNames.None,
                     TeamType = vanillaType,
                     Role = (RoleTypes)role.Id + 100
                 }, layer);
-            chanceSetting.transform.localPosition = new(initialX, initialY + offsetY * i, -2f);
-            chanceSetting.titleText.text = role.Name;
-            chanceSetting.labelSprite.color = camp switch
+            roleSetting.transform.localPosition = new(initialX, initialY + offsetY * i, -2f);
+            roleSetting.titleText.text = role.Name;
+            roleSetting.labelSprite.color = camp switch
             {
                 CampType.Crewmate => Palette.CrewmateRoleBlue,
                 CampType.Impostor => Palette.ImpostorRoleRed,
                 _ => Color.grey
             };
-            chanceSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
+            roleSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
             {
                 var setting = ob.Cast<RoleOptionSetting>();
                 var numberOption = role.RoleNumberOption!;
-                var playerCount = setting.RoleMaxCount;
+                var chanceOption = role.RoleChanceOption!;
+                var playerCount = setting.roleMaxCount;
+                var roleChance = setting.roleChance;
+
+                Main.Logger.LogInfo($"{role.GetType().Name} Num: {playerCount}p, {roleChance}%");
+
                 numberOption.UpdateSelection(newValue: playerCount);
-                role.MainRoleOption!.UpdateSelection(playerCount != 0);
+                chanceOption.UpdateSelection(newValue: roleChance);
                 setting.UpdateValuesAndText(null);
-                HudManager.Instance.Notifier.AddRoleSettingsChangeMessage(StringNames.Roles, playerCount, 100, vanillaType);
             });
+
+            Main.Logger.LogInfo($"Role option has set up for {role.GetType().Name}.");
+
             i++;
         }
     }
 
     public static GameObject? CurrentTab { get; set; }
+    public static PassiveButton? CurrentButton { get; set; }
 
     public static void SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName)
     {
+        Main.Logger.LogInfo($"Setting up tab button for {tab.name} ({index})");
+
         var headerParent = menu.transform.FindChild("HeaderButtons");
         var offset = RolesSettingsMenu.X_OFFSET;
         var xStart = RolesSettingsMenu.X_START;
@@ -407,16 +457,42 @@ public static class RoleOptionPatch
         button.OnClick.AddListener((UnityAction)(() =>
         {
             menu.RoleChancesSettings.SetActive(false);
-            CurrentTab?.SetActive(false);
+            if (CurrentButton)
+                SetButtonActive(CurrentButton!, false);
+            if (CurrentTab) /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
+                CurrentTab!.SetActive(false);
+            CurrentButton = button;
             CurrentTab = tab;
+            SetButtonActive(button, true);
             tab.SetActive(true);
         }));
+
+        Main.Logger.LogInfo("Button action has registeristed. Start to set button icon...");
 
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
         const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
 
         //renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 0.01f);
         //FIXME: 淳平突脸的sprite
+
+    }
+
+    static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
+    {
+        if (!obj) return;
+        obj.SelectButton(active);
+        if (!AllButton) return;
+        AllButton!.SelectButton(clickedAllButton);
+        
+        Main.Logger.LogInfo($"Is {obj.name} active: {active} ({clickedAllButton})");
+    }
+    
+    [HarmonyPatch(nameof(RolesSettingsMenu.CloseMenu))]
+    [HarmonyPrefix]
+    public static void OnMenuClose()
+    {
+        SetButtonActive(CurrentButton!, false, true);
+        if (CurrentTab) CurrentTab!.SetActive(false);
     }
 }
 
@@ -427,10 +503,14 @@ public static class RoleOptionSettingPatch
     [HarmonyPrefix]
     public static bool UpdateValuePatch(RoleOptionSetting __instance)
     {
-        var option = CustomOption.Options.FirstOrDefault(o => o.OptionBehaviour == __instance);
-        if (option == null) return true;
-        __instance.roleMaxCount = option.GetInt();
-        __instance.roleChance = 100;
+        var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.RoleOptions.Any(o => o.OptionBehaviour == __instance));
+        if (role == null) return true;
+
+        var playerCount = role.RoleNumberOption!;
+        var chance = role.RoleChanceOption!;
+
+        __instance.roleMaxCount = playerCount.GetInt();
+        __instance.roleChance = chance.GetInt();
         __instance.countText.text = __instance.roleMaxCount.ToString();
         __instance.chanceText.text = __instance.roleChance.ToString();
         return false;
@@ -452,135 +532,3 @@ public static class SyncVanillaSettingsPatch
     public static void Postfix() => CustomOption.ShareConfigs();
 }
 
-#if false
-
-
-[HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Update))]
-internal class GameOptionsMenuUpdatePatch
-{
-    private const float TimerForBugFix = 1f;
-    private static float _timer = 1f;
-
-    public static void Postfix(GameOptionsMenu __instance)
-    {
-        // Return Menu Update if in normal among us settings 
-        var gameSettingMenu = Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
-        if (gameSettingMenu != null && (gameSettingMenu.RegularGameSettings.active ||
-                                        gameSettingMenu.RolesSettings.gameObject.active)) return;
-
-        __instance.GetComponentInParent<Scroller>().ContentYBounds.max = -0.5F + __instance.Children.Length * 0.55F;
-
-        _timer += Time.deltaTime;
-        if (_timer < 0.1f) return;
-
-        _timer = 0f;
-
-        if (TimerForBugFix < 3.0f) FirstOpen = false;
-
-        var offset = 2.75f;
-        var objType = new Dictionary<string, TabType>
-        {
-            { "GeneralSettings", TabType.General },
-            { "ImpostorSettings", TabType.Impostor },
-            { "NeutralSettings", TabType.Neutral },
-            { "CrewmateSettings", TabType.Crewmate },
-            { "AddonsSettings", TabType.Addons }
-        };
-
-        foreach (var option in Options.Where(o => o != null))
-        {
-            if (objType.ToList().Any(kvp => GameObject.Find(kvp.Key) && option!.Page != kvp.Value)) continue;
-            if (!(option != null && option.OptionBehaviour && option.OptionBehaviour != null &&
-                  option.OptionBehaviour!.gameObject)) return;
-            var enabled = true;
-            var parent = option!.Parent;
-
-            while (enabled && parent != null)
-            {
-                enabled = parent!.Selection != 0;
-                parent = parent.Parent;
-            }
-
-            option.OptionBehaviour!.gameObject.SetActive(enabled);
-            if (enabled)
-            {
-                offset -= option.IsHeader ? 0.75f : 0.5f;
-                var transform = option.OptionBehaviour.transform;
-                var localPosition = transform.localPosition;
-                localPosition = new Vector3(localPosition.x, offset, localPosition.z);
-                transform.localPosition = localPosition;
-            }
-        }
-
-        //每帧更新按钮选项名称与按下按钮操作
-        foreach (var option in Options.Where(o => o != null && o.SpecialOptionType == OptionType.Button))
-        {
-            var toggle = (ToggleOption)option!.OptionBehaviour!;
-            toggle.TitleText.text = option.Name;
-            toggle.OnValueChanged = option.OnClickIfButton ?? new Action<OptionBehaviour>(_ => { });
-        }
-    }
-}
-
-[HarmonyPatch]
-internal class HudStringPatch
-{
-    [HarmonyPatch(typeof(IGameOptionsExtensions), nameof(IGameOptionsExtensions.ToHudString))]
-    private static void Postfix(ref string __result)
-    {
-        if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek)
-            return; // Allow Vanilla Hide N Seek
-
-        var pages = SidebarTextManager.GetManager().GetSidebarTexts().Count;
-
-        if (pages <= 0) return;
-
-        var sidebars = SidebarTextManager.GetManager().GetSidebarTexts();
-        if (GameOptionsNextPagePatch.TypePage > sidebars.Count || GameOptionsNextPagePatch.TypePage == 0)
-            GameOptionsNextPagePatch.TypePage = 1;
-
-        if (sidebars.Count <= 0) return;
-
-        var sidebar = sidebars[GameOptionsNextPagePatch.TypePage - 1];
-        var text = sidebar.Title + Environment.NewLine;
-
-        sidebar.ForResult(ref __result);
-        foreach (var sidebarObject in sidebar.Objects) text += sidebarObject + Environment.NewLine;
-        text += LanguageConfig.Instance.MessageForNextPage.CustomFormat(GameOptionsNextPagePatch.TypePage, pages);
-        __result = text;
-    }
-
-    public static string GetOptByType(TabType type)
-    {
-        var txt = "";
-        List<CustomOption> opt = new();
-        foreach (var option in Options)
-            if (option != null && option.Page == type && option.SpecialOptionType != OptionType.Button)
-                opt.Add(option);
-        foreach (var option in opt)
-            // 临时解决方案
-            try
-            {
-                txt += option.Name + ": " + option.Selections[option.Selection] + Environment.NewLine;
-            }
-            catch (IndexOutOfRangeException)
-            {
-            }
-
-        return txt;
-        /*
-         * FIXME
-         * 房主设置更新，然后如果将已经选择打开的职业关闭，那么成员客户端就会抛这个错误
-         * [Error  :Il2CppInterop] During invoking native->managed trampoline
-         * Exception: System.IndexOutOfRangeException: Index was outside the bounds of the array.
-         * at COG.UI.CustomOption.HudStringPatch.GetOptByType(CustomOptionType type) in D:\RiderProjects\ClashOfGods\COG\UI\CustomOption\CustomOption.cs:line 652
-         * at COG.UI.SidebarText.Impl.CrewmateSettings.ForResult(String& result) in D:\RiderProjects\ClashOfGods\COG\UI\SidebarText\Impl\CrewmateSettings.cs:line 15
-         * at COG.Listener.Impl.OptionListener.OnIGameOptionsExtensionsDisplay(String& result) in D:\RiderProjects\ClashOfGods\COG\Listener\Impl\OptionListener.cs:line 30
-         * at COG.UI.CustomOption.HudStringPatch.Postfix(String& __result) in D:\RiderProjects\ClashOfGods\COG\UI\CustomOption\CustomOption.cs:line 641
-         * at DMD<IGameOptionsExtensions::ToHudString>(IGameOptions gameOptions, Int32 numPlayers)
-         * at (il2cpp -> managed) ToHudString(IntPtr , Int32 , Il2CppMethodInfo* )
-         */
-    }
-}
-
-#endif
