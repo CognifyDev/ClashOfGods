@@ -137,6 +137,44 @@ public abstract class CustomRole
 
     public List<CustomOption> RoleOptions { get; }
 
+    public RoleBehaviour VanillaRole
+    {
+        get
+        {
+            var vanillaType = CampType switch
+            {
+                CampType.Crewmate => RoleTeamTypes.Crewmate,
+                CampType.Impostor => RoleTeamTypes.Impostor,
+                CampType.Neutral => (RoleTeamTypes)99,
+                _ or CampType.Unknown => (RoleTeamTypes)100
+            };
+            return new()
+            {
+                TeamType = vanillaType,
+                Role = (RoleTypes)(Id + 100),
+                StringName = StringNames.None
+            };
+        }
+    }
+
+    public RoleRulesCategory[] VanillaCategories
+    {
+        get
+        {
+            List<RoleRulesCategory> categories = new();
+            foreach (var option in RoleOptions)
+            {
+                //categories.Add(new()
+                //{
+                //    Role=VanillaRole,
+                //    AllGameSettings=new()
+                //})
+                // TODO
+            }
+            return categories.ToArray();
+        }
+    }
+
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
         var option = CustomOption.Create(ToCustomOption(this), nameGetter, rule);
