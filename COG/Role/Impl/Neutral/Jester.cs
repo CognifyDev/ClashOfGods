@@ -19,14 +19,10 @@ public class Jester : CustomRole, IListener, IWinnable
     public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral)
     {
         Description = LanguageConfig.Instance.JesterDescription;
-        _allowStartMeeting = CustomOption.Create(
-            ToCustomOption(this), () => LanguageConfig.Instance.AllowStartMeeting,
-            new BoolOptionValueRule(true), MainRoleOption);
-        _allowReportDeadBody = CustomOption.Create(
-            ToCustomOption(this), () => LanguageConfig.Instance.AllowReportDeadBody, 
-            new BoolOptionValueRule(true), MainRoleOption);
-
-        CustomWinnerManager.RegisterWinnableInstance(this);
+        _allowStartMeeting = CreateOption(() => LanguageConfig.Instance.AllowStartMeeting,
+            new BoolOptionValueRule(true));
+        _allowReportDeadBody = CreateOption(() => LanguageConfig.Instance.AllowReportDeadBody, 
+            new BoolOptionValueRule(true));
     }
 
     public bool CanWin()

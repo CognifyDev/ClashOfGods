@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,6 +9,7 @@ using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
@@ -36,15 +38,14 @@ public abstract class CustomRole
         Id = _order;
         _order++;
         ShowInOptions = showInOptions;
-        if (this is IWinnable winnable && !CustomWinnerManager.CustomWinners.Contains(winnable))
+        RoleOptions = new();
+        if (this is IWinnable winnable)
             CustomWinnerManager.RegisterWinnableInstance(winnable);
 
         if (ShowInOptions)
         {
-            MainRoleOption = CustomOption.Create(ToCustomOption(this),
-                () => Color.ToColorString(Name), new BoolOptionValueRule(false), null, true);
-            RoleNumberOption = CustomOption.Create(ToCustomOption(this),
-                () => LanguageConfig.Instance.MaxNumMessage, new IntOptionValueRule(1, 1, 15, 1), MainRoleOption);
+            //                                  Actually name here is useless for new option
+            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage, new IntOptionValueRule(1, 1, 15, 1));
         }
     }
 
@@ -109,17 +110,33 @@ public abstract class CustomRole
     public bool CanSabotage { get; protected init; }
 
     /// <summary>
-    ///     角色的Option
-    /// </summary>
-    public CustomOption? MainRoleOption { get; }
-
-    /// <summary>
     ///     选择角色数量的option
     /// </summary>
     public CustomOption? RoleNumberOption { get; }
 
+    /// <summary>
+    ///     职业是否已启用
+    /// </summary>
+    public bool Enabled
+    {
+        get
+        {
+            if (RoleNumberOption != null) return RoleNumberOption!.GetInt() > 0;
+            return false;
+        }
+    }
+
     public ReadOnlyCollection<PlayerControl> Players =>
         new(GameUtils.PlayerRoleData.Where(pr => pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
+
+    public List<CustomOption> RoleOptions { get; }
+
+    public CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
+    {
+        var option = CustomOption.Create(ToCustomOption(this), nameGetter, rule);
+        RoleOptions.Add(option);
+        return option;
+    }
 
     /// <summary>
     ///     添加一个按钮

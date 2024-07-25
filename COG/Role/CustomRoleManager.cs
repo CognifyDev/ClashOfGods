@@ -12,7 +12,7 @@ public class CustomRoleManager
 
     public CustomRole[] GetTypeCampRoles(CampType campType)
     {
-        return _roles.Where(role => role.CampType == campType && role.MainRoleOption!.GetBool()).ToArray();
+        return _roles.Where(role => role.CampType == campType && role.Enabled).ToArray();
     }
 
     public void RegisterRole(CustomRole role)
@@ -75,8 +75,8 @@ public class CustomRoleManager
         {
             foreach (var role in GetManager().GetRoles()
                          .Where(role =>
-                             role is { MainRoleOption: not null, ShowInOptions: true, IsBaseRole: false } &&
-                             role.MainRoleOption.GetBool() && role.IsSubRole == subRolesOnly))
+                             role is { Enabled: true, ShowInOptions: true, IsBaseRole: false } 
+                             && role.IsSubRole == subRolesOnly))
                 if (!role.OnRoleSelection(_roles) && role.RoleNumberOption != null)
                 {
                     var times = (int)role.RoleNumberOption.GetFloat();

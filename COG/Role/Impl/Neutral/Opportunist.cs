@@ -22,8 +22,9 @@ public class Opportunist : CustomRole, IListener
     public Opportunist() : base(LanguageConfig.Instance.OpportunistName, Color.yellow, CampType.Neutral)
     {
         Description = LanguageConfig.Instance.OpportunistDescription;
-        _killCooldownOption = CustomOption.Create(CustomOption.TabType.Neutral, () => LanguageConfig.Instance.KillCooldown,
-           new FloatOptionValueRule(20f, 5f, 200f, 45f), MainRoleOption);
+        if (ShowInOptions) 
+            _killCooldownOption = CreateOption(() => LanguageConfig.Instance.KillCooldown, 
+            new FloatOptionValueRule(20f, 5f, 200f, 45f));
         _killButton = CustomButton.Create(
             () =>
             {

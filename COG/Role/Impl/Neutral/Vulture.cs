@@ -26,13 +26,12 @@ public class Vulture : CustomRole, IListener, IWinnable
 
         if (ShowInOptions)
         {
-            var page = ToCustomOption(this);
-            EatingCooldown = CustomOption.Create(page, () => LanguageConfig.Instance.VultureEatCooldown,
-                new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
-            WinningEatenCount = CustomOption.Create(page, () => LanguageConfig.Instance.VultureEatenCountToWin,
-                new IntOptionValueRule(2, 1, 6, 4), MainRoleOption);
-            HasArrowToBodies = CustomOption.Create(page, () => LanguageConfig.Instance.VultureHasArrowToBodies,
-                new BoolOptionValueRule(true), MainRoleOption);
+            EatingCooldown = CreateOption(() => LanguageConfig.Instance.VultureEatCooldown,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f));
+            WinningEatenCount = CreateOption(() => LanguageConfig.Instance.VultureEatenCountToWin,
+                new IntOptionValueRule(2, 1, 6, 4));
+            HasArrowToBodies = CreateOption(() => LanguageConfig.Instance.VultureHasArrowToBodies,
+                new BoolOptionValueRule(true));
         }
 
         EatButton = CustomButton.Create(

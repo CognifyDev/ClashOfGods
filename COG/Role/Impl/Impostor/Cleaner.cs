@@ -23,8 +23,7 @@ public class Cleaner : CustomRole, IListener
         CanKill = true;
 
         if (ShowInOptions)
-            CleanBodyCd = CustomOption.Create(CustomOption.TabType.Impostor, () => LanguageConfig.Instance.CleanBodyCooldown, 
-            new FloatOptionValueRule(10f, 5f, 60f, 30f), MainRoleOption);
+            CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown, new FloatOptionValueRule(10f, 5f, 60f, 30f));
 
         CleanBodyButton = CustomButton.Create(
             () =>

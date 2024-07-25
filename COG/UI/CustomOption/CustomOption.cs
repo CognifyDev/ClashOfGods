@@ -16,6 +16,7 @@ using COG.Utils.WinAPI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using YamlDotNet.Core.Tokens;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG.UI.CustomOption;
@@ -53,7 +54,7 @@ public sealed class CustomOption
     public int Selection;
 
     // Option creation
-    public CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
+    private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
     {
         ID = _typeId;
         _typeId++;
@@ -195,12 +196,8 @@ public sealed class CustomOption
     {
         var selections = ValueRule.Selections;
         Selection = Mathf.Clamp((newSelection + selections.Length) % selections.Length, 0, selections.Length - 1);
-        //if (OptionBehaviour != null && OptionBehaviour is StringOption stringOption)
-        //{
-        //    stringOption.oldValue = stringOption.Value = Selection;
-        //    stringOption.ValueText.text = ValueRule.Selections[Selection].ToString();
-        //}
 
+        NotifySettingChange();
         ShareOptionChange(newSelection);
     }
 
@@ -217,6 +214,28 @@ public sealed class CustomOption
             .WritePacked(ID)
             .WritePacked(newSelection)
             .Finish();
+    }
+
+    public void NotifySettingChange()
+    {
+        if (OptionBehaviour is RoleOptionSetting setting)
+        {
+            var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.RoleOptions.Contains(this));
+            if (role == null) return;
+
+            var color = (int)setting.Role.TeamType switch
+            {
+                (int)CampType.Crewmate => Palette.CrewmateSettingChangeText,
+                (int)CampType.Impostor => Palette.ImpostorRed,
+                _ => Color.grey
+            };
+            var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotificationRole,
+                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{role.Name.Color(color)}</font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount.ToString() + "</font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance.ToString() + "%"
+            );
+            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue, item, true);
+        }
     }
 }
 
@@ -395,7 +414,6 @@ public static class RoleOptionPatch
                 var numberOption = role.RoleNumberOption!;
                 var playerCount = setting.RoleMaxCount;
                 numberOption.UpdateSelection(newValue: playerCount);
-                role.MainRoleOption!.UpdateSelection(playerCount != 0);
                 setting.UpdateValuesAndText(null);
                 HudManager.Instance.Notifier.AddRoleSettingsChangeMessage(StringNames.Roles, playerCount, 100, vanillaType);
             });
