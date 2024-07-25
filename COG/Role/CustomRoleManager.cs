@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.Utils;
@@ -77,10 +78,29 @@ public class CustomRoleManager
                          .Where(role =>
                              role is { Enabled: true, ShowInOptions: true, IsBaseRole: false } 
                              && role.IsSubRole == subRolesOnly))
-                if (!role.OnRoleSelection(_roles) && role.RoleNumberOption != null)
+                if (!role.OnRoleSelection(_roles) && role.RoleNumberOption != null && role.RoleChanceOption != null)
                 {
-                    var times = (int)role.RoleNumberOption.GetFloat();
-                    for (var i = 0; i < times; i++) _roles.Add(role);
+                    var times = role.RoleNumberOption.GetInt();
+                    var chance = role.RoleChanceOption.GetInt() / 10;
+                    for (var i = 0; i < times; i++)
+                    {
+                        if (chance != 10) // Check if it's possiblity is 100%
+                        {
+                            const int possibilityCount = 10;
+
+                            var array = new bool[possibilityCount];
+                            Array.Fill(array, false);
+                            Array.Fill(array, true, 0, chance);
+
+                            var chances = array.ToList().Disarrange();
+                            var random = new Random(DateTime.Now.Millisecond);
+                            var index = random.Next(possibilityCount);
+
+                            bool result = chances[index];
+                            if (!result) continue;
+                        }
+                        _roles.Add(role);
+                    }
                 }
 
             _roles.Disarrange();

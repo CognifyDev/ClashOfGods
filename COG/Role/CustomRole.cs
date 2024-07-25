@@ -46,6 +46,7 @@ public abstract class CustomRole
         {
             //                                  Actually name here is useless for new option
             RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage, new IntOptionValueRule(1, 1, 15, 1));
+            RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 100));
         }
     }
 
@@ -115,6 +116,11 @@ public abstract class CustomRole
     public CustomOption? RoleNumberOption { get; }
 
     /// <summary>
+    ///     职业几率的选项
+    /// </summary>
+    public CustomOption? RoleChanceOption { get; }
+
+    /// <summary>
     ///     职业是否已启用
     /// </summary>
     public bool Enabled
@@ -131,7 +137,7 @@ public abstract class CustomRole
 
     public List<CustomOption> RoleOptions { get; }
 
-    public CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
+    protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
         var option = CustomOption.Create(ToCustomOption(this), nameGetter, rule);
         RoleOptions.Add(option);

@@ -474,10 +474,14 @@ public static class RoleOptionSettingPatch
     [HarmonyPrefix]
     public static bool UpdateValuePatch(RoleOptionSetting __instance)
     {
-        var option = CustomOption.Options.FirstOrDefault(o => o.OptionBehaviour == __instance);
-        if (option == null) return true;
-        __instance.roleMaxCount = option.GetInt();
-        __instance.roleChance = 100;
+        var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.RoleOptions.Select(o => o.OptionBehaviour).Contains(__instance));
+        if (role == null) return true;
+
+        var playerCount = role.RoleNumberOption!;
+        var chance = role.RoleChanceOption!;
+
+        __instance.roleMaxCount = playerCount.GetInt();
+        __instance.roleChance = chance.GetInt();
         __instance.countText.text = __instance.roleMaxCount.ToString();
         __instance.chanceText.text = __instance.roleChance.ToString();
         return false;
