@@ -13,6 +13,7 @@ using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using COG.Utils.WinAPI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
@@ -289,18 +290,29 @@ public static class RoleOptionPatch
 
         var headers = __instance.transform.FindChild("HeaderButtons");
         headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.Destroy());
-        headers.FindChild("AllButton").GetComponent<PassiveButton>().OnClick.AddListener((UnityAction)(() =>
+        
+        (AllButton = headers.FindChild("AllButton").GetComponent<PassiveButton>()).OnClick.AddListener((UnityAction)(() =>
         {
-            Tabs.ForEach(go => go.SetActive(false));
+            Tabs.Where(go => go).ForEach(go => go.SetActive(false));
+        }));
+        AllButton.OnClick.AddListener((UnityAction)(() =>
+        {
+            if (AllButton) SetButtonActive(CurrentButton!, false, true);
+            if (CurrentTab) CurrentTab!.SetActive(false);
         }));
 
         int i = 0;
         foreach (var team in Enum.GetValues<CampType>())
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
-        
+
+        chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.Destroy();
     }
 
-    public static List<GameObject> Tabs { get; } = new();
+    public static List<GameObject> Tabs => _tabs.Where(tab => tab).ToList();
+
+    private static readonly List<GameObject> _tabs = new();
+
+    public static PassiveButton? AllButton { get; set; }
 
     public static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
     {
@@ -358,9 +370,9 @@ public static class RoleOptionPatch
         int i = 0;
         foreach (var role in CustomRoleManager.GetManager().GetRoles().Where(r => r.CampType == camp && !r.IsBaseRole))
         {
-            var chanceSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab); // FIXME: 莫名多了一个选项
-            var numberOption = role.RoleNumberOption;
-            if (numberOption == null) continue;
+            if ((camp == CampType.Unknown && !role.IsSubRole) || !role.ShowInOptions) continue;
+            var chanceSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
+            var numberOption = role.RoleNumberOption!;
             numberOption.OptionBehaviour = chanceSetting;
             chanceSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
                 new()
@@ -392,6 +404,7 @@ public static class RoleOptionPatch
     }
 
     public static GameObject? CurrentTab { get; set; }
+    public static PassiveButton? CurrentButton { get; set; }
 
     public static void SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName)
     {
@@ -407,8 +420,13 @@ public static class RoleOptionPatch
         button.OnClick.AddListener((UnityAction)(() =>
         {
             menu.RoleChancesSettings.SetActive(false);
-            CurrentTab?.SetActive(false);
+            if (CurrentButton)
+                SetButtonActive(CurrentButton!, false);
+            if (CurrentTab) /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */ 
+                CurrentTab!.SetActive(false);
+            CurrentButton = button;
             CurrentTab = tab;
+            SetButtonActive(button, true);
             tab.SetActive(true);
         }));
 
@@ -417,6 +435,17 @@ public static class RoleOptionPatch
 
         //renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 0.01f);
         //FIXME: 淳平突脸的sprite
+        
+    }
+
+    public static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
+    {
+        obj.transform.FindChild("Inactive").gameObject.SetActive(!active);
+        obj.transform.FindChild("SelectedHighlight").gameObject.SetActive(active);
+        if (!AllButton) return;
+        AllButton!.transform.Find("Selected").gameObject.SetActive(clickedAllButton);
+        AllButton!.transform.Find("Inactive").gameObject.SetActive(!clickedAllButton);
+        AllButton!.GetComponentInChildren<TextMeshPro>().color = clickedAllButton ? Palette.White : Palette.Black;
     }
 }
 
