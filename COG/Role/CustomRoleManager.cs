@@ -13,7 +13,7 @@ public class CustomRoleManager
 
     public CustomRole[] GetTypeCampRoles(CampType campType)
     {
-        return _roles.Where(role => role.CampType == campType && role.Enabled).ToArray();
+        return _roles.Where(role => role.CampType == campType).ToArray();
     }
 
     public void RegisterRole(CustomRole role)

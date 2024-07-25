@@ -304,6 +304,10 @@ public static class RoleOptionPatch
 {
     public static void Postfix(RolesSettingsMenu __instance)
     {
+        Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
+
+        Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")?.GetComponent<PassiveButton>()?.SelectButton(true); // Fix button is unselected when open at the first time
+
         var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
         chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(t => t.gameObject.SetActive(false));
 
@@ -313,12 +317,11 @@ public static class RoleOptionPatch
         (AllButton = headers.FindChild("AllButton").GetComponent<PassiveButton>()).OnClick.AddListener((UnityAction)(() =>
         {
             Tabs.Where(go => go).ForEach(go => go.SetActive(false));
-        }));
-        AllButton.OnClick.AddListener((UnityAction)(() =>
-        {
             if (AllButton) SetButtonActive(CurrentButton!, false, true);
             if (CurrentTab) CurrentTab!.SetActive(false);
         }));
+
+        Main.Logger.LogInfo("Creating tabs...");
 
         int i = 0;
         foreach (var team in Enum.GetValues<CampType>())
@@ -335,6 +338,8 @@ public static class RoleOptionPatch
 
     public static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
     {
+        Main.Logger.LogInfo($"Creating tab for team {camp}...");
+
         var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
@@ -355,7 +360,7 @@ public static class RoleOptionPatch
             CampType.Crewmate => LanguageConfig.Instance.CrewmateCamp,
             CampType.Impostor => LanguageConfig.Instance.ImpostorCamp,
             CampType.Neutral => LanguageConfig.Instance.NeutralCamp,
-            _ => "Setting"
+            _ => "Addon"
         };
         header.Background.color = camp switch
         {
@@ -375,6 +380,9 @@ public static class RoleOptionPatch
             CampType.Impostor => Palette.ImpostorRoleHeaderDarkRed,
             _ => Color.grey
         };
+
+        Main.Logger.LogInfo("Role header has created. Now set up role buttons...");
+
         var initialX = RolesSettingsMenu.X_START_CHANCE;
         var initialY = 0.14f;
         var offsetY = RolesSettingsMenu.Y_OFFSET;
@@ -387,36 +395,45 @@ public static class RoleOptionPatch
         };
 
         int i = 0;
-        foreach (var role in CustomRoleManager.GetManager().GetRoles().Where(r => r.CampType == camp && !r.IsBaseRole))
+        foreach (var role in CustomRoleManager.GetManager().GetTypeCampRoles(camp).Where(r => !r.IsBaseRole))
         {
             if ((camp == CampType.Unknown && !role.IsSubRole) || !role.ShowInOptions) continue;
-            var chanceSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
+            var roleSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
             var numberOption = role.RoleNumberOption!;
-            numberOption.OptionBehaviour = chanceSetting;
-            chanceSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
+            var chanceOption = role.RoleChanceOption!;
+            numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
+            roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
                 new()
                 {
                     StringName = StringNames.None,
                     TeamType = vanillaType,
                     Role = (RoleTypes)role.Id + 100
                 }, layer);
-            chanceSetting.transform.localPosition = new(initialX, initialY + offsetY * i, -2f);
-            chanceSetting.titleText.text = role.Name;
-            chanceSetting.labelSprite.color = camp switch
+            roleSetting.transform.localPosition = new(initialX, initialY + offsetY * i, -2f);
+            roleSetting.titleText.text = role.Name;
+            roleSetting.labelSprite.color = camp switch
             {
                 CampType.Crewmate => Palette.CrewmateRoleBlue,
                 CampType.Impostor => Palette.ImpostorRoleRed,
                 _ => Color.grey
             };
-            chanceSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
+            roleSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
             {
                 var setting = ob.Cast<RoleOptionSetting>();
                 var numberOption = role.RoleNumberOption!;
-                var playerCount = setting.RoleMaxCount;
+                var chanceOption = role.RoleChanceOption!;
+                var playerCount = setting.roleMaxCount;
+                var roleChance = setting.roleChance;
+
+                Main.Logger.LogInfo($"{role.GetType().Name} Num: {playerCount}p, {roleChance}%");
+
                 numberOption.UpdateSelection(newValue: playerCount);
+                chanceOption.UpdateSelection(newValue: roleChance);
                 setting.UpdateValuesAndText(null);
-                HudManager.Instance.Notifier.AddRoleSettingsChangeMessage(StringNames.Roles, playerCount, 100, vanillaType);
             });
+
+            Main.Logger.LogInfo($"Role option has set up for {role.GetType().Name}.");
+
             i++;
         }
     }
@@ -426,6 +443,8 @@ public static class RoleOptionPatch
 
     public static void SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName)
     {
+        Main.Logger.LogInfo($"Setting up tab button for {tab.name} ({index})");
+
         var headerParent = menu.transform.FindChild("HeaderButtons");
         var offset = RolesSettingsMenu.X_OFFSET;
         var xStart = RolesSettingsMenu.X_START;
@@ -440,7 +459,7 @@ public static class RoleOptionPatch
             menu.RoleChancesSettings.SetActive(false);
             if (CurrentButton)
                 SetButtonActive(CurrentButton!, false);
-            if (CurrentTab) /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */ 
+            if (CurrentTab) /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
                 CurrentTab!.SetActive(false);
             CurrentButton = button;
             CurrentTab = tab;
@@ -448,22 +467,32 @@ public static class RoleOptionPatch
             tab.SetActive(true);
         }));
 
+        Main.Logger.LogInfo("Button action has registeristed. Start to set button icon...");
+
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
         const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
 
         //renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 0.01f);
         //FIXME: 淳平突脸的sprite
-        
+
     }
 
-    public static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
+    static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
     {
-        obj.transform.FindChild("Inactive").gameObject.SetActive(!active);
-        obj.transform.FindChild("SelectedHighlight").gameObject.SetActive(active);
+        if (!obj) return;
+        obj.SelectButton(active);
         if (!AllButton) return;
-        AllButton!.transform.Find("Selected").gameObject.SetActive(clickedAllButton);
-        AllButton!.transform.Find("Inactive").gameObject.SetActive(!clickedAllButton);
-        AllButton!.GetComponentInChildren<TextMeshPro>().color = clickedAllButton ? Palette.White : Palette.Black;
+        AllButton!.SelectButton(clickedAllButton);
+        
+        Main.Logger.LogInfo($"Is {obj.name} active: {active} ({clickedAllButton})");
+    }
+    
+    [HarmonyPatch(nameof(RolesSettingsMenu.CloseMenu))]
+    [HarmonyPrefix]
+    public static void OnMenuClose()
+    {
+        SetButtonActive(CurrentButton!, false, true);
+        if (CurrentTab) CurrentTab!.SetActive(false);
     }
 }
 
@@ -474,7 +503,7 @@ public static class RoleOptionSettingPatch
     [HarmonyPrefix]
     public static bool UpdateValuePatch(RoleOptionSetting __instance)
     {
-        var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.RoleOptions.Select(o => o.OptionBehaviour).Contains(__instance));
+        var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.RoleOptions.Any(o => o.OptionBehaviour == __instance));
         if (role == null) return true;
 
         var playerCount = role.RoleNumberOption!;

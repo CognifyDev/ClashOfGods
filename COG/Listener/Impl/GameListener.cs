@@ -91,8 +91,8 @@ public class GameListener : IListener
                 changed = true;
             }
 
-            if (changed) 
-                Object.FindObjectOfType<RolesSettingsMenu>()?.roleChances.ToArray().ForEach(o => o.UpdateValuesAndText(roleOption));
+            if (changed)
+                GameManager.Instance.LogicOptions.SyncOptions();
         }
 
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)

@@ -45,7 +45,7 @@ public abstract class CustomRole
         if (ShowInOptions)
         {
             //                                  Actually name here is useless for new option
-            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage, new IntOptionValueRule(1, 1, 15, 1));
+            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage, new IntOptionValueRule(0, 1, 15, 1));
             RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 100));
         }
     }
