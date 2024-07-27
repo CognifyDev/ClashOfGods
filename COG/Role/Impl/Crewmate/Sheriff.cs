@@ -41,7 +41,7 @@ public class Sheriff : CustomRole, IListener
                 return GameUtils.GetGameOptions().KillDistance >= distance;
             },
             () => true,
-            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton, 100f)!,
             2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,

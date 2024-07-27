@@ -39,6 +39,19 @@ public abstract class CustomRole
         _order++;
         ShowInOptions = showInOptions;
         RoleOptions = new();
+        var vanillaType = CampType switch
+        {
+            CampType.Crewmate => RoleTeamTypes.Crewmate,
+            CampType.Impostor => RoleTeamTypes.Impostor,
+            CampType.Neutral => (RoleTeamTypes)99,
+            _ or CampType.Unknown => (RoleTeamTypes)100
+        };
+        VanillaRole =  new()
+        {
+            TeamType = vanillaType,
+            Role = (RoleTypes)(Id + 100),
+            StringName = StringNames.None
+        };
         if (this is IWinnable winnable)
             CustomWinnerManager.RegisterWinnableInstance(winnable);
 
@@ -137,25 +150,7 @@ public abstract class CustomRole
 
     public List<CustomOption> RoleOptions { get; }
 
-    public RoleBehaviour VanillaRole
-    {
-        get
-        {
-            var vanillaType = CampType switch
-            {
-                CampType.Crewmate => RoleTeamTypes.Crewmate,
-                CampType.Impostor => RoleTeamTypes.Impostor,
-                CampType.Neutral => (RoleTeamTypes)99,
-                _ or CampType.Unknown => (RoleTeamTypes)100
-            };
-            return new()
-            {
-                TeamType = vanillaType,
-                Role = (RoleTypes)(Id + 100),
-                StringName = StringNames.None
-            };
-        }
-    }
+    public RoleBehaviour VanillaRole { get; init; }
 
     public RoleRulesCategory[] VanillaCategories
     {

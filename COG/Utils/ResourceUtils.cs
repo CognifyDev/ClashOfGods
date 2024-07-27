@@ -16,25 +16,6 @@ public static class ResourceUtils
         if (stream != null) File.WriteAllBytes(toPath, stream.ReadFully());
     }
 
-    public static Sprite? LoadSpriteFromResources(string path, float pixelsPerUnit)
-    {
-        try
-        {
-            if (CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
-            var texture = LoadTextureFromResources(path);
-            sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f),
-                pixelsPerUnit);
-            sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
-            return CachedSprites[path + pixelsPerUnit] = sprite;
-        }
-        catch
-        {
-            System.Console.WriteLine("Error loading sprite from path: " + path);
-        }
-
-        return null;
-    }
-
     public static Texture2D? LoadTextureFromDisk(string path)
     {
         try
@@ -55,7 +36,7 @@ public static class ResourceUtils
         return null;
     }
 
-    public static Sprite? LoadSprite(string path, float pixelsPerUnit = 1f)
+    public static Sprite? LoadSprite(string path, float pixelsPerUnit = 100f)
     {
         try
         {

@@ -65,7 +65,7 @@ public class Eraser : CustomRole, IListener
             }, () => _eraseButton!.ResetCooldown(),
             () => !(_currentPlayer == null || (!_canEraseImpostors.GetBool() &&
                                                _currentPlayer.GetMainRole().CampType == CampType.Impostor)),
-            () => true, ResourceUtils.LoadSpriteFromResources(ResourcesConstant.EraseButton, 100f)!,
+            () => true, ResourceUtils.LoadSprite(ResourcesConstant.EraseButton, 100f)!,
             3,
             KeyCode.E, LanguageConfig.Instance.EraseAction, () => _initialEraseCooldown.GetFloat(), -1);
         AddButton(_eraseButton);

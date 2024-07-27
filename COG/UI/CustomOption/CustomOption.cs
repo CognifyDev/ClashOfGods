@@ -17,6 +17,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using YamlDotNet.Core.Tokens;
+using static UnityEngine.RemoteConfigSettingsHelper;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG.UI.CustomOption;
@@ -456,15 +457,7 @@ public static class RoleOptionPatch
         button.OnClick = new();
         button.OnClick.AddListener((UnityAction)(() =>
         {
-            menu.RoleChancesSettings.SetActive(false);
-            if (CurrentButton)
-                SetButtonActive(CurrentButton!, false);
-            if (CurrentTab) /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
-                CurrentTab!.SetActive(false);
-            CurrentButton = button;
-            CurrentTab = tab;
-            SetButtonActive(button, true);
-            tab.SetActive(true);
+            ChangeCustomTab(menu, tab, button);
         }));
 
         Main.Logger.LogInfo("Button action has registeristed. Start to set button icon...");
@@ -472,9 +465,7 @@ public static class RoleOptionPatch
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
         const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
 
-        //renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 0.01f);
-        //FIXME: 淳平突脸的sprite
-
+        renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 35f);
     }
 
     static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
@@ -485,6 +476,27 @@ public static class RoleOptionPatch
         AllButton!.SelectButton(clickedAllButton);
         
         Main.Logger.LogInfo($"Is {obj.name} active: {active} ({clickedAllButton})");
+    }
+
+    public static void ChangeCustomTab(RolesSettingsMenu menu, GameObject newTab, PassiveButton toSelect)
+    {
+        CloseAllTab(menu);
+        OpenTab(newTab, toSelect);
+    }
+
+    static void CloseAllTab(RolesSettingsMenu menuInstance)
+    {
+        menuInstance.RoleChancesSettings.SetActive(false);
+        if (CurrentTab) CurrentTab!.SetActive(false); /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
+        if (CurrentButton) CurrentButton!.SelectButton(false);
+    }
+
+    static void OpenTab(GameObject tabToOpen, PassiveButton button)
+    {
+        CurrentButton = button;
+        CurrentTab = tabToOpen;
+        SetButtonActive(button, true);
+        tabToOpen.SetActive(true);
     }
     
     [HarmonyPatch(nameof(RolesSettingsMenu.CloseMenu))]

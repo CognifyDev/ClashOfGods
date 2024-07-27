@@ -39,7 +39,7 @@ public class Vigilante : CustomRole, IListener
             () => _killButton!.ResetCooldown(),
             () => _killButton!.HasButton() && PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance),
             () => PlayerControl.LocalPlayer.IsRole(this) && _killTimes > 0,
-            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton, 100f)!,
             2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,

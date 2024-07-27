@@ -60,7 +60,7 @@ public class BountyHunter : CustomRole, IListener
                 return GameUtils.GetGameOptions().KillDistance >= distance;
             },
             () => true,
-            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton, 100f)!,
             row: 1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,

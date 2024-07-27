@@ -73,6 +73,9 @@ public partial class Main : BasePlugin
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
         Logger.LogInfo($"GitInfo: {GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})");
+#if !DEBUG
+        Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.SelectRoles)));
+#endif
 
         // Add dependencies to core directory
         ResourceUtils.WriteToFileFromResource(

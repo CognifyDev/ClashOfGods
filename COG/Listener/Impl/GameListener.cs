@@ -130,7 +130,7 @@ public class GameListener : IListener
         }
     }
 
-    private static void SelectRoles()
+    public static void SelectRoles()
     {
         GameUtils.PlayerRoleData.Clear(); // 首先清除 防止干扰
 

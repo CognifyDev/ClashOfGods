@@ -21,7 +21,7 @@ public static class ButtonConstant
             var role = PlayerControl.LocalPlayer.GetMainRole();
             return role != null! && role.CanKill;
         },
-        ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
+        ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton, 100f)!,
         1,
         KeyCode.Q,
         LanguageConfig.Instance.KillAction,
