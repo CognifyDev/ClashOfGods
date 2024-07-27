@@ -345,6 +345,8 @@ public static class RoleOptionPatch
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
         Tabs.Add(tab.gameObject);
+        tab.GetComponentsInChildren<RoleOptionSetting>().ForEach(o => o.gameObject.Destroy());
+        tab.GetComponentsInChildren<CategoryHeaderEditRole>().ForEach(o => o.gameObject.Destroy());
 
         tab.gameObject.SetActive(false);
         tab.localPosition = chanceTabTemplate.localPosition;
