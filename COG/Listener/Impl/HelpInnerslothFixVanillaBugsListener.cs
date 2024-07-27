@@ -12,6 +12,7 @@ public class VanillaBugFixListener : IListener
 {
     public static bool OccuredBlackoutOnAirship { get; private set; }
 
+    [EventHandler(EventHandlerType.Postfix)]
     public void OnSelectRole(RoleManagerSelectRolesEvent _)
     {
         var lobby = LobbyBehaviour.Instance;
