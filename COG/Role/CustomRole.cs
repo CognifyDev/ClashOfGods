@@ -157,14 +157,58 @@ public abstract class CustomRole
         get
         {
             List<RoleRulesCategory> categories = new();
-            foreach (var option in RoleOptions)
+            foreach (var option in RoleOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption))
             {
-                //categories.Add(new()
-                //{
-                //    Role=VanillaRole,
-                //    AllGameSettings=new()
-                //})
-                // TODO
+                var rule = option.ValueRule;
+                var settings = new List<BaseGameSetting>();
+                if (rule is BoolOptionValueRule)
+                {
+                    settings.Add(new CheckboxGameSetting()
+                    {
+                        Type = OptionTypes.Checkbox
+                    });
+                }
+                else if (rule is IntOptionValueRule iovr)
+                {
+                    settings.Add(new IntGameSetting()
+                    {
+                        Type = OptionTypes.Int,
+                        Value = option.GetInt(),
+                        Increment = iovr.Step,
+                        ValidRange = new(iovr.Min, iovr.Max),
+                        ZeroIsInfinity = false,
+                        SuffixType = iovr.SuffixType,
+                        FormatString = ""
+                    });
+                }
+                else if (rule is FloatOptionValueRule fovr)
+                {
+                    settings.Add(new FloatGameSetting()
+                    {
+                        Type = OptionTypes.Float,
+                        Value = option.GetFloat(),
+                        Increment = fovr.Step,
+                        ValidRange = new(fovr.Min, fovr.Max),
+                        ZeroIsInfinity = false,
+                        SuffixType = fovr.SuffixType,
+                        FormatString = ""
+                    });
+                }
+                else if (rule is StringOptionValueRule sovr)
+                {
+                    settings.Add(new StringGameSetting()
+                    {
+                        Type = OptionTypes.String,
+                        Index = option.Selection,
+                        Values = new StringNames[sovr.Selections.Length]
+                    });
+                }
+
+                categories.Add(new()
+                {
+                    Role = VanillaRole,
+                    AllGameSettings = settings.ToIl2CppList()
+                });
             }
             return categories.ToArray();
         }
