@@ -39,6 +39,19 @@ public abstract class CustomRole
         _order++;
         ShowInOptions = showInOptions;
         RoleOptions = new();
+        var vanillaType = CampType switch
+        {
+            CampType.Crewmate => RoleTeamTypes.Crewmate,
+            CampType.Impostor => RoleTeamTypes.Impostor,
+            CampType.Neutral => (RoleTeamTypes)99,
+            _ or CampType.Unknown => (RoleTeamTypes)100
+        };
+        VanillaRole =  new()
+        {
+            TeamType = vanillaType,
+            Role = (RoleTypes)(Id + 100),
+            StringName = StringNames.None
+        };
         if (this is IWinnable winnable)
             CustomWinnerManager.RegisterWinnableInstance(winnable);
 
@@ -137,41 +150,64 @@ public abstract class CustomRole
 
     public List<CustomOption> RoleOptions { get; }
 
-    public RoleBehaviour VanillaRole
+    public RoleBehaviour VanillaRole { get; init; }
+
+    public RoleRulesCategory VanillaCategory
     {
         get
         {
-            var vanillaType = CampType switch
+            var settings = new List<BaseGameSetting>();
+            foreach (var option in RoleOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption))
             {
-                CampType.Crewmate => RoleTeamTypes.Crewmate,
-                CampType.Impostor => RoleTeamTypes.Impostor,
-                CampType.Neutral => (RoleTeamTypes)99,
-                _ or CampType.Unknown => (RoleTeamTypes)100
-            };
+                var rule = option.ValueRule;
+                if (rule is BoolOptionValueRule)
+                {
+                    settings.Add(new CheckboxGameSetting()
+                    {
+                        Type = OptionTypes.Checkbox
+                    });
+                }
+                else if (rule is IntOptionValueRule iovr)
+                {
+                    settings.Add(new IntGameSetting()
+                    {
+                        Type = OptionTypes.Int,
+                        Value = option.GetInt(),
+                        Increment = iovr.Step,
+                        ValidRange = new(iovr.Min, iovr.Max),
+                        ZeroIsInfinity = false,
+                        SuffixType = iovr.SuffixType,
+                        FormatString = ""
+                    });
+                }
+                else if (rule is FloatOptionValueRule fovr)
+                {
+                    settings.Add(new FloatGameSetting()
+                    {
+                        Type = OptionTypes.Float,
+                        Value = option.GetFloat(),
+                        Increment = fovr.Step,
+                        ValidRange = new(fovr.Min, fovr.Max),
+                        ZeroIsInfinity = false,
+                        SuffixType = fovr.SuffixType,
+                        FormatString = ""
+                    });
+                }
+                else if (rule is StringOptionValueRule sovr)
+                {
+                    settings.Add(new StringGameSetting()
+                    {
+                        Type = OptionTypes.String,
+                        Index = option.Selection,
+                        Values = new StringNames[sovr.Selections.Length]
+                    });
+                }
+            }
             return new()
             {
-                TeamType = vanillaType,
-                Role = (RoleTypes)(Id + 100),
-                StringName = StringNames.None
+                AllGameSettings = settings.ToIl2CppList(),
+                Role = VanillaRole
             };
-        }
-    }
-
-    public RoleRulesCategory[] VanillaCategories
-    {
-        get
-        {
-            List<RoleRulesCategory> categories = new();
-            foreach (var option in RoleOptions)
-            {
-                //categories.Add(new()
-                //{
-                //    Role=VanillaRole,
-                //    AllGameSettings=new()
-                //})
-                // TODO
-            }
-            return categories.ToArray();
         }
     }
 

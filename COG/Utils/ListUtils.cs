@@ -48,4 +48,11 @@ public static class ListUtils
         safeValue = default!;
         return false;
     }
+
+    public static Il2CppGenericCollections.List<T> ToIl2CppList<T>(this List<T> list)
+    {
+        var toReturn = new Il2CppGenericCollections.List<T>();
+        list.ForEach(toReturn.Add);
+        return toReturn;
+    }
 }

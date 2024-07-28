@@ -22,5 +22,7 @@ public interface INumberValueRule<T> : IValueRule<T> where T : struct
     public T Max { get; }
     public T Default { get; }
 
+    public NumberSuffixes SuffixType { get; }
+
     public void Validate(ref T obj);
 }

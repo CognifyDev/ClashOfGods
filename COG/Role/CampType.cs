@@ -5,8 +5,8 @@ namespace COG.Role;
 [Serializable]
 public enum CampType
 {
-    Unknown = 0,
-    Impostor = 1,
+    Crewmate = 1,
     Neutral = 2,
-    Crewmate = 3
+    Impostor = 3,
+    Unknown = 4
 }

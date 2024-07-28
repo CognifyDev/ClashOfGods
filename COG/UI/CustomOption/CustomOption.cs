@@ -7,16 +7,19 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Role;
+using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using COG.Utils.WinAPI;
+using Innersloth.DebugTool;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using YamlDotNet.Core.Tokens;
+using static UnityEngine.RemoteConfigSettingsHelper;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG.UI.CustomOption;
@@ -306,7 +309,9 @@ public static class RoleOptionPatch
     {
         Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
 
-        Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")?.GetComponent<PassiveButton>()?.SelectButton(true); // Fix button is unselected when open at the first time
+        // Fix button is unselected when open at the first time
+        Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")?.GetComponent<PassiveButton>()?.SelectButton(true);
+        __instance.AllButton.SelectButton(true);
 
         var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
         chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(t => t.gameObject.SetActive(false));
@@ -332,6 +337,9 @@ public static class RoleOptionPatch
 
     public static List<GameObject> Tabs => _tabs.Where(tab => tab).ToList();
 
+    public static List<RoleOptionSetting> CurrentTabSettings => _currentTabSettings.Where(s => s).ToList();
+
+    public static readonly List<RoleOptionSetting> _currentTabSettings = new();
     private static readonly List<GameObject> _tabs = new();
 
     public static PassiveButton? AllButton { get; set; }
@@ -344,12 +352,13 @@ public static class RoleOptionPatch
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
         Tabs.Add(tab.gameObject);
+        tab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(o => o.gameObject.Destroy());
 
         tab.gameObject.SetActive(false);
         tab.localPosition = chanceTabTemplate.localPosition;
         var trueName = camp != CampType.Unknown ? camp.ToString() : "Addon";
         tab.name = trueName + "Tab";
-        SetUpTabButton(menu, tab.gameObject, index, trueName);
+        var button = SetUpTabButton(menu, tab.gameObject, index, trueName);
 
         var header = Object.Instantiate(menu.categoryHeaderEditRoleOrigin, tab);
         var layer = RolesSettingsMenu.MASK_LAYER;
@@ -417,6 +426,17 @@ public static class RoleOptionPatch
                 CampType.Impostor => Palette.ImpostorRoleRed,
                 _ => Color.grey
             };
+            var passive = roleSetting.labelSprite.gameObject.AddComponent<PassiveButton>();
+            passive.OnMouseOver = new();
+            passive.OnMouseOver.AddListener((UnityAction)new Action(() =>
+            {
+                Main.Logger.LogInfo("Mouse Over");
+                roleSetting.labelSprite.color.SetAlpha(0.5f);
+            }));
+            passive.AddOnClickListeners(new Action(() =>
+            {
+                menu.ChangeTab(role.VanillaCategory, button);
+            }));
             roleSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
             {
                 var setting = ob.Cast<RoleOptionSetting>();
@@ -431,6 +451,8 @@ public static class RoleOptionPatch
                 chanceOption.UpdateSelection(newValue: roleChance);
                 setting.UpdateValuesAndText(null);
             });
+            roleSetting.ControllerSelectable.Add(passive);
+            CurrentTabSettings.Add(roleSetting);
 
             Main.Logger.LogInfo($"Role option has set up for {role.GetType().Name}.");
 
@@ -441,7 +463,7 @@ public static class RoleOptionPatch
     public static GameObject? CurrentTab { get; set; }
     public static PassiveButton? CurrentButton { get; set; }
 
-    public static void SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName)
+    public static PassiveButton SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName)
     {
         Main.Logger.LogInfo($"Setting up tab button for {tab.name} ({index})");
 
@@ -454,27 +476,24 @@ public static class RoleOptionPatch
         button.transform.localPosition = new(xStart + index * offset, yStart, -2);
         button.DestroyComponent<RoleSettingsTabButton>();
         button.OnClick = new();
-        button.OnClick.AddListener((UnityAction)(() =>
+        button.OnClick.AddListener((UnityAction)new Action(() =>
         {
-            menu.RoleChancesSettings.SetActive(false);
-            if (CurrentButton)
-                SetButtonActive(CurrentButton!, false);
-            if (CurrentTab) /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
-                CurrentTab!.SetActive(false);
-            CurrentButton = button;
-            CurrentTab = tab;
-            SetButtonActive(button, true);
-            tab.SetActive(true);
+            var elements = tab.GetComponentsInChildren<UiElement>();
+            ControllerManager.Instance.OpenOverlayMenu(tab.name, menu.BackButton, elements.FirstOrDefault(), elements.ToList().ToIl2CppList());
+            ChangeCustomTab(menu, tab, button);
+            menu.ControllerSelectable.Clear();
+            menu.ControllerSelectable = elements.ToList().ToIl2CppList();
+            ControllerManager.Instance.CurrentUiState.SelectableUiElements = menu.ControllerSelectable;
+            ControllerManager.Instance.SetDefaultSelection(/*CurrentTabSettings[0]*/menu.ControllerSelectable[0], null);
         }));
 
         Main.Logger.LogInfo("Button action has registeristed. Start to set button icon...");
 
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
         const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
-
-        //renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 0.01f);
-        //FIXME: 淳平突脸的sprite
-
+        
+        renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 35f);
+        return button;
     }
 
     static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
@@ -485,6 +504,31 @@ public static class RoleOptionPatch
         AllButton!.SelectButton(clickedAllButton);
         
         Main.Logger.LogInfo($"Is {obj.name} active: {active} ({clickedAllButton})");
+    }
+
+    public static void ChangeCustomTab(RolesSettingsMenu menu, GameObject newTab, PassiveButton toSelect)
+    {
+        CloseAllTab(menu);
+        OpenTab(newTab, toSelect);
+        menu.currentTabButton = toSelect;
+        var scroller = menu.scrollBar;
+        scroller.ScrollToTop();
+        scroller.CalculateAndSetYBounds(CurrentTabSettings.Count + 3, 1f, 6f, 0.43f);
+    }
+
+    static void CloseAllTab(RolesSettingsMenu menuInstance)
+    {
+        menuInstance.RoleChancesSettings.SetActive(false);
+        if (CurrentTab) CurrentTab!.SetActive(false); /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
+        if (CurrentButton) CurrentButton!.SelectButton(false);
+    }
+
+    static void OpenTab(GameObject tabToOpen, PassiveButton button)
+    {
+        CurrentButton = button;
+        CurrentTab = tabToOpen;
+        SetButtonActive(button, true);
+        tabToOpen.SetActive(true);
     }
     
     [HarmonyPatch(nameof(RolesSettingsMenu.CloseMenu))]

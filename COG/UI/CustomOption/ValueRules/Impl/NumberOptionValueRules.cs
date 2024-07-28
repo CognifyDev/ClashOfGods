@@ -10,6 +10,8 @@ public class IntOptionValueRule : INumberValueRule<int>
     public int Max { get; }
     public int Default { get; }
 
+    public NumberSuffixes SuffixType { get; }
+
     public int DefaultSelection { get; }
     public int[] Selections { get; }
     object[] IValueRule.Selections => Selections.Select(s => (object)s).ToArray();
@@ -33,12 +35,13 @@ public class IntOptionValueRule : INumberValueRule<int>
             obj = Selections.OrderBy(n => Math.Abs(n - tmp)).FirstOrDefault();
     }
 
-    public IntOptionValueRule(int min, int step, int max, int defaultValue)
+    public IntOptionValueRule(int min, int step, int max, int defaultValue, NumberSuffixes suffix = NumberSuffixes.None)
     {
         Min = min;
         Step = step;
         Max = max;
         Default = defaultValue;
+        SuffixType = suffix;
         Selections = Enumerable.Range(0, (Max - Min) / Step + 1).Select(n => Min + n * Step).ToArray();
         DefaultSelection = Selections.ToList().IndexOf(Default);
     }
@@ -50,6 +53,8 @@ public class FloatOptionValueRule : INumberValueRule<float>
     public float Step { get; }
     public float Max { get; }
     public float Default { get; }
+
+    public NumberSuffixes SuffixType { get; }
 
     public int DefaultSelection { get; }
     public float[] Selections { get; }
@@ -76,12 +81,13 @@ public class FloatOptionValueRule : INumberValueRule<float>
 
     public float[] GetSelections() => Selections;
 
-    public FloatOptionValueRule(float min, float step, float max, float defaultValue)
+    public FloatOptionValueRule(float min, float step, float max, float defaultValue, NumberSuffixes suffix = NumberSuffixes.Seconds)
     {
         Min = min;
         Step = step;
         Max = max;
         Default = defaultValue;
+        SuffixType = suffix;
         Selections = Enumerable.Range(0, (int)((Max - Min) / Step + 1f)).Select(n => Min + n * Step).ToArray();
         DefaultSelection = Selections.ToList().IndexOf(Default);
     }

@@ -36,7 +36,7 @@ public class Cleaner : CustomRole, IListener
             () => CleanBodyButton?.ResetCooldown(),
             () => PlayerUtils.GetClosestBody() != null,
             () => true,
-            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.CleanDeadBodyButton, 100f)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.CleanDeadBodyButton, 100f)!,
             2,
             KeyCode.C,
             LanguageConfig.Instance.CleanAction,
@@ -62,7 +62,7 @@ public class Cleaner : CustomRole, IListener
                 return GameUtils.GetGameOptions().KillDistance >= distance;
             },
             () => true,
-            ResourceUtils.LoadSpriteFromResources(ResourcesConstant.GeneralKillButton, 100f)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton, 100f)!,
             1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
