@@ -152,15 +152,14 @@ public abstract class CustomRole
 
     public RoleBehaviour VanillaRole { get; init; }
 
-    public RoleRulesCategory[] VanillaCategories
+    public RoleRulesCategory VanillaCategory
     {
         get
         {
-            List<RoleRulesCategory> categories = new();
+            var settings = new List<BaseGameSetting>();
             foreach (var option in RoleOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption))
             {
                 var rule = option.ValueRule;
-                var settings = new List<BaseGameSetting>();
                 if (rule is BoolOptionValueRule)
                 {
                     settings.Add(new CheckboxGameSetting()
@@ -203,14 +202,12 @@ public abstract class CustomRole
                         Values = new StringNames[sovr.Selections.Length]
                     });
                 }
-
-                categories.Add(new()
-                {
-                    Role = VanillaRole,
-                    AllGameSettings = settings.ToIl2CppList()
-                });
             }
-            return categories.ToArray();
+            return new()
+            {
+                AllGameSettings = settings.ToIl2CppList(),
+                Role = VanillaRole
+            };
         }
     }
 
