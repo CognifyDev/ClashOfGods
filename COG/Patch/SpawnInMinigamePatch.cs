@@ -13,6 +13,7 @@ internal class SpawnInMinigameBlackoutFixPatch
         {
             hud.StartCoroutine(hud.CoFadeFullScreen(new(0, 0, 0, 1), new(0, 0, 0, 0)));
             hud.PlayerCam.Locked = false;
+            VanillaBugFixListener.OccuredBlackoutOnAirship = false;
         }
     }
 }
