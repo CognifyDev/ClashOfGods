@@ -50,8 +50,17 @@ public sealed class CustomOption
     public IValueRule ValueRule { get; }
     public OptionBehaviour? OptionBehaviour { get; set; }
     public BaseGameSetting? VanillaData { get; set; }
+    public int Selection
+    {
+        get => _selection;
+        set
+        {
+            _selection = value;
+            NotifySettingChange();
+        }
+    }
 
-    public int Selection;
+    private int _selection;
 
     // Option creation
     private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
@@ -60,7 +69,7 @@ public sealed class CustomOption
         _typeId++;
         Name = nameGetter;
         ValueRule = rule;
-        Selection = rule.DefaultSelection;
+        _selection = rule.DefaultSelection;
         Parent = parent;
         IsHeader = isHeader;
         Page = type;
@@ -195,7 +204,6 @@ public sealed class CustomOption
     public void UpdateSelection(int newSelection)
     {
         Selection = newSelection;
-        NotifySettingChange();
         ShareOptionChange(newSelection);
     }
 
@@ -216,23 +224,45 @@ public sealed class CustomOption
 
     public void NotifySettingChange()
     {
+        var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.AllOptions.Contains(this));
+        if (role == null) return;
+
         if (OptionBehaviour is RoleOptionSetting setting)
         {
-            var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.AllOptions.Contains(this));
-            if (role == null) return;
-
-            var text = (int)setting.Role.TeamType switch
+            var roleName = (int)setting.Role.TeamType switch
             {
                 (int)CampType.Crewmate => role.GetColorName(),
                 (int)CampType.Impostor => role.Name.Color(Palette.ImpostorRed),
                 _ => role.Name.Color(Color.grey)
             };
             var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotificationRole,
-                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{text}</font>",
+                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}</font>",
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount.ToString() + "</font>",
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance.ToString() + "%"
             );
             HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue, item, true);
+        }
+        else
+        {
+            var roleName = role.CampType switch
+            {
+                CampType.Crewmate => role.GetColorName(),
+                CampType.Impostor => role.Name.Color(Palette.ImpostorRed),
+                _ => role.Name.Color(Color.grey)
+            };
+            string valueText = "";
+            if (OptionBehaviour is StringOption)
+                valueText = GetString();
+            else if (OptionBehaviour is ToggleOption)
+                valueText = TranslationController.Instance.GetString(GetBool() ? StringNames.SettingsOn : StringNames.SettingsOff);
+            else
+                valueText = OptionBehaviour!.Data.GetValueString(OptionBehaviour.GetInt());
+                
+            var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotification,
+                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}: {Name()}</font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + valueText + "</font>"
+            );
+            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue - 1, item, true);
         }
     }
 }

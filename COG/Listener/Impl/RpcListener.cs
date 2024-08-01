@@ -28,7 +28,6 @@ public class RpcListener : IListener
                     if (option == null) return;
 
                     option.Selection = selection;
-                    HudManager.Instance.Notifier.AddSettingsChangeMessage(StringNames.None, selection.ToString()); // 临时写法
                     break;
                 }
             case KnownRpc.ShareOptions:
