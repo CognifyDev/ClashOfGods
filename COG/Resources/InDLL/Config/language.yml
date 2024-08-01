@@ -1,7 +1,6 @@
 lobby:
   message-for-next-page: "按 TAB 切换下一页... %currentpage%/%pagecount%"
   make-public-message: "禁止设置为公开"
-  vanilla-role-disabled: "原版职业已被禁用"
 role:
   unknown:
     name: "未知"
@@ -110,6 +109,7 @@ camp:
   crewmate:
     name: "船员阵营"
     description: "完成任务，找出内鬼"
+  addon: "附加职业"
 menu:
   general:
     name: "COG设置"
@@ -117,14 +117,6 @@ menu:
     save-preset: "保存预设"
     debug-mode: "<color=#9AFF00>调试模式</color>"
     max-sub-role-number: "最大副职业数量"
-  impostor:
-    name: "内鬼职业设置"
-  neutral:
-    name: "中立职业设置"
-  crewmate:
-    name: "船员职业设置"
-  addons:
-    name: "副职业设置"
 option:
   main:
     cog-options: "COG选项"

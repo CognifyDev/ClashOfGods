@@ -44,13 +44,7 @@ public class LanguageConfig : Config
     public static LanguageConfig Instance { get; private set; }
     public string MessageForNextPage { get; private set; } = null!;
     public string MakePublicMessage { get; private set; } = null!;
-    public string VanillaRoleDisabled { get; private set; } = null!;
 
-    public string GeneralSetting { get; private set; } = null!;
-    public string ImpostorRolesSetting { get; private set; } = null!;
-    public string NeutralRolesSetting { get; private set; } = null!;
-    public string CrewmateRolesSetting { get; private set; } = null!;
-    public string AddonsSetting { get; private set; } = null!;
     public string SavePreset { get; private set; } = null!;
     public string LoadPreset { get; private set; } = null!;
     public string DebugMode { get; private set; } = null!;
@@ -167,6 +161,7 @@ public class LanguageConfig : Config
     public string ImpostorCamp { get; private set; } = null!;
     public string NeutralCamp { get; private set; } = null!;
     public string CrewmateCamp { get; private set; } = null!;
+    public string AddonName { get; private set; } = null!;
 
     public string UnknownCampDescription { get; private set; } = null!;
     public string ImpostorCampDescription { get; private set; } = null!;
@@ -211,13 +206,6 @@ public class LanguageConfig : Config
     {
         MessageForNextPage = GetString("lobby.message-for-next-page");
         MakePublicMessage = GetString("lobby.make-public-message");
-        VanillaRoleDisabled = GetString("lobby.vanilla-role-disabled");
-
-        GeneralSetting = GetString("menu.general.name");
-        ImpostorRolesSetting = GetString("menu.impostor.name");
-        NeutralRolesSetting = GetString("menu.neutral.name");
-        CrewmateRolesSetting = GetString("menu.crewmate.name");
-        AddonsSetting = GetString("menu.addons.name");
 
         LoadPreset = GetString("menu.general.load-preset");
         SavePreset = GetString("menu.general.save-preset");
@@ -333,6 +321,7 @@ public class LanguageConfig : Config
         ImpostorCamp = GetString("camp.impostor.name");
         NeutralCamp = GetString("camp.neutral.name");
         CrewmateCamp = GetString("camp.crewmate.name");
+        AddonName = GetString("camp.addon");
 
         UnknownCampDescription = GetString("camp.unknown.description");
         ImpostorCampDescription = GetString("camp.impostor.description");

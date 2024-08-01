@@ -347,7 +347,7 @@ public static class RoleOptionPatch
         }
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
         __instance.roleDescriptionText.text = CurrentAdvancedTabFor.Description;
-        __instance.roleScreenshot.sprite = ResourceUtils.LoadSprite("COG.Resources.InDll.Images.Settings.General.png");
+        __instance.roleScreenshot.sprite = ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Settings.General.png");
 
         var options = __instance.advancedSettingChildren;
         foreach (var option in options)
@@ -393,7 +393,7 @@ public static class RoleOptionPatch
             CampType.Crewmate => LanguageConfig.Instance.CrewmateCamp,
             CampType.Impostor => LanguageConfig.Instance.ImpostorCamp,
             CampType.Neutral => LanguageConfig.Instance.NeutralCamp,
-            _ => "Addon"
+            _ => LanguageConfig.Instance.AddonName
         };
         header.Background.color = camp switch
         {
@@ -469,21 +469,21 @@ public static class RoleOptionPatch
                     Color.RGBToHSV(color, out var h, out var s, out var v);
                     label.color = Color.HSVToRGB(h, s, v / 2);
                 }));
+                passive.AddOnClickListeners(new Action(() =>
+                {
+                    CloseAllTab(menu);
+                    CurrentAdvancedTabFor = role;
+                    var scroller = menu.scrollBar;
+                    ScrollerLocationPercent = scroller.GetScrollPercY();
+                    scroller.ScrollToTop();
+                    try
+                    {
+                        menu.ChangeTab(role.VanillaCategory, button);
+                    }
+                    catch { } // Ignored
+                }));
             }
 
-            passive.AddOnClickListeners(new Action(() =>
-            {
-                CloseAllTab(menu);
-                CurrentAdvancedTabFor = role;
-                var scroller = menu.scrollBar;
-                ScrollerLocationPercent = scroller.GetScrollPercY();
-                scroller.ScrollToTop();
-                try
-                {
-                    menu.ChangeTab(role.VanillaCategory, button);
-                }
-                catch { } // Ignored
-            }));
             roleSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
             {
                 var setting = ob.Cast<RoleOptionSetting>();
