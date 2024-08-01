@@ -21,7 +21,7 @@ public class Opportunist : CustomRole, IListener
 
     public Opportunist() : base(LanguageConfig.Instance.OpportunistName, Color.yellow, CampType.Neutral)
     {
-        Description = LanguageConfig.Instance.OpportunistDescription;
+        ShortDescription = LanguageConfig.Instance.OpportunistDescription;
         if (ShowInOptions) 
             _killCooldownOption = CreateOption(() => LanguageConfig.Instance.KillCooldown, 
             new FloatOptionValueRule(20f, 5f, 200f, 45f));

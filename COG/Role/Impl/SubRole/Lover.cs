@@ -24,7 +24,7 @@ public class Lover : CustomRole, IListener, IWinnable
     private CustomOption EnablePrivateChatOption { get; }
     public Lover() : base(LanguageConfig.Instance.LoverName, Color.magenta, CampType.Unknown)
     {
-        Description = "";
+        ShortDescription = "";
         IsSubRole = true;
         Couples = new();
         if (ShowInOptions)
@@ -90,7 +90,7 @@ public class Lover : CustomRole, IListener, IWinnable
     [EventHandler(EventHandlerType.Prefix)]
     public void OnIntroBegin(IntroCutsceneShowRoleEvent @event)
     {
-        Description = LanguageConfig.Instance.LoverDescription.CustomFormat(PlayerControl.LocalPlayer.GetLover()!.Data.PlayerName);
+        ShortDescription = LanguageConfig.Instance.LoverDescription.CustomFormat(PlayerControl.LocalPlayer.GetLover()!.Data.PlayerName);
     }
 
 
@@ -148,7 +148,7 @@ public class Lover : CustomRole, IListener, IWinnable
     public override void ClearRoleGameData()
     {
         Couples.Clear();
-        Description = "";
+        ShortDescription = "";
     }
 
     public override IListener GetListener() => this;

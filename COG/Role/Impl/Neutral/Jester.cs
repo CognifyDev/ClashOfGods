@@ -18,7 +18,7 @@ public class Jester : CustomRole, IListener, IWinnable
 
     public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral)
     {
-        Description = LanguageConfig.Instance.JesterDescription;
+        ShortDescription = LanguageConfig.Instance.JesterDescription;
         _allowStartMeeting = CreateOption(() => LanguageConfig.Instance.AllowStartMeeting,
             new BoolOptionValueRule(true));
         _allowReportDeadBody = CreateOption(() => LanguageConfig.Instance.AllowReportDeadBody, 

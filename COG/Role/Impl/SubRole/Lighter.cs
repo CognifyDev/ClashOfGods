@@ -10,7 +10,7 @@ public class Lighter : CustomRole, IListener
 {
     public Lighter() : base(LanguageConfig.Instance.LighterName, Color.yellow, CampType.Unknown)
     {
-        Description = LanguageConfig.Instance.LighterDescription;
+        ShortDescription = LanguageConfig.Instance.LighterDescription;
         IsSubRole = true;
     }
 

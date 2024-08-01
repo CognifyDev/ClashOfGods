@@ -27,7 +27,7 @@ public abstract class CustomRole
     {
         Name = name;
         IsBaseRole = false;
-        Description = "";
+        ShortDescription = "";
         Color = color;
         CampType = campType;
         BaseRoleType = campType == CampType.Impostor ? RoleTypes.Impostor : RoleTypes.Crewmate;
@@ -84,9 +84,20 @@ public abstract class CustomRole
     public bool IsBaseRole { get; protected init; }
 
     /// <summary>
-    ///     角色介绍
+    ///     显示在职业分配后职业介绍界面的简短介绍文本
     /// </summary>
-    public string Description { get; protected set; }
+    public string ShortDescription { get; protected set; }
+
+    /// <summary>
+    ///     显示在职业设置的职业详细介绍文本
+    /// </summary>
+    public string LongDescription
+    {
+        get => string.IsNullOrEmpty(_longDescription) ? ShortDescription : _longDescription;
+        set => _longDescription = value;
+    }
+
+    private string _longDescription = "";
 
     /// <summary>
     ///     角色阵营

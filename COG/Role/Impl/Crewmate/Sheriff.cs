@@ -17,7 +17,7 @@ public class Sheriff : CustomRole, IListener
     public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate)
     {
         BaseRoleType = RoleTypes.Crewmate;
-        Description = LanguageConfig.Instance.SheriffDescription;
+        ShortDescription = LanguageConfig.Instance.SheriffDescription;
 
         if (ShowInOptions)
             SheriffKillCd = CreateOption(() => LanguageConfig.Instance.SheriffKillCooldown, new FloatOptionValueRule(10f, 5f, 60f, 30f));

@@ -28,7 +28,7 @@ public class BountyHunter : CustomRole, IListener
     public BountyHunter() : base(LanguageConfig.Instance.BountyHunterName, Palette.ImpostorRed, CampType.Impostor, true)
     {
         CanKill = false; // Disable vanilla kill button
-        Description = LanguageConfig.Instance.BountyHunterDescription;
+        ShortDescription = LanguageConfig.Instance.BountyHunterDescription;
         BaseRoleType = RoleTypes.Impostor;
 
         if (ShowInOptions)

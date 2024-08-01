@@ -1,3 +1,6 @@
+using Il2CppInterop.Runtime.InteropTypes;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+
 namespace COG.Utils;
 
 public static class ArrayUtils
@@ -9,4 +12,8 @@ public static class ArrayUtils
 
         return toReturn;
     }
+
+    public static T[] ToSingleElementArray<T>(this T obj) => new[] { obj };
+
+    public static Il2CppReferenceArray<T> ToIl2CppArray<T>(this T[] array) where T : Il2CppObjectBase => new(array);
 }

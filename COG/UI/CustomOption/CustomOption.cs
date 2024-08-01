@@ -270,24 +270,23 @@ public static class PresetsButtonsPatch
         std.OnClick = new();
         std.OnClick.AddListener((UnityAction)new Action(() =>
         {
-            ResetActiveState(std.transform);
+            ResetActiveState(std);
             CustomOption.LoadPresetWithDialogue();
         }));
 
         alter.OnClick = new();
         alter.OnClick.AddListener((UnityAction)new Action(() =>
         {
-            ResetActiveState(alter.transform);
+            ResetActiveState(alter);
             CustomOption.SavePresetWithDialogue();
         }));
 
         __instance.PresetDescriptionText.gameObject.SetActive(false); // Hide preset introduction text
         __instance.transform.Find("DividerImage").gameObject.Destroy();
 
-        void ResetActiveState(Transform transform)
+        void ResetActiveState(PassiveButton button)
         {
-            transform.FindChild("Active").gameObject.SetActive(false);
-            transform.FindChild("Inactive").gameObject.SetActive(true);
+            button.SelectButton(false);
             __instance.ClickPresetButton(RulesPresets.Custom);
         }
     }
@@ -311,7 +310,7 @@ public static class RoleOptionPatch
         __instance.AllButton.SelectButton(true);
         CurrentAdvancedTabFor = null;
 
-        var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
+        var chanceTab = __instance.scrollBar.Inner.Find("ChancesTab");
         chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(t => t.gameObject.SetActive(false));
 
         var headers = __instance.tabParent;
@@ -346,8 +345,9 @@ public static class RoleOptionPatch
             __instance.roleHeaderText.color = Color.white;
         }
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
-        __instance.roleDescriptionText.text = CurrentAdvancedTabFor.Description;
-        __instance.roleScreenshot.sprite = ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Settings.General.png");
+        __instance.roleDescriptionText.text = CurrentAdvancedTabFor.LongDescription;
+        __instance.roleScreenshot.sprite = ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Settings.General.png", 40);
+        __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground").GetComponent<SpriteRenderer>().color = new(1, 1, 1, 1);
 
         var options = __instance.advancedSettingChildren;
         foreach (var option in options)
@@ -428,7 +428,7 @@ public static class RoleOptionPatch
         };
 
         int i = 0;
-        foreach (var role in CustomRoleManager.GetManager().GetTypeCampRoles(camp).Where(r => !r.IsBaseRole))
+        foreach (var role in CustomRoleManager.GetManager().GetTypeCampRoles(camp).Where(r => !r.IsBaseRole && r.ShowInOptions))
         {
             if ((camp == CampType.Unknown && !role.IsSubRole) || !role.ShowInOptions) continue;
             var roleSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
@@ -456,7 +456,7 @@ public static class RoleOptionPatch
             collider.size = label.size;
 
             var passive = label.gameObject.AddComponent<PassiveButton>();
-            passive.Colliders = new(new[] { collider });
+            passive.Colliders = ((Collider2D)collider).ToSingleElementArray().ToIl2CppArray();
             passive.OnMouseOut = new();
             passive.OnMouseOver = new();
             passive.OnClick = new();
@@ -563,16 +563,14 @@ public static class RoleOptionPatch
         CloseAllTab(menu);
         OpenTab(newTab, toSelect);
         var scroller = menu.scrollBar;
-        scroller.CalculateAndSetYBounds(CustomRoleManager.GetManager().GetTypeCampRoles(camp).Length + 3, 1f, 6f, 0.43f);
+        scroller.CalculateAndSetYBounds(CustomRoleManager.GetManager().GetTypeCampRoles(camp).Where(r => !r.IsBaseRole && r.ShowInOptions).ToList().Count + 2, 1f, 6f, 0.43f);
         if (menu.currentTabButton != toSelect)
         {
             menu.currentTabButton = toSelect;
             scroller.ScrollToTop();
         }
         else
-        {
             scroller.ScrollPercentY(ScrollerLocationPercent);
-        }
     }
 
     static void CloseAllTab(RolesSettingsMenu menuInstance)
