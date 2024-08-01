@@ -30,7 +30,7 @@ public class Lover : CustomRole, IListener, IWinnable
         if (ShowInOptions)
         {
             var tab = ToCustomOption(this);
-            RoleNumberOption!.RealName = () => LanguageConfig.Instance.LoverCountOptionName;
+            RoleNumberOption!.Name = () => LanguageConfig.Instance.LoverCountOptionName;
             LoversDieTogetherOption = CreateOption(() => LanguageConfig.Instance.LoversDieTogetherOptionName, new BoolOptionValueRule(true));
             EnablePrivateChatOption = CreateOption(() => LanguageConfig.Instance.LoverEnablePrivateChat, new BoolOptionValueRule(true));
         }

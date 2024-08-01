@@ -38,7 +38,7 @@ public abstract class CustomRole
         Id = _order;
         _order++;
         ShowInOptions = showInOptions;
-        RoleOptions = new();
+        AllOptions = new();
         var vanillaType = CampType switch
         {
             CampType.Crewmate => RoleTeamTypes.Crewmate,
@@ -148,7 +148,12 @@ public abstract class CustomRole
     public ReadOnlyCollection<PlayerControl> Players =>
         new(GameUtils.PlayerRoleData.Where(pr => pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
 
-    public List<CustomOption> RoleOptions { get; }
+    public List<CustomOption> AllOptions { get; }
+
+    /// <summary>
+    ///     除了概率与人数之外的所有职业选项
+    /// </summary>
+    public ReadOnlyCollection<CustomOption> RoleOptions => new(AllOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption).ToList());
 
     public RoleBehaviour VanillaRole { get; init; }
 
@@ -157,19 +162,20 @@ public abstract class CustomRole
         get
         {
             var settings = new List<BaseGameSetting>();
-            foreach (var option in RoleOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption))
+            var idx = 0;
+            foreach (var option in RoleOptions)
             {
                 var rule = option.ValueRule;
                 if (rule is BoolOptionValueRule)
                 {
-                    settings.Add(new CheckboxGameSetting()
+                    settings.Add(option.VanillaData = new CheckboxGameSetting()
                     {
                         Type = OptionTypes.Checkbox
                     });
                 }
                 else if (rule is IntOptionValueRule iovr)
                 {
-                    settings.Add(new IntGameSetting()
+                    settings.Add(option.VanillaData = new IntGameSetting()
                     {
                         Type = OptionTypes.Int,
                         Value = option.GetInt(),
@@ -182,7 +188,7 @@ public abstract class CustomRole
                 }
                 else if (rule is FloatOptionValueRule fovr)
                 {
-                    settings.Add(new FloatGameSetting()
+                    settings.Add(option.VanillaData = new FloatGameSetting()
                     {
                         Type = OptionTypes.Float,
                         Value = option.GetFloat(),
@@ -195,13 +201,15 @@ public abstract class CustomRole
                 }
                 else if (rule is StringOptionValueRule sovr)
                 {
-                    settings.Add(new StringGameSetting()
+                    settings.Add(option.VanillaData = new StringGameSetting()
                     {
                         Type = OptionTypes.String,
                         Index = option.Selection,
                         Values = new StringNames[sovr.Selections.Length]
                     });
                 }
+
+                idx++;
             }
             return new()
             {
@@ -214,7 +222,7 @@ public abstract class CustomRole
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
         var option = CustomOption.Create(ToCustomOption(this), nameGetter, rule);
-        RoleOptions.Add(option);
+        AllOptions.Add(option);
         return option;
     }
 
