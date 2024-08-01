@@ -21,7 +21,7 @@ public class Jester : CustomRole, IListener, IWinnable
         Description = LanguageConfig.Instance.JesterDescription;
         _allowStartMeeting = CreateOption(() => LanguageConfig.Instance.AllowStartMeeting,
             new BoolOptionValueRule(true));
-        _allowReportDeadBody = CreateOption(() => LanguageConfig.Instance.AllowReportDeadBody, 
+        _allowReportDeadBody = CreateOption(() => LanguageConfig.Instance.AllowReportDeadBody,
             new BoolOptionValueRule(true));
     }
 
@@ -51,7 +51,8 @@ public class Jester : CustomRole, IListener, IWinnable
         var allowMeeting = _allowStartMeeting.GetBool();
         var allowReport = _allowReportDeadBody.GetBool();
 
-        if (!allowMeeting && !victim) return false; // Reject if meeting is unallowed (It's a meeting when victim is null)
+        if (!allowMeeting && !victim)
+            return false; // Reject if meeting is unallowed (It's a meeting when victim is null)
         if (!allowReport && victim) return false; // Reject if reporting is unallowed
         return true;
     }

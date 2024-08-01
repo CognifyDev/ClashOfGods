@@ -9,8 +9,14 @@ public class BoolOptionValueRule : IValueRule<bool>
     public int DefaultSelection { get; }
 
 #pragma warning disable CS0472
-    public bool IsValid(bool obj) => obj != null;
+    public bool IsValid(bool obj)
+    {
+        return obj != null;
+    }
 #pragma warning restore
 
-    public BoolOptionValueRule(bool defaultSelection) => DefaultSelection = defaultSelection ? 1 : 0;
+    public BoolOptionValueRule(bool defaultSelection)
+    {
+        DefaultSelection = defaultSelection ? 1 : 0;
+    }
 }

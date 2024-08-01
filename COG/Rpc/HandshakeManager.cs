@@ -16,10 +16,13 @@ namespace COG.Rpc;
 
 public class HandshakeManager
 {
+    public const string ShowerObjectName = "COGErrorMsgShower";
     private static HandshakeManager? _instance;
-    public static HandshakeManager Instance => _instance ??= new();
+    public static HandshakeManager Instance => _instance ??= new HandshakeManager();
     public Dictionary<PlayerControl, (VersionInfo, DateTime)> PlayerVersionInfo { get; private set; } = new();
-    
+    public bool HasCreatedShower => HudManager.Instance?.transform.Find(ShowerObjectName);
+    public TextMeshPro? TextShower { get; private set; }
+
     public void AddInfo(PlayerControl pc, string verStr, string timeStr)
     {
         VersionInfo version;
@@ -29,7 +32,7 @@ public class HandshakeManager
         }
         catch
         {
-            version = new(verStr);
+            version = new VersionInfo(verStr);
         }
 
         if (!DateTime.TryParse(timeStr, out var time)) time = default;
@@ -39,10 +42,13 @@ public class HandshakeManager
     public void RpcHandshake()
     {
         RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.Handshake)
-                .Write(Main.VersionInfo.ToString()).Write(GitInfo.CommitDate).Finish();
+            .Write(Main.VersionInfo.ToString()).Write(GitInfo.CommitDate).Finish();
     }
 
-    public (VersionInfo, DateTime) GetHostInfo() => PlayerVersionInfo.GetValueOrDefault(AmongUsClient.Instance.GetHost().Character);
+    public (VersionInfo, DateTime) GetHostInfo()
+    {
+        return PlayerVersionInfo.GetValueOrDefault(AmongUsClient.Instance.GetHost().Character);
+    }
 
     public string CheckModdedClientVersions()
     {
@@ -54,21 +60,23 @@ public class HandshakeManager
         if (AmongUsClient.Instance.AmHost)
         {
             foreach (var (player, (pVersion, time)) in PlayerVersionInfo)
-            {
                 if (pVersion.Equals(Main.VersionInfo))
                 {
                     if (Main.CommitTime.CompareTo(time) != 0)
                     {
-                        invalidMsgBuilder.Append("InvalidModCommitDateHost %player% %version% (at %commitDate%)\n".CustomFormat(player.Data.PlayerName, pVersion, time));
-                        Main.Logger.LogWarning($"Invalid modded client version: {player} ({player.PlayerId}) {pVersion} {time}");
+                        invalidMsgBuilder.Append(
+                            "InvalidModCommitDateHost %player% %version% (at %commitDate%)\n".CustomFormat(
+                                player.Data.PlayerName, pVersion, time));
+                        Main.Logger.LogWarning(
+                            $"Invalid modded client version: {player} ({player.PlayerId}) {pVersion} {time}");
                     }
                 }
                 else
                 {
-                    invalidMsgBuilder.Append("InvalidModVersionHost %player% %version%\n".CustomFormat(player.Data.PlayerName, pVersion));
+                    invalidMsgBuilder.Append(
+                        "InvalidModVersionHost %player% %version%\n".CustomFormat(player.Data.PlayerName, pVersion));
                     Main.Logger.LogWarning($"Uncompatible client version: {player} ({player.PlayerId}) {pVersion}");
                 }
-            }
         }
         else // Just check self
         {
@@ -76,7 +84,9 @@ public class HandshakeManager
             {
                 if (Main.CommitTime.CompareTo(dateHost) != 0)
                 {
-                    invalidMsgBuilder.Append("InvalidModCommitDateClient %version% (at %commitDate%)\n".CustomFormat(version.ToString(), dateHost.ToString()));
+                    invalidMsgBuilder.Append(
+                        "InvalidModCommitDateClient %version% (at %commitDate%)\n".CustomFormat(version.ToString(),
+                            dateHost.ToString()));
                     Main.Logger.LogWarning($"Invalid modded host commit date: {version} {dateHost}");
                 }
             }
@@ -97,13 +107,10 @@ public class HandshakeManager
         var unmodded = allPlayers.Concat(PlayerVersionInfo.Keys).Distinct();
         var unmoddedBuilder = new StringBuilder();
 
-        unmodded.ForEach(p => unmoddedBuilder.Append("UnmoddedPlayerMessage %player%\n".CustomFormat(p.Data.PlayerName)));
+        unmodded.ForEach(
+            p => unmoddedBuilder.Append("UnmoddedPlayerMessage %player%\n".CustomFormat(p.Data.PlayerName)));
         return unmoddedBuilder.ToString();
     }
-
-    public const string ShowerObjectName = "COGErrorMsgShower";
-    public bool HasCreatedShower => HudManager.Instance?.transform.Find(ShowerObjectName);
-    public TextMeshPro? TextShower { get; private set; }
 
     public void CheckPlayersAndDisplay()
     {
@@ -136,17 +143,24 @@ public class HandshakeManager
         TextShower = null;
     }
 
-    public static IListener GetListener() => new Listener();
+    public static IListener GetListener()
+    {
+        return new Listener();
+    }
 
     private class Listener : IListener
     {
-        public void OnJoinLobby(PlayerControlAwakeEvent @event) => @event.Player.StartCoroutine(CoCheckHandshake().WrapToIl2Cpp());
-        
+        public void OnJoinLobby(PlayerControlAwakeEvent @event)
+        {
+            @event.Player.StartCoroutine(CoCheckHandshake().WrapToIl2Cpp());
+        }
+
         private IEnumerator CoCheckHandshake()
         {
             Instance.Init();
 
-            yield return new WaitForSeconds(0.5f + ((float)PlayerControl.LocalPlayer.PlayerId / 10)); // Wait for initializing
+            yield return
+                new WaitForSeconds(0.5f + (float)PlayerControl.LocalPlayer.PlayerId / 10); // Wait for initializing
             Instance.RpcHandshake();
 
             yield return new WaitForSeconds(0.25f);

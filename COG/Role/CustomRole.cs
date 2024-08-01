@@ -38,7 +38,7 @@ public abstract class CustomRole
         Id = _order;
         _order++;
         ShowInOptions = showInOptions;
-        RoleOptions = new();
+        RoleOptions = new List<CustomOption>();
         var vanillaType = CampType switch
         {
             CampType.Crewmate => RoleTeamTypes.Crewmate,
@@ -46,7 +46,7 @@ public abstract class CustomRole
             CampType.Neutral => (RoleTeamTypes)99,
             _ or CampType.Unknown => (RoleTeamTypes)100
         };
-        VanillaRole =  new()
+        VanillaRole = new RoleBehaviour
         {
             TeamType = vanillaType,
             Role = (RoleTypes)(Id + 100),
@@ -58,7 +58,8 @@ public abstract class CustomRole
         if (ShowInOptions)
         {
             //                                  Actually name here is useless for new option
-            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage, new IntOptionValueRule(0, 1, 15, 1));
+            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage,
+                new IntOptionValueRule(0, 1, 15, 1));
             RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 100));
         }
     }
@@ -161,49 +162,42 @@ public abstract class CustomRole
             {
                 var rule = option.ValueRule;
                 if (rule is BoolOptionValueRule)
-                {
-                    settings.Add(new CheckboxGameSetting()
+                    settings.Add(new CheckboxGameSetting
                     {
                         Type = OptionTypes.Checkbox
                     });
-                }
                 else if (rule is IntOptionValueRule iovr)
-                {
-                    settings.Add(new IntGameSetting()
+                    settings.Add(new IntGameSetting
                     {
                         Type = OptionTypes.Int,
                         Value = option.GetInt(),
                         Increment = iovr.Step,
-                        ValidRange = new(iovr.Min, iovr.Max),
+                        ValidRange = new IntRange(iovr.Min, iovr.Max),
                         ZeroIsInfinity = false,
                         SuffixType = iovr.SuffixType,
                         FormatString = ""
                     });
-                }
                 else if (rule is FloatOptionValueRule fovr)
-                {
-                    settings.Add(new FloatGameSetting()
+                    settings.Add(new FloatGameSetting
                     {
                         Type = OptionTypes.Float,
                         Value = option.GetFloat(),
                         Increment = fovr.Step,
-                        ValidRange = new(fovr.Min, fovr.Max),
+                        ValidRange = new FloatRange(fovr.Min, fovr.Max),
                         ZeroIsInfinity = false,
                         SuffixType = fovr.SuffixType,
                         FormatString = ""
                     });
-                }
                 else if (rule is StringOptionValueRule sovr)
-                {
-                    settings.Add(new StringGameSetting()
+                    settings.Add(new StringGameSetting
                     {
                         Type = OptionTypes.String,
                         Index = option.Selection,
                         Values = new StringNames[sovr.Selections.Length]
                     });
-                }
             }
-            return new()
+
+            return new RoleRulesCategory
             {
                 AllGameSettings = settings.ToIl2CppList(),
                 Role = VanillaRole
@@ -240,7 +234,7 @@ public abstract class CustomRole
 
         foreach (var subRole in player.GetSubRoles())
             sb.Append(' ').Append(subRole.GetColorName());
-        
+
         return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, sb.ToString());
     }
 
@@ -290,5 +284,8 @@ public abstract class CustomRole
 
     public abstract CustomRole NewInstance();
 
-    ~CustomRole() => ClearRoleGameData();
+    ~CustomRole()
+    {
+        ClearRoleGameData();
+    }
 }

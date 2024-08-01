@@ -311,9 +311,13 @@ public static class PlayerUtils
         SetCustomRole(pc, role);
     }
 
-    public static CustomRole[] GetSubRoles(this PlayerControl pc) => pc.GetPlayerRole()!.SubRoles;
+    public static CustomRole[] GetSubRoles(this PlayerControl pc)
+    {
+        return pc.GetPlayerRole()!.SubRoles;
+    }
 
-    public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason, bool showCorpse = true)
+    public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason,
+        bool showCorpse = true)
     {
         _ = new DeadPlayer(DateTime.Now, reason, target, pc);
         if (showCorpse)
@@ -322,7 +326,10 @@ public static class PlayerUtils
             pc.Exiled();
     }
 
-    public static bool CanKill(this PlayerControl pc) => pc.GetMainRole().CanKill;
+    public static bool CanKill(this PlayerControl pc)
+    {
+        return pc.GetMainRole().CanKill;
+    }
 }
 
 public enum DeathReason
@@ -342,9 +349,9 @@ public class DeadPlayerListener : IListener
         var target = @event.Target;
         var killer = @event.Player;
         if (!(target.Data.IsDead && killer && target)) return;
-        
+
         if (DeadPlayerManager.DeadPlayers.Select(dp => dp.Player).Contains(target)) return;
-        
+
         var reason = DeadPlayerManager.GetDeathReason(killer, target);
         _ = new DeadPlayer(DateTime.Now, reason, target, killer);
     }

@@ -1,6 +1,5 @@
 using System.Collections;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
-using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
 using COG.Utils;
@@ -29,10 +28,16 @@ public class VanillaBugFixListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnAirshipEjectionEnd(PlayerExileEndOnAirshipEvent @event) => OnEjectionEnd();
+    public void OnAirshipEjectionEnd(PlayerExileEndOnAirshipEvent @event)
+    {
+        OnEjectionEnd();
+    }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnOtherMapEjectionEnd(PlayerExileEndEvent @event) => OnEjectionEnd();
+    public void OnOtherMapEjectionEnd(PlayerExileEndEvent @event)
+    {
+        OnEjectionEnd();
+    }
 
     public IEnumerator CoFixBlackout()
     {
@@ -42,13 +47,15 @@ public class VanillaBugFixListener : IListener
 
         var hud = HudManager.Instance;
         var fullScr = hud.FullScreen.gameObject;
-        
+
         if (!fullScr.active) yield break;
 
         Main.Logger.LogWarning("After-meeting blackout bug has occured. Trying to fix...");
         var auClient = AmongUsClient.Instance;
-        var mapId = (MapNames)(auClient.NetworkMode == NetworkModes.FreePlay ? auClient.TutorialMapId : GameUtils.GetGameOptions().MapId);
-        
+        var mapId = (MapNames)(auClient.NetworkMode == NetworkModes.FreePlay
+            ? auClient.TutorialMapId
+            : GameUtils.GetGameOptions().MapId);
+
         if (mapId is MapNames.Airship)
         {
             var ship = ShipStatus.Instance;
@@ -58,7 +65,7 @@ public class VanillaBugFixListener : IListener
         }
         else
         {
-            hud.StartCoroutine(hud.CoFadeFullScreen(new(0, 0, 0, 1), new(0, 0, 0, 0)));
+            hud.StartCoroutine(hud.CoFadeFullScreen(new Color(0, 0, 0, 1), new Color(0, 0, 0, 0)));
             hud.PlayerCam.Locked = false;
             Main.Logger.LogInfo("Fixed successfully!");
         }

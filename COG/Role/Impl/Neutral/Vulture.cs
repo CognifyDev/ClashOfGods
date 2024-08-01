@@ -103,8 +103,8 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public IEnumerator CoFadeDeath()
     {
-        yield return HudManager.Instance.CoFadeFullScreen(new(0, 0, 0, 0), Palette.CrewmateBlue);
-        yield return HudManager.Instance.CoFadeFullScreen(Palette.CrewmateBlue, new(0, 0, 0, 0));
+        yield return HudManager.Instance.CoFadeFullScreen(new Color(0, 0, 0, 0), Palette.CrewmateBlue);
+        yield return HudManager.Instance.CoFadeFullScreen(Palette.CrewmateBlue, new Color(0, 0, 0, 0));
     }
 
     public void EatBody(DeadBody body)
@@ -150,7 +150,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
     public override string HandleAdditionalPlayerName()
     {
-        return $"\n({EatenCount}/{(WinningEatenCount?.GetInt() ?? 4f)})";
+        return $"\n({EatenCount}/{WinningEatenCount?.GetInt() ?? 4f})";
     }
 
     public override void ClearRoleGameData()

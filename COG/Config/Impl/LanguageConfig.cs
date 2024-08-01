@@ -85,20 +85,6 @@ public class LanguageConfig : Config
     public string CleanerDescription { get; private set; } = null!;
     public string CleanBodyCooldown { get; private set; } = null!;
 
-    public string BountyHunterName { get; private set; } = null!;
-    public string BountyHunterDescription { get; private set; } = null!;
-    public string BountyHunterDefaultCd { get; private set; } = null!;
-    public string BountyHunterRefreshTargetTime { get; private set; } = null!;
-    public string BountyHunterHasArrowToTarget { get; private set; } = null!;
-    public string BountyHunterKillCorrectCd { get; private set; } = null!;
-    public string BountyHunterKillIncorrectCd { get; private set; } = null!;
-    public string BountyHunterCantSelectTargetError { get; private set; } = null!;
-
-    public string TroublemakerName { get; private set; } = null!;
-    public string TroublemakerDescription { get; private set; } = null!;
-    public string TroublemakerDuration { get; private set; } = null!;
-    public string TroublemakerCooldown { get; private set; } = null!;
-
     public string EraserName { get; private set; } = null!;
     public string EraserDescription { get; private set; } = null!;
     public string EraserInitialEraseCd { get; private set; } = null!;
@@ -108,9 +94,6 @@ public class LanguageConfig : Config
     // Neutral
     public string JesterName { get; private set; } = null!;
     public string JesterDescription { get; private set; } = null!;
-
-    public string OpportunistName { get; private set; } = null!;
-    public string OpportunistDescription { get; private set; } = null!;
 
     public string JackalName { get; private set; } = null!;
     public string JackalDescription { get; private set; } = null!;
@@ -175,12 +158,8 @@ public class LanguageConfig : Config
 
     public string KillAction { get; private set; } = null!;
     public string CleanAction { get; private set; } = null!;
-    public string MakeTrouble { get; private set; } = null!;
-    public string CreateSidekick { get; private set; } = null!;
     public string EraseAction { get; private set; } = null!;
     public string AnnihilateAction { get; private set; } = null!;
-    public string EatAction { get; private set; } = null!;
-
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
     public string Alive { get; private set; } = null!;
@@ -253,20 +232,6 @@ public class LanguageConfig : Config
         CleanerDescription = GetString("role.impostor.cleaner.description");
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
 
-        TroublemakerName = GetString("role.impostor.troublemaker.name");
-        TroublemakerDescription = GetString("role.impostor.troublemaker.description");
-        TroublemakerDuration = GetString("role.impostor.troublemaker.menu.duration");
-        TroublemakerCooldown = GetString("role.impostor.troublemaker.menu.cd");
-
-        BountyHunterName = GetString("role.impostor.bounty-hunter.name");
-        BountyHunterDescription = GetString("role.impostor.bounty-hunter.description");
-        BountyHunterDefaultCd = GetString("role.impostor.bounty-hunter.menu.cd");
-        BountyHunterRefreshTargetTime = GetString("role.impostor.bounty-hunter.menu.target-refresh-time");
-        BountyHunterHasArrowToTarget = GetString("role.impostor.bounty-hunter.menu.has-arrow");
-        BountyHunterKillCorrectCd = GetString("role.impostor.bounty-hunter.menu.cd-kill-target");
-        BountyHunterKillIncorrectCd = GetString("role.impostor.bounty-hunter.menu.cd-kill-non-target");
-        BountyHunterCantSelectTargetError = GetString("role.impostor.bounty-hunter.error.select-target-error");
-
         EraserName = GetString("role.impostor.eraser.name");
         EraserDescription = GetString("role.impostor.eraser.description");
         EraserInitialEraseCd = GetString("role.impostor.eraser.menu.initial-erase-cd");
@@ -276,9 +241,6 @@ public class LanguageConfig : Config
         // Neutral
         JesterName = GetString("role.neutral.jester.name");
         JesterDescription = GetString("role.neutral.jester.description");
-
-        OpportunistName = GetString("role.neutral.opportunist.name");
-        OpportunistDescription = GetString("role.neutral.opportunist.description");
 
         JackalName = GetString("role.neutral.jackal.name");
         JackalDescription = GetString("role.neutral.jackal.description");
@@ -341,8 +303,6 @@ public class LanguageConfig : Config
 
         KillAction = GetString("action.kill");
         CleanAction = GetString("action.clean");
-        MakeTrouble = GetString("action.make-trouble");
-        CreateSidekick = GetString("action.create-sidekick");
         EraseAction = GetString("action.erase-action");
         AnnihilateAction = GetString("action.annihilate");
 

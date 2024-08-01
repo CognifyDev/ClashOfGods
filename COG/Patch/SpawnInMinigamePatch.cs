@@ -1,4 +1,5 @@
 using COG.Listener.Impl;
+using UnityEngine;
 using SpawnInMinigame_WaitForFinish = SpawnInMinigame._WaitForFinish_d__13;
 
 namespace COG.Patch;
@@ -11,7 +12,7 @@ internal class SpawnInMinigameBlackoutFixPatch
         var hud = HudManager.Instance;
         if (VanillaBugFixListener.OccuredBlackoutOnAirship && !__result)
         {
-            hud.StartCoroutine(hud.CoFadeFullScreen(new(0, 0, 0, 1), new(0, 0, 0, 0)));
+            hud.StartCoroutine(hud.CoFadeFullScreen(new Color(0, 0, 0, 1), new Color(0, 0, 0, 0)));
             hud.PlayerCam.Locked = false;
         }
     }

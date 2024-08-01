@@ -9,27 +9,19 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using COG.Utils.Coding;
 using UnityEngine;
 
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 
 namespace COG.Role.Impl.Impostor;
 
-[NotUsed]
-[WorkInProgress]
 public class Eraser : CustomRole, IListener
 {
     private readonly CustomButton _eraseButton;
 
-    private PlayerControl? _currentPlayer;
-
     private readonly CustomOption _initialEraseCooldown, _increaseCooldownAfterErasing, _canEraseImpostors;
 
-    public override void ClearRoleGameData()
-    {
-        _currentPlayer = null;
-    }
+    private PlayerControl? _currentPlayer;
 
     public Eraser() : base(LanguageConfig.Instance.EraserName, Palette.ImpostorRed, CampType.Impostor)
     {
@@ -39,7 +31,7 @@ public class Eraser : CustomRole, IListener
         var type = ToCustomOption(this);
         _initialEraseCooldown = CreateOption(() => LanguageConfig.Instance.EraserInitialEraseCd,
             new FloatOptionValueRule(10f, 5f, 60f, 30f));
-        _increaseCooldownAfterErasing = CreateOption(() => LanguageConfig.Instance.EraserIncreaseCdAfterErasing, 
+        _increaseCooldownAfterErasing = CreateOption(() => LanguageConfig.Instance.EraserIncreaseCdAfterErasing,
             new FloatOptionValueRule(5f, 5f, 15f, 10f));
         _canEraseImpostors = CreateOption(() => LanguageConfig.Instance.EraserCanEraseImpostors,
             new BoolOptionValueRule(false));
@@ -54,7 +46,7 @@ public class Eraser : CustomRole, IListener
                 CustomRole setToRole = camp switch
                 {
                     CampType.Crewmate => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
-                    CampType.Neutral => CustomRoleManager.GetManager().GetTypeRoleInstance<Opportunist>(),
+                    CampType.Neutral => CustomRoleManager.GetManager().GetTypeRoleInstance<Jester>(),
                     CampType.Impostor => CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>(),
                     _ => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>()
                 };
@@ -65,10 +57,15 @@ public class Eraser : CustomRole, IListener
             }, () => _eraseButton!.ResetCooldown(),
             () => !(_currentPlayer == null || (!_canEraseImpostors.GetBool() &&
                                                _currentPlayer.GetMainRole().CampType == CampType.Impostor)),
-            () => true, ResourceUtils.LoadSprite(ResourcesConstant.EraseButton, 100f)!,
+            () => true, ResourceUtils.LoadSprite(ResourcesConstant.EraseButton)!,
             3,
             KeyCode.E, LanguageConfig.Instance.EraseAction, () => _initialEraseCooldown.GetFloat(), -1);
         AddButton(_eraseButton);
+    }
+
+    public override void ClearRoleGameData()
+    {
+        _currentPlayer = null;
     }
 
     [EventHandler(EventHandlerType.Postfix)]

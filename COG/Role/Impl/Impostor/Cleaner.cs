@@ -23,7 +23,8 @@ public class Cleaner : CustomRole, IListener
         CanKill = true;
 
         if (ShowInOptions)
-            CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown, new FloatOptionValueRule(10f, 5f, 60f, 30f));
+            CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f));
 
         CleanBodyButton = CustomButton.Create(
             () =>
@@ -36,7 +37,7 @@ public class Cleaner : CustomRole, IListener
             () => CleanBodyButton?.ResetCooldown(),
             () => PlayerUtils.GetClosestBody() != null,
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.CleanDeadBodyButton, 100f)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.CleanDeadBodyButton)!,
             2,
             KeyCode.C,
             LanguageConfig.Instance.CleanAction,
@@ -62,7 +63,7 @@ public class Cleaner : CustomRole, IListener
                 return GameUtils.GetGameOptions().KillDistance >= distance;
             },
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton, 100f)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
             1,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,

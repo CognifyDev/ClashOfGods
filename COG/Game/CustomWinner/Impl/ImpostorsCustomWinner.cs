@@ -23,7 +23,8 @@ public class ImpostorsCustomWinner : IWinnable
             && aliveNeutrals.Where
                 (p => p.GetMainRole().CanKill).ToList().Count <= 0)
         {
-            CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player), LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
+            CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player),
+                LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
             return true;
         }
 
@@ -36,7 +37,8 @@ public class ImpostorsCustomWinner : IWinnable
                 if ((o2Sabo = system.Cast<LifeSuppSystemType>()).Countdown <= 0)
                     if (o2Sabo.Countdown <= 0f)
                     {
-                        CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player), LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
+                        CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player),
+                            LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
                         return true;
                     }
             }
@@ -54,7 +56,8 @@ public class ImpostorsCustomWinner : IWinnable
                     if (sabotage is null) return false;
                     if (sabotage.Countdown <= 0)
                     {
-                        CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player), LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
+                        CustomWinnerManager.EndGame(PlayerUtils.AllImpostors.Select(pr => pr.Player),
+                            LanguageConfig.Instance.ImpostorsWinText, Palette.ImpostorRed);
                         sabotage.ClearSabotage();
                         return true;
                     }

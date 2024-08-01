@@ -28,11 +28,6 @@ public class RoleController
 
     private class CustomRoleImplement : CustomRole
     {
-        private new string Name { get; }
-        private new Color Color { get; }
-        private new CampType CampType { get; }
-        private new bool ShowInOptions { get; }
-        
         public CustomRoleImplement(string name, Color color, CampType campType, bool showInOptions = true) : base(name,
             color, campType, showInOptions)
         {
@@ -41,6 +36,11 @@ public class RoleController
             CampType = campType;
             ShowInOptions = showInOptions;
         }
+
+        private new string Name { get; }
+        private new Color Color { get; }
+        private new CampType CampType { get; }
+        private new bool ShowInOptions { get; }
 
         public override CustomRole NewInstance()
         {

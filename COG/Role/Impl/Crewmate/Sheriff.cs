@@ -20,7 +20,8 @@ public class Sheriff : CustomRole, IListener
         Description = LanguageConfig.Instance.SheriffDescription;
 
         if (ShowInOptions)
-            SheriffKillCd = CreateOption(() => LanguageConfig.Instance.SheriffKillCooldown, new FloatOptionValueRule(10f, 5f, 60f, 30f));
+            SheriffKillCd = CreateOption(() => LanguageConfig.Instance.SheriffKillCooldown,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f));
 
         SheriffKillButton = CustomButton.Create(
             () =>
@@ -41,7 +42,7 @@ public class Sheriff : CustomRole, IListener
                 return GameUtils.GetGameOptions().KillDistance >= distance;
             },
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton, 100f)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
             2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,

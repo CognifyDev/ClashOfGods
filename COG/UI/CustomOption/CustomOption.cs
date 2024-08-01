@@ -7,19 +7,15 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Role;
-using COG.Role.Impl.Crewmate;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using COG.Utils.WinAPI;
-using Innersloth.DebugTool;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using YamlDotNet.Core.Tokens;
-using static UnityEngine.RemoteConfigSettingsHelper;
+using UnityEngine.UI;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG.UI.CustomOption;
@@ -40,19 +36,7 @@ public sealed class CustomOption
         Addons = 4
     }
 
-    public static List<CustomOption?> Options { get; } = new();
-
     private static int _typeId;
-
-    public int DefaultSelection => ValueRule.DefaultSelection;
-    public int ID { get; }
-    public bool IsHeader { get; }
-    public Func<string> RealName { get; set; }
-    public TabType Page { get; }
-    public CustomOption? Parent { get; }
-    public object[] Selections => ValueRule.Selections;
-    public IValueRule ValueRule { get; }
-    public OptionBehaviour? OptionBehaviour { get; set; }
 
     public int Selection;
 
@@ -70,6 +54,18 @@ public sealed class CustomOption
         Selection = 0;
         Options.Add(this);
     }
+
+    public static List<CustomOption?> Options { get; } = new();
+
+    public int DefaultSelection => ValueRule.DefaultSelection;
+    public int ID { get; }
+    public bool IsHeader { get; }
+    public Func<string> RealName { get; set; }
+    public TabType Page { get; }
+    public CustomOption? Parent { get; }
+    public object[] Selections => ValueRule.Selections;
+    public IValueRule ValueRule { get; }
+    public OptionBehaviour? OptionBehaviour { get; set; }
 
     public static CustomOption Create(TabType type, Func<string> nameGetter, IValueRule rule,
         CustomOption? parent = null, bool isHeader = false)
@@ -93,9 +89,9 @@ public sealed class CustomOption
         var sb = new StringBuilder();
 
         foreach (var option in from option in Options
-                               where option != null
-                               where option.Selection != option.DefaultSelection
-                               select option)
+                 where option != null
+                 where option.Selection != option.DefaultSelection
+                 select option)
         {
             sb.Append(option.ID + "|" + option.Selection);
             sb.Append(',');
@@ -159,7 +155,10 @@ public sealed class CustomOption
         LoadOptionFromPreset(file.FilePath);
     }
 
-    public dynamic GetDynamicValue() => ValueRule.Selections[Selection];
+    public dynamic GetDynamicValue()
+    {
+        return ValueRule.Selections[Selection];
+    }
 
     public bool GetBool()
     {
@@ -234,8 +233,8 @@ public sealed class CustomOption
             };
             var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotificationRole,
                 $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{role.Name.Color(color)}</font>",
-                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount.ToString() + "</font>",
-                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance.ToString() + "%"
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount + "</font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance + "%"
             );
             HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue, item, true);
         }
@@ -256,9 +255,9 @@ public static class PresetsButtonsPatch
         DestroySelectableSprite(std.gameObject);
         DestroySelectableSprite(alter.gameObject);
 
-        std.transform.localPosition = new(-1.5f, 0.2f, 0);
-        alter.transform.localPosition = new(2.1f, 0.2f, 0);
-        std.transform.localScale = alter.transform.localScale = new(1.1f, 1.1f, 1);
+        std.transform.localPosition = new Vector3(-1.5f, 0.2f, 0);
+        alter.transform.localPosition = new Vector3(2.1f, 0.2f, 0);
+        std.transform.localScale = alter.transform.localScale = new Vector3(1.1f, 1.1f, 1);
 
         void DestroySelectableSprite(GameObject go)
         {
@@ -272,14 +271,14 @@ public static class PresetsButtonsPatch
         __instance.AlternateRulesText.text = LanguageConfig.Instance.SavePreset;
 
         // Set button OnClick action
-        std.OnClick = new();
+        std.OnClick = new Button.ButtonClickedEvent();
         std.OnClick.AddListener((UnityAction)new Action(() =>
         {
             ResetActiveState(std.transform);
             CustomOption.LoadPresetWithDialogue();
         }));
 
-        alter.OnClick = new();
+        alter.OnClick = new Button.ButtonClickedEvent();
         alter.OnClick.AddListener((UnityAction)new Action(() =>
         {
             ResetActiveState(alter.transform);
@@ -299,50 +298,59 @@ public static class PresetsButtonsPatch
 
     [HarmonyPatch(nameof(GamePresetsTab.ClickPresetButton))]
     [HarmonyPrefix]
-    public static void OnButtonClickAlwaysCustomPreset(ref RulesPresets preset) => preset = RulesPresets.Custom;
+    public static void OnButtonClickAlwaysCustomPreset(ref RulesPresets preset)
+    {
+        preset = RulesPresets.Custom;
+    }
 }
 
 [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Start))]
 public static class RoleOptionPatch
 {
-    public static void Postfix(RolesSettingsMenu __instance)
-    {
-        Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
-
-        // Fix button is unselected when open at the first time
-        Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")?.GetComponent<PassiveButton>()?.SelectButton(true);
-        __instance.AllButton.SelectButton(true);
-
-        var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
-        chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(t => t.gameObject.SetActive(false));
-
-        var headers = __instance.transform.FindChild("HeaderButtons");
-        headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.Destroy());
-        
-        (AllButton = headers.FindChild("AllButton").GetComponent<PassiveButton>()).OnClick.AddListener((UnityAction)(() =>
-        {
-            Tabs.Where(go => go).ForEach(go => go.SetActive(false));
-            if (AllButton) SetButtonActive(CurrentButton!, false, true);
-            if (CurrentTab) CurrentTab!.SetActive(false);
-        }));
-
-        Main.Logger.LogInfo("Creating tabs...");
-
-        int i = 0;
-        foreach (var team in Enum.GetValues<CampType>())
-            SetUpCustomRoleTab(__instance, chanceTab, team, i++);
-
-        chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.Destroy();
-    }
+    public static readonly List<RoleOptionSetting> _currentTabSettings = new();
+    private static readonly List<GameObject> _tabs = new();
 
     public static List<GameObject> Tabs => _tabs.Where(tab => tab).ToList();
 
     public static List<RoleOptionSetting> CurrentTabSettings => _currentTabSettings.Where(s => s).ToList();
 
-    public static readonly List<RoleOptionSetting> _currentTabSettings = new();
-    private static readonly List<GameObject> _tabs = new();
-
     public static PassiveButton? AllButton { get; set; }
+
+    public static GameObject? CurrentTab { get; set; }
+    public static PassiveButton? CurrentButton { get; set; }
+
+    public static void Postfix(RolesSettingsMenu __instance)
+    {
+        Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
+
+        // Fix button is unselected when open at the first time
+        Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")
+            ?.GetComponent<PassiveButton>()?.SelectButton(true);
+        __instance.AllButton.SelectButton(true);
+
+        var chanceTab = __instance.transform.Find("Scroller").Find("SliderInner").Find("ChancesTab");
+        chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked")
+            .ForEach(t => t.gameObject.SetActive(false));
+
+        var headers = __instance.transform.FindChild("HeaderButtons");
+        headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.Destroy());
+
+        (AllButton = headers.FindChild("AllButton").GetComponent<PassiveButton>()).OnClick.AddListener(
+            (UnityAction)(() =>
+            {
+                Tabs.Where(go => go).ForEach(go => go.SetActive(false));
+                if (AllButton) SetButtonActive(CurrentButton!, false, true);
+                if (CurrentTab) CurrentTab!.SetActive(false);
+            }));
+
+        Main.Logger.LogInfo("Creating tabs...");
+
+        var i = 0;
+        foreach (var team in Enum.GetValues<CampType>())
+            SetUpCustomRoleTab(__instance, chanceTab, team, i++);
+
+        chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.Destroy();
+    }
 
     public static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
     {
@@ -403,7 +411,7 @@ public static class RoleOptionPatch
             _ or CampType.Unknown => (RoleTeamTypes)100
         };
 
-        int i = 0;
+        var i = 0;
         foreach (var role in CustomRoleManager.GetManager().GetTypeCampRoles(camp).Where(r => !r.IsBaseRole))
         {
             if ((camp == CampType.Unknown && !role.IsSubRole) || !role.ShowInOptions) continue;
@@ -412,13 +420,13 @@ public static class RoleOptionPatch
             var chanceOption = role.RoleChanceOption!;
             numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
             roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
-                new()
+                new RoleBehaviour
                 {
                     StringName = StringNames.None,
                     TeamType = vanillaType,
                     Role = (RoleTypes)role.Id + 100
                 }, layer);
-            roleSetting.transform.localPosition = new(initialX, initialY + offsetY * i, -2f);
+            roleSetting.transform.localPosition = new Vector3(initialX, initialY + offsetY * i, -2f);
             roleSetting.titleText.text = role.Name;
             roleSetting.labelSprite.color = camp switch
             {
@@ -427,16 +435,13 @@ public static class RoleOptionPatch
                 _ => Color.grey
             };
             var passive = roleSetting.labelSprite.gameObject.AddComponent<PassiveButton>();
-            passive.OnMouseOver = new();
+            passive.OnMouseOver = new UnityEvent();
             passive.OnMouseOver.AddListener((UnityAction)new Action(() =>
             {
                 Main.Logger.LogInfo("Mouse Over");
                 roleSetting.labelSprite.color.SetAlpha(0.5f);
             }));
-            passive.AddOnClickListeners(new Action(() =>
-            {
-                menu.ChangeTab(role.VanillaCategory, button);
-            }));
+            passive.AddOnClickListeners(new Action(() => { menu.ChangeTab(role.VanillaCategory, button); }));
             roleSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
             {
                 var setting = ob.Cast<RoleOptionSetting>();
@@ -460,9 +465,6 @@ public static class RoleOptionPatch
         }
     }
 
-    public static GameObject? CurrentTab { get; set; }
-    public static PassiveButton? CurrentButton { get; set; }
-
     public static PassiveButton SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName)
     {
         Main.Logger.LogInfo($"Setting up tab button for {tab.name} ({index})");
@@ -472,37 +474,38 @@ public static class RoleOptionPatch
         var xStart = RolesSettingsMenu.X_START;
         var yStart = RolesSettingsMenu.TAB_Y_START;
         var button = Object.Instantiate(menu.roleSettingsTabButtonOrigin, headerParent).GetComponent<PassiveButton>();
-        
-        button.transform.localPosition = new(xStart + index * offset, yStart, -2);
+
+        button.transform.localPosition = new Vector3(xStart + index * offset, yStart, -2);
         button.DestroyComponent<RoleSettingsTabButton>();
-        button.OnClick = new();
+        button.OnClick = new Button.ButtonClickedEvent();
         button.OnClick.AddListener((UnityAction)new Action(() =>
         {
             var elements = tab.GetComponentsInChildren<UiElement>();
-            ControllerManager.Instance.OpenOverlayMenu(tab.name, menu.BackButton, elements.FirstOrDefault(), elements.ToList().ToIl2CppList());
+            ControllerManager.Instance.OpenOverlayMenu(tab.name, menu.BackButton, elements.FirstOrDefault(),
+                elements.ToList().ToIl2CppList());
             ChangeCustomTab(menu, tab, button);
             menu.ControllerSelectable.Clear();
             menu.ControllerSelectable = elements.ToList().ToIl2CppList();
             ControllerManager.Instance.CurrentUiState.SelectableUiElements = menu.ControllerSelectable;
-            ControllerManager.Instance.SetDefaultSelection(/*CurrentTabSettings[0]*/menu.ControllerSelectable[0], null);
+            ControllerManager.Instance.SetDefaultSelection(menu.ControllerSelectable.ToArray()[0]);
         }));
 
-        Main.Logger.LogInfo("Button action has registeristed. Start to set button icon...");
+        Main.Logger.LogInfo("Button action has registered. Start to set button icon...");
 
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
         const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
-        
+
         renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 35f);
         return button;
     }
 
-    static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
+    private static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
     {
         if (!obj) return;
         obj.SelectButton(active);
         if (!AllButton) return;
         AllButton!.SelectButton(clickedAllButton);
-        
+
         Main.Logger.LogInfo($"Is {obj.name} active: {active} ({clickedAllButton})");
     }
 
@@ -516,21 +519,23 @@ public static class RoleOptionPatch
         scroller.CalculateAndSetYBounds(CurrentTabSettings.Count + 3, 1f, 6f, 0.43f);
     }
 
-    static void CloseAllTab(RolesSettingsMenu menuInstance)
+    private static void CloseAllTab(RolesSettingsMenu menuInstance)
     {
         menuInstance.RoleChancesSettings.SetActive(false);
-        if (CurrentTab) CurrentTab!.SetActive(false); /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
+        if (CurrentTab)
+            CurrentTab!.SetActive(
+                false); /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
         if (CurrentButton) CurrentButton!.SelectButton(false);
     }
 
-    static void OpenTab(GameObject tabToOpen, PassiveButton button)
+    private static void OpenTab(GameObject tabToOpen, PassiveButton button)
     {
         CurrentButton = button;
         CurrentTab = tabToOpen;
         SetButtonActive(button, true);
         tabToOpen.SetActive(true);
     }
-    
+
     [HarmonyPatch(nameof(RolesSettingsMenu.CloseMenu))]
     [HarmonyPrefix]
     public static void OnMenuClose()
@@ -547,7 +552,8 @@ public static class RoleOptionSettingPatch
     [HarmonyPrefix]
     public static bool UpdateValuePatch(RoleOptionSetting __instance)
     {
-        var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.RoleOptions.Any(o => o.OptionBehaviour == __instance));
+        var role = CustomRoleManager.GetManager().GetRoles()
+            .FirstOrDefault(r => r.RoleOptions.Any(o => o.OptionBehaviour == __instance));
         if (role == null) return true;
 
         var playerCount = role.RoleNumberOption!;
@@ -573,6 +579,8 @@ public static class GameOptionsMenuPatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
 public static class SyncVanillaSettingsPatch
 {
-    public static void Postfix() => CustomOption.ShareConfigs();
+    public static void Postfix()
+    {
+        CustomOption.ShareConfigs();
+    }
 }
-

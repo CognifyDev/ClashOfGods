@@ -17,8 +17,8 @@ internal class LocalPlayerChatPatch
     {
         if (chatText is "" or null || !__instance.IsSamePlayer(PlayerControl.LocalPlayer)) return false;
         return ListenerManager.GetManager().ExecuteHandlers(
-                   new LocalPlayerChatEvent(__instance, chatText),
-                   EventHandlerType.Prefix);
+            new LocalPlayerChatEvent(__instance, chatText),
+            EventHandlerType.Prefix);
     }
 
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] string chatText)

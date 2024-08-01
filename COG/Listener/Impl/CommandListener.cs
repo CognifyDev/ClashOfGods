@@ -16,10 +16,11 @@ public class CommandListener : IListener
         var enteredName = text.Split(" ").FirstOrDefault();
         if (enteredName == null) return true;
 
-        var result = CommandManager.GetManager().GetCommands().FirstOrDefault(c => "/" + c.Name.ToLower() == enteredName || ContainAliases(text, c));
+        var result = CommandManager.GetManager().GetCommands()
+            .FirstOrDefault(c => "/" + c.Name.ToLower() == enteredName || ContainAliases(text, c));
         if (result == null) return true;
-        if (result.HostOnly && !AmongUsClient.Instance.AmHost) 
-                return false;
+        if (result.HostOnly && !AmongUsClient.Instance.AmHost)
+            return false;
 
         return !result.OnExecute(PlayerControl.LocalPlayer, AsCommandStringArray(text));
     }
