@@ -347,6 +347,7 @@ public static class RoleOptionPatch
         }
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
         __instance.roleDescriptionText.text = CurrentAdvancedTabFor.Description;
+        __instance.roleScreenshot.sprite = ResourceUtils.LoadSprite("COG.Resources.InDll.Images.Settings.General.png");
 
         var options = __instance.advancedSettingChildren;
         foreach (var option in options)
@@ -362,9 +363,7 @@ public static class RoleOptionPatch
     public static List<GameObject> Tabs => _tabs.Where(tab => tab).ToList();
 
     public static CustomRole? CurrentAdvancedTabFor { get; set; }
-    public static List<RoleOptionSetting> CurrentTabSettings => _currentTabSettings.Where(s => s).ToList();
 
-    public static readonly List<RoleOptionSetting> _currentTabSettings = new();
     private static readonly List<GameObject> _tabs = new();
 
     public static PassiveButton? AllButton { get; set; }
@@ -383,7 +382,7 @@ public static class RoleOptionPatch
         tab.localPosition = chanceTabTemplate.localPosition;
         var trueName = camp != CampType.Unknown ? camp.ToString() : "Addon";
         tab.name = trueName + "Tab";
-        var button = SetUpTabButton(menu, tab.gameObject, index, trueName);
+        var button = SetUpTabButton(menu, tab.gameObject, index, trueName, camp);
 
         var header = Object.Instantiate(menu.categoryHeaderEditRoleOrigin, tab);
         var layer = RolesSettingsMenu.MASK_LAYER;
@@ -455,11 +454,13 @@ public static class RoleOptionPatch
             var collider = label.gameObject.AddComponent<BoxCollider2D>();
             collider.offset = Vector2.zero;
             collider.size = label.size;
+
             var passive = label.gameObject.AddComponent<PassiveButton>();
             passive.Colliders = new(new[] { collider });
             passive.OnMouseOut = new();
             passive.OnMouseOver = new();
             passive.OnClick = new();
+
             if (role.RoleOptions.Count != 0)
             {
                 passive.OnMouseOut.AddListener((UnityAction)new Action(() => label.color = color));
@@ -469,6 +470,7 @@ public static class RoleOptionPatch
                     label.color = Color.HSVToRGB(h, s, v / 2);
                 }));
             }
+
             passive.AddOnClickListeners(new Action(() =>
             {
                 CloseAllTab(menu);
@@ -497,7 +499,6 @@ public static class RoleOptionPatch
                 setting.UpdateValuesAndText(null);
             });
             roleSetting.ControllerSelectable.Add(passive);
-            _currentTabSettings.Add(roleSetting);
 
             Main.Logger.LogInfo($"Role option has set up for {role.GetType().Name}.");
 
@@ -508,7 +509,7 @@ public static class RoleOptionPatch
     public static GameObject? CurrentTab { get; set; }
     public static PassiveButton? CurrentButton { get; set; }
 
-    public static PassiveButton SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName)
+    public static PassiveButton SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName, CampType camp)
     {
         Main.Logger.LogInfo($"Setting up tab button for {tab.name} ({index})");
 
@@ -525,7 +526,7 @@ public static class RoleOptionPatch
         {
             var elements = tab.GetComponentsInChildren<UiElement>();
             ControllerManager.Instance.OpenOverlayMenu(tab.name, menu.BackButton, elements.FirstOrDefault(), elements.ToList().ToIl2CppList());
-            ChangeCustomTab(menu, tab, button);
+            ChangeCustomTab(menu, tab, button, camp);
             menu.ControllerSelectable.Clear();
             menu.ControllerSelectable = elements.ToList().ToIl2CppList();
             ControllerManager.Instance.CurrentUiState.SelectableUiElements = menu.ControllerSelectable;
@@ -553,7 +554,7 @@ public static class RoleOptionPatch
 
     static float ScrollerLocationPercent { get; set; } = 0f;
 
-    public static void ChangeCustomTab(RolesSettingsMenu menu, GameObject newTab, PassiveButton toSelect)
+    public static void ChangeCustomTab(RolesSettingsMenu menu, GameObject newTab, PassiveButton toSelect, CampType camp)
     {
         menu.AdvancedRolesSettings.SetActive(false);
         CurrentAdvancedTabFor = null;
@@ -562,7 +563,7 @@ public static class RoleOptionPatch
         CloseAllTab(menu);
         OpenTab(newTab, toSelect);
         var scroller = menu.scrollBar;
-        scroller.CalculateAndSetYBounds(CurrentTabSettings.Count + 3, 1f, 6f, 0.43f);
+        scroller.CalculateAndSetYBounds(CustomRoleManager.GetManager().GetTypeCampRoles(camp).Length + 3, 1f, 6f, 0.43f);
         if (menu.currentTabButton != toSelect)
         {
             menu.currentTabButton = toSelect;
@@ -670,7 +671,10 @@ public static class OptionBehaviourPatch
         if (__instance is ToggleOption toggle)
             toggle.CheckMark.enabled = customOption.GetBool();
         else if (__instance is NumberOption number)
-            number.Value = number.oldValue = (float)customOption.GetDynamicValue();
+        {
+            number.oldValue = float.MinValue;
+            number.Value = (float)customOption.GetDynamicValue();
+        }
         else if (__instance is StringOption option)
             option.Value = customOption.Selection;
     }
@@ -687,6 +691,12 @@ public static class OptionBehaviourPatch
         }
         return false;
     }
+}
+
+[HarmonyPatch(typeof(GameSettingMenu), nameof(GameSettingMenu.Close))]
+public static class SettingMenuClosePatch
+{
+    public static void Postfix() => ControllerManager.Instance.CurrentUiState.MenuName = "";
 }
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
