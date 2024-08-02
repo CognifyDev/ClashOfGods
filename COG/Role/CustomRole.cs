@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
@@ -12,6 +7,11 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace COG.Role;
@@ -180,13 +180,14 @@ public abstract class CustomRole
                 var rule = option.ValueRule;
                 if (rule is BoolOptionValueRule)
                 {
-                    settings.Add(option.VanillaData = new CheckboxGameSetting()
+                    settings.Add(option.VanillaData = new CheckboxGameSetting
                     {
                         Type = OptionTypes.Checkbox
                     });
+                }
                 else if (rule is IntOptionValueRule iovr)
                 {
-                    settings.Add(option.VanillaData = new IntGameSetting()
+                    settings.Add(option.VanillaData = new IntGameSetting
                     {
                         Type = OptionTypes.Int,
                         Value = option.GetInt(),
@@ -196,9 +197,10 @@ public abstract class CustomRole
                         SuffixType = iovr.SuffixType,
                         FormatString = ""
                     });
+                }
                 else if (rule is FloatOptionValueRule fovr)
                 {
-                    settings.Add(option.VanillaData = new FloatGameSetting()
+                    settings.Add(option.VanillaData = new FloatGameSetting
                     {
                         Type = OptionTypes.Float,
                         Value = option.GetFloat(),
@@ -208,9 +210,10 @@ public abstract class CustomRole
                         SuffixType = fovr.SuffixType,
                         FormatString = ""
                     });
+                }
                 else if (rule is StringOptionValueRule sovr)
                 {
-                    settings.Add(option.VanillaData = new StringGameSetting()
+                    settings.Add(option.VanillaData = new StringGameSetting
                     {
                         Type = OptionTypes.String,
                         Index = option.Selection,

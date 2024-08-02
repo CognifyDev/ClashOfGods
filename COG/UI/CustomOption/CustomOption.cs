@@ -37,7 +37,22 @@ public sealed class CustomOption
         Addons = 4
     }
 
-    private static int _typeId;
+    // Option creation
+    private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
+    {
+        Id = _typeId;
+        _typeId++;
+        Name = nameGetter;
+        ValueRule = rule;
+        _selection = rule.DefaultSelection;
+        Parent = parent;
+        IsHeader = isHeader;
+        Page = type;
+        Selection = 0;
+        Options.Add(this);
+    }
+
+    public static List<CustomOption?> Options { get; } = new();
 
     public int DefaultSelection => ValueRule.DefaultSelection;
     public int Id { get; }
@@ -60,33 +75,7 @@ public sealed class CustomOption
     }
 
     private int _selection;
-
-    // Option creation
-    private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
-    {
-        Id = _typeId;
-        _typeId++;
-        Name = nameGetter;
-        ValueRule = rule;
-        _selection = rule.DefaultSelection;
-        Parent = parent;
-        IsHeader = isHeader;
-        Page = type;
-        Selection = 0;
-        Options.Add(this);
-    }
-
-    public static List<CustomOption?> Options { get; } = new();
-
-    public int DefaultSelection => ValueRule.DefaultSelection;
-    public int ID { get; }
-    public bool IsHeader { get; }
-    public Func<string> RealName { get; set; }
-    public TabType Page { get; }
-    public CustomOption? Parent { get; }
-    public object[] Selections => ValueRule.Selections;
-    public IValueRule ValueRule { get; }
-    public OptionBehaviour? OptionBehaviour { get; set; }
+    private static int _typeId;
 
     public static CustomOption Create(TabType type, Func<string> nameGetter, IValueRule rule,
         CustomOption? parent = null, bool isHeader = false)
