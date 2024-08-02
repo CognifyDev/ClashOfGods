@@ -41,7 +41,7 @@ public sealed class CustomOption
     private static int _typeId;
 
     public int DefaultSelection => ValueRule.DefaultSelection;
-    public int ID { get; }
+    public int Id { get; }
     public bool IsHeader { get; }
     public Func<string> Name { get; set; }
     public TabType Page { get; }
@@ -65,7 +65,7 @@ public sealed class CustomOption
     // Option creation
     private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
     {
-        ID = _typeId;
+        Id = _typeId;
         _typeId++;
         Name = nameGetter;
         ValueRule = rule;
@@ -103,7 +103,7 @@ public sealed class CustomOption
                                where option.Selection != option.DefaultSelection
                                select option)
         {
-            sb.Append(option.ID + "|" + option.Selection);
+            sb.Append(option.Id + "|" + option.Selection);
             sb.Append(',');
         }
 
@@ -124,7 +124,7 @@ public sealed class CustomOption
                 var optionID = optionInfo[0];
                 var optionSelection = optionInfo[1];
 
-                var option = Options.FirstOrDefault(o => o?.ID.ToString() == optionID);
+                var option = Options.FirstOrDefault(o => o?.Id.ToString() == optionID);
                 if (option == null) continue;
                 option.UpdateSelection(int.Parse(optionSelection));
             }
@@ -142,8 +142,8 @@ public sealed class CustomOption
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
             foreach (var option in Options.Where(o => o is not null)
-                         .OrderBy(o => o!.ID))
-                writer.WriteLine(option!.ID + " " + option.Selection);
+                         .OrderBy(o => o!.Id))
+                writer.WriteLine(option!.Id + " " + option.Selection);
         }
         catch (System.Exception e)
         {
@@ -217,7 +217,7 @@ public sealed class CustomOption
     public void ShareOptionChange(int newSelection)
     {
         RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.UpdateOption)
-            .WritePacked(ID)
+            .WritePacked(Id)
             .WritePacked(newSelection)
             .Finish();
     }
@@ -227,12 +227,13 @@ public sealed class CustomOption
         var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.AllOptions.Contains(this));
         if (role == null) return;
 
+        //RoleOptionSetting? setting;
         if (OptionBehaviour is RoleOptionSetting setting)
         {
-            var roleName = (int)setting.Role.TeamType switch
+            var roleName = setting.Role.TeamType switch
             {
-                (int)CampType.Crewmate => role.GetColorName(),
-                (int)CampType.Impostor => role.Name.Color(Palette.ImpostorRed),
+                RoleTeamTypes.Crewmate => role.GetColorName(),
+                RoleTeamTypes.Impostor => role.Name.Color(Palette.ImpostorRed),
                 _ => role.Name.Color(Color.grey)
             };
             var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotificationRole,
@@ -240,7 +241,7 @@ public sealed class CustomOption
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount.ToString() + "</font>",
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance.ToString() + "%"
             );
-            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue, item, true);
+            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue - role.Id, item, true);
         }
         else
         {
@@ -250,19 +251,22 @@ public sealed class CustomOption
                 CampType.Impostor => role.Name.Color(Palette.ImpostorRed),
                 _ => role.Name.Color(Color.grey)
             };
+
             string valueText = "";
-            if (OptionBehaviour is StringOption)
+            dynamic option;
+
+            if ((option = OptionBehaviour!.GetComponent<StringOption>()) == true) // It's strange that using (OptionBehaviour is TargetType) expression is useless
                 valueText = GetString();
-            else if (OptionBehaviour is ToggleOption)
+            else if ((option = OptionBehaviour!.GetComponent<ToggleOption>()) == true) // It's also strange that it will throw exception without (== true) expression 
                 valueText = TranslationController.Instance.GetString(GetBool() ? StringNames.SettingsOn : StringNames.SettingsOff);
             else
                 valueText = OptionBehaviour!.Data.GetValueString(OptionBehaviour.GetInt());
                 
             var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotification,
-                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}: {Name()}</font>",
+                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}: {Name()} </font>",
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + valueText + "</font>"
             );
-            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue - 1, item, true);
+            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue - Id, item, true);
         }
     }
 }

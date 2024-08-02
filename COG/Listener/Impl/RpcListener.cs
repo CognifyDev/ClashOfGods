@@ -24,7 +24,7 @@ public class RpcListener : IListener
                     var id = reader.ReadPackedInt32();
                     var selection = reader.ReadPackedInt32();
 
-                    var option = CustomOption.Options.FirstOrDefault(o => o != null && o.ID == id);
+                    var option = CustomOption.Options.FirstOrDefault(o => o != null && o.Id == id);
                     if (option == null) return;
 
                     option.Selection = selection;
@@ -44,9 +44,9 @@ public class RpcListener : IListener
                         {
                             var option = CustomOption.Options[i];
                             if (option == null) continue;
-                            if (option.ID != id) continue;
+                            if (option.Id != id) continue;
                             Main.Logger.LogInfo(
-                                $"Changed {option.Name()}({option.ID})'s selection to {selection}(before: {option.Selection})");
+                                $"Changed {option.Name()}({option.Id})'s selection to {selection}(before: {option.Selection})");
                             option.Selection = selection;
                             CustomOption.Options[i] = option;
                         }
