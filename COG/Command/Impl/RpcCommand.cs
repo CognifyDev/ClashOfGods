@@ -82,6 +82,7 @@ public class RpcCommand : Command
                     if (typeName is not ("player" or "string" or "vector"))
                     {
                         typeName = typeName[0].ToString().ToUpper() + typeName[1..];
+                        if (nameToClass.Any(tuple => tuple.Item1 == typeName)) typeName = nameToClass.First(tuple => tuple.Item1 == typeName).Item2;
                         var assembly = typeof(int).Assembly;
                         var typeLocation = "System." + typeName;
                         var type = assembly.GetType(typeLocation);
