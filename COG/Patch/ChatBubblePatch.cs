@@ -2,8 +2,8 @@ using COG.Config.Impl;
 
 namespace COG.Patch;
 
-[HarmonyPatch(typeof(ChatBubble), nameof(ChatBubble.SetRight))]
-internal static class ChatBubbleSetRightPatch
+[HarmonyPatch(typeof(ChatBubble), nameof(ChatBubble.SetText))]
+internal static class ChatBubblePatch
 {
     private static bool Prefix(ChatBubble __instance)
     {
