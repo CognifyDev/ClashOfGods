@@ -29,14 +29,14 @@ public static class PlayerUtils
     public static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
     public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
 
-    public static IEnumerable<PlayerRole> AllImpostors =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Impostor);
+    public static IEnumerable<PlayerData> AllImpostors =>
+        GameUtils.PlayerData.Where(pair => pair.Role.CampType == CampType.Impostor);
 
-    public static IEnumerable<PlayerRole> AllCrewmates =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Crewmate);
+    public static IEnumerable<PlayerData> AllCrewmates =>
+        GameUtils.PlayerData.Where(pair => pair.Role.CampType == CampType.Crewmate);
 
-    public static IEnumerable<PlayerRole> AllNeutrals =>
-        GameUtils.PlayerRoleData.Where(pair => pair.Role.CampType == CampType.Neutral);
+    public static IEnumerable<PlayerData> AllNeutrals =>
+        GameUtils.PlayerData.Where(pair => pair.Role.CampType == CampType.Neutral);
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家
@@ -87,14 +87,14 @@ public static class PlayerUtils
         return player.PlayerId == target.PlayerId;
     }
 
-    public static PlayerRole? GetPlayerRole(this PlayerControl player)
+    public static PlayerData? GetPlayerRole(this PlayerControl player)
     {
-        return GameUtils.PlayerRoleData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
+        return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
     }
 
     public static CustomRole GetMainRole(this PlayerControl player)
     {
-        return (from keyValuePair in GameUtils.PlayerRoleData
+        return (from keyValuePair in GameUtils.PlayerData
                 where keyValuePair.Player.IsSamePlayer(player)
                 where !keyValuePair.Role.IsSubRole
                 select keyValuePair.Role)
@@ -274,10 +274,10 @@ public static class PlayerUtils
     {
         if (!pc) return;
 
-        var playerRole = GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
-        if (playerRole is not null) GameUtils.PlayerRoleData.Remove(playerRole);
+        var playerRole = GameUtils.PlayerData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
+        if (playerRole is not null) GameUtils.PlayerData.Remove(playerRole);
 
-        GameUtils.PlayerRoleData.Add(new PlayerRole(pc, role, subRoles));
+        GameUtils.PlayerData.Add(new PlayerData(pc, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has set to {role.GetType().Name}");
@@ -431,9 +431,9 @@ public class DeadPlayer
     }
 }
 
-public class PlayerRole
+public class PlayerData
 {
-    public PlayerRole(PlayerControl player, CustomRole role, CustomRole[]? subRoles = null)
+    public PlayerData(PlayerControl player, CustomRole role, CustomRole[]? subRoles = null)
     {
         Player = player;
         Role = role;
@@ -452,94 +452,10 @@ public class PlayerRole
 
     public static CustomRole GetRole(string? playerName = null, byte? playerId = null)
     {
-        return GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) !=
+        return GameUtils.PlayerData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) !=
                null
-            ? GameUtils.PlayerRoleData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!
+            ? GameUtils.PlayerData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!
                 .Role
             : CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 }
-/*
-public class CachedPlayer : IListener
-{
-    public CachedPlayer(PlayerControl player)
-    {
-        if (!player) return;
-
-        Player = player;
-        PlayerName = player.Data.PlayerName;
-        PlayerId = player.PlayerId;
-        ColorId = player.cosmetics.ColorId;
-        FriendCode = player.FriendCode;
-
-        AllPlayers.Add(this);
-    }
-
-    private CachedPlayer()
-    {
-    } // For registering listener
-
-    internal static IListener GetCachedPlayerListener()
-    {
-        return new CachedPlayer();
-    }
-
-    public static List<CachedPlayer> AllPlayers { get; } = new();
-
-    public PlayerControl? Player { get; }
-
-    public Role.Role MyRole => GameUtils.PlayerRoleData.FirstOrDefault(dp => dp.PlayerId == PlayerId)?.Role ??
-                               Role.RoleManager.GetManager().GetTypeRoleInstance<Unknown>();
-
-    public string? PlayerName { get; }
-    public byte PlayerId { get; }
-    public int ColorId { get; }
-    public string? FriendCode { get; private set; }
-
-    public DeadPlayerManager.DeadPlayer? DeadStatus =>
-        DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == PlayerId);
-
-    public bool IsDead => DeadStatus == null;
-    public bool PlayerIsNull => Player == null;
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerJoin(AmongUsClientJoinEvent @event)
-    {
-        _ = new CachedPlayer(@event.ClientData.Character);
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnCoBegin(IntroCutsceneCoBeginEvent @event)
-    {
-        AllPlayers.RemoveAll(cp =>
-            cp.IsDead && // Will not continue if cp.IsDead is true
-            cp.DeadStatus!.DeathReason == DeathReason.Disconnected);
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameJoined(LocalAmongUsClientJoinEvent @event)
-    {
-        AllPlayers.Clear();
-        // Reset
-    }
-
-    public static CachedPlayer? FindPlayer(PlayerControl? player = null, string? name = null, byte? playerId = null,
-        int colorId = -1)
-    {
-        foreach (var cp in AllPlayers)
-            if (
-                (player && cp.Player == player)
-                || cp.PlayerName == name
-                || cp.PlayerId == playerId
-                || colorId == cp.ColorId
-            )
-                return cp;
-        return null;
-    }
-
-    public static implicit operator bool(CachedPlayer? player)
-    {
-        return player != null;
-    }
-}
-*/

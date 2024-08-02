@@ -13,7 +13,7 @@ namespace COG.Utils;
 public static class GameUtils
 {
     public const MurderResultFlags DefaultFlag = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
-    public static List<PlayerRole> PlayerRoleData { get; } = new();
+    public static List<PlayerData> PlayerData { get; } = new();
 
     public static GenericPopup? Popup { get; set; }
 
@@ -62,7 +62,7 @@ public static class GameUtils
     public static void ForceClearGameData()
     {
         GameStates.InGame = false;
-        PlayerRoleData.Clear();
+        PlayerData.Clear();
         var gameManager = GameManager.Instance;
         if (gameManager != null) gameManager.EndGame();
     }

@@ -44,7 +44,7 @@ public class CustomWinnerListener : IListener
             var winnerPoolable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
             if (winner == null) continue;
 
-            var winnerRole = PlayerRole.GetRole(winner.PlayerName);
+            var winnerRole = PlayerData.GetRole(winner.PlayerName);
             if (winnerRole == null!) continue;
 
             // ↓↓↓ These variables are from The Other Roles
@@ -122,7 +122,7 @@ public class CustomWinnerListener : IListener
 
         StringBuilder summary = new($"{LanguageConfig.Instance.ShowPlayersRolesMessage}");
         summary.Append(Environment.NewLine);
-        foreach (var role in GameUtils.PlayerRoleData)
+        foreach (var role in GameUtils.PlayerData)
         {
             var deadPlayer = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
             summary.Append(role.PlayerName).Append(' ')

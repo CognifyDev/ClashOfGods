@@ -45,7 +45,7 @@ public class GameListener : IListener
         {
             case KnownRpc.ShareRoles:
                 // 清除原列表，防止干扰
-                GameUtils.PlayerRoleData.Clear();
+                GameUtils.PlayerData.Clear();
                 // 开始读入数据
                 Main.Logger.LogInfo("The role data from the host was received by us.");
 
@@ -58,7 +58,7 @@ public class GameListener : IListener
                     player!.SetCustomRole(role!);
                 }
 
-                foreach (var playerRole in GameUtils.PlayerRoleData)
+                foreach (var playerRole in GameUtils.PlayerData)
                     Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                         $" => {playerRole.Role.Name}");
 
@@ -132,7 +132,7 @@ public class GameListener : IListener
 
     public static void SelectRoles()
     {
-        GameUtils.PlayerRoleData.Clear(); // 首先清除 防止干扰
+        GameUtils.PlayerData.Clear(); // 首先清除 防止干扰
 
         if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
 
@@ -198,7 +198,7 @@ public class GameListener : IListener
         }
 
         // 打印职业分配信息
-        foreach (var playerRole in GameUtils.PlayerRoleData)
+        foreach (var playerRole in GameUtils.PlayerData)
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                 $" => {playerRole.Role.Name}");
     }
@@ -218,8 +218,8 @@ public class GameListener : IListener
         Main.Logger.LogInfo("Share roles for players...");
         ShareRoles();
 
-        var roleList = GameUtils.PlayerRoleData.Select(pr => pr.Role).ToList();
-        roleList.AddRange(GameUtils.PlayerRoleData.SelectMany(pr => pr.SubRoles));
+        var roleList = GameUtils.PlayerData.Select(pr => pr.Role).ToList();
+        roleList.AddRange(GameUtils.PlayerData.SelectMany(pr => pr.SubRoles));
 
         foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
     }
@@ -353,7 +353,7 @@ public class GameListener : IListener
     public bool OnPlayerVent(VentCheckEvent @event)
     {
         var playerInfo = @event.PlayerInfo;
-        foreach (var ventAble in from playerRole in GameUtils.PlayerRoleData
+        foreach (var ventAble in from playerRole in GameUtils.PlayerData
                  where playerRole.Player.Data.IsSamePlayer(playerInfo)
                  select playerRole.Role.CanVent)
         {
@@ -400,12 +400,12 @@ public class GameListener : IListener
 
         var sb = new StringBuilder();
 
-        for (var i = 0; i < GameUtils.PlayerRoleData.Count; i++)
+        for (var i = 0; i < GameUtils.PlayerData.Count; i++)
         {
-            var playerRole = GameUtils.PlayerRoleData[i];
+            var playerRole = GameUtils.PlayerData[i];
             sb.Append(playerRole.Player.PlayerId + "|" + playerRole.Role.Id);
 
-            if (i + 1 < GameUtils.PlayerRoleData.Count) sb.Append(',');
+            if (i + 1 < GameUtils.PlayerData.Count) sb.Append(',');
         }
 
         writer.Write(sb.ToString());
@@ -427,7 +427,7 @@ public class GameListener : IListener
 
         var role = player.GetMainRole();
 
-        int GetCount(IEnumerable<PlayerRole> list)
+        int GetCount(IEnumerable<PlayerData> list)
         {
             return list.Select(p => p.Player)
                 .Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;

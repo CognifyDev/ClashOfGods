@@ -158,7 +158,7 @@ public abstract class CustomRole
     }
 
     public ReadOnlyCollection<PlayerControl> Players =>
-        new(GameUtils.PlayerRoleData.Where(pr => pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
+        new(GameUtils.PlayerData.Where(pr => pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
 
     public List<CustomOption> AllOptions { get; }
 

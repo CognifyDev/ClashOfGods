@@ -571,7 +571,7 @@ public static class RoleOptionPatch
             menu.ControllerSelectable.Clear();
             menu.ControllerSelectable = elements.ToList().ToIl2CppList();
             ControllerManager.Instance.CurrentUiState.SelectableUiElements = menu.ControllerSelectable;
-            ControllerManager.Instance.SetDefaultSelection(menu.ControllerSelectable[0], null);
+            ControllerManager.Instance.SetDefaultSelection(menu.ControllerSelectable.ToArray()[0], null);
         }));
 
         Main.Logger.LogInfo("Button action has registered. Start to set button icon...");

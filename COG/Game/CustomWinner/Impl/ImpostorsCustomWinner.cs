@@ -13,7 +13,7 @@ public class ImpostorsCustomWinner : IWinnable
             (p => p && p.IsAlive()).ToList();
         var aliveNeutrals = PlayerUtils.AllNeutrals.Select(pair => pair.Player).Where
             (p => p && p.IsAlive()).ToList();
-        GameUtils.PlayerRoleData.Where
+        GameUtils.PlayerData.Where
                 (pair => pair.Role.CampType == CampType.Impostor).ToList()
             .ForEach(pair => aliveImpostors.Add(pair.Player));
         if (aliveImpostors.Count >= PlayerUtils.AllCrewmates
