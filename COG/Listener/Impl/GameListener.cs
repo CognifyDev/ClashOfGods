@@ -76,7 +76,7 @@ public class GameListener : IListener
             var mainOption = GameUtils.GetGameOptions();
             var roleOption = mainOption.RoleOptions;
 
-            bool changed = false;
+            var changed = false;
 
             foreach (var role in Enum.GetValues<RoleTypes>())
             {
@@ -84,7 +84,7 @@ public class GameListener : IListener
                     roleOption.SetRoleRate(role, 0, 0);
                 changed = true;
             }
-                
+
             if (mainOption.RulesPreset != RulesPresets.Custom)
             {
                 mainOption.RulesPreset = RulesPresets.Custom;
@@ -232,7 +232,7 @@ public class GameListener : IListener
             GameUtils.ForceClearGameData();
         else
             HasStartedRoom = true;
-        
+
         //manager.HostPrivacyButtons.
     }
 
@@ -353,7 +353,9 @@ public class GameListener : IListener
     public bool OnPlayerVent(VentCheckEvent @event)
     {
         var playerInfo = @event.PlayerInfo;
-        foreach (var ventAble in from playerRole in GameUtils.PlayerRoleData where playerRole.Player.Data.IsSamePlayer(playerInfo) select playerRole.Role.CanVent)
+        foreach (var ventAble in from playerRole in GameUtils.PlayerRoleData
+                 where playerRole.Player.Data.IsSamePlayer(playerInfo)
+                 select playerRole.Role.CanVent)
         {
             @event.SetCanUse(ventAble);
             @event.SetCouldUse(ventAble);
@@ -493,6 +495,7 @@ public class GameListener : IListener
     public void OnGameEnd(AmongUsClientGameEndEvent @event)
     {
         EndGameResult.CachedWinners.Clear();
-        CustomWinnerManager.AllWinners.ToArray().ForEach(p => EndGameResult.CachedWinners.Add(new(p.Data)));
+        CustomWinnerManager.AllWinners.ToArray()
+            .ForEach(p => EndGameResult.CachedWinners.Add(new CachedPlayerData(p.Data)));
     }
 }

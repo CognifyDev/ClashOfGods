@@ -20,9 +20,9 @@ public class RpcListener : IListener
         switch (knownRpc)
         {
             case KnownRpc.UpdateOption:
-                {
-                    var id = reader.ReadPackedInt32();
-                    var selection = reader.ReadPackedInt32();
+            {
+                var id = reader.ReadPackedInt32();
+                var selection = reader.ReadPackedInt32();
 
                     var option = CustomOption.Options.FirstOrDefault(o => o != null && o.Id == id);
                     if (option == null) return;
@@ -31,14 +31,14 @@ public class RpcListener : IListener
                     break;
                 }
             case KnownRpc.ShareOptions:
+            {
+                var originalString = reader.ReadString();
+                Main.Logger.LogInfo("Received options string => " + originalString);
+                foreach (var s in originalString.Split(","))
                 {
-                    var originalString = reader.ReadString();
-                    Main.Logger.LogInfo("Received options string => " + originalString);
-                    foreach (var s in originalString.Split(","))
-                    {
-                        var contexts = s.Split("|");
-                        var id = int.Parse(contexts[0]);
-                        var selection = int.Parse(contexts[1]);
+                    var contexts = s.Split("|");
+                    var id = int.Parse(contexts[0]);
+                    var selection = int.Parse(contexts[1]);
 
                         for (var i = 0; i < CustomOption.Options.Count; i++)
                         {
@@ -54,20 +54,20 @@ public class RpcListener : IListener
                     break;
                 }
             case KnownRpc.SetRole:
-                {
-                    var playerId = reader.ReadByte();
-                    var roleId = reader.ReadPackedInt32();
-                    PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
-                    break;
-                }
+            {
+                var playerId = reader.ReadByte();
+                var roleId = reader.ReadPackedInt32();
+                PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
+                break;
+            }
             case KnownRpc.Handshake:
-                {
-                    var versionStr = reader.ReadString();
-                    var commitTime = reader.ReadString();
-                    HandshakeManager.Instance.AddInfo(@event.Player, versionStr, commitTime);
-                    HandshakeManager.Instance.CheckPlayersAndDisplay();
-                    break;
-                }
+            {
+                var versionStr = reader.ReadString();
+                var commitTime = reader.ReadString();
+                HandshakeManager.Instance.AddInfo(@event.Player, versionStr, commitTime);
+                HandshakeManager.Instance.CheckPlayersAndDisplay();
+                break;
+            }
         }
     }
 }

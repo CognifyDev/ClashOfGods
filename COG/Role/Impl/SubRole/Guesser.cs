@@ -9,11 +9,12 @@ using UnityEngine;
 namespace COG.Role.Impl.SubRole;
 
 [NotUsed]
+[WorkInProgress]
 [NotTested]
 public class Guesser : CustomRole, IListener
 {
-    public readonly CustomOption? MaxGuessTimeOption;
     public readonly CustomOption? GuesserGuessContinuously;
+    public readonly CustomOption? MaxGuessTimeOption;
 
     public Guesser() : base(LanguageConfig.Instance.GuesserName, Color.yellow, CampType.Unknown)
     {

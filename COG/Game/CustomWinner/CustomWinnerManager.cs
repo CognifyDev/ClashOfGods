@@ -58,20 +58,22 @@ public static class CustomWinnerManager
 
     internal static bool CheckEndForCustomWinners()
     {
-        if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay || GlobalCustomOptionConstant.DebugMode.GetBool()) return false;
+        if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay ||
+            GlobalCustomOptionConstant.DebugMode.GetBool()) return false;
         // 按照权重从大到小排序
         CustomWinners.Sort((first, second) => second.GetWeight().CompareTo(first.GetWeight()));
         return CustomWinners.All(customWinner => !customWinner.CanWin());
     }
 
-    public static void EndGame(IEnumerable<PlayerControl> winners, string? text = null, Color? color = null, bool ignoreDebugMode = false)
+    public static void EndGame(IEnumerable<PlayerControl> winners, string? text = null, Color? color = null,
+        bool ignoreDebugMode = false)
     {
         if (!ignoreDebugMode && GlobalCustomOptionConstant.DebugMode!.GetBool()) return;
         if (text != null) SetWinText(text);
         if (color != null) SetWinColor(WinColor);
         RegisterWinningPlayers(winners);
         var num = (GameOverReason)winners.Where(p => p).Select(p => (int)p.PlayerId).Sum();
-        GameOverReason modCustom = (GameOverReason)4673347; // String "COG " (4 characters) to byte array to integer
+        var modCustom = (GameOverReason)4673347; // String "COG " (4 characters) to byte array to integer
         GameManager.Instance.RpcEndGame(modCustom | num, false);
     }
 }

@@ -158,17 +158,12 @@ public partial class Main : BasePlugin
 
             // Neutral
             new Jester(),
-            new Opportunist(),
             new Vulture(),
-            
-            /* 下方职业未完成
-            new Troublemaker(),
-             */
 
             // Sub-roles
             new Lighter()
         });
-        
+
         // Register custom buttons
         CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
 

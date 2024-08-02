@@ -76,7 +76,7 @@ public class CustomRoleManager
         {
             foreach (var role in GetManager().GetRoles()
                          .Where(role =>
-                             role is { Enabled: true, ShowInOptions: true, IsBaseRole: false } 
+                             role is { Enabled: true, ShowInOptions: true, IsBaseRole: false }
                              && role.IsSubRole == subRolesOnly))
                 if (!role.OnRoleSelection(_roles) && role.RoleNumberOption != null && role.RoleChanceOption != null)
                 {
@@ -96,9 +96,10 @@ public class CustomRoleManager
                             var random = new Random(DateTime.Now.Millisecond);
                             var index = random.Next(possibilityCount);
 
-                            bool result = chances[index];
+                            var result = chances[index];
                             if (!result) continue;
                         }
+
                         _roles.Add(role);
                     }
                 }

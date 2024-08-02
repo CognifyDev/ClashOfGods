@@ -16,7 +16,7 @@ public class PlayerListener : IListener
         if (!GameStates.InGame) return; // Don't share option when the player prefab loaded (Scene MainMenu)
         var target = @event.Player;
         target.StartCoroutine(CoShareOptions().WrapToIl2Cpp());
-        
+
         IEnumerator CoShareOptions()
         {
             Main.Logger.LogInfo($"Coroutine {nameof(CoShareOptions)} has started.");

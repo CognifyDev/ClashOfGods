@@ -64,7 +64,8 @@ public class CustomWinnerListener : IListener
             var scale = new Vector3(scaleValue, scaleValue, 1f);
 
             winnerPoolable.transform.localScale = scale;
-            winnerPoolable.UpdateFromPlayerOutfit(winner.Outfit, PlayerMaterial.MaskType.ComplexUI, winner.IsDead, true);
+            winnerPoolable.UpdateFromPlayerOutfit(winner.Outfit, PlayerMaterial.MaskType.ComplexUI, winner.IsDead,
+                true);
 
             if (winner.IsDead)
             {

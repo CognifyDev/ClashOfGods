@@ -19,14 +19,11 @@ namespace COG.Role.Impl.SubRole;
 [WorkInProgress]
 public class Lover : CustomRole, IListener, IWinnable
 {
-    public static Dictionary<PlayerControl, PlayerControl> Couples { get; private set; }
-    private CustomOption LoversDieTogetherOption { get; }
-    private CustomOption EnablePrivateChatOption { get; }
     public Lover() : base(LanguageConfig.Instance.LoverName, Color.magenta, CampType.Unknown)
     {
         ShortDescription = "";
         IsSubRole = true;
-        Couples = new();
+        Couples = new Dictionary<PlayerControl, PlayerControl>();
         if (ShowInOptions)
         {
             var tab = ToCustomOption(this);
@@ -34,6 +31,24 @@ public class Lover : CustomRole, IListener, IWinnable
             LoversDieTogetherOption = CreateOption(() => LanguageConfig.Instance.LoversDieTogetherOptionName, new BoolOptionValueRule(true));
             EnablePrivateChatOption = CreateOption(() => LanguageConfig.Instance.LoverEnablePrivateChat, new BoolOptionValueRule(true));
         }
+    }
+
+    public static Dictionary<PlayerControl, PlayerControl> Couples { get; private set; }
+    private CustomOption LoversDieTogetherOption { get; }
+    private CustomOption EnablePrivateChatOption { get; }
+
+    public ulong GetWeight()
+    {
+        return IWinnable.GetOrder(0);
+    }
+
+    public bool CanWin()
+    {
+        if (PlayerUtils.GetAllAlivePlayers().Count == 2
+            && PlayerUtils.GetAllAlivePlayers()
+                .SequenceEqual(GetCKCouples().SelectMany(lover => new[] { lover.Item1, lover.Item2 }))) return true;
+        ;
+        return false;
     }
 
     public void RpcSyncLovers()
@@ -56,9 +71,9 @@ public class Lover : CustomRole, IListener, IWinnable
         if (id != KnownRpc.SyncLovers) return;
 
         Couples.Clear();
-        int count = reader.ReadPackedInt32();
+        var count = reader.ReadPackedInt32();
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             var p1 = PlayerUtils.GetPlayerById(reader.ReadByte())!;
             var p2 = PlayerUtils.GetPlayerById(reader.ReadByte())!;
@@ -74,7 +89,9 @@ public class Lover : CustomRole, IListener, IWinnable
         if (!(LoversDieTogetherOption?.GetBool() ?? true)) return;
 
         var lover = victim.GetLover()!;
-        lover.LocalDieWithReason(lover, Utils.DeathReason.LoverSuicide); // Everyone will know that another lover is dead, so calling local murdering method is OK
+        lover.LocalDieWithReason(lover,
+            Utils.DeathReason
+                .LoverSuicide); // Everyone will know that another lover is dead, so calling local murdering method is OK
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -96,7 +113,7 @@ public class Lover : CustomRole, IListener, IWinnable
 
     public override bool OnRoleSelection(List<CustomRole> roles)
     {
-        for (int i = 0; i < (RoleNumberOption?.GetInt() ?? 1) * 2; i++)
+        for (var i = 0; i < (RoleNumberOption?.GetInt() ?? 1) * 2; i++)
             roles.Add(this);
         return true;
     }
@@ -111,7 +128,7 @@ public class Lover : CustomRole, IListener, IWinnable
             return;
         }
 
-        for (int i = 0; i < players.Count / 2; i += 2)
+        for (var i = 0; i < players.Count / 2; i += 2)
         {
             var p1 = players[i];
             var p2 = players[i + 1];
@@ -130,17 +147,20 @@ public class Lover : CustomRole, IListener, IWinnable
 
     public override string HandleEjectText(PlayerControl player)
     {
-        string msg = "";
+        var msg = "";
 
         if (LoversDieTogetherOption?.GetBool() ?? true)
         {
             var sb = new StringBuilder(player.GetMainRole().GetColorName()).Append(' ');
             foreach (var sub in player.GetSubRoles()) sb.Append(sub.GetColorName()).Append(' ');
 
-            msg = LanguageConfig.Instance.LoverEjectText.CustomFormat(player, sb.ToString(), player.GetLover()!.Data.PlayerName);
+            msg = LanguageConfig.Instance.LoverEjectText.CustomFormat(player, sb.ToString(),
+                player.GetLover()!.Data.PlayerName);
         }
         else
+        {
             msg = base.HandleEjectText(player);
+        }
 
         return msg;
     }
@@ -151,26 +171,25 @@ public class Lover : CustomRole, IListener, IWinnable
         ShortDescription = "";
     }
 
-    public override IListener GetListener() => this;
-
-    public ulong GetWeight() => IWinnable.GetOrder(0);
-
-    public bool CanWin()
+    public override IListener GetListener()
     {
-        if (PlayerUtils.GetAllAlivePlayers().Count == 2
-            && PlayerUtils.GetAllAlivePlayers().SequenceEqual(GetCKCouples().SelectMany(lover => new[] { lover.Item1, lover.Item2 }))) return true; ;
-        return false;
+        return this;
     }
 
     public List<(PlayerControl, PlayerControl)> GetCKCouples() // CK = Crewmate + Killer
-        => Couples.Where(couple =>
+    {
+    return Couples.Where(couple =>
         {
             var (p1, p2) = couple;
             return p1.CanKill() != p2.CanKill();
         })
         .Select(kvp => (kvp.Key, kvp.Value)).ToList();
+    }
 
-    public override CustomRole NewInstance() => new Lover();
+    public override CustomRole NewInstance()
+    {
+        return new Lover();
+    }
 }
 
 public static class RoleUtils
@@ -179,7 +198,9 @@ public static class RoleUtils
     {
         if (!other)
             return Lover.Couples!.Any(c => c.Key.IsSamePlayer(player) || c.Value.IsSamePlayer(player));
-        return Lover.Couples!.Any(c => c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(player, other!)) || c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(other!, player)));
+        return Lover.Couples!.Any(c =>
+            c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(player, other!)) ||
+            c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(other!, player)));
     }
 
     public static PlayerControl? GetLover(this PlayerControl player)
@@ -192,4 +213,4 @@ public static class RoleUtils
 
         return null;
     }
-} 
+}

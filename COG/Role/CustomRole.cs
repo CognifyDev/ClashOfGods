@@ -46,7 +46,7 @@ public abstract class CustomRole
             CampType.Neutral => (RoleTeamTypes)99,
             _ or CampType.Unknown => (RoleTeamTypes)100
         };
-        VanillaRole =  new()
+        VanillaRole = new RoleBehaviour
         {
             TeamType = vanillaType,
             Role = (RoleTypes)(Id + 100),
@@ -58,7 +58,8 @@ public abstract class CustomRole
         if (ShowInOptions)
         {
             //                                  Actually name here is useless for new option
-            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage, new IntOptionValueRule(0, 1, 15, 1));
+            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage,
+                new IntOptionValueRule(0, 1, 15, 1));
             RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 100));
         }
     }
@@ -183,7 +184,6 @@ public abstract class CustomRole
                     {
                         Type = OptionTypes.Checkbox
                     });
-                }
                 else if (rule is IntOptionValueRule iovr)
                 {
                     settings.Add(option.VanillaData = new IntGameSetting()
@@ -191,12 +191,11 @@ public abstract class CustomRole
                         Type = OptionTypes.Int,
                         Value = option.GetInt(),
                         Increment = iovr.Step,
-                        ValidRange = new(iovr.Min, iovr.Max),
+                        ValidRange = new IntRange(iovr.Min, iovr.Max),
                         ZeroIsInfinity = false,
                         SuffixType = iovr.SuffixType,
                         FormatString = ""
                     });
-                }
                 else if (rule is FloatOptionValueRule fovr)
                 {
                     settings.Add(option.VanillaData = new FloatGameSetting()
@@ -204,12 +203,11 @@ public abstract class CustomRole
                         Type = OptionTypes.Float,
                         Value = option.GetFloat(),
                         Increment = fovr.Step,
-                        ValidRange = new(fovr.Min, fovr.Max),
+                        ValidRange = new FloatRange(fovr.Min, fovr.Max),
                         ZeroIsInfinity = false,
                         SuffixType = fovr.SuffixType,
                         FormatString = ""
                     });
-                }
                 else if (rule is StringOptionValueRule sovr)
                 {
                     settings.Add(option.VanillaData = new StringGameSetting()
@@ -259,7 +257,7 @@ public abstract class CustomRole
 
         foreach (var subRole in player.GetSubRoles())
             sb.Append(' ').Append(subRole.GetColorName());
-        
+
         return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, sb.ToString());
     }
 
@@ -309,5 +307,8 @@ public abstract class CustomRole
 
     public abstract CustomRole NewInstance();
 
-    ~CustomRole() => ClearRoleGameData();
+    ~CustomRole()
+    {
+        ClearRoleGameData();
+    }
 }

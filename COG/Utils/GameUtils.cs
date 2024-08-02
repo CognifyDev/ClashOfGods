@@ -87,8 +87,8 @@ public static class GameUtils
         IEnumerator CoSendChatMessage()
         {
             yield return new WaitForSeconds(delay);
-            PlayerControl host = AmongUsClient.Instance.GetHost().Character;
-            string tempName = host.Data.PlayerName;
+            var host = AmongUsClient.Instance.GetHost().Character;
+            var tempName = host.Data.PlayerName;
             host.SetName(LanguageConfig.Instance.SystemMessage);
             HudManager.Instance?.Chat?.AddChat(host, text, false);
             host.SetName(tempName);

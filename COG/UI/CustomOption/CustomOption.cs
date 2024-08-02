@@ -16,6 +16,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
 namespace COG.UI.CustomOption;
@@ -35,8 +36,6 @@ public sealed class CustomOption
         Crewmate = 3,
         Addons = 4
     }
-
-    public static List<CustomOption?> Options { get; } = new();
 
     private static int _typeId;
 
@@ -77,6 +76,18 @@ public sealed class CustomOption
         Options.Add(this);
     }
 
+    public static List<CustomOption?> Options { get; } = new();
+
+    public int DefaultSelection => ValueRule.DefaultSelection;
+    public int ID { get; }
+    public bool IsHeader { get; }
+    public Func<string> RealName { get; set; }
+    public TabType Page { get; }
+    public CustomOption? Parent { get; }
+    public object[] Selections => ValueRule.Selections;
+    public IValueRule ValueRule { get; }
+    public OptionBehaviour? OptionBehaviour { get; set; }
+
     public static CustomOption Create(TabType type, Func<string> nameGetter, IValueRule rule,
         CustomOption? parent = null, bool isHeader = false)
     {
@@ -99,9 +110,9 @@ public sealed class CustomOption
         var sb = new StringBuilder();
 
         foreach (var option in from option in Options
-                               where option != null
-                               where option.Selection != option.DefaultSelection
-                               select option)
+                 where option != null
+                 where option.Selection != option.DefaultSelection
+                 select option)
         {
             sb.Append(option.Id + "|" + option.Selection);
             sb.Append(',');
@@ -165,7 +176,10 @@ public sealed class CustomOption
         LoadOptionFromPreset(file.FilePath);
     }
 
-    public dynamic GetDynamicValue() => ValueRule.Selections[Selection];
+    public dynamic GetDynamicValue()
+    {
+        return ValueRule.Selections[Selection];
+    }
 
     public bool GetBool()
     {
@@ -285,9 +299,9 @@ public static class PresetsButtonsPatch
         DestroySelectableSprite(std.gameObject);
         DestroySelectableSprite(alter.gameObject);
 
-        std.transform.localPosition = new(-1.5f, 0.2f, 0);
-        alter.transform.localPosition = new(2.1f, 0.2f, 0);
-        std.transform.localScale = alter.transform.localScale = new(1.1f, 1.1f, 1);
+        std.transform.localPosition = new Vector3(-1.5f, 0.2f, 0);
+        alter.transform.localPosition = new Vector3(2.1f, 0.2f, 0);
+        std.transform.localScale = alter.transform.localScale = new Vector3(1.1f, 1.1f, 1);
 
         void DestroySelectableSprite(GameObject go)
         {
@@ -301,14 +315,14 @@ public static class PresetsButtonsPatch
         __instance.AlternateRulesText.text = LanguageConfig.Instance.SavePreset;
 
         // Set button OnClick action
-        std.OnClick = new();
+        std.OnClick = new Button.ButtonClickedEvent();
         std.OnClick.AddListener((UnityAction)new Action(() =>
         {
             ResetActiveState(std);
             CustomOption.LoadPresetWithDialogue();
         }));
 
-        alter.OnClick = new();
+        alter.OnClick = new Button.ButtonClickedEvent();
         alter.OnClick.AddListener((UnityAction)new Action(() =>
         {
             ResetActiveState(alter);
@@ -327,7 +341,10 @@ public static class PresetsButtonsPatch
 
     [HarmonyPatch(nameof(GamePresetsTab.ClickPresetButton))]
     [HarmonyPrefix]
-    public static void OnButtonClickAlwaysCustomPreset(ref RulesPresets preset) => preset = RulesPresets.Custom;
+    public static void OnButtonClickAlwaysCustomPreset(ref RulesPresets preset)
+    {
+        preset = RulesPresets.Custom;
+    }
 }
 
 [HarmonyPatch(typeof(RolesSettingsMenu))]
@@ -340,7 +357,8 @@ public static class RoleOptionPatch
         Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
 
         // Fix button is unselected when open at the first time
-        Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")?.GetComponent<PassiveButton>()?.SelectButton(true);
+        Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")
+            ?.GetComponent<PassiveButton>()?.SelectButton(true);
         __instance.AllButton.SelectButton(true);
         CurrentAdvancedTabFor = null;
 
@@ -359,7 +377,7 @@ public static class RoleOptionPatch
 
         Main.Logger.LogInfo("Creating tabs...");
 
-        int i = 0;
+        var i = 0;
         foreach (var team in Enum.GetValues<CampType>())
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
 
@@ -470,13 +488,13 @@ public static class RoleOptionPatch
             var chanceOption = role.RoleChanceOption!;
             numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
             roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
-                new()
+                new RoleBehaviour
                 {
                     StringName = StringNames.None,
                     TeamType = vanillaType,
                     Role = (RoleTypes)role.Id + 100
                 }, layer);
-            roleSetting.transform.localPosition = new(initialX, initialY + offsetY * i, -2f);
+            roleSetting.transform.localPosition = new Vector3(initialX, initialY + offsetY * i, -2f);
             roleSetting.titleText.text = role.Name;
             var label = roleSetting.labelSprite;
             var color = label.color = camp switch
@@ -555,7 +573,7 @@ public static class RoleOptionPatch
 
         button.transform.localPosition = new(xStart + index * offset, yStart, -2);
         button.DestroyComponent<RoleSettingsTabButton>();
-        button.OnClick = new();
+        button.OnClick = new Button.ButtonClickedEvent();
         button.OnClick.AddListener((UnityAction)new Action(() =>
         {
             var elements = tab.GetComponentsInChildren<UiElement>();
@@ -567,7 +585,7 @@ public static class RoleOptionPatch
             ControllerManager.Instance.SetDefaultSelection(menu.ControllerSelectable[0], null);
         }));
 
-        Main.Logger.LogInfo("Button action has registeristed. Start to set button icon...");
+        Main.Logger.LogInfo("Button action has registered. Start to set button icon...");
 
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
         const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
@@ -576,7 +594,7 @@ public static class RoleOptionPatch
         return button;
     }
 
-    static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
+    private static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
     {
         if (!obj) return;
         obj.SelectButton(active);
@@ -607,14 +625,16 @@ public static class RoleOptionPatch
             scroller.ScrollPercentY(ScrollerLocationPercent);
     }
 
-    static void CloseAllTab(RolesSettingsMenu menuInstance)
+    private static void CloseAllTab(RolesSettingsMenu menuInstance)
     {
         menuInstance.RoleChancesSettings.SetActive(false);
-        if (CurrentTab) CurrentTab!.SetActive(false); /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
+        if (CurrentTab)
+            CurrentTab!.SetActive(
+                false); /* Don't use CurrentTab?.SetActive(false) directly because a destroyed object won't be null immediately and unity has overwritten == operator but use ? operator won't use the logic of == operator */
         if (CurrentButton) CurrentButton!.SelectButton(false);
     }
 
-    static void OpenTab(GameObject tabToOpen, PassiveButton button)
+    private static void OpenTab(GameObject tabToOpen, PassiveButton button)
     {
         CurrentButton = button;
         CurrentTab = tabToOpen;
@@ -734,6 +754,8 @@ public static class SettingMenuClosePatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
 public static class SyncVanillaSettingsPatch
 {
-    public static void Postfix() => CustomOption.ShareConfigs();
+    public static void Postfix()
+    {
+        CustomOption.ShareConfigs();
+    }
 }
-

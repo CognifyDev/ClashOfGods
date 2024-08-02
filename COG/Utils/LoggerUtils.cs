@@ -15,14 +15,29 @@ public class StackTraceLogger
         RegisteredCustomLogger.Add(this);
     }
 
-    public void DisableSource(Type toDisable) => DisabledMethodSource.AddRange(toDisable.GetMethods());
-    public void DisableMethod(MethodInfo toDisable) => DisabledMethodSource.Add(toDisable);
-    public void EnableSource(Type toEnable) => DisabledMethodSource.RemoveAll(m => toEnable.GetMethods().Contains(m));
-    public void EnableMethod(MethodInfo toEnable) => DisabledMethodSource.Remove(toEnable);
-
     public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
     public List<MethodInfo> DisabledMethodSource { get; } = new();
     private ManualLogSource BepInExLogger { get; }
+
+    public void DisableSource(Type toDisable)
+    {
+        DisabledMethodSource.AddRange(toDisable.GetMethods());
+    }
+
+    public void DisableMethod(MethodInfo toDisable)
+    {
+        DisabledMethodSource.Add(toDisable);
+    }
+
+    public void EnableSource(Type toEnable)
+    {
+        DisabledMethodSource.RemoveAll(m => toEnable.GetMethods().Contains(m));
+    }
+
+    public void EnableMethod(MethodInfo toEnable)
+    {
+        DisabledMethodSource.Remove(toEnable);
+    }
 
     public void LogDebug(object? msg, string? customName = null)
     {

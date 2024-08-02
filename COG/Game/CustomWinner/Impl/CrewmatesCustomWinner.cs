@@ -10,12 +10,12 @@ public class CrewmatesCustomWinner : IWinnable
     {
         var taskComplete = false;
         foreach (var player in PlayerUtils.GetAllPlayers()) taskComplete = !player.Data.IsIncomplete;
-        if (taskComplete || 
+        if (taskComplete ||
             PlayerUtils.AllImpostors.Where(pair => pair.Player && !pair.Player.Data.IsDead)
-                    .Select(pair => pair.Player).ToList().Count == 0)
+                .Select(pair => pair.Player).ToList().Count == 0)
         {
-            CustomWinnerManager.EndGame(PlayerUtils.AllCrewmates.Select(p => p.Player), 
-                LanguageConfig.Instance.CrewmatesWinText, 
+            CustomWinnerManager.EndGame(PlayerUtils.AllCrewmates.Select(p => p.Player),
+                LanguageConfig.Instance.CrewmatesWinText,
                 Palette.CrewmateBlue);
             return true;
         }

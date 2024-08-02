@@ -18,23 +18,6 @@ role:
       name: "清洁工"
       description: "协助队友，清理尸体"
       clean-cd: "清理尸体冷却"
-    troublemaker:
-      name: "扰乱者"
-      description: "扰乱船员！"
-      menu:
-        cd: "冷却时间"
-        duration: "持续时间"
-    bounty-hunter:
-      name: "赏金猎人"
-      description: "击杀目标可以减少冷却，但击杀非目标则会增加冷却"
-      menu:
-        cd: "初始击杀冷却"
-        target-refresh-time: "刷新目标时间"
-        has-arrow: "箭头指向目标"
-        cd-kill-target: "击杀目标冷却时间"
-        cd-kill-non-target: "击杀非目标冷却时间"
-      error:
-        select-target-error: "无法为赏金猎人选择目标。"
     eraser:
       name: "抹除者"
       description: "抹除别人的职业"
@@ -63,18 +46,6 @@ role:
     jester:
       name: "小丑"
       description: "你会在被驱逐后获胜"
-    opportunist:
-      name: "投机主义者"
-      description: "活到最后！"
-    jackal:
-      name: "豺狼"
-      description: "招募跟班，杀死所有人"
-      create-sidekick-cd: "招募冷却"
-      kill-cd: "击杀冷却"
-    sidekick:
-      name: "跟班"
-      description: "协助豺狼，获得胜利"
-      can-create-sidekick: "继位后可继续传火"
     vulture:
       name: "秃鹫"
       description: "船员们的血肉，味道又如何呢？"
@@ -145,8 +116,6 @@ sidebar-text:
 action:
   kill: "击杀"
   clean: "清理"
-  make-trouble: "干扰"
-  create-sidekick: "招募"
   erase-action: "抹除"
   annihilate: "湮灭"
   eat-action: "吞噬"

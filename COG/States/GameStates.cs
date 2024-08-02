@@ -21,7 +21,7 @@ public static class GameStates
         set
         {
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-            
+
             _inGame = value;
             if (value == false) HandshakeManager.Instance.Reset();
         }

@@ -5,14 +5,14 @@ namespace COG.Utils.Version;
 
 public class VersionInfo
 {
-    public static VersionInfo Empty => new(string.Empty);
-
     internal VersionInfo(string parent, bool beta = false, ulong? betaVersion = null)
     {
         Parent = parent;
         Beta = beta;
         BetaVersion = betaVersion;
     }
+
+    public static VersionInfo Empty => new(string.Empty);
 
     public string Parent { get; }
     public bool Beta { get; }
