@@ -414,7 +414,7 @@ public static class RoleOptionPatch
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
         __instance.roleDescriptionText.text = CurrentAdvancedTabFor.LongDescription;
         __instance.roleScreenshot.sprite =
-            ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Settings.General.png", 40);
+            ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Settings.General.png", 28);
         __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground").GetComponent<SpriteRenderer>().color =
             new Color(1, 1, 1, 1);
 

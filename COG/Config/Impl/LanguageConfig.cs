@@ -89,15 +89,6 @@ public class LanguageConfig : Config
     public string JesterName { get; private set; } = null!;
     public string JesterDescription { get; private set; } = null!;
 
-    public string JackalName { get; private set; } = null!;
-    public string JackalDescription { get; private set; } = null!;
-    public string JackalCreateSidekickCd { get; private set; } = null!;
-    public string JackalKillCd { get; private set; } = null!;
-
-    public string SidekickName { get; private set; } = null!;
-    public string SidekickDescription { get; private set; } = null!;
-    public string SidekickCanCreateSidekick { get; private set; } = null!;
-
     public string VultureName { get; private set; } = null!;
     public string VultureDescription { get; private set; } = null!;
     public string VultureEatCooldown { get; private set; } = null!;
@@ -131,12 +122,6 @@ public class LanguageConfig : Config
     public string AllowReportDeadBody { get; private set; } = null!;
     public string KillCooldown { get; private set; } = null!;
 
-    public string SidebarTextOriginal { get; private set; } = null!;
-    public string SidebarTextNeutral { get; private set; } = null!;
-    public string SidebarTextMod { get; private set; } = null!;
-    public string SidebarTextAddons { get; private set; } = null!;
-    public string SidebarTextImpostor { get; private set; } = null!;
-    public string SidebarTextCrewmate { get; private set; } = null!;
     public string QQ { get; private set; } = null!;
     public string Discord { get; private set; } = null!;
 
@@ -230,15 +215,6 @@ public class LanguageConfig : Config
         JesterName = GetString("role.neutral.jester.name");
         JesterDescription = GetString("role.neutral.jester.description");
 
-        JackalName = GetString("role.neutral.jackal.name");
-        JackalDescription = GetString("role.neutral.jackal.description");
-        JackalCreateSidekickCd = GetString("role.neutral.jackal.create-sidekick-cd");
-        JackalKillCd = GetString("role.neutral.jackal.kill-cd");
-
-        SidekickName = GetString("role.neutral.sidekick.name");
-        SidekickDescription = GetString("role.neutral.sidekick.description");
-        SidekickCanCreateSidekick = GetString("role.neutral.sidekick.can-create-sidekick");
-
         VultureName = GetString("role.neutral.vulture.name");
         VultureDescription = GetString("role.neutral.vulture.description");
         VultureEatCooldown = GetString("role.neutral.vulture.eat-cd");
@@ -271,13 +247,6 @@ public class LanguageConfig : Config
         AllowStartMeeting = GetString("role.global.allow-start-meeting");
         AllowReportDeadBody = GetString("role.global.allow-report-body");
         KillCooldown = GetString("role.global.kill-cooldown");
-
-        SidebarTextOriginal = GetString("sidebar-text.original");
-        SidebarTextNeutral = GetString("sidebar-text.neutral");
-        SidebarTextMod = GetString("sidebar-text.mod");
-        SidebarTextAddons = GetString("sidebar-text.addons");
-        SidebarTextImpostor = GetString("sidebar-text.impostor");
-        SidebarTextCrewmate = GetString("sidebar-text.crewmate");
 
         UnknownCamp = GetString("camp.unknown.name");
         ImpostorCamp = GetString("camp.impostor.name");

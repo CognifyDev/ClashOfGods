@@ -106,13 +106,6 @@ option:
       fetched: "搜索到最新版：%version%\r\n%description%\r\n是否安装？"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
-sidebar-text:
-  original: "<color=#9AFF00>原版设置</color>"
-  neutral: "<color=#9AFF00>中立设置</color>"
-  mod: "<color=#9AFF00>模组设置</color>"
-  addons: "<color=#9AFF00>副职业设置</color>"
-  impostor: "<color=#9AFF00>伪装者设置</color>"
-  crewmate: "<color=#9AFF00>船员设置</color>"
 action:
   kill: "击杀"
   clean: "清理"
