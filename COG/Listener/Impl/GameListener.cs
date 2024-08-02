@@ -268,7 +268,7 @@ public class GameListener : IListener
             intro.YouAreText.text = sb.ToString();
             intro.YouAreText.color = myRole.Color;
             intro.RoleBlurbText.color = myRole.Color;
-            intro.RoleBlurbText.text = myRole.Description;
+            intro.RoleBlurbText.text = myRole.ShortDescription;
 
             intro.YouAreText.gameObject.SetActive(true);
             intro.RoleText.gameObject.SetActive(true);
@@ -465,7 +465,7 @@ public class GameListener : IListener
 
         var sb = new StringBuilder();
 
-        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.Description.Color(localRole.Color))
+        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.ShortDescription.Color(localRole.Color))
             .Append("\r\n\r\n");
 
         /*

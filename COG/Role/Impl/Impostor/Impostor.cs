@@ -12,7 +12,7 @@ public class Impostor : CustomRole
         IsBaseRole = true;
         CanSabotage = true;
         BaseRoleType = RoleTypes.Impostor;
-        Description = LanguageConfig.Instance.ImpostorDescription;
+        ShortDescription = LanguageConfig.Instance.ImpostorDescription;
     }
 
     public override CustomRole NewInstance()

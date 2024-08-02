@@ -10,7 +10,7 @@ public class Unknown : CustomRole
     public Unknown() : base(LanguageConfig.Instance.UnknownName, Color.white, CampType.Unknown, false)
     {
         BaseRoleType = RoleTypes.CrewmateGhost;
-        Description = LanguageConfig.Instance.UnknownDescription;
+        ShortDescription = LanguageConfig.Instance.UnknownDescription;
     }
 
     public override IListener GetListener()

@@ -21,17 +21,15 @@ public class Lover : CustomRole, IListener, IWinnable
 {
     public Lover() : base(LanguageConfig.Instance.LoverName, Color.magenta, CampType.Unknown)
     {
-        Description = "";
+        ShortDescription = "";
         IsSubRole = true;
         Couples = new Dictionary<PlayerControl, PlayerControl>();
         if (ShowInOptions)
         {
             var tab = ToCustomOption(this);
-            RoleNumberOption!.RealName = () => LanguageConfig.Instance.LoverCountOptionName;
-            LoversDieTogetherOption = CreateOption(() => LanguageConfig.Instance.LoversDieTogetherOptionName,
-                new BoolOptionValueRule(true));
-            EnablePrivateChatOption = CreateOption(() => LanguageConfig.Instance.LoverEnablePrivateChat,
-                new BoolOptionValueRule(true));
+            RoleNumberOption!.Name = () => LanguageConfig.Instance.LoverCountOptionName;
+            LoversDieTogetherOption = CreateOption(() => LanguageConfig.Instance.LoversDieTogetherOptionName, new BoolOptionValueRule(true));
+            EnablePrivateChatOption = CreateOption(() => LanguageConfig.Instance.LoverEnablePrivateChat, new BoolOptionValueRule(true));
         }
     }
 
@@ -109,9 +107,7 @@ public class Lover : CustomRole, IListener, IWinnable
     [EventHandler(EventHandlerType.Prefix)]
     public void OnIntroBegin(IntroCutsceneShowRoleEvent @event)
     {
-        Description =
-            LanguageConfig.Instance.LoverDescription.CustomFormat(PlayerControl.LocalPlayer.GetLover()!.Data
-                .PlayerName);
+        ShortDescription = LanguageConfig.Instance.LoverDescription.CustomFormat(PlayerControl.LocalPlayer.GetLover()!.Data.PlayerName);
     }
 
 
@@ -172,7 +168,7 @@ public class Lover : CustomRole, IListener, IWinnable
     public override void ClearRoleGameData()
     {
         Couples.Clear();
-        Description = "";
+        ShortDescription = "";
     }
 
     public override IListener GetListener()

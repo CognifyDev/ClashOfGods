@@ -26,7 +26,7 @@ public class Eraser : CustomRole, IListener
     public Eraser() : base(LanguageConfig.Instance.EraserName, Palette.ImpostorRed, CampType.Impostor)
     {
         BaseRoleType = RoleTypes.Impostor;
-        Description = LanguageConfig.Instance.EraserDescription;
+        ShortDescription = LanguageConfig.Instance.EraserDescription;
 
         var type = ToCustomOption(this);
         _initialEraseCooldown = CreateOption(() => LanguageConfig.Instance.EraserInitialEraseCd,

@@ -122,7 +122,7 @@ public partial class Main : BasePlugin
             Logger.LogError(e.Message);
         }
 
-        ListenerManager.GetManager().RegisterListeners(new[]
+        ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
             new PlayerListener(),
@@ -134,7 +134,7 @@ public partial class Main : BasePlugin
             new RpcListener(),
             new TaskAdderListener(),
             new VersionShowerListener(),
-            HandshakeManager.GetListener(),
+            //HandshakeManager.GetListener(), // Disable temporarily because it hasn't tested
             new VanillaBugFixListener()
         });
 

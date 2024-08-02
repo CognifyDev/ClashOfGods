@@ -18,7 +18,7 @@ public class Vigilante : CustomRole, IListener
 
     public Vigilante() : base(LanguageConfig.Instance.VigilanteName, ColorUtils.AsColor("#ffcc00"), CampType.Crewmate)
     {
-        Description = LanguageConfig.Instance.VigilanteDescription;
+        ShortDescription = LanguageConfig.Instance.VigilanteDescription;
         CanKill = false;
         CanVent = false;
 

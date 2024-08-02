@@ -24,13 +24,12 @@ public class RpcListener : IListener
                 var id = reader.ReadPackedInt32();
                 var selection = reader.ReadPackedInt32();
 
-                var option = CustomOption.Options.FirstOrDefault(o => o != null && o.ID == id);
-                if (option == null) return;
+                    var option = CustomOption.Options.FirstOrDefault(o => o != null && o.Id == id);
+                    if (option == null) return;
 
-                option.Selection = selection;
-                HudManager.Instance.Notifier.AddSettingsChangeMessage(StringNames.None, selection.ToString()); // 临时写法
-                break;
-            }
+                    option.Selection = selection;
+                    break;
+                }
             case KnownRpc.ShareOptions:
             {
                 var originalString = reader.ReadString();
@@ -41,20 +40,19 @@ public class RpcListener : IListener
                     var id = int.Parse(contexts[0]);
                     var selection = int.Parse(contexts[1]);
 
-                    for (var i = 0; i < CustomOption.Options.Count; i++)
-                    {
-                        var option = CustomOption.Options[i];
-                        if (option == null) continue;
-                        if (option.ID != id) continue;
-                        Main.Logger.LogInfo(
-                            $"Changed {option.RealName()}({option.ID})'s selection to {selection}(before: {option.Selection})");
-                        option.Selection = selection;
-                        CustomOption.Options[i] = option;
+                        for (var i = 0; i < CustomOption.Options.Count; i++)
+                        {
+                            var option = CustomOption.Options[i];
+                            if (option == null) continue;
+                            if (option.Id != id) continue;
+                            Main.Logger.LogInfo(
+                                $"Changed {option.Name()}({option.Id})'s selection to {selection}(before: {option.Selection})");
+                            option.Selection = selection;
+                            CustomOption.Options[i] = option;
+                        }
                     }
+                    break;
                 }
-
-                break;
-            }
             case KnownRpc.SetRole:
             {
                 var playerId = reader.ReadByte();
