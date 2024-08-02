@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
@@ -7,11 +12,6 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace COG.Role;
@@ -22,6 +22,8 @@ namespace COG.Role;
 public abstract class CustomRole
 {
     private static int _order;
+
+    private string _longDescription = "";
 
     public CustomRole(string name, Color color, CampType campType, bool showInOptions = true)
     {
@@ -38,7 +40,7 @@ public abstract class CustomRole
         Id = _order;
         _order++;
         ShowInOptions = showInOptions;
-        AllOptions = new();
+        AllOptions = new List<CustomOption>();
         var vanillaType = CampType switch
         {
             CampType.Crewmate => RoleTeamTypes.Crewmate,
@@ -97,8 +99,6 @@ public abstract class CustomRole
         get => string.IsNullOrEmpty(_longDescription) ? ShortDescription : _longDescription;
         set => _longDescription = value;
     }
-
-    private string _longDescription = "";
 
     /// <summary>
     ///     角色阵营
@@ -165,7 +165,8 @@ public abstract class CustomRole
     /// <summary>
     ///     除了概率与人数之外的所有职业选项
     /// </summary>
-    public ReadOnlyCollection<CustomOption> RoleOptions => new(AllOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption).ToList());
+    public ReadOnlyCollection<CustomOption> RoleOptions =>
+        new(AllOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption).ToList());
 
     public RoleBehaviour VanillaRole { get; init; }
 
@@ -179,14 +180,11 @@ public abstract class CustomRole
             {
                 var rule = option.ValueRule;
                 if (rule is BoolOptionValueRule)
-                {
                     settings.Add(option.VanillaData = new CheckboxGameSetting
                     {
                         Type = OptionTypes.Checkbox
                     });
-                }
                 else if (rule is IntOptionValueRule iovr)
-                {
                     settings.Add(option.VanillaData = new IntGameSetting
                     {
                         Type = OptionTypes.Int,
@@ -197,9 +195,7 @@ public abstract class CustomRole
                         SuffixType = iovr.SuffixType,
                         FormatString = ""
                     });
-                }
                 else if (rule is FloatOptionValueRule fovr)
-                {
                     settings.Add(option.VanillaData = new FloatGameSetting
                     {
                         Type = OptionTypes.Float,
@@ -210,20 +206,18 @@ public abstract class CustomRole
                         SuffixType = fovr.SuffixType,
                         FormatString = ""
                     });
-                }
                 else if (rule is StringOptionValueRule sovr)
-                {
                     settings.Add(option.VanillaData = new StringGameSetting
                     {
                         Type = OptionTypes.String,
                         Index = option.Selection,
                         Values = new StringNames[sovr.Selections.Length]
                     });
-                }
 
                 idx++;
             }
-            return new()
+
+            return new RoleRulesCategory
             {
                 AllGameSettings = settings.ToIl2CppList(),
                 Role = VanillaRole

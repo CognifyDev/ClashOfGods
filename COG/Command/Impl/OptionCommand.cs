@@ -19,13 +19,13 @@ public class OptionCommand : Command
         switch (operation)
         {
             case "show":
+            {
+                StringBuilder optionBuilder = new("Current Options:");
+                foreach (var option in CustomOption.Options.Where(o => o != null))
                 {
-                    StringBuilder optionBuilder = new("Current Options:");
-                    foreach (var option in CustomOption.Options.Where(o => o != null))
-                    {
-                        optionBuilder.Append("\nId: ").Append(option!.Id).Append(' ').Append(option.Name())
-                            .Append(": ");
-                        optionBuilder.Append('(');
+                    optionBuilder.Append("\nId: ").Append(option!.Id).Append(' ').Append(option.Name())
+                        .Append(": ");
+                    optionBuilder.Append('(');
 
                     var i = 0;
                     option.Selections.ForEach(s =>
@@ -47,14 +47,15 @@ public class OptionCommand : Command
             {
                 if (!int.TryParse(args[1], out var id)) return true;
 
-                    var option = CustomOption.Options.Where(o => o != null).FirstOrDefault(o => o!.Id == id);
-                    if (option == null) return true;
+                var option = CustomOption.Options.Where(o => o != null).FirstOrDefault(o => o!.Id == id);
+                if (option == null) return true;
 
                 if (!int.TryParse(args[2], out var selection)) return true;
                 option.UpdateSelection(selection - 1);
 
-                    GameUtils.SendSystemMessage($"The selection of {option.Name()} has set to {option.Selections[selection - 1]}.");
-                }
+                GameUtils.SendSystemMessage(
+                    $"The selection of {option.Name()} has set to {option.Selections[selection - 1]}.");
+            }
                 break;
             case "share":
             {

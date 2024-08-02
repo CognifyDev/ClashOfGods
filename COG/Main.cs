@@ -23,7 +23,6 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
-using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.ModOption;
 using COG.Utils;

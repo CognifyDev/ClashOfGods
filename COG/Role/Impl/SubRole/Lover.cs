@@ -28,8 +28,10 @@ public class Lover : CustomRole, IListener, IWinnable
         {
             var tab = ToCustomOption(this);
             RoleNumberOption!.Name = () => LanguageConfig.Instance.LoverCountOptionName;
-            LoversDieTogetherOption = CreateOption(() => LanguageConfig.Instance.LoversDieTogetherOptionName, new BoolOptionValueRule(true));
-            EnablePrivateChatOption = CreateOption(() => LanguageConfig.Instance.LoverEnablePrivateChat, new BoolOptionValueRule(true));
+            LoversDieTogetherOption = CreateOption(() => LanguageConfig.Instance.LoversDieTogetherOptionName,
+                new BoolOptionValueRule(true));
+            EnablePrivateChatOption = CreateOption(() => LanguageConfig.Instance.LoverEnablePrivateChat,
+                new BoolOptionValueRule(true));
         }
     }
 
@@ -107,7 +109,9 @@ public class Lover : CustomRole, IListener, IWinnable
     [EventHandler(EventHandlerType.Prefix)]
     public void OnIntroBegin(IntroCutsceneShowRoleEvent @event)
     {
-        ShortDescription = LanguageConfig.Instance.LoverDescription.CustomFormat(PlayerControl.LocalPlayer.GetLover()!.Data.PlayerName);
+        ShortDescription =
+            LanguageConfig.Instance.LoverDescription.CustomFormat(PlayerControl.LocalPlayer.GetLover()!.Data
+                .PlayerName);
     }
 
 
@@ -178,12 +182,12 @@ public class Lover : CustomRole, IListener, IWinnable
 
     public List<(PlayerControl, PlayerControl)> GetCKCouples() // CK = Crewmate + Killer
     {
-    return Couples.Where(couple =>
-        {
-            var (p1, p2) = couple;
-            return p1.CanKill() != p2.CanKill();
-        })
-        .Select(kvp => (kvp.Key, kvp.Value)).ToList();
+        return Couples.Where(couple =>
+            {
+                var (p1, p2) = couple;
+                return p1.CanKill() != p2.CanKill();
+            })
+            .Select(kvp => (kvp.Key, kvp.Value)).ToList();
     }
 
     public override CustomRole NewInstance()

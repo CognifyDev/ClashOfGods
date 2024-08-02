@@ -13,7 +13,13 @@ public static class ArrayUtils
         return toReturn;
     }
 
-    public static T[] ToSingleElementArray<T>(this T obj) => new[] { obj };
+    public static T[] ToSingleElementArray<T>(this T obj)
+    {
+        return new[] { obj };
+    }
 
-    public static Il2CppReferenceArray<T> ToIl2CppArray<T>(this T[] array) where T : Il2CppObjectBase => new(array);
+    public static Il2CppReferenceArray<T> ToIl2CppArray<T>(this T[] array) where T : Il2CppObjectBase
+    {
+        return new Il2CppReferenceArray<T>(array);
+    }
 }
