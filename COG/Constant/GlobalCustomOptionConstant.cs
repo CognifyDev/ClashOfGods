@@ -8,11 +8,11 @@ public static class GlobalCustomOptionConstant
 {
     static GlobalCustomOptionConstant()
     {
-        DebugMode = CustomOption.Create(CustomOption.TabType.General,
+        DebugMode = CustomOption.Of(CustomOption.TabType.General,
             () => LanguageConfig.Instance.DebugMode, new BoolOptionValueRule(false),
             null, true);
 
-        MaxSubRoleNumber = CustomOption.Create(CustomOption.TabType.General,
+        MaxSubRoleNumber = CustomOption.Of(CustomOption.TabType.General,
             () => LanguageConfig.Instance.MaxSubRoleNumber,
             new IntOptionValueRule(0, 1, 10, 1), null, true);
     }

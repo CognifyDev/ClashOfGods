@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
@@ -17,7 +16,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Debug = System.Diagnostics.Debug;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 // ReSharper disable InconsistentNaming
 
@@ -25,11 +23,9 @@ namespace COG.UI.CustomOption;
 
 // Code base from
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
-[DataContract]
 [ShitCode]
 public sealed class CustomOption
 {
-    [Serializable]
     public enum TabType
     {
         General = 0,
@@ -81,10 +77,15 @@ public sealed class CustomOption
         }
     }
 
-    public static CustomOption Create(TabType type, Func<string> nameGetter, IValueRule rule,
+    public static CustomOption Of(TabType type, Func<string> nameGetter, IValueRule rule,
         CustomOption? parent = null, bool isHeader = false)
     {
         return new CustomOption(type, nameGetter, rule, parent, isHeader);
+    }
+
+    public void Register()
+    {
+        
     }
 
     public static void ShareConfigs(PlayerControl? target = null)
@@ -234,7 +235,6 @@ public sealed class CustomOption
         var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.AllOptions.Contains(this));
         if (role == null) return;
 
-        //RoleOptionSetting? setting;
         if (OptionBehaviour is RoleOptionSetting setting)
         {
             var roleName = setting.Role.TeamType switch
@@ -498,9 +498,14 @@ public static class RoleOptionPatch
             var numberOption = role.RoleNumberOption!;
             var chanceOption = role.RoleChanceOption!;
             numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
-            Debug.Assert(CurrentTab != null, nameof(CurrentTab) + " != null");
             roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
-                CurrentTab.AddComponent<RoleBehaviour>(), layer);
+                // ReSharper disable once Unity.IncorrectMonoBehaviourInstantiation
+                new RoleBehaviour
+                {
+                    StringName = StringNames.None,
+                    TeamType = vanillaType,
+                    Role = (RoleTypes)role.Id + 100
+                }, layer);
             roleSetting.transform.localPosition = new Vector3(initialX, initialY + offsetY * i, -2f);
             roleSetting.titleText.text = role.Name;
             var label = roleSetting.labelSprite;
@@ -553,17 +558,11 @@ public static class RoleOptionPatch
                 var chanceOption = role.RoleChanceOption!;
                 var playerCount = setting.roleMaxCount;
                 var roleChance = setting.roleChance;
-
-                Main.Logger.LogInfo($"{role.GetType().Name} Num: {playerCount}p, {roleChance}%");
-
                 numberOption.UpdateSelection(newValue: playerCount);
                 chanceOption.UpdateSelection(newValue: roleChance);
                 setting.UpdateValuesAndText(null);
             });
             roleSetting.ControllerSelectable.Add(passive);
-
-            Main.Logger.LogInfo($"Role option has set up for {role.GetType().Name}.");
-
             i++;
         }
     }
@@ -609,18 +608,13 @@ public static class RoleOptionPatch
         obj.SelectButton(active);
         if (!AllButton) return;
         AllButton!.SelectButton(clickedAllButton);
-
-        /* Main.Logger.LogInfo($"Is {obj.name} active: {active} ({clickedAllButton})"); */
     }
 
     public static void ChangeCustomTab(RolesSettingsMenu menu, GameObject newTab, PassiveButton toSelect, CampType camp)
     {
         menu.AdvancedRolesSettings.SetActive(false);
         CurrentAdvancedTabFor = null;
-        /*
-        Main.Logger.LogInfo(
-            $"{nameof(CurrentAdvancedTabFor)}: {CurrentAdvancedTabFor?.GetType().Name ?? "(null)"} (It should be null now)");
-        */
+        
         CloseAllTab(menu);
         OpenTab(newTab, toSelect);
         var scroller = menu.scrollBar;

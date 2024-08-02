@@ -13,6 +13,7 @@ using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
+// ReSharper disable Unity.IncorrectScriptableObjectInstantiation
 
 namespace COG.Role;
 
@@ -48,6 +49,7 @@ public abstract class CustomRole
             CampType.Neutral => (RoleTeamTypes)99,
             _ or CampType.Unknown => (RoleTeamTypes)100
         };
+        // ReSharper disable once Unity.IncorrectMonoBehaviourInstantiation
         VanillaRole = new RoleBehaviour
         {
             TeamType = vanillaType,
@@ -168,7 +170,7 @@ public abstract class CustomRole
     public ReadOnlyCollection<CustomOption> RoleOptions =>
         new(AllOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption).ToList());
 
-    public RoleBehaviour VanillaRole { get; init; }
+    public RoleBehaviour VanillaRole { get; }
 
     public RoleRulesCategory VanillaCategory
     {
@@ -227,7 +229,7 @@ public abstract class CustomRole
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
-        var option = CustomOption.Create(ToCustomOption(this), nameGetter, rule);
+        var option = CustomOption.Of(GetTabType(this), nameGetter, rule);
         AllOptions.Add(option);
         return option;
     }
@@ -291,10 +293,28 @@ public abstract class CustomRole
         return Name.Color(Color);
     }
 
-    public static CustomOption.TabType ToCustomOption(CustomRole role)
+    public static CustomOption.TabType GetTabType(CustomRole role)
     {
         if (role.CampType == CampType.Unknown || role.IsSubRole) return CustomOption.TabType.Addons;
-        return (CustomOption.TabType)role.CampType;
+        CustomOption.TabType toReturn;
+        switch (role.CampType)
+        {
+            case CampType.Crewmate:
+                toReturn = CustomOption.TabType.Crewmate;
+                break;
+            case CampType.Impostor:
+                toReturn = CustomOption.TabType.Impostor;
+                break;
+            case CampType.Neutral:
+                toReturn = CustomOption.TabType.Neutral;
+                break;
+            case CampType.Unknown:
+            default: 
+                toReturn = CustomOption.TabType.Addons; 
+                break;
+        }
+
+        return toReturn;
     }
 
     public virtual IListener GetListener()

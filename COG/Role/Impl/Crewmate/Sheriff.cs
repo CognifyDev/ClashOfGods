@@ -64,7 +64,7 @@ public class Sheriff : CustomRole, IListener
         var target = @event.Target;
         if (killer == null || target == null) return true;
         if (!killer.IsRole(this)) return true;
-        if (target.GetMainRole()!.CampType != CampType.Crewmate) return true;
+        if (target.GetMainRole().CampType != CampType.Crewmate) return true;
         killer.RpcMurderPlayer(killer, true);
         return false;
     }

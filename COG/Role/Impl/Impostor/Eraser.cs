@@ -28,7 +28,7 @@ public class Eraser : CustomRole, IListener
         BaseRoleType = RoleTypes.Impostor;
         ShortDescription = LanguageConfig.Instance.EraserDescription;
 
-        var type = ToCustomOption(this);
+        var type = GetTabType(this);
         _initialEraseCooldown = CreateOption(() => LanguageConfig.Instance.EraserInitialEraseCd,
             new FloatOptionValueRule(10f, 5f, 60f, 30f));
         _increaseCooldownAfterErasing = CreateOption(() => LanguageConfig.Instance.EraserIncreaseCdAfterErasing,

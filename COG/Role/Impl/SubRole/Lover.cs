@@ -26,7 +26,6 @@ public class Lover : CustomRole, IListener, IWinnable
         Couples = new Dictionary<PlayerControl, PlayerControl>();
         if (ShowInOptions)
         {
-            var tab = ToCustomOption(this);
             RoleNumberOption!.Name = () => LanguageConfig.Instance.LoverCountOptionName;
             LoversDieTogetherOption = CreateOption(() => LanguageConfig.Instance.LoversDieTogetherOptionName,
                 new BoolOptionValueRule(true));

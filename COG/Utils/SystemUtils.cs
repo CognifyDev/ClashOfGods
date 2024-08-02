@@ -6,7 +6,7 @@ using Microsoft.Win32;
 
 namespace COG.Utils;
 
-public class SystemUtils
+public static class SystemUtils
 {
     /// <summary>
     ///     获取时间戳

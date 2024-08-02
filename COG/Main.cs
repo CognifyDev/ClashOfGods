@@ -204,8 +204,7 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
-        // 调用 GlobalCustomOptionConstant 静态构造方法来初始化
-        // typeof(GlobalCustomOptionConstant).GetType();
+        
 
         Harmony.PatchAll();
 
