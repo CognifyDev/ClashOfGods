@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AmongUs.Data;
 using COG.Config.Impl;
@@ -13,6 +14,7 @@ using COG.Rpc;
 using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
+// ReSharper disable UnusedMember.Local
 
 namespace COG.Utils;
 
@@ -43,6 +45,7 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="target">目标玩家</param>
     /// <param name="mustAlive">是否必须为活着的玩家</param>
+    /// <param name="closestDistance">限制距离</param>
     /// <returns>最近位置的玩家</returns>
     public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true,
         float closestDistance = float.MaxValue)
@@ -341,6 +344,7 @@ public enum DeathReason
     LoverSuicide
 }
 
+[SuppressMessage("Performance", "CA1822:将成员标记为 static")]
 public class DeadPlayerListener : IListener
 {
     [EventHandler(EventHandlerType.Postfix)]
@@ -365,7 +369,7 @@ public class DeadPlayerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    private void OnCoBegin(IntroCutsceneCoBeginEvent @event)
+    private void OnCoBegin(IntroCutsceneCoBeginEvent _)
     {
         DeadPlayerManager.DeadPlayers.Clear();
     }

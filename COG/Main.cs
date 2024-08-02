@@ -96,21 +96,11 @@ public partial class Main : BasePlugin
             "BepInEx/core/lua54.dll",
             "COG.Resources.InDLL.Depends.lua54.dll");
 /*
-        var disabledVersion = WebUtils
-            .GetWeb(
-                "https://raw.kkgithub.com/CognifyDev/.github/main/disabledVersions")
-            .Split("|");
-        if (disabledVersion.Any(s => PluginVersion.Equals(s)))
-        {
-            Logger.LogError("The version of the mod has been disabled!");
-            return;
-        }
-*/
-/*
         ModUpdater.FetchUpdate();
         Logger.LogInfo(
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
 */
+
         // Load plugins
         try
         {
@@ -133,7 +123,6 @@ public partial class Main : BasePlugin
             new RpcListener(),
             new TaskAdderListener(),
             new VersionShowerListener(),
-            //HandshakeManager.GetListener(), // Disable temporarily because it hasn't tested
             new VanillaBugFixListener()
         });
 
@@ -215,12 +204,8 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
-
-        // ReSharper disable once PossibleMistakenCallToGetType.2
-        // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-
         // 调用 GlobalCustomOptionConstant 静态构造方法来初始化
-        typeof(GlobalCustomOptionConstant).GetType();
+        // typeof(GlobalCustomOptionConstant).GetType();
 
         Harmony.PatchAll();
 

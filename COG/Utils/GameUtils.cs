@@ -82,7 +82,8 @@ public static class GameUtils
 
     public static void SendSystemMessage(string text, float delay = 0.2f)
     {
-        HudManager.Instance?.Chat?.StartCoroutine(CoSendChatMessage().WrapToIl2Cpp());
+        HudManager.Instance.Chat.StartCoroutine(CoSendChatMessage().WrapToIl2Cpp());
+        return;
 
         IEnumerator CoSendChatMessage()
         {
@@ -90,7 +91,7 @@ public static class GameUtils
             var host = AmongUsClient.Instance.GetHost().Character;
             var tempName = host.Data.PlayerName;
             host.SetName(LanguageConfig.Instance.SystemMessage);
-            HudManager.Instance?.Chat?.AddChat(host, text, false);
+            HudManager.Instance.Chat.AddChat(host, text, false);
             host.SetName(tempName);
         }
     }

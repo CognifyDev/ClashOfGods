@@ -17,7 +17,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Debug = System.Diagnostics.Debug;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
+// ReSharper disable InconsistentNaming
 
 namespace COG.UI.CustomOption;
 
@@ -257,14 +259,13 @@ public sealed class CustomOption
                 _ => role.Name.Color(Color.grey)
             };
 
-            var valueText = "";
-            dynamic option;
+            string valueText;
 
-            if ((option = OptionBehaviour!.GetComponent<StringOption>()) ==
+            if (OptionBehaviour!.GetComponent<StringOption>() ==
                 true) // It's strange that using (OptionBehaviour is TargetType) expression is useless
                 valueText = GetString();
             else if
-                ((option = OptionBehaviour!.GetComponent<ToggleOption>()) ==
+                (OptionBehaviour!.GetComponent<ToggleOption>() ==
                  true) // It's also strange that it will throw exception without (== true) expression 
                 valueText = TranslationController.Instance.GetString(GetBool()
                     ? StringNames.SettingsOn
@@ -295,9 +296,11 @@ public static class PresetsButtonsPatch
         DestroySelectableSprite(std.gameObject);
         DestroySelectableSprite(alter.gameObject);
 
-        std.transform.localPosition = new Vector3(-1.5f, 0.2f, 0);
-        alter.transform.localPosition = new Vector3(2.1f, 0.2f, 0);
-        std.transform.localScale = alter.transform.localScale = new Vector3(1.1f, 1.1f, 1);
+        var transform = std.transform;
+        transform.localPosition = new Vector3(-1.5f, 0.2f, 0);
+        var transform1 = alter.transform;
+        transform1.localPosition = new Vector3(2.1f, 0.2f, 0);
+        transform.localScale = transform1.localScale = new Vector3(1.1f, 1.1f, 1);
 
         void DestroySelectableSprite(GameObject go)
         {
@@ -346,9 +349,9 @@ public static class PresetsButtonsPatch
 [HarmonyPatch(typeof(RolesSettingsMenu))]
 public static class RoleOptionPatch
 {
-    private static readonly List<GameObject> _tabs = new();
+    private static readonly List<GameObject> _Tabs = new();
 
-    public static List<GameObject> Tabs => _tabs.Where(tab => tab).ToList();
+    public static List<GameObject> Tabs => _Tabs.Where(tab => tab).ToList();
 
     public static CustomRole? CurrentAdvancedTabFor { get; set; }
 
@@ -434,7 +437,7 @@ public static class RoleOptionPatch
         var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
-        _tabs.Add(tab.gameObject);
+        _Tabs.Add(tab.gameObject);
         tab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(o => o.gameObject.Destroy());
 
         tab.gameObject.SetActive(false);
@@ -495,13 +498,9 @@ public static class RoleOptionPatch
             var numberOption = role.RoleNumberOption!;
             var chanceOption = role.RoleChanceOption!;
             numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
+            Debug.Assert(CurrentTab != null, nameof(CurrentTab) + " != null");
             roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
-                new RoleBehaviour
-                {
-                    StringName = StringNames.None,
-                    TeamType = vanillaType,
-                    Role = (RoleTypes)role.Id + 100
-                }, layer);
+                CurrentTab.AddComponent<RoleBehaviour>(), layer);
             roleSetting.transform.localPosition = new Vector3(initialX, initialY + offsetY * i, -2f);
             roleSetting.titleText.text = role.Name;
             var label = roleSetting.labelSprite;
@@ -542,7 +541,8 @@ public static class RoleOptionPatch
                     }
                     catch
                     {
-                    } // Ignored
+                        // ignored
+                    }
                 }));
             }
 
@@ -610,16 +610,17 @@ public static class RoleOptionPatch
         if (!AllButton) return;
         AllButton!.SelectButton(clickedAllButton);
 
-        Main.Logger.LogInfo($"Is {obj.name} active: {active} ({clickedAllButton})");
+        /* Main.Logger.LogInfo($"Is {obj.name} active: {active} ({clickedAllButton})"); */
     }
 
     public static void ChangeCustomTab(RolesSettingsMenu menu, GameObject newTab, PassiveButton toSelect, CampType camp)
     {
         menu.AdvancedRolesSettings.SetActive(false);
         CurrentAdvancedTabFor = null;
+        /*
         Main.Logger.LogInfo(
             $"{nameof(CurrentAdvancedTabFor)}: {CurrentAdvancedTabFor?.GetType().Name ?? "(null)"} (It should be null now)");
-
+        */
         CloseAllTab(menu);
         OpenTab(newTab, toSelect);
         var scroller = menu.scrollBar;
