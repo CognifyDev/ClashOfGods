@@ -12,6 +12,7 @@ public class Spy : CustomRole, IListener
     public Spy() : base(LanguageConfig.Instance.SpyName, Color.grey, CampType.Crewmate)
     {
         ShortDescription = LanguageConfig.Instance.SpyDescription;
+        LongDescription = LanguageConfig.Instance.SpyLongDescText;
     }
 
     [EventHandler(EventHandlerType.Postfix)]

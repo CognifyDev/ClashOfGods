@@ -18,6 +18,7 @@ public class Sheriff : CustomRole, IListener
     {
         BaseRoleType = RoleTypes.Crewmate;
         ShortDescription = LanguageConfig.Instance.SheriffDescription;
+        LongDescription = LanguageConfig.Instance.SheriffLongDescText;
 
         if (ShowInOptions)
             SheriffKillCd = CreateOption(() => LanguageConfig.Instance.SheriffKillCooldown,

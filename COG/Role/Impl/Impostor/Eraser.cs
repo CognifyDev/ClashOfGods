@@ -27,6 +27,7 @@ public class Eraser : CustomRole, IListener
     {
         BaseRoleType = RoleTypes.Impostor;
         ShortDescription = LanguageConfig.Instance.EraserDescription;
+        LongDescription = LanguageConfig.Instance.EraserLongDescText;
 
         var type = GetTabType(this);
         _initialEraseCooldown = CreateOption(() => LanguageConfig.Instance.EraserInitialEraseCd,
@@ -43,7 +44,7 @@ public class Eraser : CustomRole, IListener
 
                 var camp = targetRole.CampType;
 
-                CustomRole setToRole = camp switch
+                CustomRole roleToSet = camp switch
                 {
                     CampType.Crewmate => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>(),
                     CampType.Neutral => CustomRoleManager.GetManager().GetTypeRoleInstance<Jester>(),
@@ -51,7 +52,7 @@ public class Eraser : CustomRole, IListener
                     _ => CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate.Crewmate>()
                 };
 
-                target.SetCustomRole(setToRole);
+                target.RpcSetCustomRole(roleToSet);
                 var currentCd = _eraseButton!.Cooldown();
                 _eraseButton.SetCooldown(currentCd + _increaseCooldownAfterErasing.GetFloat());
             }, () => _eraseButton!.ResetCooldown(),
