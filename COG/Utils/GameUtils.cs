@@ -56,17 +56,6 @@ public static class GameUtils
         return PlayerControl.LocalPlayer.GetMainRole();
     }
 
-    /// <summary>
-    ///     强制清除游戏状态
-    /// </summary>
-    public static void ForceClearGameData()
-    {
-        GameStates.InGame = false;
-        PlayerData.Clear();
-        var gameManager = GameManager.Instance;
-        if (gameManager != null) gameManager.EndGame();
-    }
-
     public static NormalGameOptionsV08 GetGameOptions()
     {
         return GameOptionsManager.Instance.currentNormalGameOptions;

@@ -8,12 +8,14 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Impl;
 using COG.Utils;
+using COG.Utils.Coding;
 using COG.Utils.Version;
 using TMPro;
 using UnityEngine;
 
 namespace COG.Rpc;
 
+[NotTested]
 public class HandshakeManager
 {
     public const string ShowerObjectName = "COGErrorMsgShower";

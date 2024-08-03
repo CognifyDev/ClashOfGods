@@ -18,7 +18,6 @@ namespace COG.UI.CustomOption;
 
 // Code base from
 // https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Modules/CustomOptions.cs
-[ShitCode]
 public sealed class CustomOption
 {
     public enum TabType
@@ -34,7 +33,6 @@ public sealed class CustomOption
 
     private int _selection;
 
-    // Option creation
     private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
     {
         Id = _typeId;
@@ -196,11 +194,6 @@ public sealed class CustomOption
         if (ValueRule is StringOptionValueRule rule)
             return rule.Selections[Selection];
         throw new NotSupportedException();
-    }
-
-    public int GetQuantity()
-    {
-        return Selection + 1;
     }
 
     // Option changes

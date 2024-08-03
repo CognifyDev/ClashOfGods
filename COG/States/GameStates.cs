@@ -1,5 +1,6 @@
 using COG.Role;
 using COG.Rpc;
+using COG.Utils;
 using InnerNet;
 
 namespace COG.States;
@@ -21,9 +22,11 @@ public static class GameStates
         set
         {
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
+            GameUtils.PlayerData.Clear();
 
             _inGame = value;
-            if (value == false) HandshakeManager.Instance.Reset();
+
+            if (!value) HandshakeManager.Instance.Reset();
         }
     }
 
