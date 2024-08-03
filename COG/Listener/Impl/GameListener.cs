@@ -31,8 +31,6 @@ namespace COG.Listener.Impl;
 
 public class GameListener : IListener
 {
-    private static bool HasStartedRoom { get; set; }
-
     [EventHandler(EventHandlerType.Prefix)]
     public void OnRPCReceived(PlayerHandleRpcEvent @event)
     {
@@ -95,7 +93,7 @@ public class GameListener : IListener
                 GameManager.Instance.LogicOptions.SyncOptions();
         }
 
-        if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+        if (PlayerControl.LocalPlayer.IsSamePlayer(player))
         {
             var playerRole = player.GetPlayerRole();
             if (playerRole is null) return;
@@ -204,7 +202,7 @@ public class GameListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
+    public void OnSelectRoles(RoleManagerSelectRolesEvent _)
     {
         if (!AmongUsClient.Instance.AmHost) return;
 
@@ -228,16 +226,14 @@ public class GameListener : IListener
     public void OnJoinLobby(GameStartManagerStartEvent @event)
     {
         var manager = @event.GameStartManager;
-        if (HasStartedRoom)
-            GameUtils.ForceClearGameData();
-        else
-            HasStartedRoom = true;
-
-        //manager.HostPrivacyButtons.
+        var privateButton = manager.HostPrivacyButtons.transform.FindChild("PRIVATE BUTTON");
+        var inactive = privateButton.FindChild("Inactive").GetComponent<SpriteRenderer>();
+        var highlight = privateButton.FindChild("Highlight").GetComponent<SpriteRenderer>();
+        inactive.color = highlight.color = Palette.DisabledGrey;
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnMakePublic(GameStartManagerMakePublicEvent @event)
+    public bool OnMakePublic(GameStartManagerMakePublicEvent _)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         GameUtils.SendGameMessage(LanguageConfig.Instance.MakePublicMessage);
@@ -344,7 +340,7 @@ public class GameListener : IListener
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnCheckGameEnd(GameCheckEndEvent @event)
+    public bool OnCheckGameEnd(GameCheckEndEvent _)
     {
         return CustomWinnerManager.CheckEndForCustomWinners();
     }
@@ -445,7 +441,7 @@ public class GameListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameStart(GameStartEvent @event)
+    public void OnGameStart(GameStartEvent _)
     {
         Main.Logger.LogInfo("Game started!");
 
@@ -473,15 +469,15 @@ public class GameListener : IListener
             <color=#FF1919FF>假任务：</color></color>
         */
 
-        var impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask);
-        var fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks);
+        var impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask); // 进行破坏，将所有人杀死。
+        var fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks); // 假任务：
         var impTaskTextFull =
             $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
 
         if (originText.StartsWith(impTaskTextFull))
         {
             var idx = originText.IndexOf(impTaskTextFull, StringComparison.Ordinal) + impTaskTextFull.Length;
-            sb.Append($"<color=#FF1919FF>{fakeTaskText}</color\r\n>").Append(originText[idx..]);
+            sb.Append($"<color=#FF1919FF>{fakeTaskText}</color>\r\n").Append(originText[idx..]);
         }
         else
         {
@@ -492,7 +488,7 @@ public class GameListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameEnd(AmongUsClientGameEndEvent @event)
+    public void OnGameEnd(AmongUsClientGameEndEvent _)
     {
         EndGameResult.CachedWinners.Clear();
         CustomWinnerManager.AllWinners.ToArray()

@@ -4,6 +4,7 @@ using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.PPhysics;
 using COG.UI.CustomButton;
+using COG.UI.CustomOption;
 using COG.Utils;
 using InnerNet;
 using UnityEngine;
@@ -308,5 +309,14 @@ internal class PlayerControlAwakePatch
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerControlAwakeEvent(__instance), EventHandlerType.Postfix);
+    }
+}
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
+internal class SyncVanillaSettingsPatch
+{
+    public static void Postfix()
+    {
+        CustomOption.ShareConfigs();
     }
 }

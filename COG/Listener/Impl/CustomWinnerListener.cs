@@ -17,8 +17,6 @@ public class CustomWinnerListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
-        GameStates.InGame = false;
-
         var manager = @event.Object;
         SetUpWinnerPlayers(manager);
         SetUpWinText(manager);
@@ -89,6 +87,8 @@ public class CustomWinnerListener : IListener
 
             num++;
         }
+
+        GameStates.InGame = false;
     }
 
     private static void SetUpWinText(EndGameManager manager)
