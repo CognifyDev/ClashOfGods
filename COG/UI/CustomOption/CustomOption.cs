@@ -96,7 +96,7 @@ public sealed class CustomOption
 
         var localPlayer = PlayerControl.LocalPlayer;
         PlayerControl[]? targetArr = null;
-        if (target) targetArr = new[] { target! };
+        if (target) targetArr = target.ToSingleElementArray()!;
 
         // 新建写入器
         var writer = RpcUtils.StartRpcImmediately(localPlayer, KnownRpc.ShareOptions, targetArr);
@@ -349,9 +349,7 @@ public static class PresetsButtonsPatch
 [HarmonyPatch(typeof(RolesSettingsMenu))]
 public static class RoleOptionPatch
 {
-    private static readonly List<GameObject> _Tabs = new();
-
-    public static List<GameObject> Tabs => _Tabs.Where(tab => tab).ToList();
+    public static List<GameObject> Tabs { get; } = new();
 
     public static CustomRole? CurrentAdvancedTabFor { get; set; }
 
@@ -360,7 +358,7 @@ public static class RoleOptionPatch
     public static GameObject? CurrentTab { get; set; }
     public static PassiveButton? CurrentButton { get; set; }
 
-    private static float ScrollerLocationPercent { get; set; }
+    public static float ScrollerLocationPercent { get; set; }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.Start))]
     [HarmonyPostfix]
@@ -437,7 +435,7 @@ public static class RoleOptionPatch
         var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
-        _Tabs.Add(tab.gameObject);
+        Tabs.Add(tab.gameObject);
         tab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(o => o.gameObject.Destroy());
 
         tab.gameObject.SetActive(false);
@@ -498,14 +496,7 @@ public static class RoleOptionPatch
             var numberOption = role.RoleNumberOption!;
             var chanceOption = role.RoleChanceOption!;
             numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
-            roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions,
-                // ReSharper disable once Unity.IncorrectMonoBehaviourInstantiation
-                new RoleBehaviour
-                {
-                    StringName = StringNames.None,
-                    TeamType = vanillaType,
-                    Role = (RoleTypes)role.Id + 100
-                }, layer);
+            roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions, role.VanillaRole, layer);
             roleSetting.transform.localPosition = new Vector3(initialX, initialY + offsetY * i, -2f);
             roleSetting.titleText.text = role.Name;
             var label = roleSetting.labelSprite;
@@ -520,7 +511,7 @@ public static class RoleOptionPatch
             collider.size = label.size;
 
             var passive = label.gameObject.AddComponent<PassiveButton>();
-            passive.Colliders = ((Collider2D)collider).ToSingleElementArray().ToIl2CppArray();
+            passive.Colliders = collider.ToSingleElementArray();
             passive.OnMouseOut = new UnityEvent();
             passive.OnMouseOver = new UnityEvent();
             passive.OnClick = new Button.ButtonClickedEvent();
@@ -587,6 +578,7 @@ public static class RoleOptionPatch
             ControllerManager.Instance.OpenOverlayMenu(tab.name, menu.BackButton, elements.FirstOrDefault(),
                 elements.ToList().ToIl2CppList());
             ChangeCustomTab(menu, tab, button, camp);
+            // idk if code below is useful, but keeping it is not a bad idea
             menu.ControllerSelectable.Clear();
             menu.ControllerSelectable = elements.ToList().ToIl2CppList();
             ControllerManager.Instance.CurrentUiState.SelectableUiElements = menu.ControllerSelectable;
@@ -763,7 +755,13 @@ public static class SettingMenuClosePatch
 {
     public static void Postfix()
     {
-        ControllerManager.Instance.CurrentUiState.MenuName = "";
+        RoleOptionPatch.Tabs.Clear();
+        RoleOptionPatch.AllButton = RoleOptionPatch.CurrentButton = null;
+        RoleOptionPatch.CurrentTab = null;
+        RoleOptionPatch.CurrentAdvancedTabFor = null;
+        RoleOptionPatch.ScrollerLocationPercent = 0f;
+
+        ControllerManager.Instance.CurrentUiState.MenuName = ""; // Fix player is unmoveable after closing menu
     }
 }
 
