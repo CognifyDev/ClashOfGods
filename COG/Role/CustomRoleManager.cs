@@ -84,7 +84,7 @@ public class CustomRoleManager
                     var chance = role.RoleChanceOption.GetInt() / 10;
                     for (var i = 0; i < times; i++)
                     {
-                        if (chance != 10) // Check if it's possiblity is 100%
+                        if (chance != 10) // Check if its possiblity is not 100%
                         {
                             const int possibilityCount = 10;
 
@@ -96,8 +96,7 @@ public class CustomRoleManager
                             var random = new Random(DateTime.Now.Millisecond);
                             var index = random.Next(possibilityCount);
 
-                            var result = chances[index];
-                            if (!result) continue;
+                            if (!chances[index]) continue;
                         }
 
                         _roles.Add(role);

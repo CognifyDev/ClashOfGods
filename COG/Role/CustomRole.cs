@@ -172,60 +172,11 @@ public abstract class CustomRole
 
     public RoleBehaviour VanillaRole { get; }
 
-    public RoleRulesCategory VanillaCategory
+    public RoleRulesCategory VanillaCategory => new()
     {
-        get
-        {
-            var settings = new List<BaseGameSetting>();
-            var idx = 0;
-            foreach (var option in RoleOptions)
-            {
-                var rule = option.ValueRule;
-                if (rule is BoolOptionValueRule)
-                    settings.Add(option.VanillaData = new CheckboxGameSetting
-                    {
-                        Type = OptionTypes.Checkbox
-                    });
-                else if (rule is IntOptionValueRule iovr)
-                    settings.Add(option.VanillaData = new IntGameSetting
-                    {
-                        Type = OptionTypes.Int,
-                        Value = option.GetInt(),
-                        Increment = iovr.Step,
-                        ValidRange = new IntRange(iovr.Min, iovr.Max),
-                        ZeroIsInfinity = false,
-                        SuffixType = iovr.SuffixType,
-                        FormatString = ""
-                    });
-                else if (rule is FloatOptionValueRule fovr)
-                    settings.Add(option.VanillaData = new FloatGameSetting
-                    {
-                        Type = OptionTypes.Float,
-                        Value = option.GetFloat(),
-                        Increment = fovr.Step,
-                        ValidRange = new FloatRange(fovr.Min, fovr.Max),
-                        ZeroIsInfinity = false,
-                        SuffixType = fovr.SuffixType,
-                        FormatString = ""
-                    });
-                else if (rule is StringOptionValueRule sovr)
-                    settings.Add(option.VanillaData = new StringGameSetting
-                    {
-                        Type = OptionTypes.String,
-                        Index = option.Selection,
-                        Values = new StringNames[sovr.Selections.Length]
-                    });
-
-                idx++;
-            }
-
-            return new RoleRulesCategory
-            {
-                AllGameSettings = settings.ToIl2CppList(),
-                Role = VanillaRole
-            };
-        }
-    }
+        AllGameSettings = RoleOptions.Select(o => o.ToVanillaOptionData()).ToList().ToIl2CppList(),
+        Role = VanillaRole
+    };
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
@@ -240,12 +191,7 @@ public abstract class CustomRole
     /// <param name="button">要添加的按钮</param>
     public void AddButton(CustomButton button)
     {
-        button.HasButton += () =>
-        {
-            var player = PlayerControl.LocalPlayer;
-            var role = player.GetMainRole();
-            return role.Name.Equals(Name);
-        };
+        button.HasButton += () => PlayerControl.LocalPlayer.IsRole(this);
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
@@ -296,25 +242,13 @@ public abstract class CustomRole
     public static CustomOption.TabType GetTabType(CustomRole role)
     {
         if (role.CampType == CampType.Unknown || role.IsSubRole) return CustomOption.TabType.Addons;
-        CustomOption.TabType toReturn;
-        switch (role.CampType)
+        return role.CampType switch
         {
-            case CampType.Crewmate:
-                toReturn = CustomOption.TabType.Crewmate;
-                break;
-            case CampType.Impostor:
-                toReturn = CustomOption.TabType.Impostor;
-                break;
-            case CampType.Neutral:
-                toReturn = CustomOption.TabType.Neutral;
-                break;
-            case CampType.Unknown:
-            default: 
-                toReturn = CustomOption.TabType.Addons; 
-                break;
-        }
-
-        return toReturn;
+            CampType.Crewmate => CustomOption.TabType.Crewmate,
+            CampType.Impostor => CustomOption.TabType.Impostor,
+            CampType.Neutral => CustomOption.TabType.Neutral,
+            _ => CustomOption.TabType.Addons,
+        };
     }
 
     public virtual IListener GetListener()

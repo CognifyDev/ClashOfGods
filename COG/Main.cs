@@ -209,6 +209,8 @@ public partial class Main : BasePlugin
         Harmony.PatchAll();
 
         foreach (var plugin in PluginManager.GetPlugins()) plugin.OnEnable();
+
+        _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
     }
 
     public override bool Unload()

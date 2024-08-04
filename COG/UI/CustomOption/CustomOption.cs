@@ -1,9 +1,9 @@
+using AmongUs.GameOptions;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using COG.Utils.Coding;
 using COG.Utils.WinAPI;
 using System;
 using System.Collections.Generic;
@@ -78,7 +78,7 @@ public sealed class CustomOption
 
     public void Register()
     {
-        
+
     }
 
     public static void ShareConfigs(PlayerControl? target = null)
@@ -97,9 +97,9 @@ public sealed class CustomOption
         var sb = new StringBuilder();
 
         foreach (var option in from option in Options
-                 where option != null
-                 where option.Selection != option.DefaultSelection
-                 select option)
+                               where option != null
+                               where option.Selection != option.DefaultSelection
+                               select option)
         {
             sb.Append(option.Id + "|" + option.Selection);
             sb.Append(',');
@@ -220,10 +220,30 @@ public sealed class CustomOption
 
     public void NotifySettingChange()
     {
+        if (!OptionBehaviour) return;
+        
         var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.AllOptions.Contains(this));
-        if (role == null) return;
+        
+        if (role == null)
+        {
+            string valueText = "";
 
-        if (OptionBehaviour is RoleOptionSetting setting)
+            if (OptionBehaviour!.GetComponent<StringOption>()) 
+                valueText = GetString();
+            else if (OptionBehaviour!.GetComponent<ToggleOption>())
+                valueText = TranslationController.Instance.GetString(GetBool()
+                    ? StringNames.SettingsOn
+                    : StringNames.SettingsOff);
+            else if (OptionBehaviour!.GetComponent<NumberOption>())
+                valueText = OptionBehaviour!.Data.GetValueString(OptionBehaviour.GetFloat());
+
+            var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotification,
+                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{Name()}</font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\"> " + valueText + " </font>"
+            );
+            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MinValue + Id, item, true);
+        }
+        else if (OptionBehaviour is RoleOptionSetting setting)
         {
             var roleName = setting.Role.TeamType switch
             {
@@ -251,7 +271,7 @@ public sealed class CustomOption
 
             if (OptionBehaviour!.GetComponent<StringOption>()) // It's strange that using (OptionBehaviour is TargetType) expression is useless
                 valueText = GetString();
-            else if (OptionBehaviour!.GetComponent<ToggleOption>()) 
+            else if (OptionBehaviour!.GetComponent<ToggleOption>())
                 valueText = TranslationController.Instance.GetString(GetBool()
                     ? StringNames.SettingsOn
                     : StringNames.SettingsOff);
@@ -264,5 +284,45 @@ public sealed class CustomOption
             );
             HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue - Id, item, true);
         }
+    }
+
+    public BaseGameSetting? ToVanillaOptionData()
+    {
+        var rule = ValueRule;
+        if (rule is BoolOptionValueRule)
+            return VanillaData = new CheckboxGameSetting
+            {
+                Type = OptionTypes.Checkbox
+            };
+        else if (rule is IntOptionValueRule iovr)
+            return VanillaData = new IntGameSetting
+            {
+                Type = OptionTypes.Int,
+                Value = GetInt(),
+                Increment = iovr.Step,
+                ValidRange = new IntRange(iovr.Min, iovr.Max),
+                ZeroIsInfinity = false,
+                SuffixType = iovr.SuffixType,
+                FormatString = ""
+            };
+        else if (rule is FloatOptionValueRule fovr)
+            return VanillaData = new FloatGameSetting
+            {
+                Type = OptionTypes.Float,
+                Value = GetFloat(),
+                Increment = fovr.Step,
+                ValidRange = new FloatRange(fovr.Min, fovr.Max),
+                ZeroIsInfinity = false,
+                SuffixType = fovr.SuffixType,
+                FormatString = ""
+            };
+        else if (rule is StringOptionValueRule sovr)
+            return VanillaData = new StringGameSetting
+            {
+                Type = OptionTypes.String,
+                Index = Selection,
+                Values = new StringNames[sovr.Selections.Length]
+            };
+        return null;
     }
 }

@@ -23,6 +23,7 @@ public class Vulture : CustomRole, IListener, IWinnable
     public Vulture() : base(LanguageConfig.Instance.VultureName, Color.blue, CampType.Neutral)
     {
         ShortDescription = LanguageConfig.Instance.VultureDescription;
+        LongDescription = LanguageConfig.Instance.VultureLongDescText;
 
         if (ShowInOptions)
         {
