@@ -68,5 +68,8 @@ internal static class GameOptionMenuPatch
 
     [HarmonyPatch(nameof(GameOptionsMenu.ValueChanged))]
     [HarmonyPrefix]
-    public static bool OnValueChangedVanilla() => false; 
+    public static bool OnValueChangedVanilla(OptionBehaviour __instance)
+    {
+        return !CustomOption.TryGetOption(__instance, out _);
+    } 
 }

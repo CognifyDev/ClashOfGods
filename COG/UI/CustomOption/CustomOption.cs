@@ -81,6 +81,12 @@ public sealed class CustomOption
 
     }
 
+    public static bool TryGetOption(OptionBehaviour optionBehaviour, out CustomOption customOption)
+    {
+        customOption = Options.FirstOrDefault(o => o.OptionBehaviour == optionBehaviour)!;
+        return customOption != null;
+    }
+
     public static void ShareConfigs(PlayerControl? target = null)
     {
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
