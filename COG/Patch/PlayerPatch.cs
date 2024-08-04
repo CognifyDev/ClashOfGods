@@ -101,13 +101,18 @@ internal class HostStartPatch
     public static void Prefix(GameStartManager __instance)
     {
         if (GlobalCustomOptionConstant.DebugMode.GetBool())
+        {
             // start with no limit
-            GameStartManager.Instance.MinPlayers = 1;
+            __instance.MinPlayers = 1;
+            __instance.StartButton.SetButtonEnableState(true);
+            __instance.StartButton.ChangeButtonText(TranslationController.Instance.GetString(StringNames.StartLabel));
+        }
+            
 
         {
             // showtime
             if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||
-                !__instance.GameRoomNameCode.isActiveAndEnabled) return;
+                AmongUsClient.Instance.AmLocalHost) return;
             _update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
         }
     }
