@@ -205,7 +205,7 @@ public static class RoleOptionPatch
                     }
                     catch
                     {
-                        // ignored
+                        // Ignored
                     }
                 }));
             }

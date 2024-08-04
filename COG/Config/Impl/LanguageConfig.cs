@@ -42,9 +42,9 @@ public class LanguageConfig : Config
     }
 
     public static LanguageConfig Instance { get; private set; }
-    public string MessageForNextPage { get; private set; } = null!;
     public string MakePublicMessage { get; private set; } = null!;
 
+    public string GeneralHeaderTitle { get; private set; } = null!;
     public string SavePreset { get; private set; } = null!;
     public string LoadPreset { get; private set; } = null!;
     public string DebugMode { get; private set; } = null!;
@@ -67,9 +67,11 @@ public class LanguageConfig : Config
 
     public string SpyName { get; private set; } = null!;
     public string SpyDescription { get; private set; } = null!;
+    public string SpyLongDescText { get; private set; } = null!;
 
     public string VigilanteName { get; private set; } = null!;
     public string VigilanteDescription { get; private set; } = null!;
+    public string VigilanteLongDescText { get; private set; } = null!;
 
     // Impostor
     public string ImpostorName { get; private set; } = null!;
@@ -77,10 +79,12 @@ public class LanguageConfig : Config
 
     public string CleanerName { get; private set; } = null!;
     public string CleanerDescription { get; private set; } = null!;
+    public string CleanerLongDescText { get; private set; } = null!;
     public string CleanBodyCooldown { get; private set; } = null!;
 
     public string EraserName { get; private set; } = null!;
     public string EraserDescription { get; private set; } = null!;
+    public string EraserLongDescText { get; private set; } = null!;
     public string EraserInitialEraseCd { get; private set; } = null!;
     public string EraserIncreaseCdAfterErasing { get; private set; } = null!;
     public string EraserCanEraseImpostors { get; private set; } = null!;
@@ -91,6 +95,7 @@ public class LanguageConfig : Config
 
     public string VultureName { get; private set; } = null!;
     public string VultureDescription { get; private set; } = null!;
+    public string VultureLongDescText { get; private set; } = null!;
     public string VultureEatCooldown { get; private set; } = null!;
     public string VultureEatenCountToWin { get; private set; } = null!;
     public string VultureHasArrowToBodies { get; private set; } = null!;
@@ -98,11 +103,13 @@ public class LanguageConfig : Config
     // Sub-roles
     public string GuesserName { get; private set; } = null!;
     public string GuesserDescription { get; private set; } = null!;
+    public string GuesserLongDescText { get; private set; } = null!;
     public string GuesserMaxGuessTime { get; private set; } = null!;
     public string GuesserGuessContinuously { get; private set; } = null!;
 
     public string LighterName { get; private set; } = null!;
     public string LighterDescription { get; private set; } = null!;
+    public string LighterLongDescText { get; private set; } = null!;
 
     public string LoverName { get; private set; } = null!;
     public string LoverDescription { get; private set; } = null!;
@@ -168,13 +175,13 @@ public class LanguageConfig : Config
 
     private void SetTranslations()
     {
-        MessageForNextPage = GetString("lobby.message-for-next-page");
         MakePublicMessage = GetString("lobby.make-public-message");
 
-        LoadPreset = GetString("menu.general.load-preset");
-        SavePreset = GetString("menu.general.save-preset");
-        DebugMode = GetString("menu.general.debug-mode");
-        MaxSubRoleNumber = GetString("menu.general.max-sub-role-number");
+        GeneralHeaderTitle = LoadPreset = GetString("game-setting.general.title");
+        LoadPreset = GetString("game-setting.general.load-preset");
+        SavePreset = GetString("game-setting.general.save-preset");
+        DebugMode = GetString("game-setting.general.debug-mode");
+        MaxSubRoleNumber = GetString("game-setting.general.max-sub-role-number");
 
         // Unknown
         UnknownName = GetString("role.unknown.name");
@@ -193,9 +200,11 @@ public class LanguageConfig : Config
 
         SpyName = GetString("role.crewmate.spy.name");
         SpyDescription = GetString("role.crewmate.spy.description");
+        SpyLongDescText = GetString("role.crewmate.spy.desc-long");
 
         VigilanteName = GetString("role.crewmate.vigilante.name");
         VigilanteDescription = GetString("role.crewmate.vigilante.description");
+        VigilanteLongDescText = GetString("role.crewmate.vigilante.desc-long");
 
         // Impostors
         ImpostorName = GetString("role.impostor.impostor.name");
@@ -203,10 +212,12 @@ public class LanguageConfig : Config
 
         CleanerName = GetString("role.impostor.cleaner.name");
         CleanerDescription = GetString("role.impostor.cleaner.description");
+        CleanerLongDescText = GetString("role.impostor.cleaner.desc-long");
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
 
         EraserName = GetString("role.impostor.eraser.name");
         EraserDescription = GetString("role.impostor.eraser.description");
+        EraserLongDescText = GetString("role.impostor.eraser.desc-long");
         EraserInitialEraseCd = GetString("role.impostor.eraser.menu.initial-erase-cd");
         EraserIncreaseCdAfterErasing = GetString("role.impostor.eraser.menu.increase-cd-after-erasing");
         EraserCanEraseImpostors = GetString("role.impostor.eraser.menu.can-erase-imps");
@@ -217,16 +228,19 @@ public class LanguageConfig : Config
 
         VultureName = GetString("role.neutral.vulture.name");
         VultureDescription = GetString("role.neutral.vulture.description");
+        VultureLongDescText = GetString("role.neutral.vulture.desc-long");
         VultureEatCooldown = GetString("role.neutral.vulture.eat-cd");
         VultureEatenCountToWin = GetString("role.neutral.vulture.count-to-win");
         VultureHasArrowToBodies = GetString("role.neutral.vulture.has-arrow");
 
         GuesserDescription = GetString("role.sub-roles.guesser.description");
+        GuesserLongDescText = GetString("role.sub-roles.guesser.desc-long");
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
 
         LighterName = GetString("role.sub-roles.lighter.name");
         LighterDescription = GetString("role.sub-roles.lighter.description");
+        LighterLongDescText = GetString("role.sub-roles.lighter.desc-long");
 
         LoverName = GetString("role.sub-roles.lover.name");
         LoverDescription = GetString("role.sub-roles.lover.description");
