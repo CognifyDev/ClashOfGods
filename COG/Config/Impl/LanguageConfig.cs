@@ -1,5 +1,6 @@
 using COG.Utils;
 using COG.Utils.Coding;
+using System;
 
 // ReSharper disable All
 
@@ -12,6 +13,7 @@ public class LanguageConfig : Config
     {
         Instance = new LanguageConfig();
         LoadLanguageConfig();
+        FirstTimeLoad = false;
     }
 
 
@@ -40,6 +42,10 @@ public class LanguageConfig : Config
             Instance = new LanguageConfig();
         }
     }
+
+    private static bool FirstTimeLoad = true;
+
+    public static Action OnLanguageLoaded { get; set;  } = new(() => { });
 
     public static LanguageConfig Instance { get; private set; }
     public string MakePublicMessage { get; private set; } = null!;
@@ -302,6 +308,8 @@ public class LanguageConfig : Config
         LoverEjectText = GetString("game.exile.lover-message");
 
         SystemMessage = GetString("game.chat.system-message");
+
+        if (!FirstTimeLoad) OnLanguageLoaded.GetInvocationList().ForEach(d => d.DynamicInvoke(null));
     }
 
 
@@ -317,6 +325,8 @@ public class LanguageConfig : Config
         return toReturn;
     }
 
+    public TextHandler GetHandler(string location) => new(location);
+
     private static void LoadLanguageConfig()
     {
         Instance.LoadConfig(true);
@@ -326,5 +336,20 @@ public class LanguageConfig : Config
     internal static void LoadLanguageConfig(string path)
     {
         Instance = new LanguageConfig(path);
+    }
+
+    public class TextHandler
+    {
+        internal TextHandler(string location)
+        {
+            Location = location;
+        }
+
+        public string Location { get; }
+
+        public string GetString(string target)
+        {
+            return Instance.GetString($"{Location}.{target}");
+        }
     }
 }

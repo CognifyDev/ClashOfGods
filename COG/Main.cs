@@ -152,6 +152,8 @@ public partial class Main : BasePlugin
             new Lighter()
         });
 
+        LanguageConfig.OnLanguageLoaded += () => CustomRoleManager.GetManager().ReloadRoles();
+
         // Register custom buttons
         CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
 
