@@ -83,7 +83,7 @@ public sealed class CustomOption
 
     public static bool TryGetOption(OptionBehaviour optionBehaviour, out CustomOption customOption)
     {
-        customOption = Options.FirstOrDefault(o => o.OptionBehaviour == optionBehaviour)!;
+        customOption = Options.FirstOrDefault(o => o?.OptionBehaviour == optionBehaviour)!;
         return customOption != null;
     }
 

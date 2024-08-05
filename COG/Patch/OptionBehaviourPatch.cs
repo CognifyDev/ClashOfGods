@@ -34,17 +34,11 @@ public static class OptionBehaviourPatch
 {
     private const string InitializeName = nameof(OptionBehaviour.Initialize);
 
-    private static bool TryGetCustomOption(OptionBehaviour option, out CustomOption custom)
-    {
-        custom = CustomOption.Options.FirstOrDefault(o => o?.OptionBehaviour == option)!;
-        return custom != null;
-    }
-
     [HarmonyPatch(typeof(NumberOption), nameof(NumberOption.UpdateValue))]
     [HarmonyPrefix]
     private static bool NumberOptionValueUpdatePatch(NumberOption __instance)
     {
-        if (!TryGetCustomOption(__instance, out var customOption)) return true;
+        if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
         var rule = customOption.ValueRule;
         if (rule is FloatOptionValueRule)
             customOption.UpdateSelection(__instance.GetFloat());
@@ -57,7 +51,7 @@ public static class OptionBehaviourPatch
     [HarmonyPrefix]
     private static bool StringOptionValueUpdatePatch(StringOption __instance)
     {
-        if (!TryGetCustomOption(__instance, out var customOption)) return true;
+        if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
         customOption.UpdateSelection(__instance.GetInt());
         return false;
     }
@@ -66,7 +60,7 @@ public static class OptionBehaviourPatch
     [HarmonyPrefix]
     private static bool ToggleOptionValueUpdatePatch(ToggleOption __instance)
     {
-        if (!TryGetCustomOption(__instance, out var customOption)) return true;
+        if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
         customOption.UpdateSelection(__instance.GetBool());
         return false;
     }
@@ -77,7 +71,7 @@ public static class OptionBehaviourPatch
     [HarmonyPostfix]
     private static void OptionNamePatch(OptionBehaviour __instance)
     {
-        if (!TryGetCustomOption(__instance, out var customOption)) return;
+        if (!CustomOption.TryGetOption(__instance, out var customOption)) return;
         var titleText = __instance.transform.FindChild("Title Text").GetComponent<TextMeshPro>();
         titleText.text = customOption.Name();
         if (__instance is ToggleOption toggle)
@@ -99,7 +93,7 @@ public static class OptionBehaviourPatch
     [HarmonyPrefix]
     private static bool StringOptionValueTextPatch(StringOption __instance)
     {
-        if (!TryGetCustomOption(__instance, out var customOption)) return true;
+        if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
         if (__instance.oldValue != __instance.Value)
         {
             __instance.oldValue = __instance.Value;

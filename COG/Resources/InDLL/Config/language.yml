@@ -33,6 +33,8 @@ role:
     bait:
       name: "诱饵"
       description: "你被击杀时，凶手会自动报告"
+      killer-report-delay: "凶手自报延迟"
+      warn-killer: "闪光警告凶手"
     sheriff:
       name: "警长"
       description: "你可以击杀所有非船员玩家，但是错杀船员的后果是致命的"
