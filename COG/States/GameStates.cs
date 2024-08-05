@@ -22,11 +22,14 @@ public static class GameStates
         set
         {
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-            GameUtils.PlayerData.Clear();
-
+            
             _inGame = value;
 
-            if (!value) HandshakeManager.Instance.Reset();
+            if (!value)
+            {
+                HandshakeManager.Instance.Reset(); 
+                GameUtils.PlayerData.Clear();
+            }
         }
     }
 
