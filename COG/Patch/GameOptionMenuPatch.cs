@@ -14,7 +14,7 @@ internal static class GameOptionMenuPatch
     [HarmonyPostfix]
     public static void OnSettingsCreated(GameOptionsMenu __instance)
     {
-        int layer = GameOptionsMenu.MASK_LAYER;
+        var layer = GameOptionsMenu.MASK_LAYER;
         var xStart = GameOptionsMenu.START_POS_X;
         var headerX = GameOptionsMenu.HEADER_X;
         var headerOffset = GameOptionsMenu.HEADER_SCALE;
@@ -22,12 +22,13 @@ internal static class GameOptionMenuPatch
 
         var settingMap = CustomOption.Options.Where(o => o is { Page: CustomOption.TabType.General }).ToDictionary(o => o!, o => o!.ToVanillaOptionData());
 
-        float num = -(__instance.scrollBar.ContentYBounds.max + 1.65f);
+        var num = -(__instance.scrollBar.ContentYBounds.max + 1.65f);
         var header = Object.Instantiate(__instance.categoryHeaderOrigin, __instance.settingsContainer);
         header.SetHeader(StringNames.None, layer);
         header.Title.text = LanguageConfig.Instance.GeneralHeaderTitle;
-        header.transform.localScale = Vector3.one * headerOffset;
-        header.transform.localPosition = new Vector3(headerX, num, -2f);
+        var transform = header.transform;
+        transform.localScale = Vector3.one * headerOffset;
+        transform.localPosition = new Vector3(headerX, num, -2f);
         num -= headerOffset;
 
         foreach (var (option, vanillaSetting) in settingMap)

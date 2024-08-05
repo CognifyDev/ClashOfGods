@@ -41,7 +41,6 @@ public sealed class CustomOption
         _selection = rule.DefaultSelection;
         Parent = parent;
         Page = type;
-        Selection = 0;
         Options.Add(this);
     }
 

@@ -14,7 +14,7 @@ public static class GlobalCustomOptionConstant
 
         MaxSubRoleNumber = CustomOption.Of(CustomOption.TabType.General,
             () => LanguageConfig.Instance.MaxSubRoleNumber,
-            new IntOptionValueRule(0, 1, 10, 1), null);
+            new IntOptionValueRule(0, 1, 10, 1));
     }
 
     public static CustomOption DebugMode { get; }
