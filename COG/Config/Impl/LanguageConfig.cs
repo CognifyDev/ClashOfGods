@@ -152,6 +152,7 @@ public class LanguageConfig : Config
     public string KillAction { get; private set; } = null!;
     public string CleanAction { get; private set; } = null!;
     public string EraseAction { get; private set; } = null!;
+    public string EatAction { get; private set; } = null!;
     public string AnnihilateAction { get; private set; } = null!;
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
@@ -282,6 +283,7 @@ public class LanguageConfig : Config
         KillAction = GetString("action.kill");
         CleanAction = GetString("action.clean");
         EraseAction = GetString("action.erase-action");
+        EatAction = GetString("action.eat-action");
         AnnihilateAction = GetString("action.annihilate");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");

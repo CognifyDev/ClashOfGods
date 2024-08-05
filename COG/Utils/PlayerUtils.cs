@@ -97,11 +97,7 @@ public static class PlayerUtils
 
     public static CustomRole GetMainRole(this PlayerControl player)
     {
-        return (from keyValuePair in GameUtils.PlayerData
-                where keyValuePair.Player.IsSamePlayer(player)
-                where !keyValuePair.Role.IsSubRole
-                select keyValuePair.Role)
-            .FirstOrDefault() ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
+        return GameUtils.PlayerData.FirstOrDefault(d=>d.Player.IsSamePlayer(player))?.Role ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
     }
 
     public static void SetNamePrivately(PlayerControl target, PlayerControl seer, string name)

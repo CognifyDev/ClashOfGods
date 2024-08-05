@@ -30,11 +30,12 @@ public class Vigilante : CustomRole, IListener
                 if (target == null) return;
                 PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
                 _killTimes--;
+                _killButton!.UsesRemaining = _killTimes;
             },
             () => _killButton!.ResetCooldown(),
             () => _killButton!.HasButton() &&
                   PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance),
-            () => PlayerControl.LocalPlayer.IsRole(this) && _killTimes > 0,
+            () => true,
             ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
             2,
             KeyCode.Q,

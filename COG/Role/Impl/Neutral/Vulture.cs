@@ -55,7 +55,7 @@ public class Vulture : CustomRole, IListener, IWinnable
             null!,
             2,
             KeyCode.E,
-            "eat",
+            LanguageConfig.Instance.EatAction,
             () => EatingCooldown?.GetFloat() ?? 30f,
             0
         );
