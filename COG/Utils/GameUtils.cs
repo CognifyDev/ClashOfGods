@@ -5,7 +5,6 @@ using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Config.Impl;
 using COG.Role;
-using COG.States;
 using UnityEngine;
 
 namespace COG.Utils;

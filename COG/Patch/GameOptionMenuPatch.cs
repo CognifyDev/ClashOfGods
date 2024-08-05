@@ -1,12 +1,9 @@
 using COG.Config.Impl;
 using COG.UI.CustomOption;
 using System.Linq;
-using System;
 using UnityEngine;
-using COG.Utils;
 using System.Collections.Generic;
 using COG.UI.CustomOption.ValueRules.Impl;
-using System.Reflection.Metadata.Ecma335;
 
 namespace COG.Patch;
 
@@ -110,7 +107,7 @@ internal static class GameOptionMenuPatch
         var scroller = __instance.scrollBar;
         scroller.SetYBoundsMax(-num - 1.65f);
         scroller.UpdateScrollBars();
-        if (scroller.GetScrollPercY() == 1) scroller.ScrollPercentY(1); // 修复可能的超出滚动条范围的bug
+        if (scroller.GetScrollPercY() == 1) scroller.ScrollPercentY(1); // 淇鍙兘鐨勮秴鍑烘粴鍔ㄦ潯鑼冨洿鐨刡ug
     }
 
     [HarmonyPatch(nameof(GameOptionsMenu.ValueChanged))]

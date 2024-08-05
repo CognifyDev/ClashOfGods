@@ -1,4 +1,3 @@
-using AmongUs.GameOptions;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
@@ -33,7 +32,7 @@ public sealed class CustomOption
 
     private int _selection;
 
-    private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent, bool isHeader)
+    private CustomOption(TabType type, Func<string> nameGetter, IValueRule rule, CustomOption? parent)
     {
         Id = _typeId;
         _typeId++;
@@ -41,7 +40,6 @@ public sealed class CustomOption
         ValueRule = rule;
         _selection = rule.DefaultSelection;
         Parent = parent;
-        IsHeader = isHeader;
         Page = type;
         Selection = 0;
         Options.Add(this);
@@ -51,14 +49,13 @@ public sealed class CustomOption
 
     public int DefaultSelection => ValueRule.DefaultSelection;
     public int Id { get; }
-    public bool IsHeader { get; }
     public Func<string> Name { get; set; }
     public TabType Page { get; }
     public CustomOption? Parent { get; }
     public object[] Selections => ValueRule.Selections;
     public IValueRule ValueRule { get; }
     public OptionBehaviour? OptionBehaviour { get; set; }
-    public BaseGameSetting? VanillaData { get; set; }
+    public BaseGameSetting? VanillaData { get; private set; }
 
     public int Selection
     {
@@ -71,9 +68,9 @@ public sealed class CustomOption
     }
 
     public static CustomOption Of(TabType type, Func<string> nameGetter, IValueRule rule,
-        CustomOption? parent = null, bool isHeader = false)
+        CustomOption? parent = null)
     {
-        return new CustomOption(type, nameGetter, rule, parent, isHeader);
+        return new CustomOption(type, nameGetter, rule, parent);
     }
 
     public void Register()
@@ -81,10 +78,10 @@ public sealed class CustomOption
 
     }
 
-    public static bool TryGetOption(OptionBehaviour optionBehaviour, out CustomOption customOption)
+    public static bool TryGetOption(OptionBehaviour optionBehaviour, out CustomOption? customOption)
     {
         customOption = Options.FirstOrDefault(o => o?.OptionBehaviour == optionBehaviour)!;
-        return customOption != null;
+        return customOption != null!;
     }
 
     public static void ShareConfigs(PlayerControl? target = null)
@@ -116,7 +113,7 @@ public sealed class CustomOption
         // id|selection,id|selection
     }
 
-    public static void LoadOptionFromPreset(string path)
+    private static void LoadOptionFromPreset(string path)
     {
         try
         {
@@ -139,7 +136,7 @@ public sealed class CustomOption
         }
     }
 
-    public static void SaveCurrentOption(string path)
+    private static void SaveCurrentOption(string path)
     {
         try
         {
@@ -211,12 +208,11 @@ public sealed class CustomOption
 
     public void UpdateSelection(object newValue)
     {
-        if (newValue == null) return;
         var index = ValueRule.Selections.ToList().IndexOf(newValue);
         if (index != -1) UpdateSelection(index);
     }
 
-    public void ShareOptionChange(int newSelection)
+    private void ShareOptionChange(int newSelection)
     {
         RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.UpdateOption)
             .WritePacked(Id)
@@ -224,7 +220,7 @@ public sealed class CustomOption
             .Finish();
     }
 
-    public void NotifySettingChange()
+    private void NotifySettingChange()
     {
         if (!OptionBehaviour) return;
         
@@ -296,39 +292,47 @@ public sealed class CustomOption
     {
         var rule = ValueRule;
         if (rule is BoolOptionValueRule)
-            return VanillaData = new CheckboxGameSetting
-            {
-                Type = OptionTypes.Checkbox
-            };
-        else if (rule is IntOptionValueRule iovr)
-            return VanillaData = new IntGameSetting
-            {
-                Type = OptionTypes.Int,
-                Value = GetInt(),
-                Increment = iovr.Step,
-                ValidRange = new IntRange(iovr.Min, iovr.Max),
-                ZeroIsInfinity = false,
-                SuffixType = iovr.SuffixType,
-                FormatString = ""
-            };
-        else if (rule is FloatOptionValueRule fovr)
-            return VanillaData = new FloatGameSetting
-            {
-                Type = OptionTypes.Float,
-                Value = GetFloat(),
-                Increment = fovr.Step,
-                ValidRange = new FloatRange(fovr.Min, fovr.Max),
-                ZeroIsInfinity = false,
-                SuffixType = fovr.SuffixType,
-                FormatString = ""
-            };
-        else if (rule is StringOptionValueRule sovr)
-            return VanillaData = new StringGameSetting
-            {
-                Type = OptionTypes.String,
-                Index = Selection,
-                Values = new StringNames[sovr.Selections.Length]
-            };
+        {
+            var checkboxGameSetting = ScriptableObject.CreateInstance<CheckboxGameSetting>();
+            checkboxGameSetting.Type = OptionTypes.Checkbox;
+            return VanillaData = checkboxGameSetting;
+        }
+
+        if (rule is IntOptionValueRule intOptionValueRule)
+        {
+            var intGameSetting = ScriptableObject.CreateInstance<IntGameSetting>();
+            intGameSetting.Type = OptionTypes.Int;
+            intGameSetting.Value = GetInt();
+            intGameSetting.Increment = intOptionValueRule.Step;
+            intGameSetting.ValidRange = new IntRange(intOptionValueRule.Min, intOptionValueRule.Max);
+            intGameSetting.ZeroIsInfinity = false;
+            intGameSetting.SuffixType = intOptionValueRule.SuffixType;
+            intGameSetting.FormatString = "";
+            return VanillaData = intGameSetting;
+        }
+
+        if (rule is FloatOptionValueRule floatOptionValueRule)
+        {
+            var floatGameSetting = ScriptableObject.CreateInstance<FloatGameSetting>();
+            floatGameSetting.Type = OptionTypes.Float;
+            floatGameSetting.Value = GetFloat();
+            floatGameSetting.Increment = floatOptionValueRule.Step;
+            floatGameSetting.ValidRange = new FloatRange(floatOptionValueRule.Min, floatOptionValueRule.Max);
+            floatGameSetting.ZeroIsInfinity = false;
+            floatGameSetting.SuffixType = floatOptionValueRule.SuffixType;
+            floatGameSetting.FormatString = "";
+            return VanillaData = floatGameSetting;
+        }
+
+        if (rule is StringOptionValueRule stringOptionValueRule)
+        {
+            var stringGameSetting = ScriptableObject.CreateInstance<StringGameSetting>();
+            stringGameSetting.Type = OptionTypes.String;
+            stringGameSetting.Index = Selection;
+            stringGameSetting.Values = new StringNames[stringOptionValueRule.Selections.Length];
+            return VanillaData = stringGameSetting;
+        }
+
         return null;
     }
 }
