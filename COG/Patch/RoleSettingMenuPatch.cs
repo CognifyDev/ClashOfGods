@@ -92,7 +92,9 @@ public static class RoleOptionPatch
     {
         Main.Logger.LogDebug($"Creating tab for team {camp}...");
 
-        var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
+        var headerXStart = RolesSettingsMenu.X_START_ROLE_HEADER;
+        var yStart = RolesSettingsMenu.Y_START;
+        var initialHeaderPos = new Vector3(headerXStart, yStart, -2f);
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
         tab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(o => o.gameObject.Destroy());
