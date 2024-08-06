@@ -35,11 +35,6 @@ using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 namespace COG;
 
 [BepInAutoPlugin(PluginGuid, PluginName)]
-[BepInIncompatibility("com.emptybottle.townofhost")]
-[BepInIncompatibility("me.eisbison.theotherroles")]
-[BepInIncompatibility("me.yukieiji.extremeroles")]
-[BepInIncompatibility("jp.ykundesu.supernewroles")]
-[BepInIncompatibility("com.tugaru.TownOfPlus")]
 [BepInProcess("Among Us.exe")]
 
 // ReSharper disable once ClassNeverInstantiated.Global
