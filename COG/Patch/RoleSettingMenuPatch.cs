@@ -14,16 +14,13 @@ namespace COG.Patch;
 [HarmonyPatch(typeof(RolesSettingsMenu))]
 public static class RoleOptionPatch
 {
-    public static List<GameObject> Tabs { get; } = new();
-
     public static CustomRole? CurrentAdvancedTabFor { get; set; }
-
-    public static PassiveButton? AllButton { get; set; }
 
     public static GameObject? CurrentTab { get; set; }
     public static PassiveButton? CurrentButton { get; set; }
 
     public static float ScrollerLocationPercent { get; set; }
+    public static Dictionary<CampType, (GameObject, PassiveButton)> CampTabs { get; } = new();
 
     [HarmonyPatch(nameof(RolesSettingsMenu.Start))]
     [HarmonyPostfix]
@@ -44,10 +41,7 @@ public static class RoleOptionPatch
         var headers = __instance.tabParent;
         headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.Destroy());
 
-        var allButton = AllButton = headers.FindChild("AllButton").GetComponent<PassiveButton>();
-        allButton.selected = false;
-        allButton.buttonText.text = "";
-        allButton.gameObject.SetActive(false);
+        __instance.AllButton.gameObject.SetActive(false);
         
         Main.Logger.LogDebug("Creating tabs...");
         
@@ -56,7 +50,10 @@ public static class RoleOptionPatch
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
         
         chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.Destroy();
-        
+
+        var defaultCamp = CampType.Crewmate;
+        var (defaultTab, defaultButton) = CampTabs[defaultCamp];
+        ChangeCustomTab(__instance, defaultTab, defaultButton, defaultCamp);
     }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.ChangeTab))]
@@ -98,7 +95,6 @@ public static class RoleOptionPatch
         var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
-        Tabs.Add(tab.gameObject);
         tab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(o => o.gameObject.Destroy());
 
         tab.gameObject.SetActive(false);
@@ -225,7 +221,7 @@ public static class RoleOptionPatch
         Main.Logger.LogDebug($"Setting up tab button for {tab.name} ({index})");
         
         var offset = RolesSettingsMenu.X_OFFSET;
-        var xStart = -2.69F;
+        var xStart = menu.AllButton.transform.localPosition.x;
         var yStart = RolesSettingsMenu.TAB_Y_START;
         var button = Object.Instantiate(menu.roleSettingsTabButtonOrigin, headerParent).GetComponent<PassiveButton>();
 
@@ -251,15 +247,15 @@ public static class RoleOptionPatch
         const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
 
         renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 35f);
+        CampTabs.Add(camp, (tab, button));
+
         return button;
     }
 
-    private static void SetButtonActive(PassiveButton obj, bool active, bool clickedAllButton = false)
+    private static void SetButtonActive(PassiveButton obj, bool active)
     {
         if (!obj) return;
         obj.SelectButton(active);
-        if (!AllButton) return;
-        AllButton!.SelectButton(clickedAllButton);
     }
 
     public static void ChangeCustomTab(RolesSettingsMenu menu, GameObject newTab, PassiveButton toSelect, CampType camp)
@@ -305,7 +301,7 @@ public static class RoleOptionPatch
     [HarmonyPrefix]
     public static void OnMenuClose()
     {
-        SetButtonActive(CurrentButton!, false, true);
+        SetButtonActive(CurrentButton!, false);
         if (CurrentTab) CurrentTab!.SetActive(false);
     }
 }

@@ -30,7 +30,7 @@ public class CustomButton
         HasButton = hasButton;
         Sprite = sprite;
         Position = position ?? Vector3.zero;
-        if (position is null) IsCustomPosition = true;
+        if (position is null) AutoPosition = true;
         Hotkey = hotkey;
         Text = text;
         HasEffect = hasEffect;
@@ -66,7 +66,7 @@ public class CustomButton
     public float Timer { get; set; }
     public int UsesLimit { get; set; }
     public int UsesRemaining { get; set; }
-    public bool IsCustomPosition { get; set; }
+    public bool AutoPosition { get; set; }
     public int Row { get; set; }
     public int Order { get; set; }
 
@@ -233,7 +233,7 @@ public class CustomButton
 
         if (Hotkey.HasValue && Input.GetKeyDown(Hotkey.Value)) CheckClick();
 
-        if (!IsCustomPosition && Hud!.UseButton)
+        if (!AutoPosition && Hud!.UseButton)
             GameObject!.transform.localPosition = Hud.UseButton.transform.localPosition + Position;
     }
 
@@ -336,12 +336,12 @@ public class CustomButton
 
     internal static void ArrangePosition()
     {
-        if (GameStates.IsMeeting || (MapBehaviour.Instance != null && MapBehaviour.Instance.IsOpen)) return;
+        if (GameStates.IsMeeting || PlayerStates.IsShowingMap()) return;
         var vectors = AllVanillaButtons.Where(b => b.isActiveAndEnabled).Select(b => b.transform.localPosition);
         var idx1 = 0;
         var idx2 = 0;
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()
-                     .Where(b => b.ActionButton!.isActiveAndEnabled && b.IsCustomPosition).OrderBy(b => b.Order))
+                     .Where(b => b.ActionButton!.isActiveAndEnabled && b.AutoPosition).OrderBy(b => b.Order))
         {
             var row = btn.Row;
             if (row != 1 && row != 2) btn.Row = 2;

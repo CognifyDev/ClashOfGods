@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace COG.Utils.WinAPI;
@@ -61,6 +62,6 @@ public static class MessageBoxDialogue
     public static ClickedButton OpenMessageBox(string text, string title,
         OpenTypes type = OpenTypes.MB_DEFBUTTON1 | OpenTypes.MB_ICONINFORMATION)
     {
-        return (ClickedButton)MessageBox(IntPtr.Zero, text, title, (uint)type);
+        return (ClickedButton)MessageBox(Process.GetCurrentProcess().MainWindowHandle, text, title, (uint)type);
     }
 }
