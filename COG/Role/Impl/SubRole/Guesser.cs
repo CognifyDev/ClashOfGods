@@ -23,7 +23,7 @@ public class Guesser : CustomRole, IListener
         IsSubRole = true;
 
         MaxGuessTimeOption = CreateOption(() => LanguageConfig.Instance.GuesserMaxGuessTime,
-            new FloatOptionValueRule(1, 1, 99, 5));
+            new FloatOptionValueRule(1, 1, 101, 5));
         GuesserGuessContinuously = CreateOption(() => LanguageConfig.Instance.GuesserGuessContinuously,
             new BoolOptionValueRule(true));
     }

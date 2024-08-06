@@ -38,7 +38,7 @@ public static class OptionBehaviourPatch
     private static bool NumberOptionValueUpdatePatch(NumberOption __instance)
     {
         if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
-        var rule = customOption.ValueRule;
+        var rule = customOption!.ValueRule;
         if (rule is FloatOptionValueRule)
             customOption.UpdateSelection(__instance.GetFloat());
         else
@@ -51,7 +51,7 @@ public static class OptionBehaviourPatch
     private static bool StringOptionValueUpdatePatch(StringOption __instance)
     {
         if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
-        customOption.UpdateSelection(__instance.GetInt());
+        customOption!.UpdateSelection(__instance.GetInt());
         return false;
     }
 
@@ -60,7 +60,7 @@ public static class OptionBehaviourPatch
     private static bool ToggleOptionValueUpdatePatch(ToggleOption __instance)
     {
         if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
-        customOption.UpdateSelection(__instance.GetBool());
+        customOption!.UpdateSelection(__instance.GetBool());
         return false;
     }
 
@@ -72,7 +72,7 @@ public static class OptionBehaviourPatch
     {
         if (!CustomOption.TryGetOption(__instance, out var customOption)) return;
         var titleText = __instance.transform.FindChild("Title Text").GetComponent<TextMeshPro>();
-        titleText.text = customOption.Name();
+        titleText.text = customOption!.Name();
         if (__instance is ToggleOption toggle)
         {
             toggle.CheckMark.enabled = customOption.GetBool();
@@ -96,7 +96,7 @@ public static class OptionBehaviourPatch
         if (__instance.oldValue != __instance.Value)
         {
             __instance.oldValue = __instance.Value;
-            __instance.ValueText.text = customOption.GetString();
+            __instance.ValueText.text = customOption!.GetString();
         }
 
         return false;
@@ -108,8 +108,7 @@ public static class SettingMenuClosePatch
 {
     public static void Postfix()
     {
-        RoleOptionPatch.Tabs.Clear();
-        RoleOptionPatch.AllButton = RoleOptionPatch.CurrentButton = null;
+        RoleOptionPatch.CampTabs.Clear();
         RoleOptionPatch.CurrentTab = null;
         RoleOptionPatch.CurrentAdvancedTabFor = null;
         RoleOptionPatch.ScrollerLocationPercent = 0f;
