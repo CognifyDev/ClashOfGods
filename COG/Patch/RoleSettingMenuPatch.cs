@@ -27,9 +27,9 @@ public static class RoleOptionPatch
 
     [HarmonyPatch(nameof(RolesSettingsMenu.Start))]
     [HarmonyPostfix]
-    public static void OnMenuInitialization(RolesSettingsMenu __instance)
+    private static void OnMenuInitialization(RolesSettingsMenu __instance)
     {
-        Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
+        Main.Logger.LogDebug("======== Start to initialize custom role options... ========");
 
         // Fix button is unselected when open at the first time
         Object.FindObjectOfType<GameSettingMenu>()?.transform.FindChild("LeftPanel")?.FindChild("RoleSettingsButton")
@@ -44,28 +44,26 @@ public static class RoleOptionPatch
         var headers = __instance.tabParent;
         headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.Destroy());
 
-        (AllButton = headers.FindChild("AllButton").GetComponent<PassiveButton>()).OnClick.AddListener(
-            (UnityAction)(() =>
-            {
-                Tabs.Where(go => go).ForEach(go => go.SetActive(false));
-                if (AllButton) SetButtonActive(CurrentButton!, false, true);
-                if (CurrentTab) CurrentTab!.SetActive(false);
-            }));
-
-        Main.Logger.LogInfo("Creating tabs...");
-
+        var allButton = AllButton = headers.FindChild("AllButton").GetComponent<PassiveButton>();
+        allButton.selected = false;
+        allButton.buttonText.text = "";
+        allButton.gameObject.SetActive(false);
+        
+        Main.Logger.LogDebug("Creating tabs...");
+        
         var i = 0;
         foreach (var team in Enum.GetValues<CampType>())
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
-
+        
         chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.Destroy();
+        
     }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.ChangeTab))]
     [HarmonyPostfix]
     public static void OnTabChanged(RolesSettingsMenu __instance)
     {
-        Main.Logger.LogInfo($"{nameof(CurrentAdvancedTabFor)}: {CurrentAdvancedTabFor?.GetType().Name ?? "(null)"}");
+        Main.Logger.LogDebug($"{nameof(CurrentAdvancedTabFor)}: {CurrentAdvancedTabFor?.GetType().Name ?? "(null)"}");
         if (CurrentAdvancedTabFor == null) return;
 
         if (CurrentAdvancedTabFor.CampType == CampType.Neutral)
@@ -93,9 +91,9 @@ public static class RoleOptionPatch
         }
     }
 
-    public static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
+    private static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
     {
-        Main.Logger.LogInfo($"Creating tab for team {camp}...");
+        Main.Logger.LogDebug($"Creating tab for team {camp}...");
 
         var initialHeaderPos = new Vector3(4.986f, 0.662f, -2f);
         var sliderInner = chanceTabTemplate.parent;
@@ -107,6 +105,7 @@ public static class RoleOptionPatch
         tab.localPosition = chanceTabTemplate.localPosition;
         var trueName = camp != CampType.Unknown ? camp.ToString() : "Addon";
         tab.name = trueName + "Tab";
+        
         var button = SetUpTabButton(menu, tab.gameObject, index, trueName, camp);
 
         var header = Object.Instantiate(menu.categoryHeaderEditRoleOrigin, tab);
@@ -139,25 +138,18 @@ public static class RoleOptionPatch
             _ => Color.grey
         };
 
-        if (camp is CampType.Neutral or CampType.Unknown)
+        if (camp is CampType.Unknown or CampType.Neutral)
             header.Title.color = Color.white;
 
-        Main.Logger.LogInfo("Role header has created. Now set up role buttons...");
+        Main.Logger.LogDebug("Role header has created. Now set up role buttons...");
 
         var initialX = RolesSettingsMenu.X_START_CHANCE;
-        var initialY = 0.14f;
+        const float initialY = 0.14f;
         var offsetY = RolesSettingsMenu.Y_OFFSET;
-        var vanillaType = camp switch
-        {
-            CampType.Crewmate => RoleTeamTypes.Crewmate,
-            CampType.Impostor => RoleTeamTypes.Impostor,
-            CampType.Neutral => (RoleTeamTypes)99,
-            _ or CampType.Unknown => (RoleTeamTypes)100
-        };
 
         var i = 0;
         foreach (var role in CustomRoleManager.GetManager().GetTypeCampRoles(camp)
-                     .Where(r => !r.IsBaseRole && r.ShowInOptions))
+                     .Where(r => r is { IsBaseRole: false, ShowInOptions: true }))
         {
             if ((camp == CampType.Unknown && !role.IsSubRole) || !role.ShowInOptions) continue;
             var roleSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
@@ -229,11 +221,11 @@ public static class RoleOptionPatch
     public static PassiveButton SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName,
         CampType camp)
     {
-        Main.Logger.LogInfo($"Setting up tab button for {tab.name} ({index})");
-
         var headerParent = menu.transform.FindChild("HeaderButtons");
+        Main.Logger.LogDebug($"Setting up tab button for {tab.name} ({index})");
+        
         var offset = RolesSettingsMenu.X_OFFSET;
-        var xStart = RolesSettingsMenu.X_START;
+        var xStart = -2.69F;
         var yStart = RolesSettingsMenu.TAB_Y_START;
         var button = Object.Instantiate(menu.roleSettingsTabButtonOrigin, headerParent).GetComponent<PassiveButton>();
 
@@ -253,7 +245,7 @@ public static class RoleOptionPatch
             ControllerManager.Instance.SetDefaultSelection(menu.ControllerSelectable.ToArray()[0]);
         }));
 
-        Main.Logger.LogInfo("Button action has registered. Start to set button icon...");
+        Main.Logger.LogDebug("Button action has registered. Start to set button icon...");
 
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
         const string settingImagePath = "COG.Resources.InDLL.Images.Settings";

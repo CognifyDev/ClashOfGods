@@ -33,7 +33,7 @@ public class RpcListener : IListener
             case KnownRpc.ShareOptions:
             {
                 var originalString = reader.ReadString();
-                Main.Logger.LogInfo("Received options string => " + originalString);
+                Main.Logger.LogDebug("Received options string => " + originalString);
                 foreach (var s in originalString.Split(","))
                 {
                     var contexts = s.Split("|");
