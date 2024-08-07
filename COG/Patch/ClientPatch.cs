@@ -55,6 +55,10 @@ public static class NormalModeOnly
 {
     public static void Postfix(GameOptionsManager __instance)
     {
-        if (__instance.currentGameMode != GameModes.Normal) __instance.SwitchGameMode(GameModes.Normal);
+        if (AmongUsClient.Instance && AmongUsClient.Instance.AmHost && 
+            __instance.currentGameMode != GameModes.Normal)
+        {
+            __instance.SwitchGameMode(GameModes.Normal);
+        }
     }
 }

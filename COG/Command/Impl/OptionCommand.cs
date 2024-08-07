@@ -57,21 +57,21 @@ public class OptionCommand : Command
                     $"The selection of {option.Name()} has set to {option.Selections[selection - 1]}.");
             }
                 break;
+            /*
             case "share":
             {
                 CustomOption.ShareConfigs();
                 GameUtils.SendSystemMessage("Successfully shared!");
             }
-                break;
+                break;*/
             default:
-            case "help":
             {
                 StringBuilder sb = new("Help: ");
                 sb.Append("/option show - Show all mod options\n")
                     .Append("/option set %id% %selection% - Set the selection of option with %id%.\n")
                     .Append(" %id% : The ID of the option you want to change.\n")
-                    .Append(" %selection% : The ID of the new selection.\n")
-                    .Append("/option share - Share all option to other clients immediately.");
+                    .Append(" %selection% : The ID of the new selection.\n");
+                    //.Append("/option share - Share all option to other clients immediately.");
 
                 GameUtils.SendSystemMessage(sb.ToString());
             }

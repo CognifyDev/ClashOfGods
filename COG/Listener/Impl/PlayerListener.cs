@@ -12,7 +12,7 @@ public class PlayerListener : IListener
 {
     [EventHandler(EventHandlerType.Postfix)]
     public void OnJoinPlayer(PlayerControlAwakeEvent @event)
-    {
+    {/*
         if (!GameStates.InGame) return; // Don't share option when the player prefab loaded (Scene MainMenu)
         var target = @event.Player;
         target.StartCoroutine(CoShareOptions().WrapToIl2Cpp());
@@ -26,6 +26,6 @@ public class PlayerListener : IListener
                 Main.Logger.LogInfo("Option info has sent to " + target.Data.PlayerName);
                 CustomOption.ShareConfigs(target);
             }
-        }
+        }*/
     }
 }

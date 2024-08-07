@@ -82,14 +82,9 @@ public sealed class CustomOption
         customOption = Options.FirstOrDefault(o => o?.OptionBehaviour == optionBehaviour)!;
         return customOption != null!;
     }
-
+/*
     public static void ShareConfigs(PlayerControl? target = null)
     {
-        /*
-         * FIXME
-         * 这里还没有写完 暂时先RETURN
-         */
-        return;
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
 
         // 当游戏选项更改的时候调用
@@ -116,7 +111,7 @@ public sealed class CustomOption
 
         // id|selection,id|selection
     }
-
+*/
     private static void LoadOptionFromPreset(string path)
     {
         try

@@ -29,7 +29,7 @@ public class RpcListener : IListener
 
                 option.Selection = selection;
                 break;
-            }
+            }/*
             case KnownRpc.ShareOptions:
             {
                 var originalString = reader.ReadString();
@@ -53,7 +53,7 @@ public class RpcListener : IListener
                 }
 
                 break;
-            }
+            }*/
             case KnownRpc.SetRole:
             {
                 var playerId = reader.ReadByte();

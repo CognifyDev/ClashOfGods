@@ -66,9 +66,6 @@ public class GameListener : IListener
             }
             case KnownRpc.Revive:
             {
-                // 除非发送者给自己发包，HandleRpc是无法接收发送者自己发出的RPC的
-                // 因此无须进行判断
-
                 // 从Rpc中读入PlayerControl
                 var target = reader.ReadNetObject<PlayerControl>();
                 
@@ -94,8 +91,10 @@ public class GameListener : IListener
             foreach (var role in Enum.GetValues<RoleTypes>())
             {
                 if (roleOption.GetNumPerGame(role) != 0 || roleOption.GetChancePerGame(role) != 0)
+                {
                     roleOption.SetRoleRate(role, 0, 0);
-                changed = true;
+                    changed = true;
+                }
             }
 
             if (mainOption.RulesPreset != RulesPresets.Custom)
@@ -105,7 +104,9 @@ public class GameListener : IListener
             }
 
             if (changed)
+            {
                 GameManager.Instance.LogicOptions.SyncOptions();
+            }
         }
 
         if (PlayerControl.LocalPlayer.IsSamePlayer(player))
