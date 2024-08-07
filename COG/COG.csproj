@@ -19,16 +19,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\InDLL\Images\Settings\*.*"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <EmbeddedResource Include="Resources\InDLL\Config\*.*"/>
         <EmbeddedResource Include="Resources\InDLL\Depends\*.*"/>
     </ItemGroup>
 
     <ItemGroup>
         <EmbeddedResource Include="Resources\InDLL\Images\*.*"/>
+        <EmbeddedResource Include="Resources\InDLL\Images\Buttons\*.*"/>
+        <EmbeddedResource Include="Resources\InDLL\Images\Settings\*.*"/>
+        <EmbeddedResource Include="Resources\InDLL\Images\RolePreviews\*.*"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -49,7 +48,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\InDLL\Images\Buttons\*.*"/>
         <EmbeddedResource Include="COG.csproj"/>
     </ItemGroup>
 

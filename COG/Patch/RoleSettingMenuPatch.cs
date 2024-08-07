@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using COG.Constant;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -68,8 +69,11 @@ public static class RoleOptionPatch
 
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
         __instance.roleDescriptionText.text = CurrentAdvancedTabFor.LongDescription;
-        __instance.roleScreenshot.sprite =
-            ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Settings.General.png", 28);
+        var rolePreview = ResourceUtils.LoadSprite(
+            $"COG.Resources.InDLL.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png", 
+            300);
+        __instance.roleScreenshot.sprite = rolePreview == null ?
+            ResourceUtils.LoadSprite(ResourcesConstant.DefaultRolePreview, 300) : rolePreview;
         __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground").GetComponent<SpriteRenderer>().color =
             new Color(1, 1, 1, 1);
 

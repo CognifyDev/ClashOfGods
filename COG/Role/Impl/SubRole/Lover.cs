@@ -48,7 +48,6 @@ public class Lover : CustomRole, IListener, IWinnable
         if (PlayerUtils.GetAllAlivePlayers().Count == 2
             && PlayerUtils.GetAllAlivePlayers()
                 .SequenceEqual(GetCKCouples().SelectMany(lover => new[] { lover.Item1, lover.Item2 }))) return true;
-        ;
         return false;
     }
 
