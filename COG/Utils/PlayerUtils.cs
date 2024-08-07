@@ -95,6 +95,26 @@ public static class PlayerUtils
         return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
     }
 
+    /// <summary>
+    /// 复活一个玩家并且在所有人看来他复活了
+    /// </summary>
+    /// <param name="player">欲复活的玩家</param>
+    public static void RpcRevive(this PlayerControl player)
+    {
+        // 房主视角先复活一下
+        player.Revive();
+        
+        // 新建写入器
+        var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)KnownRpc.Revive,
+            SendOption.Reliable);
+        
+        // 写入对象实例
+        writer.WriteNetObject(player);
+        
+        // 发送Rpc
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
+    }
+
     public static CustomRole GetMainRole(this PlayerControl player)
     {
         return GameUtils.PlayerData.FirstOrDefault(d=>d.Player.IsSamePlayer(player))?.Role ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空

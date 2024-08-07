@@ -10,7 +10,7 @@ namespace COG.Command.Impl;
 
 public class RpcCommand : Command
 {
-    private RpcUtils.RpcWriter? Writer;
+    private RpcUtils.RpcWriter? _writer;
 
     public RpcCommand() : base("rpc")
     {
@@ -27,23 +27,23 @@ public class RpcCommand : Command
             {
                 case "start":
                 {
-                    if (Writer != null) GameUtils.SendSystemMessage("当前仍存在一个RpcWriter实例！");
+                    if (_writer != null) GameUtils.SendSystemMessage("当前仍存在一个RpcWriter实例！");
                     var value = args[1];
                     if (int.TryParse(value, out var result))
                     {
                         if (Enum.IsDefined((RpcCalls)result))
-                            Writer = RpcUtils.StartRpcImmediately(player, (RpcCalls)result);
+                            _writer = RpcUtils.StartRpcImmediately(player, (RpcCalls)result);
                         else if (Enum.IsDefined((KnownRpc)result))
-                            Writer = RpcUtils.StartRpcImmediately(player, (KnownRpc)result);
+                            _writer = RpcUtils.StartRpcImmediately(player, (KnownRpc)result);
                         else
-                            Writer = RpcUtils.StartRpcImmediately(player, (byte)result);
+                            _writer = RpcUtils.StartRpcImmediately(player, (byte)result);
                     }
                     else
                     {
                         if (Enum.TryParse<RpcCalls>(value, true, out var vanillaRpc))
-                            Writer = RpcUtils.StartRpcImmediately(player, vanillaRpc);
+                            _writer = RpcUtils.StartRpcImmediately(player, vanillaRpc);
                         else if (Enum.TryParse<KnownRpc>(value, false, out var modRpc))
-                            Writer = RpcUtils.StartRpcImmediately(player, modRpc);
+                            _writer = RpcUtils.StartRpcImmediately(player, modRpc);
                         else
                             throw new NotSupportedException("The RPC you request to send is not supported.");
                     }
@@ -66,7 +66,7 @@ public class RpcCommand : Command
                 case "add":
                 {
                     var typeName = args[1];
-                    if (string.IsNullOrEmpty(typeName) || Writer == null)
+                    if (string.IsNullOrEmpty(typeName) || _writer == null)
                         throw new NullReferenceException(
                             "You haven't started a RpcWriter instance yet or the name of the type you entered is null. (Normally, the second situation won't be happened.)");
 
@@ -104,7 +104,7 @@ public class RpcCommand : Command
                         if (success)
                         {
                             dynamic result = array[1];
-                            Writer.Write(result);
+                            _writer.Write(result);
                         }
                         else
                         {
@@ -127,7 +127,7 @@ public class RpcCommand : Command
                                         .FirstOrDefault(p => p.Data.PlayerName == nameOrId);
 
                                 if (!pc) throw new NullReferenceException("Error getting player to write.");
-                                Writer.WriteNetObject(pc!);
+                                _writer.WriteNetObject(pc!);
                             }
                                 break;
                             case "string":
@@ -143,7 +143,7 @@ public class RpcCommand : Command
                                     i++;
                                 }
 
-                                Writer.Write(sb.ToString());
+                                _writer.Write(sb.ToString());
                             }
                                 break;
                             case "vector":
@@ -152,7 +152,7 @@ public class RpcCommand : Command
                                 var (x, y) = (-1, -1);
 
                                 if (int.TryParse(xStr, out x) && int.TryParse(yStr, out y))
-                                    Writer.WriteVector2(new Vector2(x, y));
+                                    _writer.WriteVector2(new Vector2(x, y));
                                 else
                                     throw new InvalidCastException("The position of the vector is invalid.");
                             }
@@ -165,15 +165,15 @@ public class RpcCommand : Command
                     break;
                 case "send":
                 {
-                    if (Writer == null) throw new NullReferenceException("Writer is null.");
-                    Writer.Finish();
-                    Writer = null;
+                    if (_writer == null) throw new NullReferenceException("Writer is null.");
+                    _writer.Finish();
+                    _writer = null;
                     GameUtils.SendSystemMessage("Rpc已发送！");
                 }
                     break;
                 case "close":
                 {
-                    Writer = null;
+                    _writer = null;
                 }
                     break;
             }

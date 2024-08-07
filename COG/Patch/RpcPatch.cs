@@ -10,7 +10,7 @@ internal class RPCHandlerPatch
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] byte callId,
         [HarmonyArgument(1)] MessageReader reader)
     {
-        Main.Logger.LogInfo($"Rpc {callId} received, rpc length => {reader.Length}");
+        Main.Logger.LogDebug($"Rpc {callId} received, rpc length => {reader.Length}");
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader), EventHandlerType.Postfix);
     }

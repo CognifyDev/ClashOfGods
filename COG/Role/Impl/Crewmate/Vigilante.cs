@@ -41,7 +41,7 @@ public class Vigilante : CustomRole, IListener
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             () => 1f,
-            -1);
+            1);
 
         AddButton(_killButton);
     }

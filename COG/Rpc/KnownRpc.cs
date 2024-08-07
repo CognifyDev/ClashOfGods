@@ -10,5 +10,7 @@ public enum KnownRpc : uint
 
     EatBody = 206,
     SyncLovers = 207,
-    Handshake = 208
+    Handshake = 208,
+    
+    Revive = 209
 }
