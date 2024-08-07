@@ -90,6 +90,9 @@ camp:
     description: "完成任务，找出内鬼"
   addon: "附加职业"
 game-setting:
+  view-description:
+    general: "预览游戏大厅的常规设置。"
+    role: "预览游戏大厅的职业设置。"
   general:
     title: "COG设置"
     load-preset: "加载预设"

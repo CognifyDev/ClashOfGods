@@ -1,6 +1,7 @@
 using COG.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.Utils;
 using System.Linq;
 using TMPro;
 
@@ -76,6 +77,7 @@ public static class OptionBehaviourPatch
         if (__instance is ToggleOption toggle)
         {
             toggle.CheckMark.enabled = customOption.GetBool();
+            toggle.GetComponentInChildren<PassiveButton>().SelectButton(customOption.GetBool());
         }
         else if (__instance is NumberOption number)
         {
@@ -101,18 +103,16 @@ public static class OptionBehaviourPatch
 
         return false;
     }
-}
 
-[HarmonyPatch(typeof(GameSettingMenu), nameof(GameSettingMenu.Close))]
-public static class SettingMenuClosePatch
-{
-    public static void Postfix()
+    [HarmonyPatch(typeof(OptionBehaviour), nameof(OptionBehaviour.SetAsPlayer))]
+    [HarmonyPrefix]
+    private static bool SetAsPlayerPatch(OptionBehaviour __instance)
     {
-        RoleOptionPatch.CampTabs.Clear();
-        RoleOptionPatch.CurrentTab = null;
-        RoleOptionPatch.CurrentAdvancedTabFor = null;
-        RoleOptionPatch.ScrollerLocationPercent = 0f;
-
-        ControllerManager.Instance.CurrentUiState.MenuName = ""; // Fix player is unmoveable after closing menu
+        if (__instance.GetComponent<ToggleOption>() || __instance.GetComponent<GameOptionsMapPicker>())
+        {
+            __instance.GetComponentsInChildren<PassiveButton>().ForEach(b => b.enabled = false);
+            return false;
+        }
+        return true;
     }
 }
