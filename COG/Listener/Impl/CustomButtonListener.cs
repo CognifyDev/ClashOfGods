@@ -13,20 +13,20 @@ internal class CustomButtonListener : IListener
     public void OnHudStart(HudManagerStartEvent @event)
     {
         CustomButton.Initialized = false;
-        IEnumerator CoLoad()
+        IEnumerator CoInitCustomButton()
         {
             yield return new WaitForSeconds(1f);
             CustomButton.Init(@event.Manager);
         }
         
-        @event.Manager.StartCoroutine(CoLoad().WrapToIl2Cpp());
+        @event.Manager.StartCoroutine(CoInitCustomButton().WrapToIl2Cpp());
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         if (!CustomButton.Initialized) return;
-        CustomButton.ArrangeAllVanillaButtons();
+        CustomButton.GetAllVanillaButtons();
         CustomButton.ArrangePosition();
         foreach (var button in CustomButtonManager.GetManager().GetButtons()) button.Update();
     }

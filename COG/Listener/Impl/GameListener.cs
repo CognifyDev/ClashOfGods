@@ -66,9 +66,9 @@ public class GameListener : IListener
             }
             case KnownRpc.Revive:
             {
-                // 房主视角已经复活过了，因此可以直接return
-                if (AmongUsClient.Instance.AmHost) return;
-                
+                // 除非发送者给自己发包，HandleRpc是无法接收发送者自己发出的RPC的
+                // 因此无须进行判断
+
                 // 从Rpc中读入PlayerControl
                 var target = reader.ReadNetObject<PlayerControl>();
                 
