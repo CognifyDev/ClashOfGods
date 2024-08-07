@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using COG.Config.Impl;
 using COG.UI.CustomOption;
-using System.Linq;
-using UnityEngine;
-using System.Collections.Generic;
 using COG.UI.CustomOption.ValueRules.Impl;
+using UnityEngine;
 
 namespace COG.Patch;
 

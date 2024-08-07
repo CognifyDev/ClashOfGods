@@ -20,9 +20,8 @@ public class Vigilante : CustomRole, IListener
 
     private readonly CustomOption _minCrewmateNumber;
 
-    public Vigilante() : base(LanguageConfig.Instance.VigilanteName, ColorUtils.AsColor("#ffcc00"), CampType.Crewmate)
+    public Vigilante() : base(ColorUtils.AsColor("#ffcc00"), CampType.Crewmate)
     {
-        ShortDescription = LanguageConfig.Instance.VigilanteDescription;
         CanKill = false;
         CanVent = false;
 
@@ -48,7 +47,7 @@ public class Vigilante : CustomRole, IListener
 
         AddButton(_killButton);
         
-        _minCrewmateNumber = CreateOption(() => LanguageConfig.Instance.VultureHasArrowToBodies,
+        _minCrewmateNumber = CreateOption(() => LanguageConfig.Instance.VigilanteMinCrewmateNumber,
             new IntOptionValueRule(1, 1, 15, 3));
     }
 

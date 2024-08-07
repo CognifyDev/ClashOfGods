@@ -1,4 +1,3 @@
-using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Utils;
@@ -7,9 +6,8 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Bait : CustomRole, IListener
 {
-    public Bait() : base(LanguageConfig.Instance.BaitName, ColorUtils.AsColor("#00F7FF"), CampType.Crewmate)
+    public Bait() : base(ColorUtils.AsColor("#00F7FF"), CampType.Crewmate)
     {
-        ShortDescription = LanguageConfig.Instance.BaitDescription;
     }
 
     [EventHandler(EventHandlerType.Postfix)]

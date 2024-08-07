@@ -41,6 +41,7 @@ role:
       name: "侠客"
       description: "行侠仗义！"
       long-description: "你拥有一次击杀机会，当船员数量小于等于设定值时你会额外获得一次击杀机会"
+      min-crewmate-number: "给予额外击杀机会的最小船员数量"
   neutral:
     jester:
       name: "小丑"

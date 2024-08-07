@@ -1,8 +1,8 @@
+using System.Linq;
 using COG.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using System.Linq;
 using TMPro;
 
 namespace COG.Patch;
@@ -17,7 +17,7 @@ public static class RoleOptionSettingPatch
         var role = CustomRoleManager.GetManager().GetRoles()
             .FirstOrDefault(r => r.AllOptions.Any(o => o.OptionBehaviour == __instance));
         if (role == null) return true;
-
+        
         var playerCount = role.RoleNumberOption!;
         var chance = role.RoleChanceOption!;
 

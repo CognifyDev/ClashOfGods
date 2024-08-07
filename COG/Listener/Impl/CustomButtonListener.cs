@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Listener.Event.Impl.HManager;
-using COG.Rpc;
 using COG.UI.CustomButton;
 using UnityEngine;
 

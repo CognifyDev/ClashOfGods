@@ -1,8 +1,8 @@
+using System;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.UI.CustomOption;
 using COG.Utils;
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;

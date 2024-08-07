@@ -16,9 +16,8 @@ namespace COG.Role.Impl.Impostor;
 
 public class Cleaner : CustomRole, IListener
 {
-    public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor)
+    public Cleaner() : base(Palette.ImpostorRed, CampType.Impostor)
     {
-        ShortDescription = LanguageConfig.Instance.CleanerDescription;
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;
 

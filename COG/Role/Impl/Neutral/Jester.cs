@@ -16,9 +16,8 @@ public class Jester : CustomRole, IListener, IWinnable
     private readonly CustomOption _allowReportDeadBody;
     private readonly CustomOption _allowStartMeeting;
 
-    public Jester() : base(LanguageConfig.Instance.JesterName, Color.magenta, CampType.Neutral)
+    public Jester() : base(Color.magenta, CampType.Neutral)
     {
-        ShortDescription = LanguageConfig.Instance.JesterDescription;
         _allowStartMeeting = CreateOption(() => LanguageConfig.Instance.AllowStartMeeting,
             new BoolOptionValueRule(true));
         _allowReportDeadBody = CreateOption(() => LanguageConfig.Instance.AllowReportDeadBody,

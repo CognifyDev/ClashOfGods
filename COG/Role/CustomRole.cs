@@ -13,6 +13,7 @@ using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
+
 // ReSharper disable Unity.IncorrectScriptableObjectInstantiation
 
 namespace COG.Role;
@@ -24,15 +25,13 @@ public abstract class CustomRole
 {
     private static int _order;
     
-    public CustomRole(string name, Color color, CampType campType, bool showInOptions = true)
+    public CustomRole(Color color, CampType campType, bool isSubRole = false, bool showInOptions = true)
     {
-        Name = name;
         IsBaseRole = false;
-        ShortDescription = "";
         Color = color;
         CampType = campType;
         BaseRoleType = campType == CampType.Impostor ? RoleTypes.Impostor : RoleTypes.Crewmate;
-        IsSubRole = false;
+        IsSubRole = isSubRole;
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
         CanSabotage = campType == CampType.Impostor;
@@ -40,6 +39,10 @@ public abstract class CustomRole
         _order++;
         ShowInOptions = showInOptions;
         AllOptions = new List<CustomOption>();
+        
+        Name = GetContextFromLanguage("name");
+        ShortDescription = GetContextFromLanguage("description");
+        
         var vanillaType = CampType switch
         {
             CampType.Crewmate => RoleTeamTypes.Crewmate,
@@ -59,7 +62,7 @@ public abstract class CustomRole
 
         if (ShowInOptions)
         {
-            //                                  Actually name here is useless for new option
+            // Actually name here is useless for new option
             RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage,
                 new IntOptionValueRule(0, 1, 15, 0));
             RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 0));
@@ -75,11 +78,20 @@ public abstract class CustomRole
     ///     角色颜色
     /// </summary>
     public Color Color { get; }
-
+    
     /// <summary>
-    ///     角色名称
+    /// 角色的名称
     /// </summary>
     public string Name { get; }
+    
+    private string GetContextFromLanguage(string context)
+    {
+        var campName = IsSubRole ? "sub-roles" : Enum.GetName(typeof(CampType), CampType)!.ToLower();
+        var location = $"role.{campName}.{GetType().Name.ToLower()}.{context}";
+        var toReturn = LanguageConfig.Instance.YamlReader!
+            .GetString(location);
+        return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
+    }
 
     /// <summary>
     ///     是否是基本职业
@@ -97,9 +109,7 @@ public abstract class CustomRole
     /// <returns>详细介绍</returns>
     public string GetLongDescription()
     {
-        var toReturn = LanguageConfig.Instance.YamlReader!
-            .GetString($"role.{CampType.ToString().ToLower()}.{GetType().Name.ToLower()}.long-description");
-        return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
+        return GetContextFromLanguage("long-description");
     }
 
     /// <summary>
@@ -115,7 +125,7 @@ public abstract class CustomRole
     /// <summary>
     ///     是否为副职业
     /// </summary>
-    public bool IsSubRole { get; protected init; }
+    public bool IsSubRole { get; }
 
     /// <summary>
     ///     在选项中显示

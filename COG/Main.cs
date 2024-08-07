@@ -121,6 +121,8 @@ public partial class Main : BasePlugin
             new VersionShowerListener(),
             new VanillaBugFixListener()
         });
+        
+        LanguageConfig.OnLanguageLoaded += () => CustomRoleManager.GetManager().ReloadRoles();
 
         // Register roles
         CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
@@ -145,8 +147,6 @@ public partial class Main : BasePlugin
             // Sub-roles
             new Lighter()
         });
-
-        LanguageConfig.OnLanguageLoaded += () => CustomRoleManager.GetManager().ReloadRoles();
 
         // Register listeners from role
         foreach (var role in CustomRoleManager.GetManager().GetRoles())

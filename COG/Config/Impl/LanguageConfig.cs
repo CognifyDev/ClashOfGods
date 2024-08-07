@@ -1,6 +1,6 @@
+using System;
 using COG.Utils;
 using COG.Utils.Coding;
-using System;
 
 // ReSharper disable All
 
@@ -56,52 +56,23 @@ public class LanguageConfig : Config
     public string DebugMode { get; private set; } = null!;
     public string MaxSubRoleNumber { get; private set; } = null!;
 
-    // Unknown
-    public string UnknownName { get; private set; } = null!;
-    public string UnknownDescription { get; private set; } = null!;
-
     // Crewmate
-    public string CrewmateName { get; private set; } = null!;
-    public string CrewmateDescription { get; private set; } = null!;
-
-    public string BaitName { get; private set; } = null!;
-    public string BaitDescription { get; private set; } = null!;
-
-    public string SheriffName { get; private set; } = null!;
-    public string SheriffDescription { get; private set; } = null!;
     public string SheriffKillCooldown { get; private set; } = null!;
 
-    public string VigilanteName { get; private set; } = null!;
-    public string VigilanteDescription { get; private set; } = null!;
+    public string VigilanteMinCrewmateNumber { get; private set; } = null!;
 
     // Impostor
-    public string ImpostorName { get; private set; } = null!;
-    public string ImpostorDescription { get; private set; } = null!;
-
-    public string CleanerName { get; private set; } = null!;
-    public string CleanerDescription { get; private set; } = null!;
     public string CleanBodyCooldown { get; private set; } = null!;
 
     // Neutral
-    public string JesterName { get; private set; } = null!;
-    public string JesterDescription { get; private set; } = null!;
-
-    public string VultureName { get; private set; } = null!;
-    public string VultureDescription { get; private set; } = null!;
     public string VultureEatCooldown { get; private set; } = null!;
     public string VultureEatenCountToWin { get; private set; } = null!;
     public string VultureHasArrowToBodies { get; private set; } = null!;
 
     // Sub-roles
-    public string GuesserName { get; private set; } = null!;
-    public string GuesserDescription { get; private set; } = null!;
     public string GuesserMaxGuessTime { get; private set; } = null!;
     public string GuesserGuessContinuously { get; private set; } = null!;
-
-    public string LighterName { get; private set; } = null!;
-    public string LighterDescription { get; private set; } = null!;
-
-    public string LoverName { get; private set; } = null!;
+    
     public string LoverDescription { get; private set; } = null!;
     public string LoverCountOptionName { get; private set; } = null!;
     public string LoversDieTogetherOptionName { get; private set; } = null!;
@@ -173,51 +144,23 @@ public class LanguageConfig : Config
         SavePreset = GetString("game-setting.general.save-preset");
         DebugMode = GetString("game-setting.general.debug-mode");
         MaxSubRoleNumber = GetString("game-setting.general.max-sub-role-number");
-
-        // Unknown
-        UnknownName = GetString("role.unknown.name");
-        UnknownDescription = GetString("role.unknown.description");
-
+        
         // Crewmate
-        CrewmateName = GetString("role.crewmate.crewmate.name");
-        CrewmateDescription = GetString("role.crewmate.crewmate.description");
-
-        BaitName = GetString("role.crewmate.bait.name");
-        BaitDescription = GetString("role.crewmate.bait.description");
-
-        SheriffName = GetString("role.crewmate.sheriff.name");
-        SheriffDescription = GetString("role.crewmate.sheriff.description");
         SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");
 
-        VigilanteName = GetString("role.crewmate.vigilante.name");
-        VigilanteDescription = GetString("role.crewmate.vigilante.description");
+        VigilanteMinCrewmateNumber = GetString("role.crewmate.vigilante.min-crewmate-number");
 
         // Impostors
-        ImpostorName = GetString("role.impostor.impostor.name");
-        ImpostorDescription = GetString("role.impostor.impostor.description");
-
-        CleanerName = GetString("role.impostor.cleaner.name");
-        CleanerDescription = GetString("role.impostor.cleaner.description");
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
 
         // Neutral
-        JesterName = GetString("role.neutral.jester.name");
-        JesterDescription = GetString("role.neutral.jester.description");
-
-        VultureName = GetString("role.neutral.vulture.name");
-        VultureDescription = GetString("role.neutral.vulture.description");
         VultureEatCooldown = GetString("role.neutral.vulture.eat-cd");
         VultureEatenCountToWin = GetString("role.neutral.vulture.count-to-win");
         VultureHasArrowToBodies = GetString("role.neutral.vulture.has-arrow");
 
-        GuesserDescription = GetString("role.sub-roles.guesser.description");
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
 
-        LighterName = GetString("role.sub-roles.lighter.name");
-        LighterDescription = GetString("role.sub-roles.lighter.description");
-
-        LoverName = GetString("role.sub-roles.lover.name");
         LoverDescription = GetString("role.sub-roles.lover.description");
         LoverCountOptionName = GetString("role.sub-roles.lover.count-option");
         LoversDieTogetherOptionName = GetString("role.sub-roles.lover.die-together");

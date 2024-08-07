@@ -1,5 +1,4 @@
 using AmongUs.GameOptions;
-using COG.Config.Impl;
 using COG.Listener;
 using UnityEngine;
 
@@ -7,10 +6,9 @@ namespace COG.Role.Impl;
 
 public class Unknown : CustomRole
 {
-    public Unknown() : base(LanguageConfig.Instance.UnknownName, Color.white, CampType.Unknown, false)
+    public Unknown() : base(Color.white, CampType.Unknown)
     {
         BaseRoleType = RoleTypes.CrewmateGhost;
-        ShortDescription = LanguageConfig.Instance.UnknownDescription;
     }
 
     public override IListener GetListener()

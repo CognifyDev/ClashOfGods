@@ -14,10 +14,9 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Sheriff : CustomRole, IListener
 {
-    public Sheriff() : base(LanguageConfig.Instance.SheriffName, Color.yellow, CampType.Crewmate)
+    public Sheriff() : base(Color.yellow, CampType.Crewmate)
     {
         BaseRoleType = RoleTypes.Crewmate;
-        ShortDescription = LanguageConfig.Instance.SheriffDescription;
 
         if (ShowInOptions)
             SheriffKillCd = CreateOption(() => LanguageConfig.Instance.SheriffKillCooldown,

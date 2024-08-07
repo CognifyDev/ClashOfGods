@@ -1,5 +1,4 @@
-﻿using COG.Config.Impl;
-using COG.Listener;
+﻿using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
 using UnityEngine;
@@ -8,10 +7,8 @@ namespace COG.Role.Impl.SubRole;
 
 public class Lighter : CustomRole, IListener
 {
-    public Lighter() : base(LanguageConfig.Instance.LighterName, Color.yellow, CampType.Unknown)
+    public Lighter() : base(Color.yellow, CampType.Unknown, true)
     {
-        ShortDescription = LanguageConfig.Instance.LighterDescription;
-        IsSubRole = true;
     }
 
     [EventHandler(EventHandlerType.Prefix)]

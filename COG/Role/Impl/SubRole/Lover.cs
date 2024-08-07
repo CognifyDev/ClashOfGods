@@ -19,10 +19,8 @@ namespace COG.Role.Impl.SubRole;
 [WorkInProgress]
 public class Lover : CustomRole, IListener, IWinnable
 {
-    public Lover() : base(LanguageConfig.Instance.LoverName, Color.magenta, CampType.Unknown)
+    public Lover() : base(Color.magenta, CampType.Unknown, true)
     {
-        ShortDescription = "";
-        IsSubRole = true;
         Couples = new Dictionary<PlayerControl, PlayerControl>();
         if (ShowInOptions)
         {

@@ -14,6 +14,7 @@ using COG.Rpc;
 using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
+
 // ReSharper disable UnusedMember.Local
 
 namespace COG.Utils;

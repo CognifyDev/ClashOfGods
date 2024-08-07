@@ -20,12 +20,9 @@ namespace COG.Role.Impl.Neutral;
 
 public class Vulture : CustomRole, IListener, IWinnable
 {
-    public Vulture() : base(LanguageConfig.Instance.VultureName, Color.blue, CampType.Neutral)
+    public Vulture() : base(Color.blue, CampType.Neutral)
     {
         if (!ShowInOptions) throw new System.Exception("vulture is not allowed to show in options");
-        
-        ShortDescription = LanguageConfig.Instance.VultureDescription;
-
         EatingCooldown = CreateOption(() => LanguageConfig.Instance.VultureEatCooldown,
             new FloatOptionValueRule(10f, 5f, 60f, 30f));
         WinningEatenCount = CreateOption(() => LanguageConfig.Instance.VultureEatenCountToWin,

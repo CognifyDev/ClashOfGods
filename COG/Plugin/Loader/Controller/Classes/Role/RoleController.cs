@@ -28,8 +28,7 @@ public class RoleController
 
     private class CustomRoleImplement : CustomRole
     {
-        public CustomRoleImplement(string name, Color color, CampType campType, bool showInOptions = true) : base(name,
-            color, campType, showInOptions)
+        public CustomRoleImplement(string name, Color color, CampType campType, bool showInOptions = true) : base(color, campType, showInOptions)
         {
             Name = name;
             Color = color;

@@ -7,7 +7,6 @@ using COG.Config.Impl;
 using COG.Role;
 using COG.Rpc;
 using UnityEngine;
-using static Il2CppSystem.Xml.XmlWellFormedWriter.AttributeValueCache;
 
 namespace COG.Utils;
 

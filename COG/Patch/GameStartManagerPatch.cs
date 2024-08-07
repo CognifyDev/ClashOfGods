@@ -1,5 +1,5 @@
-using COG.Utils;
 using System.Linq;
+using COG.Utils;
 using UnityEngine;
 
 namespace COG.Patch;
@@ -7,7 +7,7 @@ namespace COG.Patch;
 [HarmonyPatch(typeof(GameStartManager))]
 internal static class GameStartManagerPatch
 {
-    private static bool Opened = false;
+    private static bool Opened;
     private static GameObject? Menu;
 
     [HarmonyPatch(nameof(GameStartManager.ToggleViewPane))]
