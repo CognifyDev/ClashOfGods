@@ -33,7 +33,7 @@ namespace COG.Listener.Impl;
 public class GameListener : IListener
 {
     [EventHandler(EventHandlerType.Prefix)]
-    public void OnRPCReceived(PlayerHandleRpcEvent @event)
+    public void OnRpcReceived(PlayerHandleRpcEvent @event)
     {
         var callId = @event.CallId;
         var reader = @event.Reader;

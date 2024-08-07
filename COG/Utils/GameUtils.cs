@@ -5,7 +5,9 @@ using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Config.Impl;
 using COG.Role;
+using COG.Rpc;
 using UnityEngine;
+using static Il2CppSystem.Xml.XmlWellFormedWriter.AttributeValueCache;
 
 namespace COG.Utils;
 
@@ -82,5 +84,14 @@ public static class GameUtils
             HudManager.Instance.Chat.AddChat(host, text, false);
             host.SetName(tempName);
         }
+    }
+
+    public static void RpcNotifySettingChange(int id, string text)
+    {
+        // 先给自己发通知
+        HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)id, text, true);
+
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.NotifySettingChange);
+        writer.WritePacked(id).Write(text).Finish();
     }
 }

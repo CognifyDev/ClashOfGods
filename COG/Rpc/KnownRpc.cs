@@ -12,5 +12,6 @@ public enum KnownRpc : uint
     SyncLovers = 207,
     Handshake = 208,
     
-    Revive = 209
+    Revive = 209,
+    NotifySettingChange = 210
 }

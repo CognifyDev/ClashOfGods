@@ -96,11 +96,12 @@ public static class PlayerUtils
     }
 
     /// <summary>
-    /// 复活一个玩家并且在所有人看来他复活了
+    /// 复活一个玩家
     /// </summary>
     /// <param name="player">欲复活的玩家</param>
     public static void RpcRevive(this PlayerControl player)
-    {player.Revive();
+    {
+        player.Revive();
         
         // 新建写入器
         var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)KnownRpc.Revive,
