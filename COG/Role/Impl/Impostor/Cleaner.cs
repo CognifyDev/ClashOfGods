@@ -19,7 +19,6 @@ public class Cleaner : CustomRole, IListener
     public Cleaner() : base(LanguageConfig.Instance.CleanerName, Palette.ImpostorRed, CampType.Impostor)
     {
         ShortDescription = LanguageConfig.Instance.CleanerDescription;
-        LongDescription = LanguageConfig.Instance.CleanerLongDescText;
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;
 

@@ -23,9 +23,7 @@ namespace COG.Role;
 public abstract class CustomRole
 {
     private static int _order;
-
-    private string _longDescription = "";
-
+    
     public CustomRole(string name, Color color, CampType campType, bool showInOptions = true)
     {
         Name = name;
@@ -94,12 +92,14 @@ public abstract class CustomRole
     public string ShortDescription { get; protected set; }
 
     /// <summary>
-    ///     显示在职业设置的职业详细介绍文本
+    /// 显示在职业设置的职业详细介绍文本
     /// </summary>
-    public string LongDescription
+    /// <returns>详细介绍</returns>
+    public string GetLongDescription()
     {
-        get => string.IsNullOrEmpty(_longDescription) ? ShortDescription : _longDescription;
-        set => _longDescription = value;
+        var toReturn = LanguageConfig.Instance.YamlReader!
+            .GetString($"role.{CampType.ToString().ToLower()}.{GetType().Name.ToLower()}.long-description");
+        return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
     }
 
     /// <summary>

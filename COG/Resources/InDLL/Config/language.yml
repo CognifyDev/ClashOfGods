@@ -4,57 +4,52 @@ role:
   unknown:
     name: "未知"
     description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
+    long-description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
   global:
     max-num: "最大职业数量"
     allow-start-meeting: "允许启动会议"
     allow-report-body: "允许报告尸体"
     kill-cooldown: "击杀冷却时间"
+    no-more-description: "没有详细信息"
   impostor:
     impostor:
       name: "伪装者"
       description: "击杀船员，造成破坏"
+      long-description: "只是内鬼而已"
     cleaner:
       name: "清洁工"
-      description: "协助队友，清理尸体"
-      desc-long: "清洁工可以清理船员的尸体。清洁工可以击杀，但是击杀和清理共用冷却"
+      description: "清除作案痕迹"
+      long-description: "清洁工可以清理船员的尸体。清洁工可以击杀，但是击杀和清理共用冷却"
       clean-cd: "清理尸体冷却"
-    eraser:
-      name: "抹除者"
-      description: "抹除别人的职业"
-      desc-long: "抹除者可以立即抹除他人的职业，但值得注意的是每次抹除之后抹除冷却会变得更长"
-      menu:
-        initial-erase-cd: "初始擦除冷却"
-        increase-cd-after-erasing: "擦除后增加冷却"
-        can-erase-imps: "可擦除内鬼职业"
   crewmate:
     crewmate:
       name: "船员"
       description: "找出伪装者，投出内鬼"
+      long-description: "只是船员罢了"
     bait:
       name: "诱饵"
-      description: "你被击杀时，凶手会自动报告"
+      description: "愿者上钩"
+      long-description: "被击杀时，凶手自动报告鸡腿"
       killer-report-delay: "凶手自报延迟"
       warn-killer: "闪光警告凶手"
     sheriff:
       name: "警长"
-      description: "你可以击杀所有非船员玩家，但是错杀船员的后果是致命的"
+      description: "任何邪恶，终将绳之以法"
+      long-description: "可执法淘汰内鬼阵营，中立第三方或中立杀手玩家，尝试执法船员阵营玩家会直接出局。"
       kill-cd: "击杀冷却"
-    spy:
-      name: "间谍"
-      description: "我是内鬼！"
-      desc-long: "在所有内鬼眼中你的名字是红色的，但是你实际是船员"
     vigilante:
       name: "侠客"
       description: "行侠仗义！"
-      desc-long: "你拥有一次击杀机会，当船员数量小于等于3时你会额外获得一次击杀机会"
+      long-description: "你拥有一次击杀机会，当船员数量小于等于设定值时你会额外获得一次击杀机会"
   neutral:
     jester:
       name: "小丑"
-      description: "你会在被驱逐后获胜"
+      description: "承受一切诋毁，然后放声大笑"
+      long-description: "被投票放逐直接获胜"
     vulture:
       name: "秃鹫"
-      description: "船员们的血肉，味道又如何呢？"
-      desc-long: "你可以吞噬船员的尸体，当吞噬尸体数量达到一定值后会直接胜利"
+      description: "十腿一桶自助餐"
+      long-description: "可以得知场上所有鸡腿的位置；可以吞噬鸡腿，将鸡腿清除。吞噬鸡腿达到指定数量直接获胜"
       eat-cd: "吞噬冷却"
       count-to-win: "胜利吞噬尸体数"
       has-arrow: "箭头指向尸体"
@@ -62,13 +57,13 @@ role:
     guesser:
       name: "赌怪"
       description: "生命就是豪赌"
-      desc-long: "你可以在会议上猜测他人的职业，但如果猜测失败你将会自杀"
+      long-description: "你可以在会议上猜测他人的职业，但如果猜测失败你将会自杀"
       max-guess-time: "最大猜测次数"
       guess-continuously: "连续赌注"
     lighter:
       name: "灯人"
       description: "要相信光！"
-      desc-long: "你的视野大小不受影响"
+      long-description: "视野不会受到电力破坏影响"
     lover:
       name: "恋人"
       description: "你与 %lover% 坠入了爱河"
@@ -120,7 +115,6 @@ option:
 action:
   kill: "击杀"
   clean: "清理"
-  erase-action: "抹除"
   annihilate: "湮灭"
   eat-action: "吞噬"
 game:

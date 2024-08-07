@@ -1,8 +1,5 @@
-using System;
-
 namespace COG.Role;
 
-[Serializable]
 public enum CampType
 {
     Crewmate = 1,

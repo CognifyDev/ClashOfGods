@@ -68,7 +68,7 @@ public static class RoleOptionPatch
         }
 
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
-        __instance.roleDescriptionText.text = CurrentAdvancedTabFor.LongDescription;
+        __instance.roleDescriptionText.text = CurrentAdvancedTabFor.GetLongDescription();
         var rolePreview = ResourceUtils.LoadSprite(
             $"COG.Resources.InDLL.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png", 
             300);

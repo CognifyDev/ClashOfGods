@@ -132,13 +132,11 @@ public partial class Main : BasePlugin
             new Crewmate(),
             new Bait(),
             new Sheriff(),
-            new Spy(),
             new Vigilante(),
 
             // Impostor
             new Impostor(),
             new Cleaner(),
-            new Eraser(),
 
             // Neutral
             new Jester(),

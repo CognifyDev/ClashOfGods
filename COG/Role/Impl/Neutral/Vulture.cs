@@ -25,7 +25,6 @@ public class Vulture : CustomRole, IListener, IWinnable
         if (!ShowInOptions) throw new System.Exception("vulture is not allowed to show in options");
         
         ShortDescription = LanguageConfig.Instance.VultureDescription;
-        LongDescription = LanguageConfig.Instance.VultureLongDescText;
 
         EatingCooldown = CreateOption(() => LanguageConfig.Instance.VultureEatCooldown,
             new FloatOptionValueRule(10f, 5f, 60f, 30f));
