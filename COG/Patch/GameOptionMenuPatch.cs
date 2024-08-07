@@ -19,10 +19,11 @@ internal static class GameOptionMenuPatch
         var headerX = GameOptionsMenu.HEADER_X;
         var headerOffset = GameOptionsMenu.HEADER_SCALE;
         var space = GameOptionsMenu.SPACING_Y;
+        var mapPickerHeight = GameOptionsMenu.MAP_PICKER_HEIGHT;
 
         var settingMap = CustomOption.Options.Where(o => o is { Page: CustomOption.TabType.General }).ToDictionary(o => o!, o => o!.ToVanillaOptionData());
 
-        var num = -(__instance.scrollBar.ContentYBounds.max + 1.65f);
+        var num = -(__instance.scrollBar.ContentYBounds.max + mapPickerHeight);
         var header = Object.Instantiate(__instance.categoryHeaderOrigin, __instance.settingsContainer);
         header.SetHeader(StringNames.None, layer);
         header.Title.text = LanguageConfig.Instance.GeneralHeaderTitle;
@@ -66,7 +67,7 @@ internal static class GameOptionMenuPatch
             num -= space;
         }
 
-        __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
+        __instance.scrollBar.SetYBoundsMax(-num - mapPickerHeight);
     }
 
     [HarmonyPatch(nameof(GameOptionsMenu.Update))]
@@ -75,17 +76,18 @@ internal static class GameOptionMenuPatch
     {
         List<CustomOption> options = CustomOption.Options.Where(o => o is { OptionBehaviour: not null, Page: CustomOption.TabType.General }).ToList()!;
         var num = GameOptionsMenu.START_POS_Y;
-        var headerOffset = GameOptionsMenu.HEADER_HEIGHT;
+        var headerHeight = GameOptionsMenu.HEADER_HEIGHT;
         var space = GameOptionsMenu.SPACING_Y;
         var xStart = GameOptionsMenu.START_POS_X;
+        var mapPickerHeight = GameOptionsMenu.MAP_PICKER_HEIGHT;
 
         foreach (var category in GameManager.Instance.GameSettingsList.AllCategories) // Calculate vanilla option
         {
-            num -= headerOffset;
+            num -= headerHeight;
             foreach (var setting in category.AllGameSettings)
                 num -= space;
         }
-        num -= headerOffset;
+        num -= headerHeight;
         options.ForEach(o =>
         {
             float x = xStart;
@@ -106,7 +108,7 @@ internal static class GameOptionMenuPatch
         });
 
         var scroller = __instance.scrollBar;
-        scroller.SetYBoundsMax(-num - 1.65f);
+        scroller.SetYBoundsMax(-num - mapPickerHeight);
         scroller.UpdateScrollBars();
         if (scroller.GetScrollPercY() == 1) scroller.ScrollPercentY(1); // 修复可能的超出滚动条范围的bug
     }
