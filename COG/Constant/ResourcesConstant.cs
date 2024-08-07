@@ -12,6 +12,6 @@ public static class ResourcesConstant
     public const string EraseButton = "COG.Resources.InDLL.Images.Buttons.Erase.png";
     public const string ArrowImage = "COG.Resources.InDLL.Images.Arrow.png";
     
-    // 
+    // RolePreviews
     public const string DefaultRolePreview = "COG.Resources.InDLL.Images.RolePreviews.Default.png";
 }
