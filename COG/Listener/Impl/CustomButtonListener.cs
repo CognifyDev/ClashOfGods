@@ -1,4 +1,5 @@
-﻿using COG.Listener.Event.Impl.HManager;
+﻿using System.Threading;
+using COG.Listener.Event.Impl.HManager;
 using COG.UI.CustomButton;
 
 namespace COG.Listener.Impl;
@@ -16,7 +17,7 @@ internal class CustomButtonListener : IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         if (!CustomButton.Initialized) return;
-        CustomButton.GetAllButtons();
+        CustomButton.ArrangeAllVanillaButtons();
         CustomButton.ArrangePosition();
         foreach (var button in CustomButtonManager.GetManager().GetButtons()) button.Update();
     }

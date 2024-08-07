@@ -25,6 +25,14 @@ public static class ButtonConstant
         1,
         KeyCode.Q,
         LanguageConfig.Instance.KillAction,
-        () => GameUtils.GetGameOptions().KillCooldown,
+        () =>
+        {
+            /*
+             * Here buries a epic BUG
+             * R.I.P
+             */
+            var gameOptions = GameUtils.GetGameOptions();
+            return gameOptions == null! ? 20f : gameOptions.KillCooldown;
+        },
         0);
 }

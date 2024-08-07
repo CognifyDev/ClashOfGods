@@ -321,7 +321,7 @@ public class CustomButton
         Initialized = true;
     }
 
-    internal static void GetAllButtons()
+    internal static void ArrangeAllVanillaButtons()
     {
         var buttons = GameObject.Find("Main Camera/Hud/Buttons/BottomRight/");
         if (!buttons) return;

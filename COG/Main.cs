@@ -149,9 +149,6 @@ public partial class Main : BasePlugin
 
         LanguageConfig.OnLanguageLoaded += () => CustomRoleManager.GetManager().ReloadRoles();
 
-        // Register custom buttons
-        CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
-
         // Register listeners from role
         foreach (var role in CustomRoleManager.GetManager().GetRoles())
             ListenerManager.GetManager().RegisterListener(role.GetListener());
@@ -201,6 +198,9 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
+        
+        // Register custom buttons
+        CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
         
 
         Harmony.PatchAll();

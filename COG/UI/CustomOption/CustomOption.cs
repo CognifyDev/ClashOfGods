@@ -85,6 +85,7 @@ public sealed class CustomOption
 
     public static void ShareConfigs(PlayerControl? target = null)
     {
+        return;
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
 
         // 当游戏选项更改的时候调用
