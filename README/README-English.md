@@ -1,7 +1,7 @@
 ﻿# ClashOfGods
 #### A new-term mod for Among Us with plugin system that allows you to make your own plugin by EASY computer language Lua for Among Us
 
-> English | [简体中文](README-SChinese.md) | [繁體中文](README-TChinese.md)
+> English | [简体中文](README-SChinese.md)
 
 Clash Of Gods is an Among Us mod.<br />
 

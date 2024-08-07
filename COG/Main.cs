@@ -35,11 +35,6 @@ using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 namespace COG;
 
 [BepInAutoPlugin(PluginGuid, PluginName)]
-[BepInIncompatibility("com.emptybottle.townofhost")]
-[BepInIncompatibility("me.eisbison.theotherroles")]
-[BepInIncompatibility("me.yukieiji.extremeroles")]
-[BepInIncompatibility("jp.ykundesu.supernewroles")]
-[BepInIncompatibility("com.tugaru.TownOfPlus")]
 [BepInProcess("Among Us.exe")]
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -154,9 +149,6 @@ public partial class Main : BasePlugin
 
         LanguageConfig.OnLanguageLoaded += () => CustomRoleManager.GetManager().ReloadRoles();
 
-        // Register custom buttons
-        CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
-
         // Register listeners from role
         foreach (var role in CustomRoleManager.GetManager().GetRoles())
             ListenerManager.GetManager().RegisterListener(role.GetListener());
@@ -206,6 +198,9 @@ public partial class Main : BasePlugin
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
         });
+        
+        // Register custom buttons
+        CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
         
 
         Harmony.PatchAll();

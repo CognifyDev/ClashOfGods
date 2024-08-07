@@ -18,13 +18,14 @@ using COG.Listener.Event.Impl.VentImpl;
 using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Rpc;
-using COG.States;
 using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
 using Il2CppSystem.Collections;
+using InnerNet;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
 using Debug = System.Diagnostics.Debug;
+using GameStates = COG.States.GameStates;
 using Random = System.Random;
 
 namespace COG.Listener.Impl;
@@ -42,10 +43,11 @@ public class GameListener : IListener
         switch (knownRpc)
         {
             case KnownRpc.ShareRoles:
+            {
                 // 清除原列表，防止干扰
                 GameUtils.PlayerData.Clear();
                 // 开始读入数据
-                Main.Logger.LogInfo("The role data from the host was received by us.");
+                Main.Logger.LogDebug("The role data from the host was received by us.");
 
                 var originalText = reader.ReadString()!;
                 foreach (var s in originalText.Split(","))
@@ -61,6 +63,19 @@ public class GameListener : IListener
                                         $" => {playerRole.Role.Name}");
 
                 break;
+            }
+            case KnownRpc.Revive:
+            {
+                // 房主视角已经复活过了，因此可以直接return
+                if (AmongUsClient.Instance.AmHost) return;
+                
+                // 从Rpc中读入PlayerControl
+                var target = reader.ReadNetObject<PlayerControl>();
+                
+                // 复活目标玩家
+                target.Revive();
+                break;
+            }
         }
     }
 

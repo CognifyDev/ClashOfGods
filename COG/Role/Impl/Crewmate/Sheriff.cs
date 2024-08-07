@@ -28,7 +28,14 @@ public class Sheriff : CustomRole, IListener
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
                 if (!target) return;
-                PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
+                if (target!.GetMainRole().CampType != CampType.Crewmate)
+                {
+                    PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
+                }
+                else
+                {
+                    PlayerControl.LocalPlayer.RpcMurderPlayer(PlayerControl.LocalPlayer, true);
+                }
             },
             () => SheriffKillButton?.ResetCooldown(),
             () =>
