@@ -22,18 +22,17 @@ public class Vulture : CustomRole, IListener, IWinnable
 {
     public Vulture() : base(LanguageConfig.Instance.VultureName, Color.blue, CampType.Neutral)
     {
+        if (!ShowInOptions) throw new System.Exception("vulture is not allowed to show in options");
+        
         ShortDescription = LanguageConfig.Instance.VultureDescription;
         LongDescription = LanguageConfig.Instance.VultureLongDescText;
 
-        if (ShowInOptions)
-        {
-            EatingCooldown = CreateOption(() => LanguageConfig.Instance.VultureEatCooldown,
-                new FloatOptionValueRule(10f, 5f, 60f, 30f));
-            WinningEatenCount = CreateOption(() => LanguageConfig.Instance.VultureEatenCountToWin,
-                new IntOptionValueRule(2, 1, 6, 4));
-            HasArrowToBodies = CreateOption(() => LanguageConfig.Instance.VultureHasArrowToBodies,
-                new BoolOptionValueRule(true));
-        }
+        EatingCooldown = CreateOption(() => LanguageConfig.Instance.VultureEatCooldown,
+            new FloatOptionValueRule(10f, 5f, 60f, 30f));
+        WinningEatenCount = CreateOption(() => LanguageConfig.Instance.VultureEatenCountToWin,
+            new IntOptionValueRule(2, 1, 6, 4));
+        HasArrowToBodies = CreateOption(() => LanguageConfig.Instance.VultureHasArrowToBodies,
+            new BoolOptionValueRule(true));
 
         EatButton = CustomButton.Create(
             () =>
@@ -64,9 +63,9 @@ public class Vulture : CustomRole, IListener, IWinnable
         EatenCount = 0;
     }
 
-    public CustomOption? EatingCooldown { get; }
-    public CustomOption? WinningEatenCount { get; }
-    public CustomOption? HasArrowToBodies { get; }
+    public CustomOption EatingCooldown { get; }
+    public CustomOption WinningEatenCount { get; }
+    public CustomOption HasArrowToBodies { get; }
     public CustomButton EatButton { get; }
     public static int EatenCount { get; private set; }
     private static DeadBody? ClosestBody { get; set; }

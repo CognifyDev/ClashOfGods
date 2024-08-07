@@ -4,6 +4,8 @@ using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomButton;
+using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
 
@@ -15,6 +17,8 @@ public class Vigilante : CustomRole, IListener
     private bool _hasGiven;
 
     private int _killTimes = 1;
+
+    private readonly CustomOption _minCrewmateNumber;
 
     public Vigilante() : base(LanguageConfig.Instance.VigilanteName, ColorUtils.AsColor("#ffcc00"), CampType.Crewmate)
     {
@@ -41,9 +45,12 @@ public class Vigilante : CustomRole, IListener
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             () => 1f,
-            1);
+            -1);
 
         AddButton(_killButton);
+        
+        _minCrewmateNumber = CreateOption(() => LanguageConfig.Instance.VultureHasArrowToBodies,
+            new IntOptionValueRule(1, 1, 15, 3));
     }
 
     public override void ClearRoleGameData()
@@ -56,7 +63,7 @@ public class Vigilante : CustomRole, IListener
     public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
         var crewmates = PlayerUtils.GetAllAlivePlayers().Where(p => p.GetMainRole().CampType == CampType.Crewmate);
-        if (crewmates.Count() > 3 || _hasGiven) return;
+        if (crewmates.Count() > _minCrewmateNumber.GetInt() || _hasGiven) return;
         _killTimes++;
         _hasGiven = true;
     }
