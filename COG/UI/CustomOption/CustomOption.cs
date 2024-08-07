@@ -85,6 +85,10 @@ public sealed class CustomOption
 
     public static void ShareConfigs(PlayerControl? target = null)
     {
+        /*
+         * FIXME
+         * 这里还没有写完 暂时先RETURN
+         */
         return;
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
 
