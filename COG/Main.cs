@@ -69,6 +69,7 @@ public partial class Main : BasePlugin
         Logger.LogInfo($"GitInfo: {GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})");
 #if !DEBUG
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.SelectRoles)));
+        Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.OnRpcReceived)));
 #endif
 
         // Add dependencies to core directory

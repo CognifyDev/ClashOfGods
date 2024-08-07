@@ -10,7 +10,7 @@ namespace COG.Listener.Impl;
 public class RpcListener : IListener
 {
     [EventHandler(EventHandlerType.Postfix)]
-    public void AfterRPCReceived(PlayerHandleRpcEvent @event)
+    public void AfterRpcReceived(PlayerHandleRpcEvent @event)
     {
         var callId = @event.CallId;
         var reader = @event.Reader;
@@ -68,6 +68,13 @@ public class RpcListener : IListener
                 HandshakeManager.Instance.AddInfo(@event.Player, versionStr, commitTime);
                 HandshakeManager.Instance.CheckPlayersAndDisplay();
                 break;
+            }
+            case KnownRpc.NotifySettingChange:
+            {
+                var id = reader.ReadPackedInt32();
+                var text = reader.ReadString();
+                HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)id, text, true);
+                break;    
             }
         }
     }

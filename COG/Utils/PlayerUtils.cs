@@ -96,12 +96,11 @@ public static class PlayerUtils
     }
 
     /// <summary>
-    /// 复活一个玩家并且在所有人看来他复活了
+    /// 复活一个玩家
     /// </summary>
     /// <param name="player">欲复活的玩家</param>
     public static void RpcRevive(this PlayerControl player)
     {
-        // 房主视角先复活一下
         player.Revive();
         
         // 新建写入器

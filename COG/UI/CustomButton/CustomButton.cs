@@ -321,15 +321,15 @@ public class CustomButton
         Initialized = true;
     }
 
-    internal static void ArrangeAllVanillaButtons()
+    internal static void GetAllVanillaButtons()
     {
         var buttons = GameObject.Find("Main Camera/Hud/Buttons/BottomRight/");
         if (!buttons) return;
         AllVanillaButtons.Clear();
         buttons.ForEachChild(new Action<GameObject>(gameObject =>
         {
-            if (CustomButtonManager.GetManager().GetButtons()
-                    .FirstOrDefault(b => b.GameObject!.name == gameObject.name) is null)
+            if (!CustomButtonManager.GetManager().GetButtons()
+                    .Any(b => b.GameObject!.name == gameObject.name))
                 AllVanillaButtons.Add(gameObject.GetComponent<ActionButton>());
         }));
     }

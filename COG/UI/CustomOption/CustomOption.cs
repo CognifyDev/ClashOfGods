@@ -226,6 +226,7 @@ public sealed class CustomOption
 
     private void NotifySettingChange()
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         if (!OptionBehaviour) return;
         
         var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.AllOptions.Contains(this));
@@ -247,7 +248,7 @@ public sealed class CustomOption
                 $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{Name()}</font>",
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\"> " + valueText + " </font>"
             );
-            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MinValue + Id, item, true);
+            GameUtils.RpcNotifySettingChange(int.MinValue + Id, item);
         }
         else if (OptionBehaviour is RoleOptionSetting setting)
         {
@@ -262,7 +263,8 @@ public sealed class CustomOption
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount + "</font>",
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance + "%"
             );
-            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue - role.Id, item, true);
+
+            GameUtils.RpcNotifySettingChange(int.MaxValue - role.Id, item);
         }
         else
         {
@@ -288,7 +290,8 @@ public sealed class CustomOption
                 $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}: {Name()} </font>",
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\"> " + valueText + " </font>"
             );
-            HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)int.MaxValue - Id, item, true);
+
+            GameUtils.RpcNotifySettingChange(int.MaxValue - Id, item);
         }
     }
 
