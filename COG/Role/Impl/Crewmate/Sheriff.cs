@@ -2,8 +2,6 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
-using COG.Listener.Event.Impl.Player;
-using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -19,7 +17,7 @@ public class Sheriff : CustomRole, IListener
         BaseRoleType = RoleTypes.Crewmate;
 
         if (ShowInOptions)
-            SheriffKillCd = CreateOption(() => LanguageConfig.Instance.SheriffKillCooldown,
+            SheriffKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
                 new FloatOptionValueRule(10f, 5f, 60f, 30f));
 
         SheriffKillButton = CustomButton.Create(
@@ -61,24 +59,6 @@ public class Sheriff : CustomRole, IListener
 
     private CustomOption? SheriffKillCd { get; }
     private CustomButton SheriffKillButton { get; }
-
-    [EventHandler(EventHandlerType.Prefix)]
-    public bool OnPlayerMurder(PlayerMurderEvent @event)
-    {
-        if (!GameStates.InGame) return true;
-        var killer = @event.Player;
-        var target = @event.Target;
-        if (killer == null || target == null) return true;
-        if (!killer.IsRole(this)) return true;
-        if (target.GetMainRole().CampType != CampType.Crewmate) return true;
-        killer.RpcMurderPlayer(killer, true);
-        return false;
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
-    }
 
     public override CustomRole NewInstance()
     {

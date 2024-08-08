@@ -86,16 +86,44 @@ public static class PlayerUtils
         return IsSamePlayer(info.Object, target.Object);
     }
 
-    public static bool IsSamePlayer(this PlayerControl player, PlayerControl target)
-    {
+    public static bool IsSamePlayer(this PlayerControl? player, PlayerControl? target)
+    { 
+        if (player == null || target == null) return false; 
         return player.PlayerId == target.PlayerId;
     }
 
-    public static PlayerData? GetPlayerRole(this PlayerControl player)
+    public static DeadBody? GetDeadBody(this PlayerControl target)
+    {
+        var deadBodies = DeadBodyUtils.GetDeadBodies().Where(body => body.GetPlayer().IsSamePlayer(target)).ToList();
+        return deadBodies.Count > 0 ? deadBodies[0] : null;
+    }
+
+    public static PlayerData? GetPlayerData(this PlayerControl player)
     {
         return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
     }
 
+    /// <summary>
+    /// 给玩家添加指定标签
+    /// </summary>
+    /// <param name="tag"></param>
+    public static void RpcMark(this PlayerControl target, string tag)
+    {
+        var playerData = target.GetPlayerData();
+        playerData?.Tags.Add(tag);
+
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.Mark);
+        writer.WriteNetObject(target);
+        writer.Write(tag);
+        writer.Finish();
+    }
+
+    public static bool HasMarkAs(this PlayerControl target, string tag)
+    {
+        var tags = target.GetPlayerData()?.Tags;
+        return tags != null && tags.Contains(tag);
+    }
+    
     /// <summary>
     /// 复活一个玩家
     /// </summary>
@@ -103,16 +131,14 @@ public static class PlayerUtils
     public static void RpcRevive(this PlayerControl player)
     {
         player.Revive();
-        
-        // 新建写入器
-        var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)KnownRpc.Revive,
-            SendOption.Reliable);
+
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.Revive);
         
         // 写入对象实例
         writer.WriteNetObject(player);
         
         // 发送Rpc
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        writer.Finish();
     }
 
     public static CustomRole GetMainRole(this PlayerControl player)
@@ -160,13 +186,17 @@ public static class PlayerUtils
         return !player.Data.IsDead;
     }
 
-    public static bool IsRole(this PlayerControl player, CustomRole role)
+    public static bool IsRole(this PlayerControl? player, CustomRole role)
     {
-        var targetRole = player.GetPlayerRole();
+        if (player == null)
+        {
+            return false;
+        }
+        var targetRole = player.GetPlayerData();
         return targetRole != null && (targetRole.Role.Id.Equals(role.Id) || targetRole.SubRoles.Contains(role));
     }
 
-    public static DeadBody? GetClosestBody(List<DeadBody>? untargetable = null)
+    public static DeadBody? GetClosestBody(List<DeadBody>? unTargetAble = null)
     {
         DeadBody? result = null;
 
@@ -175,7 +205,7 @@ public static class PlayerUtils
         var position = PlayerControl.LocalPlayer.GetTruePosition();
 
         foreach (var body in Object.FindObjectsOfType<DeadBody>()
-                     .Where(b => untargetable != null ? untargetable.Contains(b) : true))
+                     .Where(b => unTargetAble?.Contains(b) ?? true))
         {
             var vector = body.TruePosition - position;
             var magnitude = vector.magnitude;
@@ -332,7 +362,7 @@ public static class PlayerUtils
 
     public static CustomRole[] GetSubRoles(this PlayerControl pc)
     {
-        return pc.GetPlayerRole()!.SubRoles;
+        return pc.GetPlayerData()!.SubRoles;
     }
 
     public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason,
@@ -459,6 +489,7 @@ public class PlayerData
         Role = role;
         PlayerName = player.name;
         PlayerId = player.PlayerId;
+        Tags = new List<string>();
         SubRoles = subRoles != null
             ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
             : Array.Empty<CustomRole>();
@@ -469,6 +500,8 @@ public class PlayerData
     public string PlayerName { get; }
     public byte PlayerId { get; }
     public CustomRole[] SubRoles { get; }
+    
+    public List<string> Tags { get; }
 
     public static CustomRole GetRole(string? playerName = null, byte? playerId = null)
     {

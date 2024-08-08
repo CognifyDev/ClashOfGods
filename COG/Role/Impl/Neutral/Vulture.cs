@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
@@ -13,6 +12,7 @@ using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using Reactor.Utilities;
 using UnityEngine;
 using Random = System.Random;
 
@@ -94,7 +94,7 @@ public class Vulture : CustomRole, IListener, IWinnable
     [EventHandler(EventHandlerType.Postfix)]
     public void OnPlayerDeath(PlayerMurderEvent _)
     {
-        HudManager.Instance.StartCoroutine(CoFadeDeath().WrapToIl2Cpp());
+        Coroutines.Start(CoFadeDeath());
     }
 
     public IEnumerator CoFadeDeath()

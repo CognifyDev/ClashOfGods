@@ -33,6 +33,23 @@ public class ListenerManager
     /// <param name="listener">the listener</param>
     public void RegisterListener(IListener listener)
     {
+        RegisterHandlers(AsHandlers(listener));
+    }
+
+    public void RegisterHandlers(Handler[] handlers)
+    {
+        handlers.ForEach(handler =>
+        {
+            _handlers.Add(handler);
+            Main.Logger.LogDebug(
+                $"Registered listener handler => {handler.Method.Name} from {handler.Listener.GetType().Name} by type of {handler.EventHandlerType.ToString()}");
+        });
+    }
+
+    public Handler[] AsHandlers(IListener listener)
+    {
+        var list = new List<Handler>();
+        
         foreach (var methodInfo in listener.GetType().GetMethods(BindingFlags.Instance |
                                                                  BindingFlags.Public |
                                                                  BindingFlags.NonPublic |
@@ -43,10 +60,11 @@ public class ListenerManager
             if (attributes.Length < 1) continue;
             var attribute = attributes[0] as EventHandlerAttribute;
             var type = attribute!.EventHandlerType;
-            _handlers.Add(new Handler(listener, methodInfo, type));
-            Main.Logger.LogDebug(
-                $"Registered listener handler => {methodInfo.Name} from {listener.GetType().Name} by type of {type.ToString()}");
+            var handler = new Handler(listener, methodInfo, type);
+            list.Add(handler);
         }
+
+        return list.ToArray();
     }
 
     /// <summary>
@@ -101,9 +119,21 @@ public class ListenerManager
     public bool ExecuteHandlers(Event.Event @event, EventHandlerType type)
     {
         var toReturn = true;
-
-        foreach (var handler in _handlers)
+        
+        /* for only
+         if you try to use foreach, then
+         [Error  :Il2CppInterop] During invoking native->managed trampoline
+         Exception: System.InvalidOperationException: Collection was modified; enumeration operation may not execute.
+         at System.Collections.Generic.List`1.Enumerator.MoveNextRare()
+         at System.Collections.Generic.List`1.Enumerator.MoveNext()
+         at COG.Listener.ListenerManager.ExecuteHandlers(Event event, EventHandlerType type) in D:\RiderProjects\ClashOfGods\COG\Listener\ListenerManager.cs:line 123
+         at COG.Patch.GameStartPatch.Postfix(GameManager __instance) in D:\RiderProjects\ClashOfGods\COG\Patch\GamePatch.cs:line 267
+         at DMD<GameManager::StartGame>(GameManager this)
+         at (il2cpp -> managed) StartGame(IntPtr , Il2CppMethodInfo* )
+         */
+        for (var i = 0; i < _handlers.Count; i++)
         {
+            var handler = _handlers[i];
             if (!type.Equals(handler.EventHandlerType) ||
                 !handler.EventType.IsInstanceOfType(@event)) continue;
 

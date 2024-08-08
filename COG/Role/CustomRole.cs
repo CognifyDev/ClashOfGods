@@ -90,7 +90,7 @@ public abstract class CustomRole
     private string GetContextFromLanguage(string context)
     {
         var campName = IsSubRole ? "sub-roles" : Enum.GetName(typeof(CampType), CampType)!.ToLower();
-        var location = $"role.{campName}.{GetType().Name.ToLower()}.{context}";
+        var location = $"role.{campName}.{GetNameInConfig()}.{context}";
         var toReturn = LanguageConfig.Instance.YamlReader!
             .GetString(location);
         return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
@@ -172,6 +172,8 @@ public abstract class CustomRole
         }
     }
 
+    public virtual string GetNameInConfig() => GetType().Name.ToLower();
+
     public ReadOnlyCollection<PlayerControl> Players =>
         new(GameUtils.PlayerData.Where(pr => pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
 
@@ -203,6 +205,11 @@ public abstract class CustomRole
         AllOptions.Add(option.Register());
     }
 
+    public bool IsPlayerControlRole(PlayerControl target)
+    {
+        return PlayerControl.LocalPlayer.IsSamePlayer(target) && target.IsRole(this);
+    }
+
     protected CustomOption CreateOptionWithoutRegister(Func<string> nameGetter, IValueRule rule)
     {
         return CustomOption.Of(GetTabType(this), nameGetter, rule);
@@ -212,9 +219,10 @@ public abstract class CustomRole
     ///     添加一个按钮
     /// </summary>
     /// <param name="button">要添加的按钮</param>
-    public void AddButton(CustomButton button)
+    public void AddButton(CustomButton button, Func<bool>? hasButton = null)
     {
-        button.HasButton += () => PlayerControl.LocalPlayer.IsRole(this);
+        hasButton ??= () => PlayerControl.LocalPlayer.IsRole(this);
+        button.HasButton = hasButton;
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
@@ -246,11 +254,6 @@ public abstract class CustomRole
 
     public virtual void AfterSharingRoles()
     {
-    }
-
-    public virtual bool CanBeGiven(PlayerControl target)
-    {
-        return true;
     }
 
     public virtual void ClearRoleGameData()

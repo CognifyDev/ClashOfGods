@@ -37,12 +37,16 @@ role:
       name: "警长"
       description: "任何邪恶，终将绳之以法"
       long-description: "可执法淘汰内鬼阵营，中立第三方或中立杀手玩家，尝试执法船员阵营玩家会直接出局。"
-      kill-cd: "击杀冷却"
     vigilante:
       name: "侠客"
       description: "行侠仗义！"
       long-description: "你拥有一次击杀机会，当船员数量小于等于设定值时你会额外获得一次击杀机会"
       min-crewmate-number: "给予额外击杀机会的最小船员数量"
+    soul-hunter:
+      name: "灵魂猎手"
+      description: "从地狱归来，将邪恶一同带去"
+      long-description: "拥有一次无代价击杀。被击杀后指定秒在鸡腿处复活(如果鸡腿还存在的话)并获得一次执法机会，下轮会议召开时将立刻出局。"
+      revive-after: "复活秒数"
   neutral:
     jester:
       name: "小丑"

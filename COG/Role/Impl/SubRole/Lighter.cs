@@ -16,7 +16,7 @@ public class Lighter : CustomRole, IListener
     {
         if (GameStates.IsLobby || !GameStates.InGame) return true;
         var player = @event.Player;
-        if (player == null) return true;
+        if (IsPlayerControlRole(player)) return true;
 
         player.SetFlashlightInputMethod();
         player.lightSource.SetupLightingForGameplay(false, 0.75f, player.TargetFlashlight.transform);

@@ -37,7 +37,6 @@ internal class PlayerKillPatch
     [HarmonyPrefix]
     public static bool CheckMurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
-        if (!AmongUsClient.Instance.AmHost) return true;
         return ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Prefix);
     }
@@ -46,7 +45,6 @@ internal class PlayerKillPatch
     [HarmonyPostfix]
     public static void MurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
-        if (!AmongUsClient.Instance.AmHost) return;
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Postfix);
     }
@@ -60,8 +58,6 @@ internal class PlayerShapeShiftPatch
     public static bool CheckShapeShiftPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target,
         [HarmonyArgument(1)] bool shouldAnimate)
     {
-        if (!AmongUsClient.Instance.AmHost) return true;
-
         var result = ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerShapeShiftEvent(__instance, target, shouldAnimate), EventHandlerType.Prefix);
         if (!result)
@@ -79,17 +75,6 @@ internal class PlayerShapeShiftPatch
     }
 }
 
-/*
-[HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
-internal class ChatUpdatePatch
-{
-    public static void Postfix(ChatController __instance)
-    {
-        if (!AmongUsClient.Instance.AmHost) return;
-        foreach (var listener in ListenerManager.GetManager().GetListeners()) listener.OnChatUpdate(__instance);
-    }
-}
-*/
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Update))]
 internal class HostStartPatch
 {

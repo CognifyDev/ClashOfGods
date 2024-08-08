@@ -137,6 +137,7 @@ public partial class Main : BasePlugin
             new Bait(),
             new Sheriff(),
             new Vigilante(),
+            new SoulHunter(),
 
             // Impostor
             new Impostor(),
@@ -149,10 +150,6 @@ public partial class Main : BasePlugin
             // Sub-roles
             new Lighter()
         });
-
-        // Register listeners from role
-        foreach (var role in CustomRoleManager.GetManager().GetRoles())
-            ListenerManager.GetManager().RegisterListener(role.GetListener());
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]

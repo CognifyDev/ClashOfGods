@@ -15,6 +15,7 @@ public class Bait : CustomRole, IListener
     {
         var killer = @event.Player;
         var target = @event.Target;
+        if (!IsPlayerControlRole(target)) return;
         if (killer == null || target == null) return;
         if (target.IsRole(this)) killer.CmdReportDeadBody(target.Data);
     }

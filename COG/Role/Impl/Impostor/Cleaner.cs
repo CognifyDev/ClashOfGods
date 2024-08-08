@@ -1,11 +1,7 @@
-using System.Linq;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
-using COG.Listener.Event.Impl.Player;
-using COG.Rpc;
-using COG.States;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -30,7 +26,7 @@ public class Cleaner : CustomRole, IListener
             {
                 var body = PlayerUtils.GetClosestBody();
                 if (!body) return;
-                RpcCleanDeadBody(body!);
+                body!.RpcCleanDeadBody();
                 KillButton?.ResetCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
@@ -77,33 +73,6 @@ public class Cleaner : CustomRole, IListener
     private CustomButton CleanBodyButton { get; }
     private CustomButton KillButton { get; }
     private static PlayerControl? ClosestTarget { get; set; }
-
-    public void RpcCleanDeadBody(DeadBody body)
-    {
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.CleanDeadBody);
-        writer.Write(body.ParentId);
-        writer.Finish();
-        CleanDeadBody(body);
-    }
-
-    public void CleanDeadBody(DeadBody body)
-    {
-        body.gameObject.SetActive(false);
-        // idk why it make PlayerControl.FixedUpdate() throw System.NullReferenceException when i destroy the body
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnRPCReceived(PlayerHandleRpcEvent @event)
-    {
-        if (!GameStates.InGame) return;
-        var callId = @event.CallId;
-        var reader = @event.Reader;
-        if (callId != (byte)KnownRpc.CleanDeadBody) return;
-        var pid = reader.ReadByte();
-        var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
-        if (!body) return;
-        CleanDeadBody(body!);
-    }
 
     public override IListener GetListener()
     {

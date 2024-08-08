@@ -29,7 +29,7 @@ public abstract class RpcUtils
         {
             writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable,
                 control.GetClientID()));
-            Main.Logger.LogInfo($"Rpc {callId} sent to {control.name}({control.PlayerId})");
+            Main.Logger.LogDebug($"Rpc {callId} sent to {control.name}({control.PlayerId})");
         }
 
         return new RpcWriter(writers.ToArray());

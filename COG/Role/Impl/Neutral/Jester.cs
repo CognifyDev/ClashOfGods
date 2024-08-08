@@ -42,7 +42,7 @@ public class Jester : CustomRole, IListener, IWinnable
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnCheckStartMeeting(PlayerReportDeadBodyEvent @event)
     {
-        if (!GameStates.InGame) return true;
+        if (!GameStates.InGame || GameStates.IsLobby) return true;
         var victim = @event.Target;
         var player = @event.Player;
         if (!player.IsRole(this)) return true;

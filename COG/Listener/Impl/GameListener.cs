@@ -6,6 +6,7 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
+using COG.Listener.Event;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.GSManager;
@@ -37,13 +38,13 @@ public class GameListener : IListener
     {
         var callId = @event.CallId;
         var reader = @event.Reader;
-        if (AmongUsClient.Instance.AmHost) return; // 是房主就返回
         var knownRpc = (KnownRpc)callId;
 
         switch (knownRpc)
         {
             case KnownRpc.ShareRoles:
             {
+                if (AmongUsClient.Instance.AmHost) return;
                 // 清除原列表，防止干扰
                 GameUtils.PlayerData.Clear();
                 // 开始读入数据
@@ -71,6 +72,24 @@ public class GameListener : IListener
                 
                 // 复活目标玩家
                 target.Revive();
+                break;
+            }
+            case KnownRpc.CleanDeadBody:
+            {
+                if (!GameStates.InGame) return;
+                var pid = reader.ReadByte();
+                var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
+                if (!body) return;
+                body!.gameObject.SetActive(false);
+                break;
+            }
+            case KnownRpc.Mark:
+            {
+                var target = reader.ReadNetObject<PlayerControl>();
+                var tag = reader.ReadString();
+                
+                var playerData = target.GetPlayerData();
+                playerData?.Tags.Add(tag);
                 break;
             }
         }
@@ -111,7 +130,7 @@ public class GameListener : IListener
 
         if (PlayerControl.LocalPlayer.IsSamePlayer(player))
         {
-            var playerRole = player.GetPlayerRole();
+            var playerRole = player.GetPlayerData();
             if (playerRole is null) return;
 
             var subRoles = playerRole.SubRoles;
@@ -223,9 +242,7 @@ public class GameListener : IListener
         if (!AmongUsClient.Instance.AmHost) return;
 
         Main.Logger.LogInfo("Shhhhhh!");
-
-        if (!AmongUsClient.Instance.AmHost) return;
-
+        
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
 
@@ -456,12 +473,25 @@ public class GameListener : IListener
         Main.Logger.LogInfo($"Eject text: {roleText} & {playerInfoText}");
     }
 
+    private readonly List<Handler> _handlers = new();
+
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent _)
     {
         Main.Logger.LogInfo("Game started!");
 
         GameStates.InGame = true;
+        
+        if (!_handlers.IsEmpty())
+        {
+            ListenerManager.GetManager().UnRegisterHandlers(_handlers.ToArray());
+            _handlers.Clear();
+        }
+        
+        CustomRoleManager.GetManager().GetRoles().Select(role => role.GetListener()).ForEach(
+            listener => _handlers.AddRange(ListenerManager.GetManager().AsHandlers(listener)));
+        
+        ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
 
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
             foreach (var player in PlayerControl.AllPlayerControls)

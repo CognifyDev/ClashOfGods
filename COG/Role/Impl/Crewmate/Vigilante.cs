@@ -60,7 +60,8 @@ public class Vigilante : CustomRole, IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
-        var crewmates = PlayerUtils.GetAllAlivePlayers().Where(p => p.GetMainRole().CampType == CampType.Crewmate);
+        var crewmates
+            = PlayerUtils.GetAllAlivePlayers().Where(p => p.GetMainRole().CampType == CampType.Crewmate);
         if (crewmates.Count() > _minCrewmateNumber.GetInt() || _hasGiven) return;
         _killTimes++;
         _hasGiven = true;

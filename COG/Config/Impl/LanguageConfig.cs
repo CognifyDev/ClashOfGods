@@ -57,9 +57,9 @@ public class LanguageConfig : Config
     public string MaxSubRoleNumber { get; private set; } = null!;
 
     // Crewmate
-    public string SheriffKillCooldown { get; private set; } = null!;
-
     public string VigilanteMinCrewmateNumber { get; private set; } = null!;
+
+    public string SoulHunterReviveAfter { get; private set; } = null!;
 
     // Impostor
     public string CleanBodyCooldown { get; private set; } = null!;
@@ -147,9 +147,9 @@ public class LanguageConfig : Config
         MaxSubRoleNumber = GetString("game-setting.general.max-sub-role-number");
         
         // Crewmate
-        SheriffKillCooldown = GetString("role.crewmate.sheriff.kill-cd");
-
         VigilanteMinCrewmateNumber = GetString("role.crewmate.vigilante.min-crewmate-number");
+
+        SoulHunterReviveAfter = GetString("role.crewmate.soul-hunter.revive-after");
 
         // Impostors
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
