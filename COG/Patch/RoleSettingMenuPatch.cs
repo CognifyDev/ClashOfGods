@@ -81,7 +81,7 @@ public static class RoleOptionPatch
         foreach (var option in options)
         {
             var customOption = CustomOption.Options.Where(o => o != null)
-                .FirstOrDefault(o => o!.VanillaData == option.Data);
+                .FirstOrDefault(o => o.VanillaData == option.Data);
             if (customOption == null) return;
 
             customOption.OptionBehaviour = option;
@@ -194,6 +194,7 @@ public static class RoleOptionPatch
             passive.OnMouseOut = new UnityEvent();
             passive.OnMouseOver = new UnityEvent();
             passive.OnClick = new Button.ButtonClickedEvent();
+            
 
             if (role.RoleOptions.Count != 0)
             {

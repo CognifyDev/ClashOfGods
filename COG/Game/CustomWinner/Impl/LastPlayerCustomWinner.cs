@@ -13,7 +13,7 @@ public class LastPlayerCustomWinner : IWinnable
         if (!lastPlayer) return false;
         CustomWinnerManager.EndGame(PlayerUtils.GetAllAlivePlayers(),
             LanguageConfig.Instance.NeutralsWinText.CustomFormat(lastPlayer!.Data.PlayerName),
-            lastPlayer.GetMainRole()!.Color);
+            lastPlayer.GetMainRole().Color);
         return true;
     }
 

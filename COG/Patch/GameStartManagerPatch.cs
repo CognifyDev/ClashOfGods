@@ -16,7 +16,7 @@ internal static class GameStartManagerPatch
     {
         if (Opened)
         {
-            Menu?.gameObject.Destroy();
+            if (Menu != null) Menu.gameObject.Destroy();
             Menu = null;
             Opened = false;
         }

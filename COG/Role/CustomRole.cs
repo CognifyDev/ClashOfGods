@@ -66,6 +66,9 @@ public abstract class CustomRole
             RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage,
                 new IntOptionValueRule(0, 1, 15, 0));
             RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 0));
+            
+            CreateOption(() => LanguageConfig.Instance.RoleCode, 
+                new StringOptionValueRule(0, _ => new[] {Id.ToString()}));
         }
     }
 
@@ -190,9 +193,19 @@ public abstract class CustomRole
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
-        var option = CustomOption.Of(GetTabType(this), nameGetter, rule);
+        var option = CustomOption.Of(GetTabType(this), nameGetter, rule).Register();
         AllOptions.Add(option);
         return option;
+    }
+
+    protected void RegisterCustomOption(CustomOption option)
+    {
+        AllOptions.Add(option.Register());
+    }
+
+    protected CustomOption CreateOptionWithoutRegister(Func<string> nameGetter, IValueRule rule)
+    {
+        return CustomOption.Of(GetTabType(this), nameGetter, rule);
     }
 
     /// <summary>
@@ -208,7 +221,7 @@ public abstract class CustomRole
     public virtual string HandleEjectText(PlayerControl player)
     {
         var role = player.GetMainRole();
-        var sb = new StringBuilder(role!.GetColorName());
+        var sb = new StringBuilder(role.GetColorName());
 
         foreach (var subRole in player.GetSubRoles())
             sb.Append(' ').Append(subRole.GetColorName());

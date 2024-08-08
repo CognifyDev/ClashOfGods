@@ -90,6 +90,7 @@ public class LanguageConfig : Config
     public string AllowReportDeadBody { get; private set; } = null!;
     public string KillCooldown { get; private set; } = null!;
     public string NoMoreDescription { get; private set; } = null!;
+    public string RoleCode { get; private set; } = null!;
 
     public string QQ { get; private set; } = null!;
     public string Discord { get; private set; } = null!;
@@ -180,6 +181,7 @@ public class LanguageConfig : Config
         AllowReportDeadBody = GetString("role.global.allow-report-body");
         KillCooldown = GetString("role.global.kill-cooldown");
         NoMoreDescription = GetString("role.global.no-more-description");
+        RoleCode = GetString("role.global.role-code");
 
         UnknownCamp = GetString("camp.unknown.name");
         ImpostorCamp = GetString("camp.impostor.name");

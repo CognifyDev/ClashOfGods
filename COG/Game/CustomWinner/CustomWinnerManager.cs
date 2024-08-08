@@ -68,7 +68,7 @@ public static class CustomWinnerManager
     public static void EndGame(IEnumerable<PlayerControl> winners, string? text = null, Color? color = null,
         bool ignoreDebugMode = false)
     {
-        if (!ignoreDebugMode && GlobalCustomOptionConstant.DebugMode!.GetBool()) return;
+        if (!ignoreDebugMode && GlobalCustomOptionConstant.DebugMode.GetBool()) return;
         if (text != null) SetWinText(text);
         if (color != null) SetWinColor(WinColor);
         RegisterWinningPlayers(winners);

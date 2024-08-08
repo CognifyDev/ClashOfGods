@@ -54,7 +54,7 @@ public class Lover : CustomRole, IListener, IWinnable
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.SyncLovers);
 
         writer.WritePacked(Couples.Count);
-        foreach (var (p1, p2) in Couples!)
+        foreach (var (p1, p2) in Couples)
             writer.Write(p1.PlayerId).Write(p2.PlayerId);
 
         writer.Finish();
@@ -132,7 +132,7 @@ public class Lover : CustomRole, IListener, IWinnable
         {
             var p1 = players[i];
             var p2 = players[i + 1];
-            Couples!.Add(p1, p2);
+            Couples.Add(p1, p2);
         }
 
         RpcSyncLovers();
@@ -197,15 +197,15 @@ public static class RoleUtils
     public static bool IsInLove(this PlayerControl player, PlayerControl? other = null)
     {
         if (!other)
-            return Lover.Couples!.Any(c => c.Key.IsSamePlayer(player) || c.Value.IsSamePlayer(player));
-        return Lover.Couples!.Any(c =>
+            return Lover.Couples.Any(c => c.Key.IsSamePlayer(player) || c.Value.IsSamePlayer(player));
+        return Lover.Couples.Any(c =>
             c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(player, other!)) ||
             c.Equals(new KeyValuePair<PlayerControl, PlayerControl>(other!, player)));
     }
 
     public static PlayerControl? GetLover(this PlayerControl player)
     {
-        foreach (var (p1, p2) in Lover.Couples!)
+        foreach (var (p1, p2) in Lover.Couples)
             if (p1.IsSamePlayer(player))
                 return p2;
             else if (p2.IsSamePlayer(player))

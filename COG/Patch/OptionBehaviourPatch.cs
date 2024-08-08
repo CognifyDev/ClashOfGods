@@ -113,6 +113,8 @@ public static class OptionBehaviourPatch
             __instance.GetComponentsInChildren<PassiveButton>().ForEach(b => b.enabled = false);
             return false;
         }
+
+        
         return true;
     }
 }

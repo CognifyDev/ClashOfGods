@@ -21,7 +21,7 @@ internal static class GameOptionMenuPatch
         var space = GameOptionsMenu.SPACING_Y;
         var mapPickerHeight = GameOptionsMenu.MAP_PICKER_HEIGHT;
 
-        var settingMap = CustomOption.Options.Where(o => o is { Page: CustomOption.TabType.General }).ToDictionary(o => o!, o => o!.ToVanillaOptionData());
+        var settingMap = CustomOption.Options.Where(o => o is { Page: CustomOption.TabType.General }).ToDictionary(o => o, o => o.ToVanillaOptionData());
 
         var num = -(__instance.scrollBar.ContentYBounds.max + mapPickerHeight);
         var header = Object.Instantiate(__instance.categoryHeaderOrigin, __instance.settingsContainer);
@@ -74,7 +74,7 @@ internal static class GameOptionMenuPatch
     [HarmonyPostfix]
     public static void OnMenuUpdate(GameOptionsMenu __instance)
     {
-        List<CustomOption> options = CustomOption.Options.Where(o => o is { OptionBehaviour: not null, Page: CustomOption.TabType.General }).ToList()!;
+        List<CustomOption> options = CustomOption.Options.Where(o => o is { OptionBehaviour: not null, Page: CustomOption.TabType.General }).ToList();
         var num = GameOptionsMenu.START_POS_Y;
         var headerHeight = GameOptionsMenu.HEADER_HEIGHT;
         var space = GameOptionsMenu.SPACING_Y;

@@ -41,12 +41,10 @@ public sealed class CustomOption
         _selection = rule.DefaultSelection;
         Parent = parent;
         Page = type;
-        Options.Add(this);
     }
 
-    public static List<CustomOption?> Options { get; } = new();
+    public static List<CustomOption> Options { get; } = new();
 
-    public int DefaultSelection => ValueRule.DefaultSelection;
     public int Id { get; }
     public Func<string> Name { get; set; }
     public TabType Page { get; }
@@ -72,14 +70,15 @@ public sealed class CustomOption
         return new CustomOption(type, nameGetter, rule, parent);
     }
 
-    public void Register()
+    public CustomOption Register()
     {
-
+        Options.Add(this);
+        return this;
     }
 
     public static bool TryGetOption(OptionBehaviour optionBehaviour, out CustomOption? customOption)
     {
-        customOption = Options.FirstOrDefault(o => o?.OptionBehaviour == optionBehaviour)!;
+        customOption = Options.FirstOrDefault(o => o.OptionBehaviour == optionBehaviour)!;
         return customOption != null!;
     }
 /*
@@ -124,7 +123,7 @@ public sealed class CustomOption
                 var optionID = optionInfo[0];
                 var optionSelection = optionInfo[1];
 
-                var option = Options.FirstOrDefault(o => o?.Id.ToString() == optionID);
+                var option = Options.FirstOrDefault(o => o.Id.ToString() == optionID);
                 if (option == null) continue;
                 option.UpdateSelection(int.Parse(optionSelection));
             }
@@ -141,9 +140,8 @@ public sealed class CustomOption
         {
             var realPath = path.EndsWith(".cog") ? path : path + ".cog";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
-            foreach (var option in Options.Where(o => o is not null)
-                         .OrderBy(o => o!.Id))
-                writer.WriteLine(option!.Id + " " + option.Selection);
+            foreach (var option in Options.OrderBy(o => o.Id))
+                writer.WriteLine(option.Id + " " + option.Selection);
         }
         catch (System.Exception e)
         {

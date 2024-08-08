@@ -38,7 +38,7 @@ public class Vulture : CustomRole, IListener, IWinnable
 
                 if (arrow != null)
                 {
-                    Arrows.Remove(arrow!);
+                    Arrows.Remove(arrow);
                     arrow.Destroy();
                 }
 

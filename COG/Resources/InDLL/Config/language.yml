@@ -11,6 +11,7 @@ role:
     allow-report-body: "允许报告尸体"
     kill-cooldown: "击杀冷却时间"
     no-more-description: "没有详细信息"
+    role-code: "职业特征码"
   impostor:
     impostor:
       name: "伪装者"
