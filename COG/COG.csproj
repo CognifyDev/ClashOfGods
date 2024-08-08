@@ -16,7 +16,7 @@
         <PackageLicenseUrl>https://github.com/CognifyDev/ClashOfGods/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/CognifyDev/ClashOfGods</RepositoryUrl>
         <OutputType>Library</OutputType>
-        <PublicSign>true</PublicSign>
+        <PublicSign>false</PublicSign>
         <DelaySign>true</DelaySign>
     </PropertyGroup>
 
