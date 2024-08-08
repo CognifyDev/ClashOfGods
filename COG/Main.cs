@@ -29,6 +29,8 @@ using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
 using InnerNet;
+using Reactor.Networking;
+using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
@@ -36,8 +38,8 @@ namespace COG;
 
 [BepInAutoPlugin(PluginGuid, PluginName)]
 [BepInProcess("Among Us.exe")]
-
-// ReSharper disable once ClassNeverInstantiated.Global
+[BepInDependency(Reactor.ReactorPlugin.Id)]
+[ReactorModFlags(ModFlags.RequireOnAllClients)]
 public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
