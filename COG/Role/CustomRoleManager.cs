@@ -33,7 +33,7 @@ public class CustomRoleManager
 
     public List<CustomRole> GetRoles()
     {
-        return _roles.Where(role => role.Enabled).ToList();
+        return _roles;
     }
 
     public CustomRole? GetRoleByClassName(string name)
