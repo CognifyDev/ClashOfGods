@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
 using COG.Utils.Version;
+using Reactor.Utilities;
 using TMPro;
 using UnityEngine;
 
@@ -154,7 +154,7 @@ public class HandshakeManager
     {
         public void OnJoinLobby(PlayerControlAwakeEvent @event)
         {
-            @event.Player.StartCoroutine(CoCheckHandshake().WrapToIl2Cpp());
+            Coroutines.Start(CoCheckHandshake());
         }
 
         private IEnumerator CoCheckHandshake()

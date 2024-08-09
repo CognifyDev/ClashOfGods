@@ -98,3 +98,20 @@ internal class MeetingHudVotingCompletePatch
             .ExecuteHandlers(new MeetingVotingCompleteEvent(__instance, states, exiled, tie), EventHandlerType.Postfix);
     }
 }
+
+[HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CheckForEndVoting))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+internal class MeetingHudCheckForEndVotingPatch
+{
+    private static bool Prefix(MeetingHud __instance)
+    {
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new MeetingCheckForEndVotingEvent(__instance), EventHandlerType.Prefix);
+    }
+    
+    private static void Postfix(MeetingHud __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new MeetingCheckForEndVotingEvent(__instance), EventHandlerType.Postfix);
+    }
+}

@@ -56,13 +56,6 @@ role:
       name: "小丑"
       description: "承受一切诋毁，然后放声大笑"
       long-description: "被投票放逐直接获胜"
-    vulture:
-      name: "秃鹫"
-      description: "十腿一桶自助餐"
-      long-description: "可以得知场上所有鸡腿的位置；可以吞噬鸡腿，将鸡腿清除。吞噬鸡腿达到指定数量直接获胜"
-      eat-cd: "吞噬冷却"
-      count-to-win: "胜利吞噬尸体数"
-      has-arrow: "箭头指向尸体"
   sub-roles:
     guesser:
       name: "赌怪"
@@ -125,8 +118,6 @@ option:
 action:
   kill: "击杀"
   clean: "清理"
-  annihilate: "湮灭"
-  eat-action: "吞噬"
 game:
   end:
     show-players-roles-message: "玩家职业: "

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
@@ -29,6 +30,7 @@ public class SoulHunter : CustomRole, IListener
     {
         CanKill = false;
         CanVent = false;
+        BaseRoleType = RoleTypes.Crewmate;
 
         ReviveAfter = CreateOption(() => LanguageConfig.Instance.SoulHunterReviveAfter,
             new IntOptionValueRule(1, 1, 60, 5));
