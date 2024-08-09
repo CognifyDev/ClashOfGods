@@ -236,12 +236,10 @@ public class GameListener : IListener
                                 $" => {playerRole.Role.Name}");
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnSelectRoles(RoleManagerSelectRolesEvent _)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
-        if (!AmongUsClient.Instance.AmHost) return;
-
-        Main.Logger.LogInfo("Shhhhhh!");
+        if (!AmongUsClient.Instance.AmHost) return true;
         
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
@@ -253,6 +251,10 @@ public class GameListener : IListener
         roleList.AddRange(GameUtils.PlayerData.SelectMany(pr => pr.SubRoles));
 
         foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
+        
+        PlayerUtils.GetAllPlayers().ForEach(player => player.roleAssigned = true);
+
+        return false;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
