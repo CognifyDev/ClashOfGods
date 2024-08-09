@@ -65,9 +65,6 @@ public class LanguageConfig : Config
     public string CleanBodyCooldown { get; private set; } = null!;
 
     // Neutral
-    public string VultureEatCooldown { get; private set; } = null!;
-    public string VultureEatenCountToWin { get; private set; } = null!;
-    public string VultureHasArrowToBodies { get; private set; } = null!;
 
     // Sub-roles
     public string GuesserMaxGuessTime { get; private set; } = null!;
@@ -108,8 +105,6 @@ public class LanguageConfig : Config
 
     public string KillAction { get; private set; } = null!;
     public string CleanAction { get; private set; } = null!;
-    public string EatAction { get; private set; } = null!;
-    public string AnnihilateAction { get; private set; } = null!;
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
     public string Alive { get; private set; } = null!;
@@ -155,10 +150,8 @@ public class LanguageConfig : Config
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
 
         // Neutral
-        VultureEatCooldown = GetString("role.neutral.vulture.eat-cd");
-        VultureEatenCountToWin = GetString("role.neutral.vulture.count-to-win");
-        VultureHasArrowToBodies = GetString("role.neutral.vulture.has-arrow");
-
+        
+        
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
 
@@ -196,8 +189,6 @@ public class LanguageConfig : Config
 
         KillAction = GetString("action.kill");
         CleanAction = GetString("action.clean");
-        EatAction = GetString("action.eat-action");
-        AnnihilateAction = GetString("action.annihilate");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 
