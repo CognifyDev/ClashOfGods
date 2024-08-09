@@ -47,6 +47,10 @@ role:
       description: "从地狱归来，将邪恶一同带去"
       long-description: "拥有一次无代价击杀。被击杀后指定秒在鸡腿处复活(如果鸡腿还存在的话)并获得一次执法机会，下轮会议召开时将立刻出局。"
       revive-after: "复活秒数"
+    technician:
+      name: "技术员"
+      description: "解决飞船的一切疑难杂症"
+      long-description: "可以进行2次修复，立刻结束破坏或封锁。完成所有任务后可以使用通风口。"
   neutral:
     jester:
       name: "小丑"
