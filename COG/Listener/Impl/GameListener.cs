@@ -89,8 +89,14 @@ public class GameListener : IListener
             {
                 var target = reader.ReadNetObject<PlayerControl>();
                 var tag = reader.ReadString();
-                
                 var playerData = target.GetPlayerData();
+
+                if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
+                {
+                    playerData?.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
+                    break;
+                }
+                
                 playerData?.Tags.Add(tag);
                 break;
             }
@@ -292,7 +298,6 @@ public class GameListener : IListener
          * 首先先随机挑选玩家随机副职业数目，然后假设未分配完全，再弄出来一个新的players的List来
          * 挑选那些未被分配满的玩家进行副职业分配
          */
-        subRole:
         while (true)
         {
             // 如果已经分配的大于等于应当分配的那就跳出循环
@@ -362,10 +367,35 @@ public class GameListener : IListener
             GameUtils.PlayerData.Add(data);
         }
         
+        GameUtils.PlayerData.ForEach(data =>
+        {
+            var player = data.Player;
+            var role = data.Role;
+            RoleManager.Instance.SetRole(player, role.BaseRoleType);
+            
+            player.RpcMark(BaseRoleSetPrefix + (ushort) role.BaseRoleType);
+        });
+        
         // 打印职业分配信息
         foreach (var playerRole in GameUtils.PlayerData)
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                 $" => {playerRole.Role.GetNormalName()}");
+    }
+    
+    private const string BaseRoleSetPrefix = "BASE_ROLE_SET_";
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
+    {
+        if (AmongUsClient.Instance.AmHost) return;
+        var player = PlayerControl.LocalPlayer;
+        var baseRoleMarks = player.GetMarks().Where(mark => mark.StartsWith(BaseRoleSetPrefix));
+        var roleMarks = baseRoleMarks as string[] ?? baseRoleMarks.ToArray();
+        if (!roleMarks.Any()) return;
+        var baseRole = (RoleTypes) ushort.Parse(roleMarks[0].Replace(BaseRoleSetPrefix, ""));
+        RoleManager.Instance.SetRole(player, baseRole);
+        
+        player.RemoveMark(roleMarks[0]);
     }
 
     [EventHandler(EventHandlerType.Postfix)]

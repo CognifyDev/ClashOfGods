@@ -16,7 +16,7 @@ public static class GlobalCustomOptionConstant
             new IntOptionValueRule(0, 1, 10, 1)).Register();
         
         MaxNeutralNumber = CustomOption.Of(CustomOption.TabType.General,
-            () => LanguageConfig.Instance.MaxSubRoleNumber,
+            () => LanguageConfig.Instance.MaxNeutralNumber,
             new IntOptionValueRule(0, 1, 10, 1)).Register();
     }
 

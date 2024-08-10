@@ -118,6 +118,32 @@ public static class PlayerUtils
         writer.Finish();
     }
 
+    public const string DeleteTagPrefix = "DELETE010_TAG101_";
+
+    public static void RemoveMark(this PlayerControl target, string tag)
+    {
+        var playerData = target.GetPlayerData();
+        if (playerData == null)
+        {
+            return;
+        }
+        if (!playerData.Tags.Contains(tag))
+        {
+            return;
+        }
+
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.Mark);
+        writer.WriteNetObject(target);
+        writer.Write(DeleteTagPrefix + tag);
+        writer.Finish();
+    }
+
+    public static string[] GetMarks(this PlayerControl target)
+    {
+        var tags = target.GetPlayerData()?.Tags;
+        return tags == null ? Array.Empty<string>() : tags.ToArray();
+    }
+
     public static bool HasMarkAs(this PlayerControl target, string tag)
     {
         var tags = target.GetPlayerData()?.Tags;
