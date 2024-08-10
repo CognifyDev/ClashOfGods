@@ -326,6 +326,8 @@ public class GameListener : IListener
         for (var i = 0; i < mainRoleData.Count; i++)
         {
             var target = mainRoleData.Keys.ToArray()[i];
+            
+            // 歌姬树懒并没有重写Equals方法，因此只能这样
             var subRoles = subRoleData.Where(pair => 
                 pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList()[0];
             
