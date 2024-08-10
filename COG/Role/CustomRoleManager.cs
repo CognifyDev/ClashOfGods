@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using COG.Role.Impl.Impostor;
 using COG.Utils;
 
 namespace COG.Role;
@@ -50,9 +51,9 @@ public class CustomRoleManager
     ///     获取一个新的获取器
     /// </summary>
     /// <returns>获取器实例</returns>
-    public RoleGetter NewGetter(bool subRolesOnly = false)
+    public IGetter<CustomRole> NewGetter(Func<CustomRole, bool> predicate, CustomRole? defaultRole = null)
     {
-        return new RoleGetter(subRolesOnly);
+        return new RoleGetter(predicate, defaultRole);
     }
 
     public static CustomRoleManager GetManager()
@@ -67,61 +68,50 @@ public class CustomRoleManager
         _roles.AddRange(newInstanceRoles);
     }
 
-    public class RoleGetter : IGetter<CustomRole?>
+    private class RoleGetter : IGetter<CustomRole>
     {
-        private readonly List<CustomRole> _roles = new();
-        private int _selection;
+        private List<CustomRole> CustomRoles { get; } = new();
 
-        internal RoleGetter(bool subRolesOnly = false)
+        private readonly CustomRole? _defaultRole;
+        
+        public RoleGetter(Func<CustomRole, bool> predicate, CustomRole? defaultRole = null)
         {
-            foreach (var role in GetManager().GetRoles()
-                         .Where(role =>
-                             role is { Enabled: true, ShowInOptions: true, IsBaseRole: false }
-                             && role.IsSubRole == subRolesOnly))
-                if (!role.OnRoleSelection(_roles) && role.RoleNumberOption != null && role.RoleChanceOption != null)
+            _defaultRole = defaultRole;
+            foreach (var role in GetManager().GetRoles().Where(role => role.IsAvailable()))
+            {
+                if (!predicate(role)) continue;
+                if (role.RoleNumberOption == null) continue;
+                
+                var length = role.RoleNumberOption.GetInt();
+
+                for (var i = 0; i < length; i++)
                 {
-                    var times = role.RoleNumberOption.GetInt();
-                    var chance = role.RoleChanceOption.GetInt() / 10;
-                    for (var i = 0; i < times; i++)
-                    {
-                        if (chance != 10) // Check if its possiblity is not 100%
-                        {
-                            const int possibilityCount = 10;
-
-                            var array = new bool[possibilityCount];
-                            Array.Fill(array, false);
-                            Array.Fill(array, true, 0, chance);
-
-                            var chances = array.ToList().Disarrange();
-                            var random = new Random(DateTime.Now.Millisecond);
-                            var index = random.Next(possibilityCount);
-
-                            if (!chances[index]) continue;
-                        }
-
-                        _roles.Add(role);
-                    }
+                    CustomRoles.Add(role);
                 }
+            }
 
-            _roles.Disarrange();
+            CustomRoles = CustomRoles.Disarrange();
         }
-
-        public CustomRole? GetNext()
+        
+        public CustomRole GetNext()
         {
-            if (_selection >= _roles.Count) return null;
-            var toReturn = _roles[_selection];
-            _selection++;
-            return toReturn;
+            if (!HasNext() && _defaultRole != null)
+            {
+                return _defaultRole;
+            }
+            var role = CustomRoles[0];
+            CustomRoles.Remove(role);
+            return role;
         }
 
         public bool HasNext()
         {
-            return _selection < _roles.Count;
+            return !CustomRoles.IsEmpty();
         }
 
-        public bool IsEmpty()
+        public int Number()
         {
-            return _roles.IsEmpty();
+            return CustomRoles.Count;
         }
     }
 }

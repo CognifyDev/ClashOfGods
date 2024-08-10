@@ -55,6 +55,7 @@ public class LanguageConfig : Config
     public string LoadPreset { get; private set; } = null!;
     public string DebugMode { get; private set; } = null!;
     public string MaxSubRoleNumber { get; private set; } = null!;
+    public string MaxNeutralNumber { get; private set; } = null!;
 
     // Crewmate
     public string VigilanteMinCrewmateNumber { get; private set; } = null!;
@@ -140,6 +141,7 @@ public class LanguageConfig : Config
         SavePreset = GetString("game-setting.general.save-preset");
         DebugMode = GetString("game-setting.general.debug-mode");
         MaxSubRoleNumber = GetString("game-setting.general.max-sub-role-number");
+        MaxNeutralNumber = GetString("game-setting.general.max-neutral-number");
         
         // Crewmate
         VigilanteMinCrewmateNumber = GetString("role.crewmate.vigilante.min-crewmate-number");

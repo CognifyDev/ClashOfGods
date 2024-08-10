@@ -12,7 +12,9 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
+using Random = System.Random;
 
 // ReSharper disable Unity.IncorrectScriptableObjectInstantiation
 
@@ -171,6 +173,21 @@ public abstract class CustomRole
             return false;
         }
     }
+
+    public bool IsAvailable()
+    {
+        if (!Enabled || IsBaseRole || !ShowInOptions) return false;
+        var chance = RoleChanceOption?.GetInt();
+        
+        if (chance == null)
+        {
+            return false;
+        }
+
+        return new Random().Next(0, 100) <= chance;
+    }
+
+    public string GetNormalName() => GetType().Name;
 
     public virtual string GetNameInConfig() => GetType().Name.ToLower();
 
