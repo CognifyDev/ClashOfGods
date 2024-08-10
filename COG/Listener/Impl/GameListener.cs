@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
@@ -18,6 +19,8 @@ using COG.Listener.Event.Impl.TPBehaviour;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Role;
 using COG.Role.Impl.Crewmate;
+using COG.Role.Impl.Impostor;
+using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
@@ -25,7 +28,6 @@ using Il2CppSystem.Collections;
 using InnerNet;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
-using Debug = System.Diagnostics.Debug;
 using GameStates = COG.States.GameStates;
 using Random = System.Random;
 
@@ -87,8 +89,14 @@ public class GameListener : IListener
             {
                 var target = reader.ReadNetObject<PlayerControl>();
                 var tag = reader.ReadString();
-                
                 var playerData = target.GetPlayerData();
+
+                if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
+                {
+                    playerData?.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
+                    break;
+                }
+                
                 playerData?.Tags.Add(tag);
                 break;
             }
@@ -163,83 +171,207 @@ public class GameListener : IListener
         }
     }
 
-    public static void SelectRoles()
+    /*
+     * 职业分配逻辑：
+     *
+     * 职业分配基本条件
+     * 1.首先要保证所有可用的职业都被分配完成，然后再去分配基职业
+     * 2.应当保证内鬼先被分配完全，其次是船员和中立阵营
+     * 3.副职业分配要小心，为了算法的快速应当在分配上述职业的情况下一同分配副职业
+     *
+     */
+    private static void SelectRoles()
     {
-        GameUtils.PlayerData.Clear(); // 首先清除 防止干扰
+        // 首先清除 防止干扰
+        GameUtils.PlayerData.Clear();
 
-        if (!AmongUsClient.Instance.AmHost) return; // 不是房主停止分配
+        // 不是房主停止分配
+        if (!AmongUsClient.Instance.AmHost) return;
+        
+        // 获取所有的玩家集合
+        var players = PlayerUtils.GetAllPlayers().Disarrange().ToList();
 
-        // 开始分配职业
-        var players = PlayerUtils.GetAllPlayers().ToList().Disarrange(); // 打乱玩家顺序
+        // 添加到字典
+        var mainRoleData = new Dictionary<PlayerControl, CustomRole>();
+        var subRoleData = new Dictionary<PlayerControl, CustomRole[]>();
+        
+        // 获取最多可以被赋予的副职业数量
+        var maxSubRoleNumber = GlobalCustomOptionConstant.MaxSubRoleNumber.GetInt();
+        
+        // 获取本局游戏要分配的内鬼数量
+        var impostorNumber = GameUtils.GetImpostorsNumber();
+        
+        // 获取本局游戏要分配的中立数量
+        var neutralNumber = GameUtils.GetNeutralNumber();
+        
+        // 获取一个副职业获取器
+        var subRoleGetter = CustomRoleManager.GetManager().NewGetter(role => role.IsSubRole);
 
-        var rolesToAdd = new List<CustomRole>(); // 新建集合，用来存储可用的职业
+        // 获取一个内鬼获取器
+        var impostorGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Impostor,
+            CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>());
+        
+        // 创建一个中立职业获取器
+        // 实际上 CustomRoleManager.GetManager().GetTypeRoleInstance<Jester>() 是多余的
+        // 因为在 GameUtils#GetNeutralNumber 中我们已经制定了场上存在的中立数量是设置里面设置的中立数量
+        var neutralGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Neutral);
+        
+        var crewmateGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Crewmate,
+            CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>());
 
-        // 获取最大可以启用的内鬼数量
-        var maxImpostorsNum = GameUtils.GetImpostorsNum();
-
-        // 新建一个获取器
-        var getter = CustomRoleManager.GetManager().NewGetter();
-
-        // 获取已经获取的内鬼职业数量
-        var equalsImpostorsNum = 0;
-
-        // 开始获取可以分配的职业
-        while (getter.HasNext())
+        // 首先分配内鬼职业
+        for (var i = 0; i < impostorNumber; i++)
         {
-            var next = getter.GetNext();
-            if (next == null) continue;
-            if (rolesToAdd.Count >= players.Count) break;
-            if (equalsImpostorsNum >= maxImpostorsNum && next.CampType == CampType.Impostor) continue;
-            if (next.CampType == CampType.Impostor) equalsImpostorsNum++;
-            rolesToAdd.Add(next);
+            // 因为Getter设置了默认值，因此无需检测是否含有下一个
+            var impostorRole = impostorGetter.GetNext();
+
+            // 玩家是一定可以获取到的，因为如果玩家的数目不足以获取到，那么内鬼的数目也不会大于1，因此，除非一个玩家也没有，不然是一定可以获取到的
+            // 而玩家不可能一个也没有，因此一定可以获取到
+            var target = players[0];
+            
+            // 移除此玩家在列表中，以免造成干扰
+            players.Remove(target);
+            
+            // 添加数据
+            mainRoleData.Add(target, impostorRole);
         }
+        
+        // 接下来分配中立职业
+        for (var i = 0; i < neutralNumber; i++)
+        {
+            if (!neutralGetter.HasNext()) break;
+            
+            // 同理，已经设置了默认值，无需检测
+            var neutralRole = neutralGetter.GetNext();
+            
+            // 获取玩家实例
+            var target = players[0];
 
-        // 新建副职业获取器
-        var subRoleGetter = CustomRoleManager.GetManager().NewGetter(true);
-
+            // 移除此玩家在列表中
+            players.Remove(target);
+            
+            // 添加数据
+            mainRoleData.Add(target, neutralRole);
+        }
+        
+        // 紧接着分配船员职业
         for (var i = 0; i < players.Count; i++)
         {
-            var player = players[i];
-            CustomRole role;
-            try
-            {
-                role = rolesToAdd[i];
-            }
-            catch
-            {
-                role = CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>(); // 无法分配默认职业为Crewmate
-            }
+            // 获取实例
+            var cremateRole = crewmateGetter.GetNext();
 
-            // 接下来分配副职业
-            var random = new Random();
-            var option = GlobalCustomOptionConstant.MaxSubRoleNumber;
-            Debug.Assert(option != null, nameof(option) + " != null");
-            var subRoleNumber = random.Next(0, option.GetInt()); // 获取这个玩家应当被给予的副职业数量
-            var subRoles = new List<CustomRole>();
-            var givenNumber = 0;
-
-            while (subRoleGetter.HasNext())
-            {
-                if (subRoleNumber < givenNumber) break;
-                givenNumber++;
-                var toAdd = subRoleGetter.GetNext();
-                if (toAdd == null) break;
-                subRoles.Add(toAdd);
-            }
-
-            player.SetCustomRole(role, subRoles.ToArray());
+            // 获取玩家实例
+            var target = players[0];
+            
+            // 没必要移除玩家在列表中，因为后面我们用不到players集合了
+            // players.Remove(target);
+            
+            // 添加数据
+            mainRoleData.Add(target, cremateRole);
         }
+        
+        // 最后分配一下副职业
+        /*
+         * 副职业分配算法如下：
+         * 随机获取玩家蹦极式地发放副职业
+         */
+        var allPlayers = PlayerUtils.GetAllPlayers().Disarrange();
+        
+        /*
+         * 副职业的分配有点特殊
+         * 副职业有最大分配数目以及副职业数目限制
+         * 因此它的分配比较麻烦
+         *
+         * 首先要明确分配玩家的判定条件，条件如下：
+         * 最大分配数目 = 最大分配数目 * 玩家数目
+         * 当且仅当 副职业已分配数目 等于 副职业应当分配数目(=副职业启用数目 > 最大分配数目 ? 最大分配数目 : 副职业启用数目)
+         * 分配完成
+         */
+        var subRoleEnabledNumber = subRoleGetter.Number();
+        var subRoleMaxCanBeArrange = maxSubRoleNumber * allPlayers.Count;
+        var subRoleShouldBeGivenNumber = subRoleEnabledNumber > subRoleMaxCanBeArrange
+            ? subRoleMaxCanBeArrange
+            : subRoleEnabledNumber;
 
+        var givenTimes = 0;
+        
+        while (givenTimes < subRoleShouldBeGivenNumber)
+        {
+            var random = new Random();
+            var randomPlayer = allPlayers[random.Next(0, allPlayers.Count)];
+            subRoleData.TryGetValue(randomPlayer, out var existRoles);
+            if (existRoles != null && existRoles.Length >= maxSubRoleNumber) continue;
+            var roles = new List<CustomRole>();
+            if (existRoles != null)
+            {
+                roles.AddRange(existRoles);
+            }
+
+            var customRole = subRoleGetter.GetNext();
+            
+            if (roles.Contains(customRole))
+            {
+                subRoleGetter.PutBack(customRole);
+                continue;
+            }
+            
+            roles.Add(customRole);
+            
+            subRoleData.Add(randomPlayer, roles.ToArray());
+            givenTimes ++;
+        }
+        
+        
+        // 全部都分配完成，接下来应用一下
+        for (var i = 0; i < mainRoleData.Count; i++)
+        {
+            var target = mainRoleData.Keys.ToArray()[i];
+            
+            // 歌姬树懒并没有重写Equals方法，因此只能这样
+            var subRoles = subRoleData.Where(pair => 
+                pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList()[0];
+            
+            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles);
+        }
+        
+        GameUtils.PlayerData.ForEach(data =>
+        {
+            var player = data.Player;
+            var role = data.Role;
+            RoleManager.Instance.SetRole(player, role.BaseRoleType);
+            
+            player.RpcMark(BaseRoleSetPrefix + (ushort) role.BaseRoleType);
+        });
+        
         // 打印职业分配信息
         foreach (var playerRole in GameUtils.PlayerData)
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
-                                $" => {playerRole.Role.Name}");
+                                $" => {playerRole.Role.GetNormalName()}" +
+                                $"{playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}");
+    }
+    
+    private const string BaseRoleSetPrefix = "BASE_ROLE_SET_";
+    
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
+    {
+        if (AmongUsClient.Instance.AmHost) return;
+        foreach (var player in PlayerUtils.GetAllPlayers())
+        {
+            var marks = player.GetMarks().Where(mark => mark.StartsWith(BaseRoleSetPrefix));
+            var enumerable = marks as string[] ?? marks.ToArray();
+            if (!enumerable.Any()) continue;
+            var mark = enumerable[0];
+            var baseRole = (RoleTypes) ushort.Parse(mark.Replace(BaseRoleSetPrefix, ""));
+            RoleManager.Instance.SetRole(player, baseRole);
+            player.GetPlayerData()?.Tags.Remove(mark);
+        }
     }
 
-    [EventHandler(EventHandlerType.Prefix)]
-    public bool OnSelectRoles(RoleManagerSelectRolesEvent @event)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
-        if (!AmongUsClient.Instance.AmHost) return true;
+        if (!AmongUsClient.Instance.AmHost) return;
         
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
@@ -251,10 +383,6 @@ public class GameListener : IListener
         roleList.AddRange(GameUtils.PlayerData.SelectMany(pr => pr.SubRoles));
 
         foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
-        
-        PlayerUtils.GetAllPlayers().ForEach(player => player.roleAssigned = true);
-
-        return false;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -352,7 +480,7 @@ public class GameListener : IListener
         var role = GameUtils.GetLocalPlayerRole();
         var player = PlayerControl.LocalPlayer;
 
-        var camp = role?.CampType;
+        var camp = role.CampType;
         if (camp is not (CampType.Neutral or CampType.Unknown)) return;
         var soloTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
         soloTeam.Add(player);
@@ -454,25 +582,25 @@ public class GameListener : IListener
 
         var controller = @event.ExileController;
         var player = @event.Player;
-        if (!player) return;
-
-        var role = player.GetMainRole();
 
         int GetCount(IEnumerable<PlayerData> list)
         {
             return list.Select(p => p.Player)
-                .Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+                .Where(p => (!p.IsSamePlayer(player) && p.IsAlive()) || player == null).ToList().Count;
         }
 
         var crewCount = GetCount(PlayerUtils.AllCrewmates);
         var impCount = GetCount(PlayerUtils.AllImpostors);
         var neutralCount = GetCount(PlayerUtils.AllNeutrals);
-
-        var roleText = controller.completeString = role.HandleEjectText(player);
-        var playerInfoText = controller.ImpostorText.text =
+        
+        if (player != null)
+        {
+            var role = player.GetMainRole();
+            controller.completeString = role.HandleEjectText(player);
+        }
+        
+        controller.ImpostorText.text =
             LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
-
-        Main.Logger.LogInfo($"Eject text: {roleText} & {playerInfoText}");
     }
 
     private readonly List<Handler> _handlers = new();

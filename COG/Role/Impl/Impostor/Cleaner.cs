@@ -15,7 +15,9 @@ public class Cleaner : CustomRole, IListener
     public Cleaner() : base(Palette.ImpostorRed, CampType.Impostor)
     {
         BaseRoleType = RoleTypes.Impostor;
-        CanKill = true;
+        CanKill = false;
+        CanVent = true;
+        CanSabotage = true;
 
         if (ShowInOptions)
             CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown,

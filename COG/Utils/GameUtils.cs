@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Role;
 using COG.Rpc;
 using UnityEngine;
@@ -27,7 +29,12 @@ public static class GameUtils
             hud.Notifier.AddDisconnectMessage(text);
     }
 
-    public static int GetImpostorsNum()
+    /// <summary>
+    /// 获取当前启用的内鬼数量
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NullReferenceException"></exception>
+    public static int GetImpostorsNumber()
     {
         var players = PlayerUtils.GetAllPlayers();
         if (players == null) throw new NullReferenceException("Player list is null");
@@ -38,17 +45,36 @@ public static class GameUtils
         switch (playersNum)
         {
             case <= 6:
+            {
                 impostorsNum = 1;
                 break;
+            }
             case <= 8:
+            {
                 impostorsNum = 2;
                 break;
+            }
             default:
+            {
                 impostorsNum = 3;
                 break;
+            }
         }
 
-        return impostorsNum;
+        var numberInOptions = GetGameOptions().NumImpostors;
+        return impostorsNum >= numberInOptions ? numberInOptions : impostorsNum;
+    }
+
+    public static int GetNeutralNumber()
+    {
+        var players = PlayerUtils.GetAllPlayers();
+        var count = players.Count - GetImpostorsNumber();
+        var countInConfig = GlobalCustomOptionConstant.MaxNeutralNumber.GetInt();
+        var finalCount = CustomRoleManager.GetManager().GetRoles()
+            .Count(role => role.CampType == CampType.Neutral);
+        if (finalCount < countInConfig) countInConfig = finalCount; 
+        var result = count >= countInConfig ? countInConfig : count;
+        return result < 0 ? 0 : result;
     }
 
     public static CustomRole GetLocalPlayerRole()
