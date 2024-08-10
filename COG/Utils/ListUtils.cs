@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Il2CppGenericCollections = Il2CppSystem.Collections.Generic;
 
 namespace COG.Utils;
@@ -30,6 +31,24 @@ public static class ListUtils
         return obj;
     }
 
+    public static string AsString(this List<string> list)
+    {
+        var stringBuilder = new StringBuilder("[");
+        for (var i = 0; i < list.Count; i++)
+        {
+            var text = list[i];
+
+            stringBuilder.Append(text);
+            if (i < list.Count - 1)
+            {
+                stringBuilder.Append(", ");
+            }
+        }
+
+        stringBuilder.Append(']');
+        return stringBuilder.ToString();
+    }
+    
     public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
     {
         collection.ToList().ForEach(action);

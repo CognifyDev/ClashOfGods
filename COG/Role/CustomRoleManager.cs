@@ -112,5 +112,10 @@ public class CustomRoleManager
         {
             return CustomRoles.Count;
         }
+
+        public void PutBack(CustomRole value)
+        {
+            CustomRoles.Add(value);
+        }
     }
 }
