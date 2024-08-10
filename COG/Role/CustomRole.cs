@@ -12,7 +12,6 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using Reactor.Utilities.Extensions;
 using UnityEngine;
 using Random = System.Random;
 

@@ -28,7 +28,6 @@ using Il2CppSystem.Collections;
 using InnerNet;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
-using Debug = System.Diagnostics.Debug;
 using GameStates = COG.States.GameStates;
 using Random = System.Random;
 

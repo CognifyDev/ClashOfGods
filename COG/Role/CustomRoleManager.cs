@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using COG.Role.Impl.Impostor;
 using COG.Utils;
 
 namespace COG.Role;
