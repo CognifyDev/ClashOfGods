@@ -256,7 +256,7 @@ public class GameListener : IListener
             var target = players[0];
 
             // 移除此玩家在列表中
-            players.Remove(target);
+            players = players.Where(player => !player.IsSamePlayer(target)).ToList();
             
             // 添加数据
             mainRoleData.Add(target, neutralRole);
@@ -272,7 +272,7 @@ public class GameListener : IListener
             var target = players[0];
             
             // 没必要移除玩家在列表中，因为后面我们用不到players集合了
-            // players.Remove(target);
+            // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
             
             // 添加数据
             mainRoleData.Add(target, cremateRole);
