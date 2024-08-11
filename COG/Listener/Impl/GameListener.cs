@@ -20,7 +20,6 @@ using COG.Listener.Event.Impl.VentImpl;
 using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
-using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
@@ -52,6 +51,15 @@ public class GameListener : IListener
                 // 开始读入数据
                 Main.Logger.LogDebug("The role data from the host was received by us.");
 
+                var count = reader.ReadPackedInt32();
+
+                for (var i = 0; i < count; i++)
+                {
+                    var bytes = reader.ReadBytesAndSize().ToArray();
+                    var data = bytes.DeserializeToData<SerializablePlayerData>().AsPlayerData();
+                    GameUtils.PlayerData.Add(data);
+                }
+/*
                 var originalText = reader.ReadString()!;
                 foreach (var s in originalText.Split(","))
                 {
@@ -60,10 +68,10 @@ public class GameListener : IListener
                     var role = CustomRoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
                     player!.SetCustomRole(role!);
                 }
-
+*/
                 foreach (var playerRole in GameUtils.PlayerData)
-                    Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
-                                        $" => {playerRole.Role.Name}");
+                    Main.Logger.LogInfo($"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
+                                        $" => {playerRole.Role.GetNormalName()}{playerRole.SubRoles.AsString()}");
 
                 break;
             }
@@ -108,7 +116,7 @@ public class GameListener : IListener
     {
         var player = @event.Player;
         if (player == null! || !PlayerControl.LocalPlayer) return;
-        if (GameStates.IsLobby && AmongUsClient.Instance.AmHost)
+        if (GameStates.InLobby && AmongUsClient.Instance.AmHost)
         {
             var mainOption = GameUtils.GetGameOptions();
             var roleOption = mainOption.RoleOptions;
@@ -328,8 +336,10 @@ public class GameListener : IListener
             var target = mainRoleData.Keys.ToArray()[i];
             
             // 歌姬树懒并没有重写Equals方法，因此只能这样
-            var subRoles = subRoleData.Where(pair => 
-                pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList()[0];
+            var subRolesList = subRoleData.Where(pair => 
+                pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList();
+
+            var subRoles = subRolesList.Any() ? subRolesList[0] : Array.Empty<CustomRole>();
             
             target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles);
         }
@@ -555,8 +565,18 @@ public class GameListener : IListener
 
     private static void ShareRoles()
     {
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareRoles);
 
+        writer.WritePacked(GameUtils.PlayerData.Count);
+        
+        foreach (var playerData in GameUtils.PlayerData)
+        {
+            var data = SerializablePlayerData.Of(playerData);
+            var bytes = data.SerializeToData();
+            writer.WriteBytesAndSize(bytes);
+        }
+        
+/*
         var sb = new StringBuilder();
 
         for (var i = 0; i < GameUtils.PlayerData.Count; i++)
@@ -571,7 +591,7 @@ public class GameListener : IListener
 
         // 职业格式应该是
         // playerId1|roleId1,playerId2|roleId2 
-
+*/
         writer.Finish();
     }
 

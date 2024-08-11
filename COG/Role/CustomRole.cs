@@ -73,6 +73,14 @@ public abstract class CustomRole
         }
     }
 
+#pragma warning disable CS0659
+    public override bool Equals(object? obj)
+#pragma warning restore CS0659
+    {
+        if (obj is not CustomRole role) return false;
+        return role.Id == Id;
+    }
+
     /// <summary>
     ///     角色特征码
     /// </summary>

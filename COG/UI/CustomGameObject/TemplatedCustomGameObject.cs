@@ -6,12 +6,8 @@ public abstract class TemplatedCustomGameObject : ICustomGameObject
 {
     public GameObject GameObject { get; }
     
-    public TemplatedCustomGameObject(GameObject template)
+    public TemplatedCustomGameObject(GameObject template, Transform transform)
     {
-        GameObject = template;
+        GameObject = Object.Instantiate(template, transform);
     }
-
-    public abstract void Update();
-
-    public abstract void Destroy();
 }

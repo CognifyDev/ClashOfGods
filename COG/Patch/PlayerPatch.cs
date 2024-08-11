@@ -300,12 +300,3 @@ internal class PlayerControlAwakePatch
             .ExecuteHandlers(new PlayerControlAwakeEvent(__instance), EventHandlerType.Postfix);
     }
 }
-/*
-[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
-internal class SyncVanillaSettingsPatch
-{
-    public static void Postfix()
-    {
-        CustomOption.ShareConfigs();
-    }
-}*/

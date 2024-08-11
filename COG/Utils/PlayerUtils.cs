@@ -15,7 +15,6 @@ using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 
-// ReSharper disable UnusedMember.Local
 
 namespace COG.Utils;
 
@@ -207,7 +206,7 @@ public static class PlayerUtils
     /// <returns></returns>
     public static bool IsAlive(this PlayerControl player)
     {
-        if (GameStates.IsLobby) return true;
+        if (GameStates.InLobby) return true;
         if (player == null) return false;
         return !player.Data.IsDead;
     }
@@ -508,6 +507,36 @@ public class DeadPlayer
     }
 }
 
+[Serializable]
+public class SerializablePlayerData
+{
+    public byte PlayerId { get; }
+    
+    public int MainRoleId { get; }
+    
+    public int[] SubRoleIds { get; }
+    
+    private SerializablePlayerData(byte playerId, int mainRoleId, int[] subRoleIds)
+    {
+        PlayerId = playerId;
+        MainRoleId = mainRoleId;
+        SubRoleIds = subRoleIds;
+    }
+
+    public PlayerData AsPlayerData()
+    {
+        return new PlayerData(PlayerUtils.GetPlayerById(PlayerId)!,
+            CustomRoleManager.GetManager().GetRoleById(MainRoleId)!,
+            SubRoleIds.Select(id => CustomRoleManager.GetManager().GetRoleById(id)).ToArray()!);
+    }
+    
+    public static SerializablePlayerData Of(PlayerData playerData)
+    {
+        return new SerializablePlayerData(playerData.PlayerId, playerData.Role.Id,
+            playerData.SubRoles.Select(role => role.Id).ToArray());
+    }
+}
+
 public class PlayerData
 {
     public PlayerData(PlayerControl player, CustomRole role, CustomRole[]? subRoles = null)
@@ -521,7 +550,7 @@ public class PlayerData
             ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
             : Array.Empty<CustomRole>();
     }
-
+    
     public PlayerControl Player { get; }
     public CustomRole Role { get; }
     public string PlayerName { get; }

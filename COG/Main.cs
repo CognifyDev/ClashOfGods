@@ -147,7 +147,8 @@ public partial class Main : BasePlugin
             new Jester(),
 
             // Sub-roles
-            new Lighter()
+            new Lighter(),
+            new Guesser()
         });
 
         // Register mod options

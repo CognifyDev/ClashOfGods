@@ -2,15 +2,16 @@ namespace COG.Rpc;
 
 public enum KnownRpc : uint
 {
-    ShareRoles = 200,
-    CleanDeadBody = 201,
-    UpdateOption = 202,
-    SetRole = 203,
+    ShareRoles = 100,
+    CleanDeadBody = 101,
+    UpdateOption = 102,
+    SetRole = 103,
 
-    SyncLovers = 204,
-    Handshake = 205,
+    SyncLovers = 104,
+    Handshake = 105,
     
-    Revive = 206,
-    NotifySettingChange = 207,
-    Mark = 208
+    Revive = 106,
+    NotifySettingChange = 107,
+    Mark = 108,
+    ShareOptions = 109
 }

@@ -318,7 +318,8 @@ public static class RoleOptionPatch
         CurrentButton = button;
         CurrentTab = tabToOpen;
         SetButtonActive(button, true);
-        tabToOpen.SetActive(true);
+        if (tabToOpen != null) 
+            tabToOpen.SetActive(true);
     }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.CloseMenu))]

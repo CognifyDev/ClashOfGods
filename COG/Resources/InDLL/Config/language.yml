@@ -59,6 +59,8 @@ role:
       long-description: "你可以在会议上猜测他人的职业，但如果猜测失败你将会自杀"
       max-guess-time: "最大猜测次数"
       guess-continuously: "连续赌注"
+      guess-enabled-roles-only: "仅能赌注启用职业"
+      can-guess-sub-roles: "启用赌注副职业"
     lighter:
       name: "灯人"
       description: "要相信光！"

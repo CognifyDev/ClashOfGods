@@ -70,6 +70,8 @@ public class LanguageConfig : Config
     // Sub-roles
     public string GuesserMaxGuessTime { get; private set; } = null!;
     public string GuesserGuessContinuously { get; private set; } = null!;
+    public string GuesserGuessEnabledRolesOnly { get; private set; } = null!;
+    public string GuesserCanGuessSubRoles { get; private set; } = null!;
     
     public string LoverDescription { get; private set; } = null!;
     public string LoverCountOptionName { get; private set; } = null!;
@@ -156,6 +158,8 @@ public class LanguageConfig : Config
         
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
+        GuesserGuessEnabledRolesOnly = GetString("role.sub-roles.guesser.guess-enabled-roles-only");
+        GuesserCanGuessSubRoles = GetString("role.sub-roles.guesser.can-guess-sub-roles");
 
         LoverDescription = GetString("role.sub-roles.lover.description");
         LoverCountOptionName = GetString("role.sub-roles.lover.count-option");
