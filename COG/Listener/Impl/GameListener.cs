@@ -179,6 +179,39 @@ public class GameListener : IListener
         }
     }
 
+    public class PlayerGetter : IGetter<PlayerControl>
+    {
+        public readonly List<PlayerControl> _players;
+        
+        public PlayerGetter(PlayerControl[] targets)
+        {
+            _players = new List<PlayerControl>(targets).Disarrange();
+        }
+        
+        public PlayerControl GetNext()
+        {
+            var target = _players[0];
+            _players.RemoveAt(0);
+
+            return target;
+        }
+
+        public bool HasNext()
+        {
+            return !_players.IsEmpty();
+        }
+
+        public int Number()
+        {
+            return _players.Count;
+        }
+
+        public void PutBack(PlayerControl value)
+        {
+            _players.Add(value);
+        }
+    }
+
     /*
      * 职业分配逻辑：
      *
@@ -197,7 +230,7 @@ public class GameListener : IListener
         if (!AmongUsClient.Instance.AmHost) return;
         
         // 获取所有的玩家集合
-        var players = PlayerUtils.GetAllPlayers().Disarrange().ToList();
+        var playerGetter = new PlayerGetter(PlayerUtils.GetAllPlayers().ToArray());
 
         // 添加到字典
         var mainRoleData = new Dictionary<PlayerControl, CustomRole>();
@@ -226,57 +259,69 @@ public class GameListener : IListener
         
         var crewmateGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Crewmate,
             CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>());
+        
+        Main.Logger.LogInfo("players => " + playerGetter._players.Select(player => player.Data.PlayerId).ToArray().AsString());
 
         // 首先分配内鬼职业
         for (var i = 0; i < impostorNumber; i++)
         {
+            if (!playerGetter.HasNext()) break;
+            
             // 因为Getter设置了默认值，因此无需检测是否含有下一个
             var impostorRole = impostorGetter.GetNext();
 
             // 玩家是一定可以获取到的，因为如果玩家的数目不足以获取到，那么内鬼的数目也不会大于1，因此，除非一个玩家也没有，不然是一定可以获取到的
             // 而玩家不可能一个也没有，因此一定可以获取到
-            var target = players[0];
-            
-            // 移除此玩家在列表中，以免造成干扰
-            players.Remove(target);
+            var target = playerGetter.GetNext();
             
             // 添加数据
             mainRoleData.Add(target, impostorRole);
+            Main.Logger.LogInfo("1");
+            Main.Logger.LogInfo(mainRoleData.Keys.Select(data => data.Data.PlayerName).ToArray().AsString());
         }
+        
+        Main.Logger.LogInfo("players => " + playerGetter._players.Select(player => player.Data.PlayerId).ToArray().AsString());
         
         // 接下来分配中立职业
         for (var i = 0; i < neutralNumber; i++)
         {
             if (!neutralGetter.HasNext()) break;
             
+            if (!playerGetter.HasNext()) break;
+            
             // 同理，已经设置了默认值，无需检测
             var neutralRole = neutralGetter.GetNext();
             
             // 获取玩家实例
-            var target = players[0];
-
-            // 移除此玩家在列表中
-            players = players.Where(player => !player.IsSamePlayer(target)).ToList();
+            var target = playerGetter.GetNext();
             
             // 添加数据
             mainRoleData.Add(target, neutralRole);
+            Main.Logger.LogInfo("2");
+            Main.Logger.LogInfo(mainRoleData.Keys.Select(data => data.Data.PlayerName).ToArray().AsString());
         }
         
+        Main.Logger.LogInfo("players => " + playerGetter._players.Select(player => player.Data.PlayerId).ToArray().AsString());
+        
         // 紧接着分配船员职业
-        for (var i = 0; i < players.Count; i++)
+        while (playerGetter.HasNext())
         {
             // 获取实例
             var cremateRole = crewmateGetter.GetNext();
 
             // 获取玩家实例
-            var target = players[0];
+            var target = playerGetter.GetNext();
             
-            // 没必要移除玩家在列表中，因为后面我们用不到players集合了
-            // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
+                // 没必要移除玩家在列表中，因为后面我们用不到players集合了
+                // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
             
-            // 添加数据
-            mainRoleData.Add(target, cremateRole);
+                // 添加数据
+                mainRoleData.Add(target, cremateRole);
+            Main.Logger.LogInfo("3");
+            Main.Logger.LogInfo(mainRoleData.Keys.Select(data => data.Data.PlayerName).ToArray().AsString());
         }
+        
+        Main.Logger.LogInfo("players => " + playerGetter._players.Select(player => player.Data.PlayerId).ToArray().AsString());
         
         // 最后分配一下副职业
         /*
@@ -603,12 +648,6 @@ public class GameListener : IListener
         var controller = @event.ExileController;
         var player = @event.Player;
 
-        int GetCount(IEnumerable<PlayerData> list)
-        {
-            return list.Select(p => p.Player)
-                .Where(p => (!p.IsSamePlayer(player) && p.IsAlive()) || player == null).ToList().Count;
-        }
-
         var crewCount = GetCount(PlayerUtils.AllCrewmates);
         var impCount = GetCount(PlayerUtils.AllImpostors);
         var neutralCount = GetCount(PlayerUtils.AllNeutrals);
@@ -621,6 +660,13 @@ public class GameListener : IListener
         
         controller.ImpostorText.text =
             LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
+        return;
+
+        int GetCount(IEnumerable<PlayerData> list)
+        {
+            return list.Select(p => p.Player)
+                .Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+        }
     }
 
     private readonly List<Handler> _handlers = new();
@@ -653,7 +699,7 @@ public class GameListener : IListener
     {
         var originText = @event.GetTaskString();
         var localRole = GameUtils.GetLocalPlayerRole();
-        if (originText == "None" || localRole == null) return;
+        if (originText == "None" || localRole == null!) return;
 
         var sb = new StringBuilder();
 

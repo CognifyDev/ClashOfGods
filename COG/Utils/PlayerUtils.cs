@@ -189,6 +189,10 @@ public static class PlayerUtils
     // ReSharper disable once MemberCanBePrivate.Global
     public static ClientData? GetClient(this PlayerControl player)
     {
+        if (!AmongUsClient.Instance)
+        {
+            return null;
+        }
         var client = AmongUsClient.Instance.allClients.ToArray()
             .FirstOrDefault(cd => cd.Character.PlayerId == player.PlayerId);
         return client;
@@ -388,7 +392,12 @@ public static class PlayerUtils
 
     public static CustomRole[] GetSubRoles(this PlayerControl pc)
     {
-        return pc.GetPlayerData()!.SubRoles;
+        var data = pc.GetPlayerData();
+        if (data == null)
+        {
+            return Array.Empty<CustomRole>();
+        }
+        return data.SubRoles;
     }
 
     public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason,

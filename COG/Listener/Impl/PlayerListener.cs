@@ -21,11 +21,9 @@ public class PlayerListener : IListener
 
         IEnumerator CoShareOptions()
         {
-            Main.Logger.LogDebug($"Coroutine {nameof(CoShareOptions)} has started.");
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.8f);
             if (!target.IsSamePlayer(PlayerControl.LocalPlayer))
             {
-                Main.Logger.LogDebug("Option info has sent to " + target.Data.PlayerName);
                 CustomOption.ShareConfigs(target);
             }
         }

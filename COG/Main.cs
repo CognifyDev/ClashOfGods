@@ -39,7 +39,7 @@ namespace COG;
 [BepInAutoPlugin(PluginGuid, PluginName)]
 [BepInProcess("Among Us.exe")]
 [BepInDependency(Reactor.ReactorPlugin.Id)]
-[ReactorModFlags(ModFlags.RequireOnAllClients)]
+// [ReactorModFlags(ModFlags.RequireOnAllClients)]
 public partial class Main : BasePlugin
 {
     public const string PluginName = "Clash Of Gods";
