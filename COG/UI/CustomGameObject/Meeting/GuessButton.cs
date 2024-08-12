@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using COG.Constant;
 using COG.Role;
 using COG.Role.Impl.SubRole;
@@ -35,7 +36,7 @@ public class GuessButton : TemplatedCustomGameObject
         var button = GameObject.GetComponent<PassiveButton>();
         button.StopAllCoroutines();
         button.OnClick.RemoveAllListeners();
-        button.OnClick.AddListener((System.Action)(() =>
+        button.OnClick.AddListener((Action)(() =>
         {
             var buttonTemplate = MeetingHud.playerStates[0].transform.FindChild("votePlayerBase");
             var maskTemplate = MeetingHud.playerStates[0].transform.FindChild("MaskArea");

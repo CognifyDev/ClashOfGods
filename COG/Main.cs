@@ -29,6 +29,7 @@ using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
 using InnerNet;
+using Reactor;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 
@@ -36,7 +37,7 @@ namespace COG;
 
 [BepInAutoPlugin(PluginGuid, PluginName)]
 [BepInProcess("Among Us.exe")]
-[BepInDependency(Reactor.ReactorPlugin.Id)]
+[BepInDependency(ReactorPlugin.Id)]
 // [ReactorModFlags(ModFlags.RequireOnAllClients)]
 public partial class Main : BasePlugin
 {

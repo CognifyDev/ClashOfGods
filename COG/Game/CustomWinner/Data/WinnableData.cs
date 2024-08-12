@@ -6,7 +6,7 @@ namespace COG.Game.CustomWinner.Data;
 
 public class WinnableData
 {
-    public bool Winnable { get; set; } = false;
+    public bool Winnable { get; set; }
     public string? WinText { get; set; }
     public Color? WinColor { get; set; }
 
