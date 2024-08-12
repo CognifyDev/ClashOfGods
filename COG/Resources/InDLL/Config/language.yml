@@ -119,7 +119,7 @@ action:
   clean: "清理"
 game:
   end:
-    show-players-roles-message: "玩家职业: "
+    show-players-roles-message: "玩家职业:"
     wins:
       impostor: "伪装者胜利"
       crewmate: "船员胜利"

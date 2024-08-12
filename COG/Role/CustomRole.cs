@@ -58,8 +58,11 @@ public abstract class CustomRole
             Role = (RoleTypes)(Id + 100),
             StringName = StringNames.None
         };
+
         if (this is IWinnable winnable)
-            CustomWinnerManager.RegisterWinnableInstance(winnable);
+        {
+            CustomWinnerManager.GetManager().RegisterCustomWinnable(winnable);
+        }
 
         if (ShowInOptions)
         {

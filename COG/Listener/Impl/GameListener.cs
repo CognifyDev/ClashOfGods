@@ -6,9 +6,7 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
-using COG.Game.CustomWinner;
 using COG.Listener.Event;
-using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.GSManager;
 using COG.Listener.Event.Impl.HManager;
@@ -259,8 +257,6 @@ public class GameListener : IListener
         
         var crewmateGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Crewmate,
             CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>());
-        
-        Main.Logger.LogInfo("players => " + playerGetter._players.Select(player => player.Data.PlayerId).ToArray().AsString());
 
         // 首先分配内鬼职业
         for (var i = 0; i < impostorNumber; i++)
@@ -276,11 +272,7 @@ public class GameListener : IListener
             
             // 添加数据
             mainRoleData.Add(target, impostorRole);
-            Main.Logger.LogInfo("1");
-            Main.Logger.LogInfo(mainRoleData.Keys.Select(data => data.Data.PlayerName).ToArray().AsString());
         }
-        
-        Main.Logger.LogInfo("players => " + playerGetter._players.Select(player => player.Data.PlayerId).ToArray().AsString());
         
         // 接下来分配中立职业
         for (var i = 0; i < neutralNumber; i++)
@@ -297,11 +289,7 @@ public class GameListener : IListener
             
             // 添加数据
             mainRoleData.Add(target, neutralRole);
-            Main.Logger.LogInfo("2");
-            Main.Logger.LogInfo(mainRoleData.Keys.Select(data => data.Data.PlayerName).ToArray().AsString());
         }
-        
-        Main.Logger.LogInfo("players => " + playerGetter._players.Select(player => player.Data.PlayerId).ToArray().AsString());
         
         // 紧接着分配船员职业
         while (playerGetter.HasNext())
@@ -317,11 +305,7 @@ public class GameListener : IListener
             
                 // 添加数据
                 mainRoleData.Add(target, cremateRole);
-            Main.Logger.LogInfo("3");
-            Main.Logger.LogInfo(mainRoleData.Keys.Select(data => data.Data.PlayerName).ToArray().AsString());
         }
-        
-        Main.Logger.LogInfo("players => " + playerGetter._players.Select(player => player.Data.PlayerId).ToArray().AsString());
         
         // 最后分配一下副职业
         /*
@@ -469,6 +453,23 @@ public class GameListener : IListener
 
         var list = new List<IEnumerator>();
 
+        list.Add(Effects.Action((Action)SetupRoles));
+        list.Add(Effects.Wait(2.5f));
+
+        void Action()
+        {
+            intro.YouAreText.gameObject.SetActive(false);
+            intro.RoleText.gameObject.SetActive(false);
+            intro.RoleBlurbText.gameObject.SetActive(false);
+            intro.ourCrewmate.gameObject.SetActive(false);
+        }
+
+        list.Add(Effects.Action((Action)Action));
+
+        @event.SetResult(Effects.Sequence(list.ToArray()));
+
+        return false;
+
         void SetupRoles()
         {
             if (GameOptionsManager.Instance.currentGameMode != GameModes.Normal) return;
@@ -502,23 +503,6 @@ public class GameListener : IListener
             transform.localScale = new Vector3(1f, 1f, 1f);
             intro.ourCrewmate.ToggleName(false);
         }
-
-        list.Add(Effects.Action((Action)SetupRoles));
-        list.Add(Effects.Wait(2.5f));
-
-        void Action()
-        {
-            intro.YouAreText.gameObject.SetActive(false);
-            intro.RoleText.gameObject.SetActive(false);
-            intro.RoleBlurbText.gameObject.SetActive(false);
-            intro.ourCrewmate.gameObject.SetActive(false);
-        }
-
-        list.Add(Effects.Action((Action)Action));
-
-        @event.SetResult(Effects.Sequence(list.ToArray()));
-
-        return false;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -555,12 +539,6 @@ public class GameListener : IListener
         intro.TeamTitle.color = camp.GetColor();
 
         intro.ImpostorText.text = camp.GetDescription();
-    }
-
-    [EventHandler(EventHandlerType.Prefix)]
-    public bool OnCheckGameEnd(GameCheckEndEvent _)
-    {
-        return CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -614,29 +592,11 @@ public class GameListener : IListener
 
         writer.WritePacked(GameUtils.PlayerData.Count);
         
-        foreach (var playerData in GameUtils.PlayerData)
+        foreach (var bytes in GameUtils.PlayerData.Select(SerializablePlayerData.Of).Select(data => data.SerializeToData()))
         {
-            var data = SerializablePlayerData.Of(playerData);
-            var bytes = data.SerializeToData();
             writer.WriteBytesAndSize(bytes);
         }
         
-/*
-        var sb = new StringBuilder();
-
-        for (var i = 0; i < GameUtils.PlayerData.Count; i++)
-        {
-            var playerRole = GameUtils.PlayerData[i];
-            sb.Append(playerRole.Player.PlayerId + "|" + playerRole.Role.Id);
-
-            if (i + 1 < GameUtils.PlayerData.Count) sb.Append(',');
-        }
-
-        writer.Write(sb.ToString());
-
-        // 职业格式应该是
-        // playerId1|roleId1,playerId2|roleId2 
-*/
         writer.Finish();
     }
 
@@ -727,13 +687,5 @@ public class GameListener : IListener
         }
 
         @event.SetTaskString(sb.ToString());
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameEnd(AmongUsClientGameEndEvent _)
-    {
-        EndGameResult.CachedWinners.Clear();
-        CustomWinnerManager.AllWinners.ToArray()
-            .ForEach(p => EndGameResult.CachedWinners.Add(new CachedPlayerData(p.Data)));
     }
 }

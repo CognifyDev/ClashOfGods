@@ -1,79 +1,57 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using COG.Constant;
+using COG.Game.CustomWinner.Data;
 using COG.Utils;
-using UnityEngine;
 
 namespace COG.Game.CustomWinner;
 
-public static class CustomWinnerManager
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+public class CustomWinnerManager
 {
-    internal static readonly List<IWinnable> CustomWinners = new();
-    public static Il2CppSystem.Collections.Generic.List<PlayerControl> AllWinners { get; } = new();
+    private static CustomWinnerManager? _manager;
+    public static CustomWinnerManager GetManager() => _manager ??= new CustomWinnerManager();
 
-    public static string WinText { get; private set; } = "";
-    public static Color WinColor { get; private set; } = Color.white;
+    private readonly List<IWinnable> _winnable = new();
 
-    public static void RegisterWinningPlayer(PlayerControl winner)
+    private CustomWinnerManager()
     {
-        AllWinners.Add(winner);
+        WinnableData = WinnableData.Of();
     }
 
-    public static void UnregisterWinningPlayer(PlayerControl playerControl)
+    public WinnableData WinnableData { get; private set; }
+
+    public void RegisterCustomWinnable(IWinnable winnable)
     {
-        foreach (var winner in AllWinners)
-            if (playerControl.IsSamePlayer(winner))
-                AllWinners.Remove(winner);
+        _winnable.Add(winnable);
     }
 
-    public static void RegisterWinningPlayers(IEnumerable<PlayerControl> winners)
+    public void RegisterCustomWinnables(IWinnable[] winnableArray)
     {
-        winners.ToList().ForEach(AllWinners.Add);
+        winnableArray.ForEach(RegisterCustomWinnable);
     }
 
-    public static void ResetWinningPlayers()
+    internal void InitForGameStart()
     {
-        AllWinners.Clear();
+        WinnableData = WinnableData.Of();
     }
 
-    public static void SetWinText(string text)
+    internal WinnableData CheckForGameEnd()
     {
-        WinText = text;
-    }
+        // 首先按照权重由大到小排列
+        var enumerable = _winnable.Distinct().ToList();
+        enumerable.Sort((first, second) => second.GetWeight().CompareTo(first.GetWeight()));
 
-    public static void SetWinColor(Color color)
-    {
-        WinColor = color;
-    }
+        foreach (var winnable in enumerable)
+        {
+            if (WinnableData.Winnable)
+            {
+                return WinnableData;
+            }
+            
+            winnable.CheckWin(WinnableData);
+        }
 
-    public static void RegisterWinnableInstance(IWinnable customWinner)
-    {
-        CustomWinners.Add(customWinner);
-    }
-
-    public static void RegisterWinnableInstances(IEnumerable<IWinnable> customWinners)
-    {
-        customWinners.ToList().ForEach(RegisterWinnableInstance);
-    }
-
-    internal static bool CheckEndForCustomWinners()
-    {
-        if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay ||
-            GlobalCustomOptionConstant.DebugMode.GetBool()) return false;
-        // 按照权重从大到小排序
-        CustomWinners.Sort((first, second) => second.GetWeight().CompareTo(first.GetWeight()));
-        return CustomWinners.All(customWinner => !customWinner.CanWin());
-    }
-
-    public static void EndGame(IEnumerable<PlayerControl> winners, string? text = null, Color? color = null,
-        bool ignoreDebugMode = false)
-    {
-        if (!ignoreDebugMode && GlobalCustomOptionConstant.DebugMode.GetBool()) return;
-        if (text != null) SetWinText(text);
-        if (color != null) SetWinColor(WinColor);
-        RegisterWinningPlayers(winners);
-        var num = (GameOverReason)winners.Where(p => p).Select(p => (int)p.PlayerId).Sum();
-        var modCustom = (GameOverReason)4673347; // String "COG " (4 characters) to byte array to integer
-        GameManager.Instance.RpcEndGame(modCustom | num, false);
+        return WinnableData;
     }
 }
