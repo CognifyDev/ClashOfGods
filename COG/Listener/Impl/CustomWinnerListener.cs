@@ -1,4 +1,5 @@
-﻿using COG.Game.CustomWinner;
+﻿using COG.Constant;
+using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
 using COG.Listener.Event.Impl.Game;
 
@@ -15,6 +16,7 @@ public class CustomWinnerListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnCheckGameEnd(GameCheckEndEvent @event)
     {
+        if (GlobalCustomOptionConstant.DebugMode.GetBool()) return false;
         CheckForWinnableData(CustomWinnerManager.GetManager().CheckForGameEnd());
         return false;
     }
