@@ -9,7 +9,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Version>1.0.0-beta.21</Version>
+        <Version>1.0.0-beta.22</Version>
         <Title>ClashOfGods</Title>
         <Copyright>CognifyDev</Copyright>
         <PackageProjectUrl>https://github.com/CognifyDev/ClashOfGods</PackageProjectUrl>
