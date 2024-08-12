@@ -58,14 +58,6 @@ public class RpcListener : IListener
                 PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
                 break;
             }
-            case KnownRpc.Handshake:
-            {
-                var versionStr = reader.ReadString();
-                var commitTime = reader.ReadString();
-                HandshakeManager.Instance.AddInfo(@event.Player, versionStr, commitTime);
-                HandshakeManager.Instance.CheckPlayersAndDisplay();
-                break;
-            }
             case KnownRpc.NotifySettingChange:
             {
                 var id = reader.ReadPackedInt32();

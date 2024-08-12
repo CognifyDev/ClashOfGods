@@ -6,12 +6,9 @@ public enum KnownRpc : uint
     CleanDeadBody = 101,
     UpdateOption = 102,
     SetRole = 103,
-
-    SyncLovers = 104,
-    Handshake = 105,
     
-    Revive = 106,
-    NotifySettingChange = 107,
-    Mark = 108,
-    ShareOptions = 109
+    Revive = 104,
+    NotifySettingChange = 105,
+    Mark = 106,
+    ShareOptions = 107
 }

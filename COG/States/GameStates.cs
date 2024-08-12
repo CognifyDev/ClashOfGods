@@ -26,7 +26,6 @@ public static class GameStates
 
             if (!value)
             {
-                HandshakeManager.Instance.Reset(); 
                 GameUtils.PlayerData.Clear();
             }
         }
