@@ -558,6 +558,7 @@ public class PlayerData
         SubRoles = subRoles != null
             ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
             : Array.Empty<CustomRole>();
+        CachedPlayerData = new CachedPlayerData(player.Data);
     }
     
     public PlayerControl Player { get; }
@@ -565,6 +566,7 @@ public class PlayerData
     public string PlayerName { get; }
     public byte PlayerId { get; }
     public CustomRole[] SubRoles { get; }
+    public CachedPlayerData CachedPlayerData { get; }
     
     public List<string> Tags { get; }
 

@@ -7,6 +7,7 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener.Event;
+using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.GSManager;
 using COG.Listener.Event.Impl.HManager;
