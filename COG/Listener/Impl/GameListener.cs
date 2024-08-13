@@ -57,6 +57,7 @@ public class GameListener : IListener
                     var bytes = reader.ReadBytesAndSize().ToArray();
                     var data = bytes.DeserializeToData<SerializablePlayerData>().AsPlayerData();
                     GameUtils.PlayerData.Add(data);
+                    data.Player.SetCustomRole(data.Role, data.SubRoles);
                 }
 /*
                 var originalText = reader.ReadString()!;

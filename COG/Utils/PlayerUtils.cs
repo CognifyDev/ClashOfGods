@@ -357,7 +357,6 @@ public static class PlayerUtils
 
         GameUtils.PlayerData.Add(new PlayerData(pc, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
-        pc.RpcSetRole(role.BaseRoleType, true);
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has set to {role.GetType().Name}");
     }
