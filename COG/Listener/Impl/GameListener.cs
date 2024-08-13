@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
@@ -517,17 +518,29 @@ public class GameListener : IListener
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnPlayerVent(VentCheckEvent @event)
+    public bool OnVentCheck(VentCheckEvent @event)
     {
         var playerInfo = @event.PlayerInfo;
-        foreach (var ventAble in from playerRole in GameUtils.PlayerData
-                 where playerRole.Player.Data.IsSamePlayer(playerInfo)
-                 select playerRole.Role.CanVent)
+        if (playerInfo.Disconnected) return true;
+
+        var role = playerInfo.Object.GetMainRole();
+
+        if (!role.CanVent)
         {
-            @event.SetCanUse(ventAble);
-            @event.SetCouldUse(ventAble);
+            @event.SetCanUse(false);
+            @event.SetCouldUse(false);
             @event.SetResult(float.MaxValue);
-            return ventAble;
+            return false;
+        }
+        else
+        {
+            var usable = @event.GetCanUse() && @event.GetCouldUse();
+            if (usable)
+            {
+                var vent = @event.Vent;
+                vent.myRend.material.SetFloat("_Outline", usable ? 1 : 0);
+                vent.myRend.material.SetColor("_OutlineColor", role.Color);
+            }
         }
 
         return true;
@@ -600,7 +613,7 @@ public class GameListener : IListener
         int GetCount(IEnumerable<PlayerData> list)
         {
             return list.Select(p => p.Player)
-                .Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+                .Count(p => !p.IsSamePlayer(player) && p.IsAlive());
         }
     }
 

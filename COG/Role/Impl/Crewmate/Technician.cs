@@ -49,9 +49,7 @@ public class Technician : CustomRole
     public void OnRpcReceived(PlayerHandleRpcEvent @event)
     {
         if ((KnownRpc)@event.CallId == KnownRpc.ClearSabotages)
-        {
             RepairSabotages();
-        }
     }
 
     public void RepairSabotages()

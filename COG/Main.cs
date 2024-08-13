@@ -132,7 +132,7 @@ public partial class Main : BasePlugin
         {
             new CrewmatesCustomWinner(),
             new ImpostorsCustomWinner(),
-            new LastPlayerCustomWinner()
+            new LastPlayerCustomWinner(),
         });
 
         // Register roles
@@ -147,7 +147,7 @@ public partial class Main : BasePlugin
             new Sheriff(),
             new Vigilante(),
             new SoulHunter(),
-            new Technician(),
+            //new Technician(),
 
             // Impostor
             new Impostor(),
