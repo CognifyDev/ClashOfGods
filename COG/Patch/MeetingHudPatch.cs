@@ -16,6 +16,18 @@ internal class MeetingHudStartPatch
     }
 }
 
+[HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.ServerStart))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+internal class MeetingHudServerStartPatch
+{
+    [HarmonyPostfix]
+    public static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] byte reporter)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new MeetingServerStartEvent(__instance, reporter), EventHandlerType.Postfix);
+    }
+}
+
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CastVote))]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 internal class MeetingHudCastVotePatch

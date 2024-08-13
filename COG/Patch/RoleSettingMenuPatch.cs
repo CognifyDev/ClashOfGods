@@ -1,13 +1,13 @@
-using BepInEx.Unity.IL2CPP.Utils.Collections;
-using COG.Config.Impl;
-using COG.Role;
-using COG.UI.CustomOption;
-using COG.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BepInEx.Unity.IL2CPP.Utils.Collections;
+using COG.Config.Impl;
 using COG.Constant;
+using COG.Role;
+using COG.UI.CustomOption;
+using COG.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -318,7 +318,8 @@ public static class RoleOptionPatch
         CurrentButton = button;
         CurrentTab = tabToOpen;
         SetButtonActive(button, true);
-        tabToOpen.SetActive(true);
+        if (tabToOpen != null) 
+            tabToOpen.SetActive(true);
     }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.CloseMenu))]

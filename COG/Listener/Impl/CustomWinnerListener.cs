@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Text;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Game.CustomWinner;
+using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.States;
 using COG.Utils;
@@ -13,7 +15,33 @@ namespace COG.Listener.Impl;
 public class CustomWinnerListener : IListener
 {
     private static readonly int Color1 = Shader.PropertyToID("_Color");
+    
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameStart(GameStartEvent _)
+    {
+        CustomWinnerManager.GetManager().InitForGameStart();
+    }
 
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnCheckGameEnd(GameCheckEndEvent @event)
+    {
+        if (GlobalCustomOptionConstant.DebugMode.GetBool()) return false;
+        var checkForGameEnd = CustomWinnerManager.GetManager().CheckForGameEnd();
+        return checkForGameEnd.Winnable;
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnAmongUsClientGameEnd(AmongUsClientGameEndEvent @event)
+    {
+        var endGameResult = @event.GetEndGameResult();
+        var data = CustomWinnerManager.GetManager().WinnableData;
+        EndGameResult.CachedWinners.Clear();
+        EndGameResult.CachedWinners = data.WinnablePlayers
+            .Select(player => new CachedPlayerData(player.Data)).ToList().ToIl2CppList();
+        endGameResult.GameOverReason = data.GameOverReason;
+        EndGameResult.CachedGameOverReason = data.GameOverReason;
+    }
+    
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
@@ -21,9 +49,10 @@ public class CustomWinnerListener : IListener
         SetUpWinnerPlayers(manager);
         SetUpWinText(manager);
         SetUpRoleSummary(manager);
+        
+        GameStates.InGame = false;
     }
 
-    // FIXME：小人没有身体，只有名字
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
         manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList()
@@ -62,8 +91,6 @@ public class CustomWinnerListener : IListener
             var scale = new Vector3(scaleValue, scaleValue, 1f);
 
             winnerPoolable.transform.localScale = scale;
-            winnerPoolable.UpdateFromPlayerOutfit(winner.Outfit, PlayerMaterial.MaskType.ComplexUI, winner.IsDead,
-                true);
 
             if (winner.IsDead)
             {
@@ -74,6 +101,8 @@ public class CustomWinnerListener : IListener
             {
                 winnerPoolable.SetFlipX(num % 2 == 0);
             }
+            
+            winnerPoolable.UpdateFromPlayerOutfit(winner.Outfit, PlayerMaterial.MaskType.None, winner.IsDead, true);
 
             var namePos = winnerPoolable.cosmetics.nameText.transform.localPosition;
 
@@ -87,26 +116,24 @@ public class CustomWinnerListener : IListener
 
             num++;
         }
-
-        GameStates.InGame = false;
     }
 
     private static void SetUpWinText(EndGameManager manager)
     {
+        var data = CustomWinnerManager.GetManager().WinnableData;
         var template = manager.WinText;
         var pos = template.transform.position;
         var winText = Object.Instantiate(template);
 
         winText.transform.position = new Vector3(pos.x, pos.y - 0.5f, pos.z);
         winText.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
-        winText.text = CustomWinnerManager.WinText;
-        winText.color = CustomWinnerManager.WinColor;
-        manager.BackgroundBar.material.SetColor(Color1, CustomWinnerManager.WinColor);
+        winText.text = data.WinText;
+        if (data.WinColor != null)
+        {
+            winText.color = data.WinColor.Value;
+            manager.BackgroundBar.material.SetColor(Color1, data.WinColor.Value);
+        }
 
-        // Reset
-        CustomWinnerManager.SetWinText("");
-        CustomWinnerManager.SetWinColor(Color.white);
-        CustomWinnerManager.ResetWinningPlayers();
     }
 
     private static void SetUpRoleSummary(EndGameManager manager)
@@ -120,7 +147,7 @@ public class CustomWinnerListener : IListener
         roleSummary.fontSizeMax = roleSummary.fontSizeMin = roleSummary.fontSize = 1.5f;
         roleSummary.color = Color.white;
 
-        StringBuilder summary = new($"{LanguageConfig.Instance.ShowPlayersRolesMessage}");
+        var summary = new StringBuilder($"{LanguageConfig.Instance.ShowPlayersRolesMessage}");
         summary.Append(Environment.NewLine);
         foreach (var role in GameUtils.PlayerData)
         {

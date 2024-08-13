@@ -81,36 +81,24 @@ public sealed class CustomOption
         customOption = Options.FirstOrDefault(o => o.OptionBehaviour == optionBehaviour)!;
         return customOption != null!;
     }
-/*
+
     public static void ShareConfigs(PlayerControl? target = null)
     {
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
 
-        // 当游戏选项更改的时候调用
-
-        var localPlayer = PlayerControl.LocalPlayer;
-        PlayerControl[]? targetArr = null;
-        if (target) targetArr = target.ToSingleElementArray()!;
-
-        // 新建写入器
-        var writer = RpcUtils.StartRpcImmediately(localPlayer, KnownRpc.ShareOptions, targetArr);
-
-        var sb = new StringBuilder();
-
-        foreach (var option in from option in Options
-                               where option != null
-                               where option.Selection != option.DefaultSelection
-                               select option)
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareOptions,
+            target == null ? null : new[] { target });
+        
+        writer.WritePacked((uint) Options.Count);
+        foreach (var option in Options)
         {
-            sb.Append(option.Id + "|" + option.Selection);
-            sb.Append(',');
+            writer.WritePacked((uint)option.Id);
+            writer.WritePacked((uint) option.Selection);
         }
-
-        writer.Write(sb.ToString().RemoveLast()).Finish();
-
-        // id|selection,id|selection
+        
+        writer.Finish();
     }
-*/
+
     private static void LoadOptionFromPreset(string path)
     {
         try

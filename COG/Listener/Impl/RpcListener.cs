@@ -29,44 +29,33 @@ public class RpcListener : IListener
 
                 option.Selection = selection;
                 break;
-            }/*
+            }
+            
             case KnownRpc.ShareOptions:
             {
-                var originalString = reader.ReadString();
-                Main.Logger.LogDebug("Received options string => " + originalString);
-                foreach (var s in originalString.Split(","))
+                var count = reader.ReadPackedUInt32();
+                try
                 {
-                    var contexts = s.Split("|");
-                    var id = int.Parse(contexts[0]);
-                    var selection = int.Parse(contexts[1]);
-
-                    for (var i = 0; i < CustomOption.Options.Count; i++)
+                    for (var i = 0; i < count; i++)
                     {
-                        var option = CustomOption.Options[i];
-                        if (option == null) continue;
-                        if (option.Id != id) continue;
-                        Main.Logger.LogInfo(
-                            $"Changed {option.Name()}({option.Id})'s selection to {selection}(before: {option.Selection})");
-                        option.Selection = selection;
-                        CustomOption.Options[i] = option;
+                        var optionId = reader.ReadPackedUInt32();
+                        var selection = reader.ReadPackedUInt32();
+                        var option = CustomOption.Options.FirstOrDefault(option => option.Id == (int)optionId);
+                        option?.UpdateSelection((int) selection);
                     }
                 }
-
+                catch (System.Exception e)
+                {
+                    Main.Logger.LogError("Error while deserializing options: " + e.Message);
+                }
+                
                 break;
-            }*/
+            }
             case KnownRpc.SetRole:
             {
                 var playerId = reader.ReadByte();
                 var roleId = reader.ReadPackedInt32();
                 PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
-                break;
-            }
-            case KnownRpc.Handshake:
-            {
-                var versionStr = reader.ReadString();
-                var commitTime = reader.ReadString();
-                HandshakeManager.Instance.AddInfo(@event.Player, versionStr, commitTime);
-                HandshakeManager.Instance.CheckPlayersAndDisplay();
                 break;
             }
             case KnownRpc.NotifySettingChange:

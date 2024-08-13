@@ -2,7 +2,4 @@
 
 public interface ICustomGameObject
 {
-    void Update();
-
-    void Destroy();
 }

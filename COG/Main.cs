@@ -12,7 +12,7 @@ using COG.Command.Impl;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
-using COG.Game.CustomWinner.Impl;
+using COG.Game.CustomWinner.Winnable;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Patch;
@@ -29,6 +29,7 @@ using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
 using InnerNet;
+using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
@@ -38,7 +39,7 @@ namespace COG;
 
 [BepInAutoPlugin(PluginGuid, PluginName)]
 [BepInProcess("Among Us.exe")]
-[BepInDependency(Reactor.ReactorPlugin.Id)]
+[BepInDependency(ReactorPlugin.Id)]
 [ReactorModFlags(ModFlags.RequireOnAllClients)]
 public partial class Main : BasePlugin
 {
@@ -115,16 +116,24 @@ public partial class Main : BasePlugin
             new PlayerListener(),
             new DeadPlayerListener(),
             new CustomButtonListener(),
-            new CustomWinnerListener(),
             new GameListener(),
             new ModOptionListener(),
             new RpcListener(),
             new TaskAdderListener(),
             new VersionShowerListener(),
-            new VanillaBugFixListener()
+            new VanillaBugFixListener(),
+            new CustomWinnerListener()
         });
         
         LanguageConfig.OnLanguageLoaded += () => CustomRoleManager.GetManager().ReloadRoles();
+        
+        // Register CustomWinners
+        CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
+        {
+            new CrewmatesCustomWinner(),
+            new ImpostorsCustomWinner(),
+            new LastPlayerCustomWinner()
+        });
 
         // Register roles
         CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
@@ -148,7 +157,8 @@ public partial class Main : BasePlugin
             new Jester(),
 
             // Sub-roles
-            new Lighter()
+            new Lighter(),
+            // new Guesser()
         });
 
         // Register mod options
@@ -188,14 +198,6 @@ public partial class Main : BasePlugin
             new RpcCommand(),
             new OptionCommand()
         });
-
-        // Register CustomWinners
-        CustomWinnerManager.RegisterWinnableInstances(new IWinnable[]
-        {
-            new CrewmatesCustomWinner(),
-            new ImpostorsCustomWinner(),
-            new LastPlayerCustomWinner()
-        });
         
         // Register custom buttons
         CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
@@ -217,9 +219,7 @@ public partial class Main : BasePlugin
         ModOptionManager.GetManager().GetOptions().Clear();
         CustomRoleManager.GetManager().GetRoles().Clear();
         ListenerManager.GetManager().UnregisterHandlers();
-        CustomWinnerManager.AllWinners.Clear();
         EndGameResult.CachedWinners?.Clear();
-        CustomWinnerManager.CustomWinners.Clear();
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
         MainMenuPatch.CustomBG!.Destroy();

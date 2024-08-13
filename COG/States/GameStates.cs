@@ -1,7 +1,6 @@
 using COG.Role;
 using COG.Rpc;
 using COG.Utils;
-using InnerNet;
 
 namespace COG.States;
 
@@ -27,7 +26,6 @@ public static class GameStates
 
             if (!value)
             {
-                HandshakeManager.Instance.Reset(); 
                 GameUtils.PlayerData.Clear();
             }
         }
@@ -36,7 +34,7 @@ public static class GameStates
     /// <summary>
     ///     是否在大厅中
     /// </summary>
-    public static bool IsLobby => AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Joined;
+    public static bool InLobby => LobbyBehaviour.Instance;
 
     /// <summary>
     ///     是否处于会议中

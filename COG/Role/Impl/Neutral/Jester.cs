@@ -1,6 +1,7 @@
 using System.Linq;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
+using COG.Game.CustomWinner.Data;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
@@ -24,17 +25,23 @@ public class Jester : CustomRole, IListener, IWinnable
             new BoolOptionValueRule(true));
     }
 
-    public bool CanWin()
+    public void CheckWin(WinnableData data)
     {
-        var jester = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp =>
+        var jesters = DeadPlayerManager.DeadPlayers.Where(dp =>
             dp.Player.IsRole(this) && dp.DeathReason == Utils.DeathReason.Exiled);
-        if (jester == null) return false;
 
-        CustomWinnerManager.EndGame(new[] { jester.Player }, "Jester wins", Color);
-        return true;
+        var deadPlayers = jesters as DeadPlayer[] ?? jesters.ToArray();
+        if (!deadPlayers.Any()) return;
+
+        data.WinnableCampType = CampType; 
+        data.WinText = "Jester wins";
+        data.WinColor = Color;
+        data.WinnablePlayers.Clear();
+        data.WinnablePlayers.Add(deadPlayers.ToArray()[0].Player);
+        data.Winnable = true;
     }
 
-    public ulong GetWeight()
+    public uint GetWeight()
     {
         return IWinnable.GetOrder(5);
     }
@@ -42,7 +49,7 @@ public class Jester : CustomRole, IListener, IWinnable
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnCheckStartMeeting(PlayerReportDeadBodyEvent @event)
     {
-        if (!GameStates.InGame || GameStates.IsLobby) return true;
+        if (!GameStates.InGame || GameStates.InLobby) return true;
         var victim = @event.Target;
         var player = @event.Player;
         if (!player.IsRole(this)) return true;

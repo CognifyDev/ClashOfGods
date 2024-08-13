@@ -6,7 +6,6 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
-using COG.Game.CustomWinner;
 using COG.Listener.Event;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
@@ -20,7 +19,6 @@ using COG.Listener.Event.Impl.VentImpl;
 using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
-using COG.Role.Impl.Neutral;
 using COG.Rpc;
 using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
@@ -52,35 +50,27 @@ public class GameListener : IListener
                 // 开始读入数据
                 Main.Logger.LogDebug("The role data from the host was received by us.");
 
-                    var count = reader.ReadPackedInt32();
-                    for (var i = 0; i < count; i++)
-                    {
-                        var player = PlayerUtils.GetPlayerById(reader.ReadByte());
-                        var mainRole = CustomRoleManager.GetManager().GetRoleById(reader.ReadPackedInt32());
-                        
-                        var subCount = reader.ReadPackedInt32();
-                        var subRoles = new List<CustomRole>();
-                        for (var j = 0; j < subCount; j++)
-                        {
+                var count = reader.ReadPackedInt32();
 
-                        }
-
-                        if (!player || mainRole == null) return;
-                        player.SetCustomRole(mainRole);
-                    }
-
-                //var originalText = reader.ReadString()!;
-                //foreach (var s in originalText.Split(","))
-                //{
-                //    var texts = s.Split("|");
-                //    var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
-                //    var role = CustomRoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
-                //    player!.SetCustomRole(role!);
-                //}
-
-                //foreach (var playerRole in GameUtils.PlayerData)
-                //    Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
-                //                        $" => {playerRole.Role.Name}");
+                for (var i = 0; i < count; i++)
+                {
+                    var bytes = reader.ReadBytesAndSize().ToArray();
+                    var data = bytes.DeserializeToData<SerializablePlayerData>().AsPlayerData();
+                    GameUtils.PlayerData.Add(data);
+                }
+/*
+                var originalText = reader.ReadString()!;
+                foreach (var s in originalText.Split(","))
+                {
+                    var texts = s.Split("|");
+                    var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
+                    var role = CustomRoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
+                    player!.SetCustomRole(role!);
+                }
+*/
+                foreach (var playerRole in GameUtils.PlayerData)
+                    Main.Logger.LogInfo($"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
+                                        $" => {playerRole.Role.GetNormalName()}{playerRole.SubRoles.AsString()}");
 
                 break;
             }
@@ -125,7 +115,7 @@ public class GameListener : IListener
     {
         var player = @event.Player;
         if (player == null! || !PlayerControl.LocalPlayer) return;
-        if (GameStates.IsLobby && AmongUsClient.Instance.AmHost)
+        if (GameStates.InLobby && AmongUsClient.Instance.AmHost)
         {
             var mainOption = GameUtils.GetGameOptions();
             var roleOption = mainOption.RoleOptions;
@@ -188,6 +178,39 @@ public class GameListener : IListener
         }
     }
 
+    public class PlayerGetter : IGetter<PlayerControl>
+    {
+        public readonly List<PlayerControl> _players;
+        
+        public PlayerGetter(PlayerControl[] targets)
+        {
+            _players = new List<PlayerControl>(targets).Disarrange();
+        }
+        
+        public PlayerControl GetNext()
+        {
+            var target = _players[0];
+            _players.RemoveAt(0);
+
+            return target;
+        }
+
+        public bool HasNext()
+        {
+            return !_players.IsEmpty();
+        }
+
+        public int Number()
+        {
+            return _players.Count;
+        }
+
+        public void PutBack(PlayerControl value)
+        {
+            _players.Add(value);
+        }
+    }
+
     /*
      * 职业分配逻辑：
      *
@@ -206,7 +229,7 @@ public class GameListener : IListener
         if (!AmongUsClient.Instance.AmHost) return;
         
         // 获取所有的玩家集合
-        var players = PlayerUtils.GetAllPlayers().Disarrange().ToList();
+        var playerGetter = new PlayerGetter(PlayerUtils.GetAllPlayers().ToArray());
 
         // 添加到字典
         var mainRoleData = new Dictionary<PlayerControl, CustomRole>();
@@ -239,15 +262,14 @@ public class GameListener : IListener
         // 首先分配内鬼职业
         for (var i = 0; i < impostorNumber; i++)
         {
+            if (!playerGetter.HasNext()) break;
+            
             // 因为Getter设置了默认值，因此无需检测是否含有下一个
             var impostorRole = impostorGetter.GetNext();
 
             // 玩家是一定可以获取到的，因为如果玩家的数目不足以获取到，那么内鬼的数目也不会大于1，因此，除非一个玩家也没有，不然是一定可以获取到的
             // 而玩家不可能一个也没有，因此一定可以获取到
-            var target = players[0];
-            
-            // 移除此玩家在列表中，以免造成干扰
-            players.Remove(target);
+            var target = playerGetter.GetNext();
             
             // 添加数据
             mainRoleData.Add(target, impostorRole);
@@ -258,33 +280,32 @@ public class GameListener : IListener
         {
             if (!neutralGetter.HasNext()) break;
             
+            if (!playerGetter.HasNext()) break;
+            
             // 同理，已经设置了默认值，无需检测
             var neutralRole = neutralGetter.GetNext();
             
             // 获取玩家实例
-            var target = players[0];
-
-            // 移除此玩家在列表中
-            players.Remove(target);
+            var target = playerGetter.GetNext();
             
             // 添加数据
             mainRoleData.Add(target, neutralRole);
         }
         
         // 紧接着分配船员职业
-        for (var i = 0; i < players.Count; i++)
+        while (playerGetter.HasNext())
         {
             // 获取实例
             var cremateRole = crewmateGetter.GetNext();
 
             // 获取玩家实例
-            var target = players[0];
+            var target = playerGetter.GetNext();
             
-            // 没必要移除玩家在列表中，因为后面我们用不到players集合了
-            // players.Remove(target);
+                // 没必要移除玩家在列表中，因为后面我们用不到players集合了
+                // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
             
-            // 添加数据
-            mainRoleData.Add(target, cremateRole);
+                // 添加数据
+                mainRoleData.Add(target, cremateRole);
         }
         
         // 最后分配一下副职业
@@ -345,8 +366,10 @@ public class GameListener : IListener
             var target = mainRoleData.Keys.ToArray()[i];
             
             // 歌姬树懒并没有重写Equals方法，因此只能这样
-            var subRoles = subRoleData.Where(pair => 
-                pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList()[0];
+            var subRolesList = subRoleData.Where(pair => 
+                pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList();
+
+            var subRoles = subRolesList.Any() ? subRolesList[0] : Array.Empty<CustomRole>();
             
             target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles); // 先本地设置职业，后面ShareRole会把职业发出去的
         }
@@ -404,6 +427,23 @@ public class GameListener : IListener
 
         var list = new List<IEnumerator>();
 
+        list.Add(Effects.Action((Action)SetupRoles));
+        list.Add(Effects.Wait(2.5f));
+
+        void Action()
+        {
+            intro.YouAreText.gameObject.SetActive(false);
+            intro.RoleText.gameObject.SetActive(false);
+            intro.RoleBlurbText.gameObject.SetActive(false);
+            intro.ourCrewmate.gameObject.SetActive(false);
+        }
+
+        list.Add(Effects.Action((Action)Action));
+
+        @event.SetResult(Effects.Sequence(list.ToArray()));
+
+        return false;
+
         void SetupRoles()
         {
             if (GameOptionsManager.Instance.currentGameMode != GameModes.Normal) return;
@@ -437,23 +477,6 @@ public class GameListener : IListener
             transform.localScale = new Vector3(1f, 1f, 1f);
             intro.ourCrewmate.ToggleName(false);
         }
-
-        list.Add(Effects.Action((Action)SetupRoles));
-        list.Add(Effects.Wait(2.5f));
-
-        void Action()
-        {
-            intro.YouAreText.gameObject.SetActive(false);
-            intro.RoleText.gameObject.SetActive(false);
-            intro.RoleBlurbText.gameObject.SetActive(false);
-            intro.ourCrewmate.gameObject.SetActive(false);
-        }
-
-        list.Add(Effects.Action((Action)Action));
-
-        @event.SetResult(Effects.Sequence(list.ToArray()));
-
-        return false;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -490,12 +513,6 @@ public class GameListener : IListener
         intro.TeamTitle.color = camp.GetColor();
 
         intro.ImpostorText.text = camp.GetDescription();
-    }
-
-    [EventHandler(EventHandlerType.Prefix)]
-    public bool OnCheckGameEnd(GameCheckEndEvent _)
-    {
-        return CustomWinnerManager.CheckEndForCustomWinners();
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -545,19 +562,15 @@ public class GameListener : IListener
 
     private static void ShareRoles()
     {
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareRoles);
 
         writer.WritePacked(GameUtils.PlayerData.Count);
-
-        foreach (var playerRole in GameUtils.PlayerData)
+        
+        foreach (var bytes in GameUtils.PlayerData.Select(SerializablePlayerData.Of).Select(data => data.SerializeToData()))
         {
-            writer.Write(playerRole.PlayerId).WritePacked(playerRole.Role.Id);
-
-            writer.WritePacked(playerRole.SubRoles.Length);
-            foreach (var subRole in playerRole.SubRoles)
-                writer.Write(subRole.Id);
+            writer.WriteBytesAndSize(bytes);
         }
-
+        
         writer.Finish();
     }
 
@@ -568,12 +581,6 @@ public class GameListener : IListener
 
         var controller = @event.ExileController;
         var player = @event.Player;
-
-        int GetCount(IEnumerable<PlayerData> list)
-        {
-            return list.Select(p => p.Player)
-                .Where(p => (!p.IsSamePlayer(player) && p.IsAlive()) || player == null).ToList().Count;
-        }
 
         var crewCount = GetCount(PlayerUtils.AllCrewmates);
         var impCount = GetCount(PlayerUtils.AllImpostors);
@@ -587,6 +594,13 @@ public class GameListener : IListener
         
         controller.ImpostorText.text =
             LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
+        return;
+
+        int GetCount(IEnumerable<PlayerData> list)
+        {
+            return list.Select(p => p.Player)
+                .Where(p => !p.IsSamePlayer(player) && p.IsAlive()).ToList().Count;
+        }
     }
 
     private readonly List<Handler> _handlers = new();
@@ -619,7 +633,7 @@ public class GameListener : IListener
     {
         var originText = @event.GetTaskString();
         var localRole = GameUtils.GetLocalPlayerRole();
-        if (originText == "None" || localRole == null) return;
+        if (originText == "None" || localRole == null!) return;
 
         var sb = new StringBuilder();
 
@@ -647,13 +661,5 @@ public class GameListener : IListener
         }
 
         @event.SetTaskString(sb.ToString());
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameEnd(AmongUsClientGameEndEvent _)
-    {
-        EndGameResult.CachedWinners.Clear();
-        CustomWinnerManager.AllWinners.ToArray()
-            .ForEach(p => EndGameResult.CachedWinners.Add(new CachedPlayerData(p.Data)));
     }
 }

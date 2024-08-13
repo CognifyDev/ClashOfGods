@@ -15,7 +15,6 @@ using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 
-// ReSharper disable UnusedMember.Local
 
 namespace COG.Utils;
 
@@ -190,6 +189,10 @@ public static class PlayerUtils
     // ReSharper disable once MemberCanBePrivate.Global
     public static ClientData? GetClient(this PlayerControl player)
     {
+        if (!AmongUsClient.Instance)
+        {
+            return null;
+        }
         var client = AmongUsClient.Instance.allClients.ToArray()
             .FirstOrDefault(cd => cd.Character.PlayerId == player.PlayerId);
         return client;
@@ -207,7 +210,7 @@ public static class PlayerUtils
     /// <returns></returns>
     public static bool IsAlive(this PlayerControl player)
     {
-        if (GameStates.IsLobby) return true;
+        if (GameStates.InLobby) return true;
         if (player == null) return false;
         return !player.Data.IsDead;
     }
@@ -389,7 +392,12 @@ public static class PlayerUtils
 
     public static CustomRole[] GetSubRoles(this PlayerControl pc)
     {
-        return pc.GetPlayerData()!.SubRoles;
+        var data = pc.GetPlayerData();
+        if (data == null)
+        {
+            return Array.Empty<CustomRole>();
+        }
+        return data.SubRoles;
     }
 
     public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason,
@@ -508,6 +516,36 @@ public class DeadPlayer
     }
 }
 
+[Serializable]
+public class SerializablePlayerData
+{
+    public byte PlayerId { get; }
+    
+    public int MainRoleId { get; }
+    
+    public int[] SubRoleIds { get; }
+    
+    private SerializablePlayerData(byte playerId, int mainRoleId, int[] subRoleIds)
+    {
+        PlayerId = playerId;
+        MainRoleId = mainRoleId;
+        SubRoleIds = subRoleIds;
+    }
+
+    public PlayerData AsPlayerData()
+    {
+        return new PlayerData(PlayerUtils.GetPlayerById(PlayerId)!,
+            CustomRoleManager.GetManager().GetRoleById(MainRoleId)!,
+            SubRoleIds.Select(id => CustomRoleManager.GetManager().GetRoleById(id)).ToArray()!);
+    }
+    
+    public static SerializablePlayerData Of(PlayerData playerData)
+    {
+        return new SerializablePlayerData(playerData.PlayerId, playerData.Role.Id,
+            playerData.SubRoles.Select(role => role.Id).ToArray());
+    }
+}
+
 public class PlayerData
 {
     public PlayerData(PlayerControl player, CustomRole role, CustomRole[]? subRoles = null)
@@ -521,7 +559,7 @@ public class PlayerData
             ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
             : Array.Empty<CustomRole>();
     }
-
+    
     public PlayerControl Player { get; }
     public CustomRole Role { get; }
     public string PlayerName { get; }

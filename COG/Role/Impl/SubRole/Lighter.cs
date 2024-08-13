@@ -14,7 +14,7 @@ public class Lighter : CustomRole, IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnPlayerAdjustLighting(PlayerAdjustLightingEvent @event)
     {
-        if (GameStates.IsLobby || !GameStates.InGame) return true;
+        if (GameStates.InLobby || !GameStates.InGame) return true;
         var player = @event.Player;
         if (IsPlayerControlRole(player)) return true;
 
