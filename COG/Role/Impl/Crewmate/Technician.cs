@@ -16,7 +16,7 @@ public class Technician : CustomRole
     {
         RepairButton = CustomButton.Create(() =>
         {
-            RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.RepairAllSabotages).Finish();
+            RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ClearSabotages).Finish();
             RepairSabotages();
         },
         () => RepairButton.ResetCooldown(),
@@ -46,9 +46,12 @@ public class Technician : CustomRole
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnRpcReceived()
+    public void OnRpcReceived(PlayerHandleRpcEvent @event)
     {
-
+        if ((KnownRpc)@event.CallId == KnownRpc.ClearSabotages)
+        {
+            RepairSabotages();
+        }
     }
 
     public void RepairSabotages()
