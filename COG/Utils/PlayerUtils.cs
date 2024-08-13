@@ -72,7 +72,7 @@ public static class PlayerUtils
 
     public static List<PlayerControl> GetAllPlayers()
     {
-        return new List<PlayerControl>(PlayerControl.AllPlayerControls.ToArray().Where(p => p));
+        return new List<PlayerControl>(PlayerControl.AllPlayerControls.ToArray());
     }
 
     public static List<PlayerControl> GetAllAlivePlayers()
@@ -448,12 +448,6 @@ public class DeadPlayerListener : IListener
         _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
     }
 
-    [EventHandler(EventHandlerType.Prefix)]
-    private void OnCoBegin(IntroCutsceneCoBeginEvent _)
-    {
-        DeadPlayerManager.DeadPlayers.Clear();
-    }
-
     [EventHandler(EventHandlerType.Postfix)]
     private void OnPlayerExile(PlayerExileEndEvent @event)
     {
@@ -553,6 +547,7 @@ public class PlayerData
         Role = role;
         PlayerName = player.name;
         PlayerId = player.PlayerId;
+        ColorId = player.cosmetics.ColorId;
         Tags = new List<string>();
         SubRoles = subRoles != null
             ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
@@ -563,16 +558,8 @@ public class PlayerData
     public CustomRole Role { get; }
     public string PlayerName { get; }
     public byte PlayerId { get; }
+    public int ColorId { get; }
     public CustomRole[] SubRoles { get; }
     
     public List<string> Tags { get; }
-
-    public static CustomRole GetRole(string? playerName = null, byte? playerId = null)
-    {
-        return GameUtils.PlayerData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId) !=
-               null
-            ? GameUtils.PlayerData.FirstOrDefault(pr => pr.PlayerName == playerName || pr.PlayerId == playerId)!
-                .Role
-            : CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>();
-    }
 }

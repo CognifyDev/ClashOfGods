@@ -132,7 +132,7 @@ public partial class Main : BasePlugin
         {
             new CrewmatesCustomWinner(),
             new ImpostorsCustomWinner(),
-            new LastPlayerCustomWinner()
+            new LastPlayerCustomWinner(),
         });
 
         // Register roles

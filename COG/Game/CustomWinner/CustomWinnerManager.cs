@@ -19,7 +19,7 @@ public class CustomWinnerManager
         WinnableData = WinnableData.Of();
     }
 
-    public WinnableData WinnableData { get; private set; }
+    public WinnableData WinnableData { get; internal set; }
 
     public void RegisterCustomWinnable(IWinnable winnable)
     {
