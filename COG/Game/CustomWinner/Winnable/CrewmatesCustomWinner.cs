@@ -10,10 +10,10 @@ public class CrewmatesCustomWinner : IWinnable
 {
     public void CheckWin(WinnableData data)
     {
-        var taskComplete = PlayerUtils.GetAllPlayers().All(player => player.Data.IsIncomplete);
+        var taskComplete = PlayerUtils.GetAllPlayers().All(player => player.AllTasksCompleted());
         if (taskComplete ||
-            PlayerUtils.AllImpostors.Where(pair => pair.Player && !pair.Player.Data.IsDead)
-                .Select(pair => pair.Player).ToList().Count <= 0 
+            PlayerUtils.AllImpostors.Where(pair => pair.Player.IsAlive())
+                .Select(pair => pair.Player).ToList().Count <= 0
             && PlayerUtils.GetAllAlivePlayers().Select(p => p.GetMainRole()).Where(role => role.CanKill).ToArray().Length <= 0)
         {
             data.GameOverReason = taskComplete ? GameOverReason.HumansByTask : GameOverReason.HumansByVote;
