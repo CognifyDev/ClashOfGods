@@ -1,5 +1,6 @@
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
+using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.Utils;
 using COG.Utils.Coding;
@@ -15,31 +16,8 @@ public class Technician : CustomRole
     {
         RepairButton = CustomButton.Create(() =>
         {
-            var ship = ShipStatus.Instance;
-            var mapId = (MapNames)(AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay ?
-            AmongUsClient.Instance.TutorialMapId :
-            GameUtils.GetGameOptions().MapId);
-
-            ship.RepairCriticalSabotages();
-            if (ship.Systems.TryGetValueSafeIl2Cpp(SystemTypes.Electrical, out var system))
-            {
-                var elecSystem = system.TryCast<SwitchSystem>();
-                if (elecSystem != null) 
-                    elecSystem.ActualSwitches = elecSystem.ExpectedSwitches;
-            }
-
-            ship.UpdateSystem(SystemTypes.Comms, PlayerControl.LocalPlayer, 16 | 0);
-            ship.UpdateSystem(SystemTypes.Comms, PlayerControl.LocalPlayer, 16 | 1);
-
-            if (mapId != MapNames.Mira)
-                ship.AllDoors.ForEach(d => d.SetDoorway(true));
-
-            if (mapId == MapNames.Fungle)
-            {
-                var mixup = ship.Cast<FungleShipStatus>().specialSabotage;
-                if (mixup.IsActive)
-                    mixup.currentSecondsUntilHeal = 0.1f;
-            }
+            RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.RepairAllSabotages).Finish();
+            RepairSabotages();
         },
         () => RepairButton.ResetCooldown(),
         () => true,
@@ -64,6 +42,41 @@ public class Technician : CustomRole
         if (PlayerControl.LocalPlayer.AllTasksCompleted())
         {
             
+        }
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnRpcReceived()
+    {
+
+    }
+
+    public void RepairSabotages()
+    {
+        var ship = ShipStatus.Instance;
+        var mapId = (MapNames)(AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay ?
+        AmongUsClient.Instance.TutorialMapId :
+        GameUtils.GetGameOptions().MapId);
+
+        ship.RepairCriticalSabotages();
+        if (ship.Systems.TryGetValueSafeIl2Cpp(SystemTypes.Electrical, out var system))
+        {
+            var elecSystem = system.TryCast<SwitchSystem>();
+            if (elecSystem != null)
+                elecSystem.ActualSwitches = elecSystem.ExpectedSwitches;
+        }
+
+        ship.UpdateSystem(SystemTypes.Comms, PlayerControl.LocalPlayer, 16 | 0);
+        ship.UpdateSystem(SystemTypes.Comms, PlayerControl.LocalPlayer, 16 | 1);
+
+        if (mapId != MapNames.Mira)
+            ship.AllDoors.ForEach(d => d.SetDoorway(true));
+
+        if (mapId == MapNames.Fungle)
+        {
+            var mixup = ship.Cast<FungleShipStatus>().specialSabotage;
+            if (mixup.IsActive)
+                mixup.currentSecondsUntilHeal = 0.1f;
         }
     }
 

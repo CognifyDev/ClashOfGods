@@ -52,18 +52,35 @@ public class GameListener : IListener
                 // 开始读入数据
                 Main.Logger.LogDebug("The role data from the host was received by us.");
 
-                var originalText = reader.ReadString()!;
-                foreach (var s in originalText.Split(","))
-                {
-                    var texts = s.Split("|");
-                    var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
-                    var role = CustomRoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
-                    player!.SetCustomRole(role!);
-                }
+                    var count = reader.ReadPackedInt32();
+                    for (var i = 0; i < count; i++)
+                    {
+                        var player = PlayerUtils.GetPlayerById(reader.ReadByte());
+                        var mainRole = CustomRoleManager.GetManager().GetRoleById(reader.ReadPackedInt32());
+                        
+                        var subCount = reader.ReadPackedInt32();
+                        var subRoles = new List<CustomRole>();
+                        for (var j = 0; j < subCount; j++)
+                        {
 
-                foreach (var playerRole in GameUtils.PlayerData)
-                    Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
-                                        $" => {playerRole.Role.Name}");
+                        }
+
+                        if (!player || mainRole == null) return;
+                        player.SetCustomRole(mainRole);
+                    }
+
+                //var originalText = reader.ReadString()!;
+                //foreach (var s in originalText.Split(","))
+                //{
+                //    var texts = s.Split("|");
+                //    var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
+                //    var role = CustomRoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
+                //    player!.SetCustomRole(role!);
+                //}
+
+                //foreach (var playerRole in GameUtils.PlayerData)
+                //    Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
+                //                        $" => {playerRole.Role.Name}");
 
                 break;
             }
@@ -331,41 +348,14 @@ public class GameListener : IListener
             var subRoles = subRoleData.Where(pair => 
                 pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList()[0];
             
-            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles);
+            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles); // 先本地设置职业，后面ShareRole会把职业发出去的
         }
-        
-        GameUtils.PlayerData.ForEach(data =>
-        {
-            var player = data.Player;
-            var role = data.Role;
-            RoleManager.Instance.SetRole(player, role.BaseRoleType);
-            
-            player.RpcMark(BaseRoleSetPrefix + (ushort) role.BaseRoleType);
-        });
         
         // 打印职业分配信息
         foreach (var playerRole in GameUtils.PlayerData)
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                 $" => {playerRole.Role.GetNormalName()}" +
                                 $"{playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}");
-    }
-    
-    private const string BaseRoleSetPrefix = "BASE_ROLE_SET_";
-    
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
-    {
-        if (AmongUsClient.Instance.AmHost) return;
-        foreach (var player in PlayerUtils.GetAllPlayers())
-        {
-            var marks = player.GetMarks().Where(mark => mark.StartsWith(BaseRoleSetPrefix));
-            var enumerable = marks as string[] ?? marks.ToArray();
-            if (!enumerable.Any()) continue;
-            var mark = enumerable[0];
-            var baseRole = (RoleTypes) ushort.Parse(mark.Replace(BaseRoleSetPrefix, ""));
-            RoleManager.Instance.SetRole(player, baseRole);
-            player.GetPlayerData()?.Tags.Remove(mark);
-        }
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -557,20 +547,16 @@ public class GameListener : IListener
     {
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, (byte)KnownRpc.ShareRoles);
 
-        var sb = new StringBuilder();
+        writer.WritePacked(GameUtils.PlayerData.Count);
 
-        for (var i = 0; i < GameUtils.PlayerData.Count; i++)
+        foreach (var playerRole in GameUtils.PlayerData)
         {
-            var playerRole = GameUtils.PlayerData[i];
-            sb.Append(playerRole.Player.PlayerId + "|" + playerRole.Role.Id);
+            writer.Write(playerRole.PlayerId).WritePacked(playerRole.Role.Id);
 
-            if (i + 1 < GameUtils.PlayerData.Count) sb.Append(',');
+            writer.WritePacked(playerRole.SubRoles.Length);
+            foreach (var subRole in playerRole.SubRoles)
+                writer.Write(subRole.Id);
         }
-
-        writer.Write(sb.ToString());
-
-        // 职业格式应该是
-        // playerId1|roleId1,playerId2|roleId2 
 
         writer.Finish();
     }

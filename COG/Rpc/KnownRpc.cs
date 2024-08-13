@@ -12,5 +12,6 @@ public enum KnownRpc : uint
     
     Revive = 206,
     NotifySettingChange = 207,
-    Mark = 208
+    Mark = 208,
+    RepairAllSabotages = 209
 }
