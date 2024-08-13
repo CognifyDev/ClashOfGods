@@ -11,18 +11,16 @@ public class ImpostorsCustomWinner : IWinnable
     public void CheckWin(WinnableData data)
     {
         var aliveImpostors = PlayerUtils.AllImpostors.Select(pair => pair.Player).Where
-            (p => p && p.IsAlive()).ToList();
+            (p => p.IsAlive()).ToList();
         var aliveNeutrals = PlayerUtils.AllNeutrals.Select(pair => pair.Player).Where
-            (p => p && p.IsAlive()).ToList();
+            (p => p.IsAlive()).ToList();
+        var aliveCrewmates = PlayerUtils.AllCrewmates.Select(pair => pair.Player).Where
+            (p => p.IsAlive()).ToList();
         GameUtils.PlayerData.Where
                 (pair => pair.Role.CampType == CampType.Impostor).ToList()
             .ForEach(pair => aliveImpostors.Add(pair.Player));
-        if (aliveImpostors.Count >= PlayerUtils.AllCrewmates
-                .Select(pair => pair.Player).Where
-                    (p => p && p.IsAlive())
-                .ToList().Count
-            && aliveNeutrals.Where
-                (p => p.GetMainRole().CanKill).ToList().Count <= 0)
+        if (aliveImpostors.Count >= aliveCrewmates.Count && 
+            aliveNeutrals.Where(p => p.GetMainRole().CanKill).ToList().Count <= 0)
         {
             EndGame(data, true);
         }

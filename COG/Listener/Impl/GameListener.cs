@@ -57,6 +57,7 @@ public class GameListener : IListener
                     var bytes = reader.ReadBytesAndSize().ToArray();
                     var data = bytes.DeserializeToData<SerializablePlayerData>().AsPlayerData();
                     GameUtils.PlayerData.Add(data);
+                    data.Player.SetCustomRole(data.Role, data.SubRoles);
                 }
 /*
                 var originalText = reader.ReadString()!;
@@ -371,41 +372,14 @@ public class GameListener : IListener
 
             var subRoles = subRolesList.Any() ? subRolesList[0] : Array.Empty<CustomRole>();
             
-            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles);
+            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles); // 先本地设置职业，后面ShareRole会把职业发出去的
         }
-        
-        GameUtils.PlayerData.ForEach(data =>
-        {
-            var player = data.Player;
-            var role = data.Role;
-            RoleManager.Instance.SetRole(player, role.BaseRoleType);
-            
-            player.RpcMark(BaseRoleSetPrefix + (ushort) role.BaseRoleType);
-        });
         
         // 打印职业分配信息
         foreach (var playerRole in GameUtils.PlayerData)
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
                                 $" => {playerRole.Role.GetNormalName()}" +
                                 $"{playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}");
-    }
-    
-    private const string BaseRoleSetPrefix = "BASE_ROLE_SET_";
-    
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
-    {
-        if (AmongUsClient.Instance.AmHost) return;
-        foreach (var player in PlayerUtils.GetAllPlayers())
-        {
-            var marks = player.GetMarks().Where(mark => mark.StartsWith(BaseRoleSetPrefix));
-            var enumerable = marks as string[] ?? marks.ToArray();
-            if (!enumerable.Any()) continue;
-            var mark = enumerable[0];
-            var baseRole = (RoleTypes) ushort.Parse(mark.Replace(BaseRoleSetPrefix, ""));
-            RoleManager.Instance.SetRole(player, baseRole);
-            player.GetPlayerData()?.Tags.Remove(mark);
-        }
     }
 
     [EventHandler(EventHandlerType.Postfix)]

@@ -32,13 +32,13 @@ public static class PlayerUtils
     public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
 
     public static IEnumerable<PlayerData> AllImpostors =>
-        GameUtils.PlayerData.Where(pair => pair.Role.CampType == CampType.Impostor);
+        GameUtils.PlayerData.Where(pair => pair.Player && pair.Role.CampType == CampType.Impostor);
 
     public static IEnumerable<PlayerData> AllCrewmates =>
-        GameUtils.PlayerData.Where(pair => pair.Role.CampType == CampType.Crewmate);
+        GameUtils.PlayerData.Where(pair => pair.Player && pair.Role.CampType == CampType.Crewmate);
 
     public static IEnumerable<PlayerData> AllNeutrals =>
-        GameUtils.PlayerData.Where(pair => pair.Role.CampType == CampType.Neutral);
+        GameUtils.PlayerData.Where(pair => pair.Player && pair.Role.CampType == CampType.Neutral);
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家
@@ -357,9 +357,8 @@ public static class PlayerUtils
 
         GameUtils.PlayerData.Add(new PlayerData(pc, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
-        pc.RpcSetRole(role.BaseRoleType, true);
 
-        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has set to {role.GetType().Name}");
+        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has set to {role.GetNormalName()}");
     }
 
     public static void SetCustomRole<T>(this PlayerControl pc) where T : CustomRole

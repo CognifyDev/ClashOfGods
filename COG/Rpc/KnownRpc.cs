@@ -10,5 +10,6 @@ public enum KnownRpc : uint
     Revive = 104,
     NotifySettingChange = 105,
     Mark = 106,
-    ShareOptions = 107
+    ShareOptions = 107,
+    ClearSabotages = 108
 }

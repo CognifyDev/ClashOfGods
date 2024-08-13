@@ -249,7 +249,7 @@ public abstract class CustomRole
     public void AddButton(CustomButton button, Func<bool>? hasButton = null)
     {
         hasButton ??= () => PlayerControl.LocalPlayer.IsRole(this);
-        button.HasButton = hasButton;
+        button.HasButton += hasButton;
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
