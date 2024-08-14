@@ -76,7 +76,7 @@ public static class PlayerUtils
 
     public static List<PlayerControl> GetAllAlivePlayers()
     {
-        return GetAllPlayers().ToArray().Where(player => player != null && player.IsAlive()).ToList();
+        return GetAllPlayers().ToArray().Where(player => player.IsAlive()).ToList();
     }
 
     public static bool IsSamePlayer(this NetworkedPlayerInfo info, NetworkedPlayerInfo target)
@@ -98,7 +98,12 @@ public static class PlayerUtils
 
     public static PlayerData? GetPlayerData(this PlayerControl player)
     {
-        return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.IsSamePlayer(player));
+        return player.Data.GetPlayerData();
+    }
+
+    public static PlayerData? GetPlayerData(this NetworkedPlayerInfo player)
+    {
+        return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.Data.IsSamePlayer(player));
     }
 
     /// <summary>
@@ -167,7 +172,12 @@ public static class PlayerUtils
 
     public static CustomRole GetMainRole(this PlayerControl player)
     {
-        return GameUtils.PlayerData.FirstOrDefault(d=>d.Player.IsSamePlayer(player))?.Role ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
+        return GameUtils.PlayerData.FirstOrDefault(d => d.Player.IsSamePlayer(player))?.Role ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
+    }
+
+    public static CustomRole GetMainRole(this NetworkedPlayerInfo player)
+    {
+        return GameUtils.PlayerData.FirstOrDefault(d => d.Data.IsSamePlayer(player))?.Role ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 
     public static void SetNamePrivately(PlayerControl target, PlayerControl seer, string name)
@@ -390,11 +400,14 @@ public static class PlayerUtils
 
     public static CustomRole[] GetSubRoles(this PlayerControl pc)
     {
+        return pc.Data.GetSubRoles();
+    }
+
+    public static CustomRole[] GetSubRoles(this NetworkedPlayerInfo pc)
+    {
         var data = pc.GetPlayerData();
         if (data == null)
-        {
             return Array.Empty<CustomRole>();
-        }
         return data.SubRoles;
     }
 
@@ -543,6 +556,7 @@ public class PlayerData
     public PlayerData(PlayerControl player, CustomRole role, CustomRole[]? subRoles = null)
     {
         Player = player;
+        Data = player.Data;
         Role = role;
         PlayerName = player.name;
         PlayerId = player.PlayerId;
@@ -554,6 +568,8 @@ public class PlayerData
     }
     
     public PlayerControl Player { get; }
+    public NetworkedPlayerInfo Data { get; }
+    public bool IsDisconnected => Data.Disconnected;
     public CustomRole Role { get; }
     public string PlayerName { get; }
     public byte PlayerId { get; }

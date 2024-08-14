@@ -255,7 +255,7 @@ public abstract class CustomRole
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
-    public virtual string HandleEjectText(PlayerControl player)
+    public virtual string HandleEjectText(NetworkedPlayerInfo player)
     {
         var role = player.GetMainRole();
         var sb = new StringBuilder(role.GetColorName());
@@ -263,7 +263,7 @@ public abstract class CustomRole
         foreach (var subRole in player.GetSubRoles())
             sb.Append(' ').Append(subRole.GetColorName());
 
-        return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, sb.ToString());
+        return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.PlayerName, sb.ToString());
     }
 
     public virtual string HandleAdditionalPlayerName()
