@@ -202,7 +202,6 @@ public partial class Main : BasePlugin
         // Register custom buttons
         CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
         
-
         Harmony.PatchAll();
 
         foreach (var plugin in PluginManager.GetPlugins()) plugin.OnEnable();

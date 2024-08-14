@@ -25,6 +25,14 @@ public static class RoleOptionPatch
     public static float ScrollerLocationPercent { get; set; }
     public static Dictionary<CampType, (GameObject, PassiveButton)> CampTabs { get; } = new();
 
+    [HarmonyPatch(nameof(RolesSettingsMenu.CreateAdvancedSettings))]
+    [HarmonyPrefix]
+    private static void BeforeSettingCreation(RolesSettingsMenu __instance)
+    {
+        __instance.advancedSettingChildren = new();
+    }
+
+
     [HarmonyPatch(nameof(RolesSettingsMenu.OnEnable))]
     [HarmonyPostfix]
     private static void OnMenuInitialization(RolesSettingsMenu __instance)
@@ -211,14 +219,7 @@ public static class RoleOptionPatch
                     var scroller = menu.scrollBar;
                     ScrollerLocationPercent = scroller.GetScrollPercY();
                     scroller.ScrollToTop();
-                    try
-                    {
-                        menu.ChangeTab(role.VanillaCategory, button);
-                    }
-                    catch
-                    {
-                        // Ignored
-                    }
+                    menu.ChangeTab(role.VanillaCategory, button);
                 }));
             }
             
