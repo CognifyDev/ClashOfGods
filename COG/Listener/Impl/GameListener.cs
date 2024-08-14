@@ -593,16 +593,17 @@ public class GameListener : IListener
         if (!GameUtils.GetGameOptions().ConfirmImpostor) return;
 
         var controller = @event.ExileController;
-        var player = @event.Player;
+        var state = @event.ExileState;
+        var exiled = state.networkedPlayer;
 
         var crewCount = GetCount(PlayerUtils.AllCrewmates);
         var impCount = GetCount(PlayerUtils.AllImpostors);
         var neutralCount = GetCount(PlayerUtils.AllNeutrals);
         
-        if (player != null)
+        if (!state.voteTie && exiled && (state.confirmImpostor || PlayerControl.LocalPlayer.Data.IsDead))
         {
-            var role = player.GetMainRole();
-            controller.completeString = role.HandleEjectText(player);
+            var role = exiled.GetMainRole();
+            controller.completeString = role.HandleEjectText(state.networkedPlayer);
         }
         
         controller.ImpostorText.text =
@@ -611,8 +612,8 @@ public class GameListener : IListener
 
         int GetCount(IEnumerable<PlayerData> list)
         {
-            return list.Select(p => p.Player)
-                .Count(p => !p.IsSamePlayer(player) && p.IsAlive());
+            return list.Select(p => p.Data)
+                .Count(p => !p.IsDead);
         }
     }
 

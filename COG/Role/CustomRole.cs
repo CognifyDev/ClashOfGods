@@ -71,7 +71,7 @@ public abstract class CustomRole
                 new IntOptionValueRule(0, 1, 15, 0));
             RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 0));
             
-            CreateOption(() => LanguageConfig.Instance.RoleCode, 
+            RoleCode = CreateOption(() => LanguageConfig.Instance.RoleCode, 
                 new StringOptionValueRule(0, _ => new[] {Id.ToString()}));
         }
     }
@@ -172,6 +172,8 @@ public abstract class CustomRole
     /// </summary>
     public CustomOption? RoleChanceOption { get; }
 
+    public CustomOption? RoleCode { get; }
+
     /// <summary>
     ///     职业是否已启用
     /// </summary>
@@ -253,7 +255,7 @@ public abstract class CustomRole
         CustomButtonManager.GetManager().RegisterCustomButton(button);
     }
 
-    public virtual string HandleEjectText(PlayerControl player)
+    public virtual string HandleEjectText(NetworkedPlayerInfo player)
     {
         var role = player.GetMainRole();
         var sb = new StringBuilder(role.GetColorName());
@@ -261,7 +263,7 @@ public abstract class CustomRole
         foreach (var subRole in player.GetSubRoles())
             sb.Append(' ').Append(subRole.GetColorName());
 
-        return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.Data.PlayerName, sb.ToString());
+        return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.PlayerName, sb.ToString());
     }
 
     public virtual string HandleAdditionalPlayerName()

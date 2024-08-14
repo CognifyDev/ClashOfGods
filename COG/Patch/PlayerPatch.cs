@@ -104,15 +104,15 @@ internal class HostStartPatch
     public static void Postfix(GameStartManager __instance)
     {
         // showtime
-        if (_update) _currentText = __instance.PlayerCounter.text;
-        if (!AmongUsClient.Instance.AmHost) return;
-        Timer = Mathf.Max(0f, Timer -= Time.deltaTime);
-        var minutes = (int)Timer / 60;
-        var seconds = (int)Timer % 60;
+        //if (_update) _currentText = __instance.PlayerCounter.text;
+        //if (!AmongUsClient.Instance.AmHost) return;
+        //Timer = Mathf.Max(0f, Timer -= Time.deltaTime);
+        //var minutes = (int)Timer / 60;
+        //var seconds = (int)Timer % 60;
 
-        var suffix = $"({minutes:00}:{seconds:00})";
-        __instance.PlayerCounter.text = _currentText + suffix;
-        __instance.PlayerCounter.autoSizeTextContainer = true;
+        //var suffix = $"({minutes:00}:{seconds:00})";
+        //__instance.PlayerCounter.text = _currentText + suffix;
+        //__instance.PlayerCounter.autoSizeTextContainer = true;
     }
 }
 

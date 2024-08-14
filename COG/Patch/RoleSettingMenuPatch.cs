@@ -8,11 +8,15 @@ using COG.Constant;
 using COG.Role;
 using COG.UI.CustomOption;
 using COG.Utils;
+using Rewired;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace COG.Patch;
+
+// FIXME
+// 有时候勾选框的背景会消失
 
 [HarmonyPatch(typeof(RolesSettingsMenu))]
 public static class RoleOptionPatch
@@ -23,12 +27,24 @@ public static class RoleOptionPatch
     public static PassiveButton? CurrentButton { get; set; }
 
     public static float ScrollerLocationPercent { get; set; }
-    public static Dictionary<CampType, (GameObject, PassiveButton)> CampTabs { get; } = new();
+    public static Dictionary<CampType, (GameObject gameObject, PassiveButton tabButton)> CampTabs { get; } = new();
+
+    [HarmonyPatch(nameof(RolesSettingsMenu.CreateAdvancedSettings))]
+    [HarmonyPrefix]
+    private static void BeforeSettingCreation(RolesSettingsMenu __instance)
+    {
+        __instance.advancedSettingChildren ??= new();
+        foreach (var behaviour in __instance.advancedSettingChildren)
+            behaviour.gameObject.Destroy();
+        __instance.advancedSettingChildren.Clear(); // Fix advanced tab couldn't be opened
+    }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.OnEnable))]
     [HarmonyPostfix]
     private static void OnMenuInitialization(RolesSettingsMenu __instance)
     {
+        if (CampTabs.Count != 0) return;
+
         Main.Logger.LogDebug("======== Start to initialize custom role options... ========");
 
         // Fix button is unselected when open at the first time
@@ -52,6 +68,18 @@ public static class RoleOptionPatch
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
         
         chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.Destroy();
+    }
+
+    [HarmonyPatch(nameof(RolesSettingsMenu.Update))]
+    [HarmonyPrefix]
+    public static bool OnMenuUpdate(RolesSettingsMenu __instance)
+    {
+        if (__instance.cachedData != GameOptionsManager.Instance.CurrentGameOptions.RoleOptions)
+        {
+            __instance.cachedData = GameOptionsManager.Instance.CurrentGameOptions.RoleOptions;
+            __instance.RefreshChildren();
+        }
+        return false;
     }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.ChangeTab))]
@@ -87,8 +115,10 @@ public static class RoleOptionPatch
             customOption.OptionBehaviour = option;
             option.OnValueChanged = new Action<OptionBehaviour>(_ => { });
         }
-    }
 
+        CurrentAdvancedTabFor.RoleCode!.OptionBehaviour!.SetAsPlayer();
+    }
+    
     [HarmonyPatch(nameof(RolesSettingsMenu.OpenChancesTab))]
     [HarmonyPrefix]
     public static bool OnChanceTabOpened(RolesSettingsMenu __instance)
@@ -211,14 +241,7 @@ public static class RoleOptionPatch
                     var scroller = menu.scrollBar;
                     ScrollerLocationPercent = scroller.GetScrollPercY();
                     scroller.ScrollToTop();
-                    try
-                    {
-                        menu.ChangeTab(role.VanillaCategory, button);
-                    }
-                    catch
-                    {
-                        // Ignored
-                    }
+                    menu.ChangeTab(role.VanillaCategory, button);
                 }));
             }
             
@@ -286,6 +309,7 @@ public static class RoleOptionPatch
     {
         menu.AdvancedRolesSettings.SetActive(false);
         CurrentAdvancedTabFor = null;
+        //menu.selectedRoleTab = CampTabs.Values.Select(pair => pair.gameObject).ToList().IndexOf(newTab);
 
         CloseAllTab(menu);
         OpenTab(newTab, toSelect);
