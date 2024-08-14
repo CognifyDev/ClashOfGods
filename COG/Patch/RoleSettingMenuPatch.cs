@@ -25,7 +25,7 @@ public static class RoleOptionPatch
     public static float ScrollerLocationPercent { get; set; }
     public static Dictionary<CampType, (GameObject, PassiveButton)> CampTabs { get; } = new();
 
-    [HarmonyPatch(nameof(RolesSettingsMenu.Start))]
+    [HarmonyPatch(nameof(RolesSettingsMenu.OnEnable))]
     [HarmonyPostfix]
     private static void OnMenuInitialization(RolesSettingsMenu __instance)
     {
@@ -221,7 +221,7 @@ public static class RoleOptionPatch
                     }
                 }));
             }
-
+            
             roleSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
             {
                 var setting = ob.Cast<RoleOptionSetting>();

@@ -450,7 +450,7 @@ public class DeadPlayerListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     private void OnPlayerExile(PlayerExileEndEvent @event)
     {
-        var exiled = @event.ExileController.exiled;
+        var exiled = @event.ExileController.initData.networkedPlayer;
         if (exiled == null) return;
         if (DeadPlayerManager.DeadPlayers.Select(dp => dp.Player).Contains(exiled.Object)) return;
         _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, exiled.Object, null);

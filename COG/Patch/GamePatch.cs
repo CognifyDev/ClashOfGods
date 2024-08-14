@@ -307,7 +307,7 @@ public class GameStartManagerBeginGamePatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CompleteTask))]
 public class PlayerControlCompleteTaskPatch
 {
-    public static bool Prefix(PlayerControl __instance, uint idx)
+    public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] uint idx)
     {
         return ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerTaskFinishEvent(__instance, idx), EventHandlerType.Prefix);
@@ -323,18 +323,19 @@ public class PlayerControlCompleteTaskPatch
 [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
 public class ExileControllerBeginPatch
 {
-    public static bool Prefix(ExileController __instance, NetworkedPlayerInfo exiled, bool tie)
+    public static bool Prefix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
     {
         return ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie),
+            .ExecuteHandlers(new PlayerExileBeginEvent(init.networkedPlayer.Object, __instance, init.networkedPlayer, init.voteTie),
                 EventHandlerType.Prefix);
     }
 
-    public static void Postfix(ExileController __instance, [HarmonyArgument(0)] NetworkedPlayerInfo exiled,
-        [HarmonyArgument(1)] bool tie)
+    public static void Postfix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
     {
-        ListenerManager.GetManager().ExecuteHandlers(new PlayerExileBeginEvent(exiled?.Object, __instance, exiled, tie),
-            EventHandlerType.Postfix);
+        ListenerManager.GetManager()
+            .ExecuteHandlers(
+                new PlayerExileBeginEvent(init.networkedPlayer.Object, __instance, init.networkedPlayer, init.voteTie),
+                EventHandlerType.Postfix);
     }
 }
 

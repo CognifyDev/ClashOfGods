@@ -59,6 +59,8 @@ public class CustomWinnerListener : IListener
 
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
+        Main.Logger.LogInfo(EndGameResult.CachedWinners.ToArray().Select(winner => winner.PlayerName)
+            .ToArray().AsString());
         manager.transform.GetComponentsInChildren<PoolablePlayer>().ForEach(p =>
         {
             var data = GameUtils.PlayerData.FirstOrDefault(d => d.ColorId == p.ColorId);
