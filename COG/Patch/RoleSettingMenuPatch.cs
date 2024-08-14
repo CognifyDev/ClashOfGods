@@ -14,6 +14,9 @@ using UnityEngine.UI;
 
 namespace COG.Patch;
 
+// FIXME
+// 有时候勾选框的背景会消失
+
 [HarmonyPatch(typeof(RolesSettingsMenu))]
 public static class RoleOptionPatch
 {
@@ -29,7 +32,7 @@ public static class RoleOptionPatch
     [HarmonyPrefix]
     private static void BeforeSettingCreation(RolesSettingsMenu __instance)
     {
-        __instance.advancedSettingChildren = new();
+        __instance.advancedSettingChildren = new(); // Fix advanced tab couldn't be opened
     }
 
 
@@ -95,8 +98,10 @@ public static class RoleOptionPatch
             customOption.OptionBehaviour = option;
             option.OnValueChanged = new Action<OptionBehaviour>(_ => { });
         }
-    }
 
+        CurrentAdvancedTabFor.RoleCode!.OptionBehaviour!.SetAsPlayer();
+    }
+    
     [HarmonyPatch(nameof(RolesSettingsMenu.OpenChancesTab))]
     [HarmonyPrefix]
     public static bool OnChanceTabOpened(RolesSettingsMenu __instance)

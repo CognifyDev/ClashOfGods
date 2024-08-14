@@ -71,7 +71,7 @@ public abstract class CustomRole
                 new IntOptionValueRule(0, 1, 15, 0));
             RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 0));
             
-            CreateOption(() => LanguageConfig.Instance.RoleCode, 
+            RoleCode = CreateOption(() => LanguageConfig.Instance.RoleCode, 
                 new StringOptionValueRule(0, _ => new[] {Id.ToString()}));
         }
     }
@@ -171,6 +171,8 @@ public abstract class CustomRole
     ///     职业几率的选项
     /// </summary>
     public CustomOption? RoleChanceOption { get; }
+
+    public CustomOption? RoleCode { get; }
 
     /// <summary>
     ///     职业是否已启用
