@@ -1,5 +1,4 @@
 using COG.Role;
-using COG.Rpc;
 using COG.Utils;
 
 namespace COG.States;

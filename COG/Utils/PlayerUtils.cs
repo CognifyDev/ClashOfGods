@@ -6,7 +6,6 @@ using AmongUs.Data;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
-using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;

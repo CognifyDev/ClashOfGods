@@ -4,7 +4,6 @@ using System.Text;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
-using COG.Game.CustomWinner.Data;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Role;

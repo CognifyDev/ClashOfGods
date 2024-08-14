@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener.Event;
-using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.GSManager;
 using COG.Listener.Event.Impl.HManager;
@@ -386,6 +384,7 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
+        
         if (!AmongUsClient.Instance.AmHost) return;
         
         Main.Logger.LogInfo("Select roles for players...");
