@@ -15,9 +15,6 @@ using UnityEngine.UI;
 
 namespace COG.Patch;
 
-// FIXME
-// 有时候勾选框的背景会消失
-
 [HarmonyPatch(typeof(RolesSettingsMenu))]
 public static class RoleOptionPatch
 {

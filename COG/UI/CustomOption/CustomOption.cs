@@ -60,6 +60,7 @@ public sealed class CustomOption
         set
         {
             _selection = value;
+            Object.FindObjectOfType<RolesSettingsMenu>()?.RefreshChildren();
             NotifySettingChange();
         }
     }
