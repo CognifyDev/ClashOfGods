@@ -99,7 +99,7 @@ public abstract class CustomRole
     /// </summary>
     public string Name { get; }
     
-    private string GetContextFromLanguage(string context)
+    protected string GetContextFromLanguage(string context)
     {
         var campName = IsSubRole ? "sub-roles" : Enum.GetName(typeof(CampType), CampType)!.ToLower();
         var location = $"role.{campName}.{GetNameInConfig()}.{context}";
@@ -234,7 +234,7 @@ public abstract class CustomRole
         AllOptions.Add(option.Register());
     }
 
-    public bool IsPlayerControlRole(PlayerControl target)
+    public bool IsLocalPlayerRole(PlayerControl target)
     {
         return PlayerControl.LocalPlayer.IsSamePlayer(target) && target.IsRole(this);
     }

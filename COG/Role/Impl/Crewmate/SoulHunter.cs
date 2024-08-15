@@ -67,7 +67,7 @@ public class SoulHunter : CustomRole, IListener
     {
         if (!GameStates.InGame) return;
         var target = @event.Target;
-        if (!IsPlayerControlRole(target)) return;
+        if (!IsLocalPlayerRole(target)) return;
         if (target.HasMarkAs(HasRevivedTag)) return;
         _position = target.transform.position;
         Coroutines.Start(Revive());
