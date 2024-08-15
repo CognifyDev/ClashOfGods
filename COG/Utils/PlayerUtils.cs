@@ -224,12 +224,15 @@ public static class PlayerUtils
         return !player.Data.IsDead;
     }
 
-    public static bool IsRole(this PlayerControl? player, CustomRole role)
+    public static bool IsRole(this PlayerControl player, CustomRole role)
     {
-        if (player == null)
-        {
-            return false;
-        }
+        return player?.Data?.IsRole(role) ?? false;
+    }
+
+    public static bool IsRole(this NetworkedPlayerInfo player, CustomRole role)
+    {
+        if (!player) return false; // 在对局内只要是游戏正式开始时在游戏内的玩家，玩家的NetworkedPlayerInfo绝对不为空
+        
         var targetRole = player.GetPlayerData();
         return targetRole != null && (targetRole.Role.Id.Equals(role.Id) || targetRole.SubRoles.Contains(role));
     }
@@ -339,6 +342,11 @@ public static class PlayerUtils
     public static bool IsRole<T>(this PlayerControl pc) where T : CustomRole
     {
         return IsRole(pc, CustomRoleManager.GetManager().GetTypeRoleInstance<T>());
+    }
+
+    public static bool IsRole<T>(this NetworkedPlayerInfo data) where T : CustomRole
+    {
+        return IsRole(data, CustomRoleManager.GetManager().GetTypeRoleInstance<T>());
     }
 
     public static PlayerControl? SetClosestPlayerOutline(this PlayerControl pc, Color color, bool checkDist = true)
@@ -501,6 +509,7 @@ public class DeadPlayer
         DeadTime = deadTime;
         DeathReason = deathReason;
         Player = player;
+        Data = Player.Data;
         Killer = killer;
         Role = player.GetMainRole();
         PlayerId = player.PlayerId;
@@ -509,7 +518,8 @@ public class DeadPlayer
 
     public DateTime DeadTime { get; private set; }
     public DeathReason? DeathReason { get; }
-    public PlayerControl Player { get; }
+    public PlayerControl? Player { get; }
+    public NetworkedPlayerInfo Data { get; }
     public PlayerControl? Killer { get; }
     public CustomRole? Role { get; private set; }
     public byte PlayerId { get; }

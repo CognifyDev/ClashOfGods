@@ -28,16 +28,16 @@ public class Jester : CustomRole, IListener, IWinnable
     public void CheckWin(WinnableData data)
     {
         var jesters = DeadPlayerManager.DeadPlayers.Where(dp =>
-            dp.Player.IsRole(this) && dp.DeathReason == Utils.DeathReason.Exiled);
+            dp.Data.IsRole(this) && dp.DeathReason == Utils.DeathReason.Exiled);
 
-        var deadPlayers = jesters as DeadPlayer[] ?? jesters.ToArray();
+        var deadPlayers = jesters.ToArray();
         if (!deadPlayers.Any()) return;
 
         data.WinnableCampType = CampType; 
         data.WinText = "Jester wins";
         data.WinColor = Color;
         data.WinnablePlayers.Clear();
-        data.WinnablePlayers.Add(deadPlayers.ToArray()[0].Player);
+        data.WinnablePlayers.Add(deadPlayers[0].Data);
         data.Winnable = true;
     }
 

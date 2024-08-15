@@ -12,7 +12,7 @@ public class WinnableData
 
     public GameOverReason GameOverReason { get; set; } = GameOverReason.ImpostorByKill;
 
-    public List<PlayerControl> WinnablePlayers { get; } = new();
+    public List<NetworkedPlayerInfo> WinnablePlayers { get; } = new();
 
     public CampType WinnableCampType { get; set; } = CampType.Unknown;
     

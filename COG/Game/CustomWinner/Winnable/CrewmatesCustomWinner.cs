@@ -18,7 +18,7 @@ public class CrewmatesCustomWinner : IWinnable
         {
             data.GameOverReason = taskComplete ? GameOverReason.HumansByTask : GameOverReason.HumansByVote;
             data.WinnableCampType = CampType.Crewmate;
-            data.WinnablePlayers.AddRange(PlayerUtils.AllCrewmates.Select(p => p.Player));
+            data.WinnablePlayers.AddRange(PlayerUtils.AllCrewmates.Select(p => p.Data));
             data.WinText = LanguageConfig.Instance.CrewmatesWinText;
             data.WinColor = Palette.CrewmateBlue;
             data.Winnable = true;
