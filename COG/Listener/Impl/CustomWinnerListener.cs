@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using COG.Config.Impl;
@@ -6,17 +8,22 @@ using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.Player;
 using COG.Role;
+using COG.Rpc;
 using COG.States;
 using COG.Utils;
+using Reactor.Utilities;
 using TMPro;
 using UnityEngine;
+using static Il2CppSystem.Globalization.CultureInfo;
 
 namespace COG.Listener.Impl;
 
 public class CustomWinnerListener : IListener
 {
     private static readonly int Color1 = Shader.PropertyToID("_Color");
+    private static readonly List<CachedPlayerData> WinnerData = new();
     
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent _)
@@ -25,13 +32,27 @@ public class CustomWinnerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnCheckGameEnd(GameCheckEndEvent @event)
+    public bool OnCheckGameEnd(GameCheckEndEvent _)
     {
-        if (GlobalCustomOptionConstant.DebugMode.GetBool()) return false;
+        if (GlobalCustomOptionConstant.DebugMode.GetBool() || !AmongUsClient.Instance.AmHost) return false;
         var checkForGameEnd = CustomWinnerManager.GetManager().CheckForGameEnd();
         if (checkForGameEnd.Winnable)
-            GameManager.Instance.RpcEndGame(checkForGameEnd.GameOverReason, false);
+            Coroutines.Start(CoShareGameEnd());
         return false;
+
+        IEnumerator CoShareGameEnd()
+        {
+            var data = CustomWinnerManager.GetManager().WinnableData;
+
+            var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareWinners);
+            
+            writer.WriteBytesAndSize(data.WinnablePlayers.Select(p => p.PlayerId).ToArray());
+            writer.Finish();
+
+            yield return new WaitForSeconds(AmongUsClient.Instance.Ping / 1000); // Wait for other players receiving RPC
+
+            GameManager.Instance.RpcEndGame(checkForGameEnd.GameOverReason, false);
+        }
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -39,13 +60,24 @@ public class CustomWinnerListener : IListener
     {
         var endGameResult = @event.GetEndGameResult();
         var data = CustomWinnerManager.GetManager().WinnableData;
-        EndGameResult.CachedWinners.Clear();
-        EndGameResult.CachedWinners = data.WinnablePlayers
-            .Select(player => new CachedPlayerData(player.Data)).ToList().ToIl2CppList();
         endGameResult.GameOverReason = data.GameOverReason;
         EndGameResult.CachedGameOverReason = data.GameOverReason;
+
+        EndGameResult.CachedWinners.Clear();
+        EndGameResult.CachedWinners = WinnerData.ToIl2CppList();
+        WinnerData.Clear();
     }
-    
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnRpcReceived(PlayerHandleRpcEvent @event)
+    {
+        if (@event.CallId == (byte)KnownRpc.ShareWinners)
+        {
+            WinnerData.Clear();
+            WinnerData.AddRange(@event.Reader.ReadBytesAndSize().Select(id => new CachedPlayerData(GameData.Instance.GetPlayerById(id))));
+        }
+    }
+
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {

@@ -1,6 +1,7 @@
 using COG.Game.CustomWinner;
 using COG.Role;
 using COG.Utils;
+using System.Linq;
 using UnityEngine;
 
 namespace COG.Patch;
@@ -16,7 +17,7 @@ public static class KeyboardJoystickPatch
             data.WinColor = Color.white;
             data.Winnable = true;
             data.WinnableCampType = CampType.Crewmate | CampType.Neutral | CampType.Impostor | CampType.Unknown;
-            data.WinnablePlayers.AddRange(PlayerUtils.GetAllPlayers());
+            data.WinnablePlayers.AddRange(PlayerUtils.GetAllPlayers().Select(p => p.Data));
             data.WinText = "Force End";
             GameManager.Instance.RpcEndGame(GameOverReason.HumansByVote, false);
         }

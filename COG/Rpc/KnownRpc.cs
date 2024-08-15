@@ -11,5 +11,6 @@ public enum KnownRpc : uint
     NotifySettingChange = 105,
     Mark = 106,
     ShareOptions = 107,
-    ClearSabotages = 108
+    ClearSabotages = 108,
+    ShareWinners = 109
 }
