@@ -6,6 +6,7 @@ using COG.UI.CustomButton;
 using COG.Utils;
 using COG.Utils.Coding;
 using UnityEngine;
+using static Il2CppSystem.TimeZoneInfo;
 
 namespace COG.Role.Impl.Crewmate;
 
@@ -49,6 +50,12 @@ public class Technician : CustomRole
             var dist = float.MaxValue;
             var couldUse = (!player.MustCleanVent(vent.Id) || (player.inVent && Vent.currentVent == vent))
                 && !data.IsDead && (player.CanMove || player.inVent);
+            if (ShipStatus.Instance.Systems.TryGetValueSafeIl2Cpp(SystemTypes.Ventilation, out var systemType))
+            {
+                var ventilationSystem = systemType.Cast<VentilationSystem>();
+                if (ventilationSystem != null && ventilationSystem.IsVentCurrentlyBeingCleaned(vent.Id))
+                    couldUse = false;
+            }
             var canUse = couldUse;
             if (canUse)
             {
