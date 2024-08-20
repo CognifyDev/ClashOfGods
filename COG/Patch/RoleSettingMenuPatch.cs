@@ -306,7 +306,6 @@ public static class RoleOptionPatch
     {
         menu.AdvancedRolesSettings.SetActive(false);
         CurrentAdvancedTabFor = null;
-        //menu.selectedRoleTab = CampTabs.Values.Select(pair => pair.gameObject).ToList().IndexOf(newTab);
 
         CloseAllTab(menu);
         OpenTab(newTab, toSelect);
@@ -345,9 +344,35 @@ public static class RoleOptionPatch
 
     [HarmonyPatch(nameof(RolesSettingsMenu.CloseMenu))]
     [HarmonyPrefix]
-    public static void OnMenuClose()
+    public static void OnMenuClosing()
     {
         SetButtonActive(CurrentButton!, false);
         if (CurrentTab) CurrentTab!.SetActive(false);
+    }
+
+    [HarmonyPatch(nameof(RolesSettingsMenu.RefreshChildren))]
+    [HarmonyPostfix]
+    public static void OnMenuRefreshing()
+    {
+        if (AmongUsClient.Instance.AmHost) return; // This patch is for clients who are previewing the settings to update options when the host has changed settings
+
+        foreach (var option in CustomRoleManager.GetManager().GetRoles()
+                     .Where(r => r is { IsBaseRole: false, ShowInOptions: true }))
+        {
+            option.RoleNumberOption!.OptionBehaviour!.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
+            option.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
+            {
+                var behaviour = o.OptionBehaviour!;
+                NumberOption numberOption = null!;
+                StringOption stringOption = null!;
+                ToggleOption toggleOption = null!;
+                if (numberOption = behaviour.GetComponent<NumberOption>())
+                    numberOption.Value = o.GetFloat();
+                else if (stringOption = behaviour.GetComponent<StringOption>())
+                    stringOption.Value = o.Selection;
+                else if (toggleOption = behaviour.GetComponent<ToggleOption>())
+                    toggleOption.CheckMark.enabled = o.GetBool();
+            });
+        }
     }
 }

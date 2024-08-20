@@ -113,7 +113,6 @@ public static class OptionBehaviourPatch
             return false;
         }
 
-        
         return true;
     }
 }

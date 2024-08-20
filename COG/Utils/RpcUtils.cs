@@ -44,6 +44,13 @@ public abstract class RpcUtils
             _writers = writers;
         }
 
+        public RpcWriter WriteAll(params dynamic[] values)
+        {
+            foreach (var messageWriter in _writers)
+                values.ForEach(v => messageWriter.Write(v));
+            return this;
+        }
+
         public RpcWriter Write(bool value)
         {
             foreach (var messageWriter in _writers) messageWriter.Write(value);
