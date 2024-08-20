@@ -22,24 +22,24 @@ public class VanillaBugFixListener : IListener
         }
     }
 
-    public void OnEjectionEnd()
+    public void OnEjectionEnd(ExileController controller)
     {
-        HudManager.Instance.StartCoroutine(CoFixBlackout().WrapToIl2Cpp());
+        controller.StartCoroutine(CoFixBlackout(controller).WrapToIl2Cpp());
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnAirshipEjectionEnd(PlayerExileEndOnAirshipEvent @event)
     {
-        OnEjectionEnd();
+        OnEjectionEnd(@event.Controller);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnOtherMapEjectionEnd(PlayerExileEndEvent @event)
     {
-        OnEjectionEnd();
+        OnEjectionEnd(@event.ExileController);
     }
 
-    public IEnumerator CoFixBlackout()
+    public IEnumerator CoFixBlackout(ExileController controller)
     {
         Main.Logger.LogInfo("Checking if blackout occured...");
 
@@ -51,23 +51,15 @@ public class VanillaBugFixListener : IListener
         if (!fullScr.active) yield break;
 
         Main.Logger.LogWarning("After-meeting blackout bug has occured. Trying to fix...");
-        var auClient = AmongUsClient.Instance;
-        var mapId = (MapNames)(auClient.NetworkMode == NetworkModes.FreePlay
-            ? auClient.TutorialMapId
-            : GameUtils.GetGameOptions().MapId);
+        var mapId = (MapNames)GameUtils.GetGameOptions().MapId;
 
         if (mapId is MapNames.Airship)
         {
             var ship = ShipStatus.Instance;
-            ship.StartCoroutine(ship.PrespawnStep());
-            Main.Logger.LogInfo("Fixed successfully! Now fix SpawnInMiniGame and FollowerCamera...");
-            OccuredBlackoutOnAirship = true;
+            yield return ship.PrespawnStep();
         }
-        else
-        {
-            hud.StartCoroutine(hud.CoFadeFullScreen(new Color(0, 0, 0, 1), new Color(0, 0, 0, 0)));
-            hud.PlayerCam.Locked = false;
-            Main.Logger.LogInfo("Fixed successfully!");
-        }
+
+        controller.ReEnableGameplay();
+        Main.Logger.LogInfo("Fixed successfully!");
     }
 }
