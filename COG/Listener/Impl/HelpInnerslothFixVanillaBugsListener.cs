@@ -9,8 +9,6 @@ namespace COG.Listener.Impl;
 
 public class VanillaBugFixListener : IListener
 {
-    public static bool OccuredBlackoutOnAirship { get; set; }
-
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSelectRole(RoleManagerSelectRolesEvent _)
     {

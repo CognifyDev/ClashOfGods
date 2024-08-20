@@ -568,7 +568,7 @@ public class PlayerData
         Player = data.Object;
         Data = data;
         Role = role;
-        PlayerName = data.name;
+        PlayerName = data.PlayerName;
         PlayerId = data.PlayerId;
         ColorId = data.DefaultOutfit.ColorId;
         Tags = new List<string>();
