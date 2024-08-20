@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using COG.Patch;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
@@ -60,6 +61,12 @@ public sealed class CustomOption
         set
         {
             _selection = value;
+            var menu = Object.FindObjectOfType<RolesSettingsMenu>();
+            if (menu)
+            {
+                RoleOptionPatch.OnMenuUpdate(menu); // Try update vanilla options
+                menu?.RefreshChildren();
+            }
             NotifySettingChange();
         }
     }

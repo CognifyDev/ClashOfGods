@@ -6,8 +6,9 @@ namespace COG.Patch;
 internal static class GameSettingMenuPatch
 {
     [HarmonyPatch(nameof(GameSettingMenu.Close))]
+    [HarmonyPatch(nameof(GameSettingMenu.Start))]
     [HarmonyPostfix]
-    public static void OnClose()
+    public static void ResetOptionData()
     {
         RoleOptionPatch.CampTabs.Clear();
         RoleOptionPatch.CurrentTab = null;

@@ -101,7 +101,7 @@ public abstract class CustomRole
     
     protected string GetContextFromLanguage(string context)
     {
-        var campName = IsSubRole ? "sub-roles" : Enum.GetName(typeof(CampType), CampType)!.ToLower();
+        var campName = IsSubRole ? "sub-roles" : CampType.ToString().ToLower();
         var location = $"role.{campName}.{GetNameInConfig()}.{context}";
         var toReturn = LanguageConfig.Instance.YamlReader!
             .GetString(location);

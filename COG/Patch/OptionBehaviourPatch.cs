@@ -77,7 +77,6 @@ public static class OptionBehaviourPatch
         if (__instance is ToggleOption toggle)
         {
             toggle.CheckMark.enabled = customOption.GetBool();
-            toggle.GetComponentInChildren<PassiveButton>().SelectButton(customOption.GetBool());
         }
         else if (__instance is NumberOption number)
         {
@@ -114,7 +113,6 @@ public static class OptionBehaviourPatch
             return false;
         }
 
-        
         return true;
     }
 }
