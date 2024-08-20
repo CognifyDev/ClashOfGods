@@ -372,7 +372,7 @@ public static class PlayerUtils
         var playerRole = GameUtils.PlayerData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
         if (playerRole is not null) GameUtils.PlayerData.Remove(playerRole);
 
-        GameUtils.PlayerData.Add(new PlayerData(pc, role, subRoles));
+        GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has set to {role.GetNormalName()}");
@@ -549,7 +549,7 @@ public class SerializablePlayerData
 
     public PlayerData AsPlayerData()
     {
-        return new PlayerData(PlayerUtils.GetPlayerById(PlayerId)!,
+        return new PlayerData(GameData.Instance.GetPlayerById(PlayerId),
             CustomRoleManager.GetManager().GetRoleById(MainRoleId)!,
             SubRoleIds.Select(id => CustomRoleManager.GetManager().GetRoleById(id)).ToArray()!);
     }
@@ -563,14 +563,14 @@ public class SerializablePlayerData
 
 public class PlayerData
 {
-    public PlayerData(PlayerControl player, CustomRole role, CustomRole[]? subRoles = null)
+    public PlayerData(NetworkedPlayerInfo data, CustomRole role, CustomRole[]? subRoles = null)
     {
-        Player = player;
-        Data = player.Data;
+        Player = data.Object;
+        Data = data;
         Role = role;
-        PlayerName = player.name;
-        PlayerId = player.PlayerId;
-        ColorId = player.cosmetics.ColorId;
+        PlayerName = data.name;
+        PlayerId = data.PlayerId;
+        ColorId = data.DefaultOutfit.ColorId;
         Tags = new List<string>();
         SubRoles = subRoles != null
             ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
