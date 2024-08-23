@@ -1,15 +1,36 @@
 using Il2CppInterop.Runtime.InteropTypes;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace COG.Utils;
 
 public static class ArrayUtils
 {
-    public static string AsString<T>(this T[] array)
+    public static string AsString<T>(this IEnumerable<T> collection)
     {
         var toReturn = "[";
-        for (var i = 0; i < array.Length; i++)
-            toReturn += array[i] + (i == array.Length - 1 ? "" : ", ");
+        int i = 0;
+        foreach (var item in collection)
+        {
+            toReturn += item + (i == collection.Count() - 1 ? "" : ", ");
+            i++;
+        }
+        toReturn += "]";
+
+        return toReturn;
+    }
+
+    public static string AsString<T>(this IEnumerable<T> collection, Func<T, string> selector)
+    {
+        var toReturn = "[";
+        int i = 0;
+        foreach (var item in collection)
+        {
+            toReturn += selector(item) + (i == collection.Count() - 1 ? "" : ", ");
+            i++;
+        }
         toReturn += "]";
 
         return toReturn;
