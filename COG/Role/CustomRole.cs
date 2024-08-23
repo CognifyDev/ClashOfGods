@@ -165,14 +165,14 @@ public abstract class CustomRole
     /// <summary>
     ///     选择角色数量的option
     /// </summary>
-    public CustomOption? RoleNumberOption { get; }
+    public CustomOption? RoleNumberOption { get; internal set; }
 
     /// <summary>
     ///     职业几率的选项
     /// </summary>
-    public CustomOption? RoleChanceOption { get; }
+    public CustomOption? RoleChanceOption { get; internal set;  }
 
-    public CustomOption? RoleCode { get; }
+    public CustomOption? RoleCode { get; internal set; }
 
     /// <summary>
     ///     职业是否已启用
@@ -206,7 +206,7 @@ public abstract class CustomRole
     public ReadOnlyCollection<PlayerControl> Players =>
         new(GameUtils.PlayerData.Where(pr => pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
 
-    public List<CustomOption> AllOptions { get; }
+    public List<CustomOption> AllOptions { get; internal set; }
 
     /// <summary>
     ///     除了概率与人数之外的所有职业选项
