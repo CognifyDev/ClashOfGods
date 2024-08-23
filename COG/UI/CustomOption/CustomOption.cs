@@ -61,11 +61,13 @@ public sealed class CustomOption
         set
         {
             _selection = value;
-            var menu = Object.FindObjectOfType<RolesSettingsMenu>();
-            if (menu)
+            var roleMenu = Object.FindObjectOfType<RolesSettingsMenu>();
+            var optionMenu = Object.FindObjectOfType<GameOptionsMenu>();
+            if (roleMenu)
             {
-                RoleOptionPatch.OnMenuUpdate(menu); // Try update vanilla options
-                menu?.RefreshChildren();
+                RoleOptionPatch.OnMenuUpdate(roleMenu); // Try update vanilla options
+                roleMenu?.RefreshChildren();
+                optionMenu?.RefreshChildren();
             }
             NotifySettingChange();
         }
