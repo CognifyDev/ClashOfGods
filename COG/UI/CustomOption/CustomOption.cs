@@ -174,6 +174,11 @@ public sealed class CustomOption
     {
         if (ValueRule is FloatOptionValueRule rule)
             return rule.Selections[Selection];
+        else if (ValueRule is IntOptionValueRule intRule)
+        {
+            Main.Logger.LogWarning($"Trying to get float value from int option: {Name()}({Id})");
+            return intRule.Selections[Selection];
+        }
         throw new NotSupportedException();
     }
 
@@ -181,6 +186,11 @@ public sealed class CustomOption
     {
         if (ValueRule is IntOptionValueRule rule)
             return rule.Selections[Selection];
+        else if (ValueRule is FloatOptionValueRule floatRule)
+        {
+            Main.Logger.LogWarning($"Trying to get int value from float option: {Name()}({Id})");
+            return (int)floatRule.Selections[Selection];
+        }
         throw new NotSupportedException();
     }
 
