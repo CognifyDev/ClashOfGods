@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -81,5 +82,20 @@ public class StackTraceLogger
         var type = method.DeclaringType;
 
         return $"[{type?.FullName}::{method.Name}] {data}";
+    }
+}
+
+public static class LoggerUtils
+{
+    public static T Dump<T>(this T obj)
+    {
+        Main.Logger.LogInfo(obj?.ToString() ?? "(null)", "Dump");
+        return obj;
+    }
+
+    public static IEnumerable<T> Dump<T>(this IEnumerable<T> obj, Func<T, string> selector)
+    {
+        Main.Logger.LogInfo(obj.Select(selector).AsString(), "Dump");
+        return obj;
     }
 }

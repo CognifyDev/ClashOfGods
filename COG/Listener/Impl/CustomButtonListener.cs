@@ -15,6 +15,7 @@ internal class CustomButtonListener : IListener
         IEnumerator CoInitCustomButton()
         {
             yield return new WaitForSeconds(1f);
+            CustomButton.GetAllVanillaButtons();
             CustomButton.Init(@event.Manager);
         }
         
@@ -25,7 +26,6 @@ internal class CustomButtonListener : IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         if (!CustomButton.Initialized) return;
-        CustomButton.GetAllVanillaButtons();
         CustomButton.ArrangePosition();
         foreach (var button in CustomButtonManager.GetManager().GetButtons()) button.Update();
     }

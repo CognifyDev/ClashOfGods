@@ -62,7 +62,15 @@ public class CustomRoleManager
 
     public void ReloadRoles()
     {
-        var newInstanceRoles = _roles.Select(customRole => customRole.NewInstance()).ToList();
+        var newInstanceRoles = _roles.Select(role =>
+        {
+            var newInstance = role.NewInstance();
+            newInstance.RoleChanceOption = role.RoleChanceOption;
+            newInstance.RoleNumberOption = role.RoleNumberOption;
+            newInstance.RoleCode = role.RoleCode;
+            newInstance.AllOptions = role.AllOptions;
+            return newInstance;
+        }).ToList();
         _roles.Clear();
         _roles.AddRange(newInstanceRoles);
     }
