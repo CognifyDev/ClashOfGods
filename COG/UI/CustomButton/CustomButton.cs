@@ -336,7 +336,7 @@ public class CustomButton
         {
             var pos = b.transform.localPosition;
             return ((int)pos.x, (int)pos.y, (int)pos.z);
-        }).ToList(); // 不知为何原来的select函数返回的集合中未知条件下会返回一个极大的数字，只能这样了
+        }).ToList(); // 不知为何原来的select函数返回的集合中在靠近管理室地图下会返回一个极大的数字，只能这样了
         var idx1 = 0;
         var idx2 = 0;
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()

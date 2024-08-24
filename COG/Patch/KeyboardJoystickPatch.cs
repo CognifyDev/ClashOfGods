@@ -12,7 +12,7 @@ public static class KeyboardJoystickPatch
     public static void Postfix()
     {
         var data = CustomWinnerManager.GetManager().WinnableData;
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && AmongUsClient.Instance.AmHost)
         {
             data.WinColor = Color.white;
             data.Winnable = true;

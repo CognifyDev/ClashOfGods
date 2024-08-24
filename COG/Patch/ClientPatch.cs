@@ -35,8 +35,7 @@ public static class DestroyQuickButton
     public static void Postfix(ChatController __instance)
     {
         var gameObject = __instance.quickChatButton.gameObject;
-        if (gameObject == null || gameObject.IsDestroyedOrNull())
-            gameObject!.Destroy();
+        gameObject?.Destroy();
     }
 }
 
@@ -46,7 +45,7 @@ public static class HideUselessButtons
     public static void Postfix()
     {
         var gameObject = GameObject.Find("OptionsMenu/DataTab/TwitchLinkButton");
-        if (gameObject != null && !gameObject.IsDestroyedOrNull()) gameObject.SetActive(false);
+        gameObject?.SetActive(false);
     }
 }
 

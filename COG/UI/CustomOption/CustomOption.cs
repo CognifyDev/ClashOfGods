@@ -65,7 +65,7 @@ public sealed class CustomOption
             var optionMenu = Object.FindObjectOfType<GameOptionsMenu>();
             if (roleMenu)
             {
-                RoleOptionPatch.OnMenuUpdate(roleMenu); // Try update vanilla options
+                RoleOptionPatch.OnMenuUpdate(roleMenu); // Try to update vanilla options
                 roleMenu?.RefreshChildren();
                 optionMenu?.RefreshChildren();
             }

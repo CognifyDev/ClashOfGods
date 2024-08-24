@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using COG.Config.Impl;
 using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,31 +43,21 @@ public static class MainMenuPatch
             LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); },
             Color.gray);
 
-        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
-            LanguageConfig.Instance.UpdateButtonString, () =>
-            {
-                if (VersionInfo.Empty.Equals(ModUpdater.LatestVersion))
+        if (!VersionInfo.Empty.Equals(ModUpdater.LatestVersion) || 
+            (ModUpdater.LatestVersion != null && !ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo)))
+            CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
+                LanguageConfig.Instance.UpdateButtonString, () =>
                 {
-                    SystemUtils.OpenMessageBox(LanguageConfig.Instance.NonCheck, "WARNING");
-                    return;
-                }
+                    var result = SystemUtils.OpenMessageBox(
+                        LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion!.ToString(),
+                            ModUpdater.LatestDescription), "Update COG",
+                        MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
 
-                if (ModUpdater.LatestVersion != null && !ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo))
-                {
-                    SystemUtils.OpenMessageBox(LanguageConfig.Instance.UpToDate, "WARNING");
-                    return;
-                }
+                    if (result is MessageBoxDialogue.ClickedButton.IDNO) return;
 
-                var result = SystemUtils.OpenMessageBox(
-                    LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion!.ToString(),
-                        ModUpdater.LatestDescription), "Update COG",
-                    MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
-
-                if (result is MessageBoxDialogue.ClickedButton.IDNO) return;
-
-                ModUpdater.DoUpdate();
-                Application.Quit();
-            }, Color.yellow);
+                    ModUpdater.DoUpdate();
+                    Application.Quit();
+                }, Color.yellow);
     }
 
     /// <summary>
@@ -113,8 +103,7 @@ public static class MainMenuPatch
     private static void InitPopup()
     {
         if (PopupCreated) return;
-        if (!Camera.main) return;
-        var popup = Object.Instantiate(DiscordManager.Instance.discordPopup, Camera.main.transform);
+        var popup = Object.Instantiate(DiscordManager.Instance.discordPopup);
         var bg = popup.transform.Find("Background").GetComponent<SpriteRenderer>();
         var size = bg.size;
         popup.name = "COGPopup";
@@ -122,7 +111,7 @@ public static class MainMenuPatch
         bg.size = size;
         popup.TextAreaTMP.fontSizeMin = popup.TextAreaTMP.fontSizeMax = popup.TextAreaTMP.fontSize;
         Object.DontDestroyOnLoad(popup);
-        GameUtils.Popup = popup;
+        GameUtils.PopupPrefab = popup;
         PopupCreated = true;
     }
 

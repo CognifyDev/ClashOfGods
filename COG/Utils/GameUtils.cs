@@ -17,7 +17,18 @@ public static class GameUtils
     public const MurderResultFlags DefaultFlag = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
     public static List<PlayerData> PlayerData { get; } = new();
 
-    public static GenericPopup? Popup { get; set; }
+    internal static GenericPopup? PopupPrefab { get; set; }
+    public static GenericPopup? Popup
+    { 
+        get
+        {
+            if (!PopupPrefab) return null;
+            var popup = Object.Instantiate(PopupPrefab)!;
+            popup.transform.SetParent(Camera.main.transform);
+            popup.transform.localPosition = new(0, 0, 0);
+            return popup;
+        }
+    }
 
     /// <summary>
     ///     向游戏里面发送一条信息
