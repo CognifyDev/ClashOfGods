@@ -1,4 +1,5 @@
-﻿using COG.Config.Impl;
+﻿using System.Linq;
+using COG.Config.Impl;
 using COG.UI.CustomButton;
 using COG.Utils;
 using UnityEngine;
@@ -18,8 +19,12 @@ public static class ButtonConstant
         () => PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance) != null,
         () =>
         {
-            var role = PlayerControl.LocalPlayer.GetMainRole();
-            return role != null! && role.CanKill;
+            var role = PlayerControl.LocalPlayer.GetPlayerData();
+            if (role == null)
+            {
+                return false;
+            }
+            return role.Role.CanKill || role.SubRoles.Any(subRole => subRole.CanKill);
         },
         ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
         1,

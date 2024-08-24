@@ -28,10 +28,6 @@ public class SoulHunter : CustomRole, IListener
     
     public SoulHunter() : base(Color.green, CampType.Crewmate)
     {
-        CanKill = false;
-        CanVent = false;
-        BaseRoleType = RoleTypes.Crewmate;
-
         ReviveAfter = CreateOption(() => LanguageConfig.Instance.SoulHunterReviveAfter,
             new IntOptionValueRule(1, 1, 60, 5));
         SoulHunterKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
