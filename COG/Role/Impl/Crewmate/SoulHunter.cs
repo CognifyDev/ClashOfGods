@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Linq;
-using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;

@@ -16,7 +16,6 @@ using COG.Utils;
 using Reactor.Utilities;
 using TMPro;
 using UnityEngine;
-using static Il2CppSystem.Globalization.CultureInfo;
 
 namespace COG.Listener.Impl;
 

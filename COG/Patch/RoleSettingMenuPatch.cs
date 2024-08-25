@@ -8,7 +8,6 @@ using COG.Constant;
 using COG.Role;
 using COG.UI.CustomOption;
 using COG.Utils;
-using Rewired;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
