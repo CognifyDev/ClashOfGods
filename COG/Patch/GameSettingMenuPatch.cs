@@ -65,12 +65,18 @@ internal static class GameSettingMenuPatch
     [HarmonyPostfix]
     private static void OnRefreshChildren()
     {
-        // This patch is for clients who are previewing the settings and hosts who has loaded the preset to update options when the host has changed settings
+        // This patch is for clients who are previewing the settings
+        // and hosts who has loaded the preset to update options when the host has changed settings
 
         foreach (var role in CustomRoleManager.GetManager().GetRoles()
                      .Where(r => r is { IsBaseRole: false, ShowInOptions: true }))
         {
-            role.RoleNumberOption?.OptionBehaviour?.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
+            var roleRoleNumberOption = role.RoleNumberOption;
+            if (roleRoleNumberOption == null)
+            {
+                continue;
+            }
+            roleRoleNumberOption.OptionBehaviour?.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
             role.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
             {
                 var behaviour = o.OptionBehaviour!;
@@ -85,8 +91,13 @@ internal static class GameSettingMenuPatch
                     toggleOption.CheckMark.enabled = o.GetBool();
             });
         }
-
-        GameSettingMenu.Instance?.GameSettingsTab?.Children?.ForEach(new Action<OptionBehaviour>(o =>
+        if (GameSettingMenu.Instance == null 
+            || GameSettingMenu.Instance.GameSettingsTab == null 
+            || GameSettingMenu.Instance.GameSettingsTab.Children == null)
+        {
+            return;
+        }
+        GameSettingMenu.Instance.GameSettingsTab.Children.ForEach(new Action<OptionBehaviour>(o =>
         {
             var customOption = CustomOption.Options.FirstOrDefault(co => co.OptionBehaviour == o);
             if (customOption == null) return;
