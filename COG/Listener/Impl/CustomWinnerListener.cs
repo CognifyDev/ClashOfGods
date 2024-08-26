@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using COG.Command.Impl;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
