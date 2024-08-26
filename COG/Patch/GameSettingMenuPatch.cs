@@ -59,31 +59,18 @@ internal static class GameSettingMenuPatch
     }
     
     // DANGER: refresh methods can not be executed.
-/*
-    [HarmonyPatch(nameof(RolesSettingsMenu.RefreshChildren))]
-    [HarmonyPostfix]
-    private static void OnRolesSettingsMenuRefreshChildren()
-    {
-        OnMenuRefreshing();
-    }
-*/
-/*
-    [HarmonyPatch(nameof(GameOptionsMenu.RefreshChildren))]
-    [HarmonyPostfix]
-    private static void OnGameOptionsMenuRefreshChildren()
-    {
-        OnMenuRefreshing();
-    }
-  */
 
-    private static void OnMenuRefreshing()
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.RefreshChildren))]
+    [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.RefreshChildren))]
+    [HarmonyPostfix]
+    private static void OnRefreshChildren()
     {
         // This patch is for clients who are previewing the settings and hosts who has loaded the preset to update options when the host has changed settings
 
         foreach (var role in CustomRoleManager.GetManager().GetRoles()
                      .Where(r => r is { IsBaseRole: false, ShowInOptions: true }))
         {
-            role.RoleNumberOption!.OptionBehaviour!.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
+            role.RoleNumberOption?.OptionBehaviour?.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
             role.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
             {
                 var behaviour = o.OptionBehaviour!;
@@ -99,7 +86,7 @@ internal static class GameSettingMenuPatch
             });
         }
 
-        GameSettingMenu.Instance.GameSettingsTab.Children.ForEach(new Action<OptionBehaviour>(o =>
+        GameSettingMenu.Instance?.GameSettingsTab?.Children?.ForEach(new Action<OptionBehaviour>(o =>
         {
             var customOption = CustomOption.Options.FirstOrDefault(co => co.OptionBehaviour == o);
             if (customOption == null) return;
