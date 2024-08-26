@@ -92,7 +92,8 @@ public static class PlayerUtils
 
     public static DeadBody? GetDeadBody(this PlayerControl target)
     {
-        var deadBodies = DeadBodyUtils.GetDeadBodies().Where(body => body.GetPlayer().IsSamePlayer(target)).ToList();
+        var deadBodies = DeadBodyUtils.GetDeadBodies().Where(body => 
+            body.GetPlayer().IsSamePlayer(target)).ToList();
         return deadBodies.Count > 0 ? deadBodies[0] : null;
     }
 
@@ -172,12 +173,14 @@ public static class PlayerUtils
 
     public static CustomRole GetMainRole(this PlayerControl player)
     {
-        return GameUtils.PlayerData.FirstOrDefault(d => d.Player.IsSamePlayer(player))?.Role ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
+        return GameUtils.PlayerData.FirstOrDefault(d => d.Player.IsSamePlayer(player))?.Role ??
+               CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
     }
 
     public static CustomRole GetMainRole(this NetworkedPlayerInfo player)
     {
-        return GameUtils.PlayerData.FirstOrDefault(d => d.Data.IsSamePlayer(player))?.Role ?? CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>();
+        return GameUtils.PlayerData.FirstOrDefault(d => d.Data.IsSamePlayer(player))?.Role ??
+               CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 
     public static void SetNamePrivately(PlayerControl target, PlayerControl seer, string name)
@@ -250,8 +253,8 @@ public static class PlayerUtils
         {
             var vector = body.TruePosition - position;
             var magnitude = vector.magnitude;
-            if (magnitude <= num && !PhysicsHelpers.AnyNonTriggersBetween(position, vector.normalized, magnitude,
-                    Constants.ShipAndObjectsMask))
+            if (magnitude <= num && !PhysicsHelpers.AnyNonTriggersBetween(position, vector.normalized, 
+                    magnitude, Constants.ShipAndObjectsMask))
             {
                 result = body;
                 num = magnitude;

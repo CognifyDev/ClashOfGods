@@ -13,7 +13,7 @@ public class CustomWinnerManager
     public static CustomWinnerManager GetManager() => _manager ??= new CustomWinnerManager();
 
     private readonly List<IWinnable> _winnable = new();
-
+    
     private CustomWinnerManager()
     {
         WinnableData = WinnableData.Of();
@@ -44,12 +44,12 @@ public class CustomWinnerManager
 
         foreach (var winnable in enumerable)
         {
+            winnable.CheckWin(WinnableData);
+            
             if (WinnableData.Winnable)
             {
                 return WinnableData;
             }
-            
-            winnable.CheckWin(WinnableData);
         }
 
         return WinnableData;

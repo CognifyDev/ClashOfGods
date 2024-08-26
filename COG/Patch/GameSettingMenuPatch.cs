@@ -48,7 +48,7 @@ internal static class GameSettingMenuPatch
     public static void OnMenuUpdate(GameSettingMenu __instance)
     {
         if (AmongUsClient.Instance.AmHost) return;
-        int tabNum = __instance.GameSettingsTab.isActiveAndEnabled ? 1 : 2;
+        var tabNum = __instance.GameSettingsTab.isActiveAndEnabled ? 1 : 2;
         var handler = LanguageConfig.Instance.GetHandler("game-setting.view-description");
         __instance.MenuDescriptionText.text = tabNum switch
         {
@@ -57,11 +57,26 @@ internal static class GameSettingMenuPatch
             _ => ""
         };
     }
-
+    
+    // DANGER: refresh methods can not be executed.
+/*
     [HarmonyPatch(nameof(RolesSettingsMenu.RefreshChildren))]
+    [HarmonyPostfix]
+    private static void OnRolesSettingsMenuRefreshChildren()
+    {
+        OnMenuRefreshing();
+    }
+*/
+/*
     [HarmonyPatch(nameof(GameOptionsMenu.RefreshChildren))]
     [HarmonyPostfix]
-    public static void OnMenuRefreshing()
+    private static void OnGameOptionsMenuRefreshChildren()
+    {
+        OnMenuRefreshing();
+    }
+  */
+
+    private static void OnMenuRefreshing()
     {
         // This patch is for clients who are previewing the settings and hosts who has loaded the preset to update options when the host has changed settings
 
@@ -72,14 +87,14 @@ internal static class GameSettingMenuPatch
             role.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
             {
                 var behaviour = o.OptionBehaviour!;
-                NumberOption numberOption = null!;
-                StringOption stringOption = null!;
-                ToggleOption toggleOption = null!;
-                if (numberOption = behaviour.GetComponent<NumberOption>())
+                NumberOption numberOption;
+                StringOption stringOption;
+                ToggleOption toggleOption;
+                if ((numberOption = behaviour.GetComponent<NumberOption>()) != null)
                     numberOption.Value = o.GetFloat();
-                else if (stringOption = behaviour.GetComponent<StringOption>())
+                else if ((stringOption = behaviour.GetComponent<StringOption>()) != null)
                     stringOption.Value = o.Selection;
-                else if (toggleOption = behaviour.GetComponent<ToggleOption>())
+                else if ((toggleOption = behaviour.GetComponent<ToggleOption>()) != null)
                     toggleOption.CheckMark.enabled = o.GetBool();
             });
         }
@@ -88,14 +103,14 @@ internal static class GameSettingMenuPatch
         {
             var customOption = CustomOption.Options.FirstOrDefault(co => co.OptionBehaviour == o);
             if (customOption == null) return;
-            NumberOption numberOption = null!;
-            StringOption stringOption = null!;
-            ToggleOption toggleOption = null!;
-            if (numberOption = o.GetComponent<NumberOption>())
+            NumberOption numberOption;
+            StringOption stringOption;
+            ToggleOption toggleOption;
+            if ((numberOption = o.GetComponent<NumberOption>()) != null)
                 numberOption.UpdateValue();
-            else if (stringOption = o.GetComponent<StringOption>())
+            else if ((stringOption = o.GetComponent<StringOption>()) != null)
                 stringOption.UpdateValue();
-            else if (toggleOption = o.GetComponent<ToggleOption>())
+            else if ((toggleOption = o.GetComponent<ToggleOption>()) != null)
                 toggleOption.UpdateValue();
         }));
     }
