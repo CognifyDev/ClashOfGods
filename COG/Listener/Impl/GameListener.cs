@@ -27,6 +27,7 @@ using UnityEngine;
 using Action = Il2CppSystem.Action;
 using GameStates = COG.States.GameStates;
 using Random = System.Random;
+using Il2CppStringBuilder = Il2CppSystem.Text.StringBuilder;
 
 namespace COG.Listener.Impl;
 
@@ -301,11 +302,11 @@ public class GameListener : IListener
             // 获取玩家实例
             var target = playerGetter.GetNext();
             
-                // 没必要移除玩家在列表中，因为后面我们用不到players集合了
-                // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
+            // 没必要移除玩家在列表中，因为后面我们用不到players集合了
+            // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
             
-                // 添加数据
-                mainRoleData.Add(target, cremateRole);
+            // 添加数据
+            mainRoleData.Add(target, cremateRole);
         }
         
         // 最后分配一下副职业
@@ -384,7 +385,6 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
-        
         if (!AmongUsClient.Instance.AmHost) return;
         
         Main.Logger.LogInfo("Select roles for players...");
@@ -649,31 +649,33 @@ public class GameListener : IListener
         var localRole = GameUtils.GetLocalPlayerRole();
         if (originText == "None" || localRole == null!) return;
 
-        var sb = new StringBuilder();
+        bool isImpostorRole = localRole.CampType == CampType.Impostor;
 
-        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.ShortDescription.Color(localRole.Color))
-            .Append("\r\n\r\n");
+        var sb = new Il2CppStringBuilder();
 
-        /*
-            <color=#FF0000FF>进行破坏，将所有人杀死。
-            <color=#FF1919FF>假任务：</color></color>
-        */
+        sb.Append(localRole.GetColorName()).Append(": ".Color(localRole.Color))
+            .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n\r\n");
 
-        var impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask); // 进行破坏，将所有人杀死。
-        var fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks); // 假任务：
-        var impTaskTextFull =
-            $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
-
-        if (originText.StartsWith(impTaskTextFull))
+        foreach (var playerTask in PlayerControl.LocalPlayer.myTasks.ToArray()) 
         {
-            var idx = originText.IndexOf(impTaskTextFull, StringComparison.Ordinal) + impTaskTextFull.Length;
-            sb.Append($"<color=#FF1919FF>{fakeTaskText}</color>\r\n").Append(originText[idx..]);
-        }
-        else
-        {
-            sb.Append(originText);
+            if (!isImpostorRole && playerTask is ImportantTextTask task)
+                continue;
+            else
+                sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>");
+            
+            if (playerTask)
+            {
+                if (playerTask.TaskType == TaskTypes.FixComms && !isImpostorRole)
+                {
+                    sb.Clear();
+                    playerTask.AppendTaskText(sb);
+                    break;
+                }
+                playerTask.AppendTaskText(sb);
+            }
         }
 
+        sb.TrimEnd();
         @event.SetTaskString(sb.ToString());
     }
 }

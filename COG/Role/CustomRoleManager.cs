@@ -38,9 +38,13 @@ public class CustomRoleManager
         return _roles;
     }
 
-    public CustomRole? GetRoleByClassName(string name)
+    public CustomRole? GetRoleByClassName(string name, bool ignoreCase = false)
     {
-        return _roles.FirstOrDefault(r => r.GetType().Name == name);
+        return _roles.FirstOrDefault(r =>
+        {
+            var type = r.GetType();
+            return ignoreCase ? type.Name.ToLower() == name.ToLower() : type.Name == name;
+        });
     }
 
     public CustomRole? GetRoleById(int id)
