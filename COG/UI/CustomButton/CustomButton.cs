@@ -38,8 +38,12 @@ public class CustomButton
         EffectTime = effectTime;
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
+        Id = _availableId++;
     }
 
+    private static int _availableId = 0;
+
+    public int Id { get; }
     public ActionButton? ActionButton { get; set; }
     public Func<float> Cooldown { get; set; }
     public Func<bool> CouldUse { get; set; }
@@ -92,7 +96,7 @@ public class CustomButton
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown,
+        Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
@@ -276,17 +280,17 @@ public class CustomButton
     }
 
 #nullable enable
-    // Static methods
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not CustomButton btn) return false;
+        return btn.Id == Id;
+    }
+
     public static void ResetAllCooldown()
     {
         CustomButtonManager.GetManager().GetButtons().ForEach(b => b.ResetCooldown());
     }
-
-    public static void SetAllActive(bool active)
-    {
-        CustomButtonManager.GetManager().GetButtons().ForEach(b => b.SetActive(active));
-    }
-
     internal static void Init(HudManager? hud)
     {
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
@@ -336,7 +340,7 @@ public class CustomButton
         {
             var pos = b.transform.localPosition;
             return ((int)pos.x, (int)pos.y, (int)pos.z);
-        }).ToList(); // 不知为何原来的select函数返回的集合中未知条件下会返回一个极大的数字，只能这样了
+        }).ToList(); // 不知为何原来的select函数返回的集合中在靠近管理室地图下会返回一个极大的数字，只能这样了
         var idx1 = 0;
         var idx2 = 0;
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()

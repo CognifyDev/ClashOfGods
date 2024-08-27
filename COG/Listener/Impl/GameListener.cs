@@ -27,6 +27,8 @@ using UnityEngine;
 using Action = Il2CppSystem.Action;
 using GameStates = COG.States.GameStates;
 using Random = System.Random;
+using Il2CppStringBuilder = Il2CppSystem.Text.StringBuilder;
+using COG.UI.CustomButton;
 
 namespace COG.Listener.Impl;
 
@@ -301,11 +303,11 @@ public class GameListener : IListener
             // 获取玩家实例
             var target = playerGetter.GetNext();
             
-                // 没必要移除玩家在列表中，因为后面我们用不到players集合了
-                // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
+            // 没必要移除玩家在列表中，因为后面我们用不到players集合了
+            // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
             
-                // 添加数据
-                mainRoleData.Add(target, cremateRole);
+            // 添加数据
+            mainRoleData.Add(target, cremateRole);
         }
         
         // 最后分配一下副职业
@@ -384,7 +386,6 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
-        
         if (!AmongUsClient.Instance.AmHost) return;
         
         Main.Logger.LogInfo("Select roles for players...");
@@ -571,6 +572,21 @@ public class GameListener : IListener
 
         Arrow.CreatedArrows.RemoveAll(a => !a.ArrowObject);
         Arrow.CreatedArrows.ForEach(a => a.Update());
+
+        var localRole = GameUtils.GetLocalPlayerRole();
+        bool isImpostorRole = localRole.CampType == CampType.Impostor;
+
+        var sb = new StringBuilder();
+
+        sb.Append(localRole.GetColorName()).Append("：".Color(localRole.Color))
+            .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n");
+
+        if (isImpostorRole)
+            sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
+
+        var impText = Object.FindObjectOfType<ImportantTextTask>();
+        if (impText)
+            impText.Text = sb.ToString();
     }
 
     private static void ShareRoles()
@@ -634,46 +650,13 @@ public class GameListener : IListener
         
         CustomRoleManager.GetManager().GetRoles().Select(role => role.GetListener()).ForEach(
             listener => _handlers.AddRange(ListenerManager.GetManager().AsHandlers(listener)));
-        
+
+        CustomButton.ResetAllCooldown();
+
         ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
 
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
             foreach (var player in PlayerControl.AllPlayerControls)
                 player.RpcSetCustomRole<Crewmate>();
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnTaskPanelSetText(TaskPanelBehaviourSetTaskTextEvent @event)
-    {
-        var originText = @event.GetTaskString();
-        var localRole = GameUtils.GetLocalPlayerRole();
-        if (originText == "None" || localRole == null!) return;
-
-        var sb = new StringBuilder();
-
-        sb.Append(localRole.GetColorName()).Append('：').Append(localRole.ShortDescription.Color(localRole.Color))
-            .Append("\r\n\r\n");
-
-        /*
-            <color=#FF0000FF>进行破坏，将所有人杀死。
-            <color=#FF1919FF>假任务：</color></color>
-        */
-
-        var impTaskText = TranslationController.Instance.GetString(StringNames.ImpostorTask); // 进行破坏，将所有人杀死。
-        var fakeTaskText = TranslationController.Instance.GetString(StringNames.FakeTasks); // 假任务：
-        var impTaskTextFull =
-            $"<color=#FF0000FF>{impTaskText}\r\n<color=#FF1919FF>{fakeTaskText}</color></color>\r\n";
-
-        if (originText.StartsWith(impTaskTextFull))
-        {
-            var idx = originText.IndexOf(impTaskTextFull, StringComparison.Ordinal) + impTaskTextFull.Length;
-            sb.Append($"<color=#FF1919FF>{fakeTaskText}</color>\r\n").Append(originText[idx..]);
-        }
-        else
-        {
-            sb.Append(originText);
-        }
-
-        @event.SetTaskString(sb.ToString());
     }
 }

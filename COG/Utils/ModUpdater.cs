@@ -53,7 +53,27 @@ public static class ModUpdater
         );
 
         File.WriteAllText("BepInEx/plugins/do.vbs",
-            "WScript.Sleep 1000\n\nstrFileToDelete = \"ClashOfGods.dll\"\nstrFileToRename = \"ClashOfGods.dll.new\"\nstrScriptToDelete = WScript.ScriptFullName\n\nSet fs = CreateObject(\"Scripting.FileSystemObject\")\n\nIf fs.FileExists(strFileToDelete) Then\n    fs.DeleteFile strFileToDelete\nEnd If\n\nIf fs.FileExists(strFileToRename) Then\n    fs.MoveFile strFileToRename, strFileToDelete\nEnd If\n\nIf fs.FileExists(strScriptToDelete) Then\n    fs.DeleteFile strScriptToDelete\nEnd If");
+            """
+            WScript.Sleep 1000
+            
+            strFileToDelete = "ClashOfGods.dll"
+            strFileToRename = "ClashOfGods.dll.new"
+            strScriptToDelete = WScript.ScriptFullName
+            
+            Set fs = CreateObject("Scripting.FileSystemObject")
+            
+            If fs.FileExists(strFileToDelete) Then
+                fs.DeleteFile strFileToDelete
+            End If
+            
+            If fs.FileExists(strFileToRename) Then
+                fs.MoveFile strFileToRename, strFileToDelete
+            End If
+            
+            If fs.FileExists(strScriptToDelete) Then
+                fs.DeleteFile strScriptToDelete
+            End If
+            """);
 
         Process.Start("BepInEx/plugins/do.vbs");
     }

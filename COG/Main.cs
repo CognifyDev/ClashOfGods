@@ -34,6 +34,8 @@ using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
+using COG.States;
+using GameStates = COG.States.GameStates;
 
 namespace COG;
 
@@ -167,6 +169,11 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
                 {
+                    if (GameStates.InGame)
+                    {
+                        GameUtils.Popup?.Show("You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
+                        return false;
+                    }
                     var p = OpenFileDialogue.Open(Mode.Open, "*",
                         defaultDir: @$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
                     if (p.FilePath is null or "") return false;
@@ -180,14 +187,14 @@ public partial class Main : BasePlugin
                 () =>
                 {
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-                    if (AmongUsClient.Instance.GameState != InnerNetClient.GameStates.NotJoined)
+                    if (GameStates.InGame)
                     {
-                        GameUtils.Popup!.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
+                        GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
                         return false;
                     }
 
                     Unload();
-                    GameUtils.Popup!.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
+                    GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }, false)
         });

@@ -108,8 +108,6 @@ public class CustomWinnerListener : IListener
             var winnerPoolable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
             if (winner == null!) continue;
             
-            // ↓↓↓ These variables are from The Other Roles
-            // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Patches/EndGamePatch.cs#L239
             // Variable names optimizing by ChatGPT
             var offsetMultiplier = num % 2 == 0 ? -1 : 1;
             var indexOffset = (num + 1) / 2;

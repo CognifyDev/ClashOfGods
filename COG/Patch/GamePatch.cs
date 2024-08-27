@@ -326,7 +326,7 @@ public class ExileControllerBeginPatch
     public static bool Prefix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
     {
         return ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerExileBeginEvent(init.networkedPlayer.Object, __instance, init),
+            .ExecuteHandlers(new PlayerExileBeginEvent(init.networkedPlayer?.Object, __instance, init),
                 EventHandlerType.Prefix);
     }
 
@@ -334,7 +334,7 @@ public class ExileControllerBeginPatch
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(
-                new PlayerExileBeginEvent(init.networkedPlayer.Object, __instance, init),
+                new PlayerExileBeginEvent(init.networkedPlayer?.Object, __instance, init),
                 EventHandlerType.Postfix);
     }
 }

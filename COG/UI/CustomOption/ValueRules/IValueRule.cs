@@ -1,9 +1,17 @@
+using Il2CppSystem;
+using System.Linq;
+
 namespace COG.UI.CustomOption.ValueRules;
 
 public interface IValueRule
 {
     public int DefaultSelection { get; }
     public object[] Selections { get; }
+
+    public bool Equals(IValueRule rule)
+    {
+        return rule.DefaultSelection == DefaultSelection && Selections.SequenceEqual(rule.Selections);
+    }
 }
 
 public interface IValueRule<T> : IValueRule

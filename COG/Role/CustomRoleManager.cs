@@ -11,6 +11,8 @@ public class CustomRoleManager
 
     private readonly List<CustomRole> _roles = new();
 
+    public bool ReloadingRoles { get; private set; } = false;
+
     public CustomRole[] GetTypeCampRoles(CampType campType)
     {
         return _roles.Where(role => role.CampType == campType).ToArray();
@@ -36,9 +38,13 @@ public class CustomRoleManager
         return _roles;
     }
 
-    public CustomRole? GetRoleByClassName(string name)
+    public CustomRole? GetRoleByClassName(string name, bool ignoreCase = false)
     {
-        return _roles.FirstOrDefault(r => r.GetType().Name == name);
+        return _roles.FirstOrDefault(r =>
+        {
+            var type = r.GetType();
+            return ignoreCase ? type.Name.ToLower() == name.ToLower() : type.Name == name;
+        });
     }
 
     public CustomRole? GetRoleById(int id)
@@ -62,6 +68,8 @@ public class CustomRoleManager
 
     public void ReloadRoles()
     {
+        ReloadingRoles = true;
+
         var newInstanceRoles = _roles.Select(role =>
         {
             var newInstance = role.NewInstance();
@@ -71,8 +79,11 @@ public class CustomRoleManager
             newInstance.AllOptions = role.AllOptions;
             return newInstance;
         }).ToList();
+
         _roles.Clear();
         _roles.AddRange(newInstanceRoles);
+
+        ReloadingRoles = false;
     }
 
     private class RoleGetter : IGetter<CustomRole>
