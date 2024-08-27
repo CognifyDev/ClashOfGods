@@ -287,17 +287,10 @@ public class CustomButton
         return btn.Id == Id;
     }
 
-    // Static methods
     public static void ResetAllCooldown()
     {
         CustomButtonManager.GetManager().GetButtons().ForEach(b => b.ResetCooldown());
     }
-
-    public static void SetAllActive(bool active)
-    {
-        CustomButtonManager.GetManager().GetButtons().ForEach(b => b.SetActive(active));
-    }
-
     internal static void Init(HudManager? hud)
     {
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
