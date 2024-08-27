@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
@@ -14,7 +15,7 @@ public class PlayerListener : IListener
     public void OnJoinPlayer(PlayerControlAwakeEvent @event)
     {
         if (!GameStates.InLobby || !AmongUsClient.Instance.AmHost)
-            return; // Don't share option when the player prefab loaded (Scene MainMenu)
+            return; // Don't share options when the player prefab loaded (Scene MainMenu)
         var target = @event.Player;
         Coroutines.Start(CoShareOptions());
         return;
@@ -24,7 +25,15 @@ public class PlayerListener : IListener
             yield return new WaitForSeconds(0.8f);
             if (!target.IsSamePlayer(PlayerControl.LocalPlayer))
             {
-                CustomOption.ShareConfigs(target);
+                try
+                {
+                    CustomOption.ShareConfigs(target);
+                }
+                // DANGER: some exceptions may be ignored
+                catch (NullReferenceException)
+                {
+                    // ignore
+                }
             }
         }
     }

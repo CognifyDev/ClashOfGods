@@ -4,7 +4,6 @@ using COG.UI.CustomOption;
 using COG.Utils;
 using System;
 using System.Linq;
-using UnityEngine;
 
 namespace COG.Patch;
 
@@ -49,7 +48,7 @@ internal static class GameSettingMenuPatch
     public static void OnMenuUpdate(GameSettingMenu __instance)
     {
         if (AmongUsClient.Instance.AmHost) return;
-        int tabNum = __instance.GameSettingsTab.isActiveAndEnabled ? 1 : 2;
+        var tabNum = __instance.GameSettingsTab.isActiveAndEnabled ? 1 : 2;
         var handler = LanguageConfig.Instance.GetHandler("game-setting.view-description");
         __instance.MenuDescriptionText.text = tabNum switch
         {
@@ -58,45 +57,58 @@ internal static class GameSettingMenuPatch
             _ => ""
         };
     }
+    
+    // DANGER: refresh methods can not be executed.
 
-    [HarmonyPatch(nameof(RolesSettingsMenu.RefreshChildren))]
-    [HarmonyPatch(nameof(GameOptionsMenu.RefreshChildren))]
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.RefreshChildren))]
+    [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.RefreshChildren))]
     [HarmonyPostfix]
-    public static void OnMenuRefreshing()
+    private static void OnRefreshChildren()
     {
-        // This patch is for clients who are previewing the settings and hosts who has loaded the preset to update options when the host has changed settings
+        // This patch is for clients who are previewing the settings
+        // and hosts who has loaded the preset to update options when the host has changed settings
 
         foreach (var role in CustomRoleManager.GetManager().GetRoles()
                      .Where(r => r is { IsBaseRole: false, ShowInOptions: true }))
         {
-            role.RoleNumberOption!.OptionBehaviour!.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
+            var roleRoleNumberOption = role.RoleNumberOption;
+            if (roleRoleNumberOption == null)
+            {
+                continue;
+            }
+            roleRoleNumberOption.OptionBehaviour?.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
             role.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
             {
                 var behaviour = o.OptionBehaviour!;
-                NumberOption numberOption = null!;
-                StringOption stringOption = null!;
-                ToggleOption toggleOption = null!;
-                if (numberOption = behaviour.GetComponent<NumberOption>())
+                NumberOption numberOption;
+                StringOption stringOption;
+                ToggleOption toggleOption;
+                if ((numberOption = behaviour.GetComponent<NumberOption>()) != null)
                     numberOption.Value = o.GetFloat();
-                else if (stringOption = behaviour.GetComponent<StringOption>())
+                else if ((stringOption = behaviour.GetComponent<StringOption>()) != null)
                     stringOption.Value = o.Selection;
-                else if (toggleOption = behaviour.GetComponent<ToggleOption>())
+                else if ((toggleOption = behaviour.GetComponent<ToggleOption>()) != null)
                     toggleOption.CheckMark.enabled = o.GetBool();
             });
         }
-
+        if (GameSettingMenu.Instance == null 
+            || GameSettingMenu.Instance.GameSettingsTab == null 
+            || GameSettingMenu.Instance.GameSettingsTab.Children == null)
+        {
+            return;
+        }
         GameSettingMenu.Instance.GameSettingsTab.Children.ForEach(new Action<OptionBehaviour>(o =>
         {
             var customOption = CustomOption.Options.FirstOrDefault(co => co.OptionBehaviour == o);
             if (customOption == null) return;
-            NumberOption numberOption = null!;
-            StringOption stringOption = null!;
-            ToggleOption toggleOption = null!;
-            if (numberOption = o.GetComponent<NumberOption>())
+            NumberOption numberOption;
+            StringOption stringOption;
+            ToggleOption toggleOption;
+            if ((numberOption = o.GetComponent<NumberOption>()) != null)
                 numberOption.UpdateValue();
-            else if (stringOption = o.GetComponent<StringOption>())
+            else if ((stringOption = o.GetComponent<StringOption>()) != null)
                 stringOption.UpdateValue();
-            else if (toggleOption = o.GetComponent<ToggleOption>())
+            else if ((toggleOption = o.GetComponent<ToggleOption>()) != null)
                 toggleOption.UpdateValue();
         }));
     }

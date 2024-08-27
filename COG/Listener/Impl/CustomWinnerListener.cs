@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
+using COG.Game.CustomWinner.Data;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Player;
@@ -13,17 +13,16 @@ using COG.Role;
 using COG.Rpc;
 using COG.States;
 using COG.Utils;
-using Reactor.Utilities;
 using TMPro;
 using UnityEngine;
-using static Il2CppSystem.Globalization.CultureInfo;
 
 namespace COG.Listener.Impl;
 
 public class CustomWinnerListener : IListener
 {
+    private bool _ending;
+    
     private static readonly int Color1 = Shader.PropertyToID("_Color");
-    private static readonly List<CachedPlayerData> WinnerData = new();
     
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent _)
@@ -32,50 +31,50 @@ public class CustomWinnerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Prefix)]
+    [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
     public bool OnCheckGameEnd(GameCheckEndEvent _)
     {
+        if (_ending) return false;
         if (GlobalCustomOptionConstant.DebugMode.GetBool() || !AmongUsClient.Instance.AmHost) return false;
         var checkForGameEnd = CustomWinnerManager.GetManager().CheckForGameEnd();
-        if (checkForGameEnd.Winnable)
-            Coroutines.Start(CoShareGameEnd());
-        return false;
-
-        IEnumerator CoShareGameEnd()
-        {
-            var data = CustomWinnerManager.GetManager().WinnableData;
-
-            var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareWinners);
+        if (!checkForGameEnd.Winnable) return false;
+        _ending = true;
+        var data = CustomWinnerManager.GetManager().WinnableData;
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareWinners);
+        writer.WriteBytesAndSize(SerializableWinnableData.Of(data).SerializeToData());
+        writer.Finish();
             
-            writer.WriteBytesAndSize(data.WinnablePlayers.Select(p => p.PlayerId).ToArray());
-            writer.Finish();
-
-            yield return new WaitForSeconds(AmongUsClient.Instance.Ping / 1000); // Wait for other players receiving RPC
-
-            GameManager.Instance.RpcEndGame(checkForGameEnd.GameOverReason, false);
-        }
+        TaskUtils.RunTaskAfter(1.5f, () =>
+            GameManager.Instance.RpcEndGame(checkForGameEnd.GameOverReason, false));
+        return false;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnAmongUsClientGameEnd(AmongUsClientGameEndEvent @event)
     {
-        var endGameResult = @event.GetEndGameResult();
-        var data = CustomWinnerManager.GetManager().WinnableData;
-        endGameResult.GameOverReason = data.GameOverReason;
-        EndGameResult.CachedGameOverReason = data.GameOverReason;
+        UpdateWinners();
+    }
 
+    private static void UpdateWinners()
+    {
+        var data = CustomWinnerManager.GetManager().WinnableData;
+        EndGameResult.CachedGameOverReason = data.GameOverReason;
         EndGameResult.CachedWinners.Clear();
-        EndGameResult.CachedWinners = WinnerData.ToIl2CppList();
-        WinnerData.Clear();
+        EndGameResult.CachedWinners = CustomWinnerManager.GetManager()
+            .WinnableData.GetWinnablePlayersAsCachedPlayerData().ToIl2CppList();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnRpcReceived(PlayerHandleRpcEvent @event)
     {
-        if (@event.CallId == (byte)KnownRpc.ShareWinners)
-        {
-            WinnerData.Clear();
-            WinnerData.AddRange(@event.Reader.ReadBytesAndSize().Select(id => new CachedPlayerData(GameData.Instance.GetPlayerById(id))));
-        }
+        if (!GameStates.InGame) return;
+        if (@event.CallId != (byte)KnownRpc.ShareWinners) return;
+        
+        CustomWinnerManager.GetManager().WinnableData = new WinnableData();
+        CustomWinnerManager.GetManager().WinnableData = @event.Reader.ReadBytesAndSize().ToArray()
+            .DeserializeToData<SerializableWinnableData>().ToWinnableData();
+            
+        UpdateWinners();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -87,12 +86,69 @@ public class CustomWinnerListener : IListener
         SetUpRoleSummary(manager);
         
         GameStates.InGame = false;
+        _ending = false;
     }
 
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
-        Main.Logger.LogInfo(EndGameResult.CachedWinners.ToArray().Select(winner => winner.PlayerName)
-            .ToArray().AsString());
+        manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList()
+            .ForEach(pb => pb.gameObject.Destroy());
+
+        var num = 0;
+        var ceiling = Mathf.CeilToInt(7.5f);
+
+        var winners = CustomWinnerManager.GetManager().WinnableData.WinnablePlayers.Select(info 
+            => new CachedPlayerData(info)).ToList();
+        Main.Logger.LogDebug($"Winners number => {winners.Count}");
+
+        foreach (var winner in winners.ToArray().OrderBy(b => b.IsYou ? -1 : 0))
+        {
+            if (!(manager.PlayerPrefab && manager.transform)) break;
+
+            var winnerPoolable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
+            if (winner == null!) continue;
+            
+            // ↓↓↓ These variables are from The Other Roles
+            // Link: https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Patches/EndGamePatch.cs#L239
+            // Variable names optimizing by ChatGPT
+            var offsetMultiplier = num % 2 == 0 ? -1 : 1;
+            var indexOffset = (num + 1) / 2;
+            var lerpFactor = indexOffset / ceiling;
+            var scaleLerp = Mathf.Lerp(1f, 0.75f, lerpFactor);
+            float positionOffset = num == 0 ? -8 : -1;
+
+            winnerPoolable.transform.localPosition = new Vector3(offsetMultiplier * indexOffset * scaleLerp,
+                FloatRange.SpreadToEdges(-1.125f, 0f, indexOffset, ceiling),
+                positionOffset + indexOffset * 0.01f) * 0.9f;
+
+            var scaleValue = Mathf.Lerp(1f, 0.65f, lerpFactor) * 0.9f;
+            var scale = new Vector3(scaleValue, scaleValue, 1f);
+
+            winnerPoolable.transform.localScale = scale;
+
+            if (winner.IsDead)
+            {
+                winnerPoolable.SetBodyAsGhost();
+                winnerPoolable.SetDeadFlipX(num % 2 == 0);
+            }
+            else
+            {
+                winnerPoolable.SetFlipX(num % 2 == 0);
+            }
+            
+            winnerPoolable.UpdateFromPlayerOutfit(winner.Outfit, PlayerMaterial.MaskType.None, winner.IsDead, true);
+
+            var namePos = winnerPoolable.cosmetics.nameText.transform.localPosition;
+            
+            winnerPoolable.SetNamePosition(new Vector3(namePos.x, namePos.y, -15f));
+            winnerPoolable.SetNameScale(new Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
+
+            Main.Logger.LogDebug(
+                $"Set up winner message for {winner.PlayerName} at {manager.transform.position.ToString()}");
+
+            num++;
+        }
+        
         manager.transform.GetComponentsInChildren<PoolablePlayer>().ForEach(p =>
         {
             var data = GameUtils.PlayerData.FirstOrDefault(d => d.ColorId == p.ColorId);
