@@ -572,6 +572,21 @@ public class GameListener : IListener
 
         Arrow.CreatedArrows.RemoveAll(a => !a.ArrowObject);
         Arrow.CreatedArrows.ForEach(a => a.Update());
+
+        var localRole = GameUtils.GetLocalPlayerRole();
+        bool isImpostorRole = localRole.CampType == CampType.Impostor;
+
+        var sb = new StringBuilder();
+
+        sb.Append(localRole.GetColorName()).Append("：".Color(localRole.Color))
+            .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n");
+
+        if (isImpostorRole)
+            sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
+
+        var impText = Object.FindObjectOfType<ImportantTextTask>();
+        if (impText)
+            impText.Text = sb.ToString();
     }
 
     private static void ShareRoles()
@@ -643,44 +658,5 @@ public class GameListener : IListener
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
             foreach (var player in PlayerControl.AllPlayerControls)
                 player.RpcSetCustomRole<Crewmate>();
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnTaskPanelSetText(TaskPanelBehaviourSetTaskTextEvent @event)
-    {
-        var originText = @event.GetTaskString();
-        var localRole = GameUtils.GetLocalPlayerRole();
-        if (originText == "None" || localRole == null!) return;
-
-        bool isImpostorRole = localRole.CampType == CampType.Impostor;
-
-        var sb = new Il2CppStringBuilder();
-
-        sb.Append(localRole.GetColorName()).Append("：".Color(localRole.Color))
-            .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n\r\n");
-
-        foreach (var playerTask in PlayerControl.LocalPlayer.myTasks.ToArray()) 
-        {
-            if (playerTask.GetComponent<ImportantTextTask>())
-            {
-                if (isImpostorRole)
-                    sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
-                continue;
-            }
-            
-            if (playerTask)
-            {
-                if (playerTask.TaskType == TaskTypes.FixComms && !isImpostorRole)
-                {
-                    sb.Clear();
-                    playerTask.AppendTaskText(sb);
-                    break;
-                }
-                playerTask.AppendTaskText(sb);
-            }
-        }
-
-        sb.TrimEnd();
-        @event.SetTaskString(sb.ToString());
     }
 }

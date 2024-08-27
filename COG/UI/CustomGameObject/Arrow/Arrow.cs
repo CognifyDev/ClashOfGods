@@ -21,7 +21,7 @@ public class Arrow
         if (Color.HasValue)
             Renderer.color = Color.Value;
         else
-            Renderer.color = new Color(0.9034f, 1f, 0, 1f);
+            Renderer.color = UnityEngine.Color.yellow;
         Renderer.sprite = ResourceUtils.LoadSprite(ResourcesConstant.ArrowImage, 200f);
 
         Behaviour.image = Renderer;
