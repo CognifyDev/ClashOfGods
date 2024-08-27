@@ -57,7 +57,7 @@ internal static class GameSettingMenuPatch
             _ => ""
         };
     }
-    
+
     // DANGER: refresh methods can not be executed.
 
     [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.RefreshChildren))]
@@ -91,25 +91,22 @@ internal static class GameSettingMenuPatch
                     toggleOption.CheckMark.enabled = o.GetBool();
             });
         }
-        if (GameSettingMenu.Instance == null 
-            || GameSettingMenu.Instance.GameSettingsTab == null 
-            || GameSettingMenu.Instance.GameSettingsTab.Children == null)
-        {
+
+        if (!(GameSettingMenu.Instance && GameSettingMenu.Instance.GameSettingsTab))
             return;
-        }
+
         GameSettingMenu.Instance.GameSettingsTab.Children.ForEach(new Action<OptionBehaviour>(o =>
         {
-            var customOption = CustomOption.Options.FirstOrDefault(co => co.OptionBehaviour == o);
-            if (customOption == null) return;
+            if (CustomOption.TryGetOption(o, out var customOption)) return;
             NumberOption numberOption;
             StringOption stringOption;
             ToggleOption toggleOption;
             if ((numberOption = o.GetComponent<NumberOption>()) != null)
-                numberOption.UpdateValue();
+                numberOption.oldValue = int.MinValue;
             else if ((stringOption = o.GetComponent<StringOption>()) != null)
-                stringOption.UpdateValue();
+                stringOption.oldValue = -1;
             else if ((toggleOption = o.GetComponent<ToggleOption>()) != null)
-                toggleOption.UpdateValue();
+                toggleOption.oldValue = !toggleOption.CheckMark.enabled;
         }));
     }
 }
