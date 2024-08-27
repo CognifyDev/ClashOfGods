@@ -224,6 +224,8 @@ public abstract class CustomRole
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
+        if (CustomRoleManager.GetManager().ReloadingRoles)
+            return AllOptions.FirstOrDefault(o => o.Name() == nameGetter() && o.ValueRule.Equals(rule))!;
         var option = CustomOption.Of(GetTabType(this), nameGetter, rule).Register();
         AllOptions.Add(option);
         return option;
@@ -244,6 +246,8 @@ public abstract class CustomRole
         return CustomOption.Of(GetTabType(this), nameGetter, rule);
     }
 
+    public List<CustomButton> AllButtons { get; } = new();
+
     /// <summary>
     ///     添加一个按钮
     /// </summary>
@@ -253,6 +257,9 @@ public abstract class CustomRole
         hasButton ??= () => PlayerControl.LocalPlayer.IsRole(this);
         button.HasButton += hasButton;
         CustomButtonManager.GetManager().RegisterCustomButton(button);
+        if (CustomRoleManager.GetManager().ReloadingRoles)
+            CustomButtonManager.GetManager().GetButtons().RemoveAll(b => AllButtons.Contains(b));
+        AllButtons.Add(button);
     }
 
     public virtual string HandleEjectText(NetworkedPlayerInfo player)

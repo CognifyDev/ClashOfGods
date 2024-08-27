@@ -38,8 +38,12 @@ public class CustomButton
         EffectTime = effectTime;
         UsesLimit = UsesRemaining = usesLimit;
         HotkeyName = hotkeyName;
+        Id = _availableId++;
     }
 
+    private static int _availableId = 0;
+
+    public int Id { get; }
     public ActionButton? ActionButton { get; set; }
     public Func<float> Cooldown { get; set; }
     public Func<bool> CouldUse { get; set; }
@@ -92,7 +96,7 @@ public class CustomButton
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown,
+        Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
@@ -276,6 +280,13 @@ public class CustomButton
     }
 
 #nullable enable
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not CustomButton btn) return false;
+        return btn.Id == Id;
+    }
+
     // Static methods
     public static void ResetAllCooldown()
     {

@@ -29,16 +29,6 @@ public static class IsVersionModdedPatch
     }
 }
 
-[HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
-public static class DestroyQuickButton
-{
-    public static void Postfix(ChatController __instance)
-    {
-        var gameObject = __instance.quickChatButton.gameObject;
-        gameObject?.Destroy();
-    }
-}
-
 [HarmonyPatch(typeof(OptionsMenuBehaviour), nameof(OptionsMenuBehaviour.Update))]
 public static class HideUselessButtons
 {
