@@ -95,7 +95,7 @@ internal static class GameSettingMenuPatch
         if (!(GameSettingMenu.Instance && GameSettingMenu.Instance.GameSettingsTab))
             return;
 
-        GameSettingMenu.Instance.GameSettingsTab.Children.ForEach(new Action<OptionBehaviour>(o =>
+        GameSettingMenu.Instance.GameSettingsTab.Children?.ForEach(new Action<OptionBehaviour>(o =>
         {
             if (CustomOption.TryGetOption(o, out var customOption)) return;
             NumberOption numberOption;
