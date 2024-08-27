@@ -28,6 +28,7 @@ using Action = Il2CppSystem.Action;
 using GameStates = COG.States.GameStates;
 using Random = System.Random;
 using Il2CppStringBuilder = Il2CppSystem.Text.StringBuilder;
+using COG.UI.CustomButton;
 
 namespace COG.Listener.Impl;
 
@@ -634,7 +635,9 @@ public class GameListener : IListener
         
         CustomRoleManager.GetManager().GetRoles().Select(role => role.GetListener()).ForEach(
             listener => _handlers.AddRange(ListenerManager.GetManager().AsHandlers(listener)));
-        
+
+        CustomButton.ResetAllCooldown();
+
         ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
 
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
@@ -653,15 +656,17 @@ public class GameListener : IListener
 
         var sb = new Il2CppStringBuilder();
 
-        sb.Append(localRole.GetColorName()).Append(": ".Color(localRole.Color))
+        sb.Append(localRole.GetColorName()).Append("：".Color(localRole.Color))
             .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n\r\n");
 
         foreach (var playerTask in PlayerControl.LocalPlayer.myTasks.ToArray()) 
         {
-            if (!isImpostorRole && playerTask is ImportantTextTask task)
+            if (playerTask.GetComponent<ImportantTextTask>())
+            {
+                if (isImpostorRole)
+                    sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
                 continue;
-            else
-                sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>");
+            }
             
             if (playerTask)
             {
