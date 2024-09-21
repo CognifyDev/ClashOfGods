@@ -425,7 +425,7 @@ public static class PlayerUtils
     public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason,
         bool showCorpse = true)
     {
-        _ = new DeadPlayer(DateTime.Now, reason, target, pc);
+        _ = new DeadPlayer(DateTime.Now, reason, target.Data, pc.Data);
         if (showCorpse)
             pc.MurderPlayer(target, GameUtils.DefaultFlag);
         else
@@ -456,28 +456,26 @@ public class DeadPlayerListener : IListener
         var target = @event.Target;
         var killer = @event.Player;
         if (!(target.Data.IsDead && killer && target)) return;
-
-        if (DeadPlayerManager.DeadPlayers.Select(dp => dp.Player).Contains(target)) return;
+        if (DeadPlayerManager.DeadPlayers.Any(p => p.PlayerId == target.PlayerId)) return;
 
         var reason = DeadPlayerManager.GetDeathReason(killer, target);
-        _ = new DeadPlayer(DateTime.Now, reason, target, killer);
+        _ = new DeadPlayer(DateTime.Now, reason, target.Data, killer.Data);
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
+    [EventHandler(EventHandlerType.Prefix)]
     private void OnPlayerLeft(AmongUsClientLeaveEvent @event)
     {
         var data = @event.ClientData;
-        if (DeadPlayerManager.DeadPlayers.Any(dp => dp.Player.NetId == data.Character.NetId)) return;
-        _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character, null);
+        if (!GameStates.InGame) return;
+        _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character.Data, null);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     private void OnPlayerExile(PlayerExileEndEvent @event)
     {
         var exiled = @event.ExileController.initData.networkedPlayer;
-        if (exiled == null) return;
-        if (DeadPlayerManager.DeadPlayers.Select(dp => dp.Player).Contains(exiled.Object)) return;
-        _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, exiled.Object, null);
+        if (exiled == null || DeadPlayerManager.DeadPlayers.Any(p => p.PlayerId == exiled.PlayerId)) return;
+        _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, exiled, null);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -507,31 +505,25 @@ public class DeadPlayerManager
 
 public class DeadPlayer
 {
-    public DeadPlayer(DateTime deadTime, DeathReason? deathReason, PlayerControl player, PlayerControl? killer)
+    public DeadPlayer(DateTime deadTime, DeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer)
     {
         DeadTime = deadTime;
         DeathReason = deathReason;
-        Player = player;
-        Data = Player.Data;
+        Data = playerInfo;
         Killer = killer;
-        Role = player.GetMainRole();
-        PlayerId = player.PlayerId;
+        VictimRole = playerInfo.GetMainRole();
+        KillerRole = killer?.GetMainRole();
+        PlayerId = playerInfo.PlayerId;
         DeadPlayerManager.DeadPlayers.Add(this);
     }
 
     public DateTime DeadTime { get; private set; }
     public DeathReason? DeathReason { get; }
-    public PlayerControl? Player { get; }
     public NetworkedPlayerInfo Data { get; }
-    public PlayerControl? Killer { get; }
-    public CustomRole? Role { get; private set; }
+    public NetworkedPlayerInfo? Killer { get; }
+    public CustomRole? VictimRole { get; private set; }
+    public CustomRole? KillerRole { get; private set; }
     public byte PlayerId { get; }
-
-    // 先这样，以后再改，反正暂时用不着
-    public override string ToString()
-    {
-        return Player + " was killed by " + Killer;
-    }
 }
 
 [Serializable]
