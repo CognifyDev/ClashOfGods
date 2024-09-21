@@ -12,6 +12,8 @@ using Debug = System.Diagnostics.Debug;
 
 namespace COG.UI.CustomButton;
 
+#pragma warning disable CS0659
+
 [ShitCode]
 public class CustomButton
 {
@@ -364,3 +366,5 @@ public class CustomButton
         }
     }
 }
+
+#pragma warning restore CS0659

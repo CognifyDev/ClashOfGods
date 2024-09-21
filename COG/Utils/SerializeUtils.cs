@@ -11,6 +11,7 @@ public static class SerializeUtils
         using var stream = new MemoryStream();
 #pragma warning disable
         formatter.Serialize(stream, obj);
+#pragma warning restore
         return stream.ToArray();
     }
 
@@ -20,5 +21,6 @@ public static class SerializeUtils
         using var stream = new MemoryStream(data);
 #pragma warning disable
         return (T)formatter.Deserialize(stream);
+#pragma warning restore
     }
 }

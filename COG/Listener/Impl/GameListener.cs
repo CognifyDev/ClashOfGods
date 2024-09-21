@@ -585,8 +585,11 @@ public class GameListener : IListener
             sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
 
         var impText = Object.FindObjectOfType<ImportantTextTask>();
-        if (impText)
-            impText.Text = sb.ToString();
+        if (!impText)
+            impText = PlayerTask.GetOrCreateTask<ImportantTextTask>(PlayerControl.LocalPlayer);
+
+        impText.name = "RoleHintTask";
+        impText.Text = sb.ToString();
     }
 
     private static void ShareRoles()
@@ -596,9 +599,7 @@ public class GameListener : IListener
         writer.WritePacked(GameUtils.PlayerData.Count);
         
         foreach (var bytes in GameUtils.PlayerData.Select(SerializablePlayerData.Of).Select(data => data.SerializeToData()))
-        {
             writer.WriteBytesAndSize(bytes);
-        }
         
         writer.Finish();
     }

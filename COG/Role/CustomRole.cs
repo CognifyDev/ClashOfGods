@@ -19,6 +19,8 @@ using Random = System.Random;
 
 namespace COG.Role;
 
+#pragma warning disable CS0659
+
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
@@ -76,9 +78,7 @@ public abstract class CustomRole
         }
     }
 
-#pragma warning disable CS0659
     public override bool Equals(object? obj)
-#pragma warning restore CS0659
     {
         if (obj is not CustomRole role) return false;
         return role.Id == Id;
@@ -325,3 +325,5 @@ public abstract class CustomRole
         ClearRoleGameData();
     }
 }
+
+#pragma warning restore CS0659
