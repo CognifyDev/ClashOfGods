@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using COG.States;
 using COG.Utils;
 using COG.Utils.Coding;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -103,7 +103,7 @@ public class CustomButton
     {
         return new CustomButton(onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
                 true, cooldown, effectTime, usesLimit, hotkeyName)
-            { Order = order };
+        { Order = order };
     }
 
     /// <summary>
@@ -127,7 +127,7 @@ public class CustomButton
     {
         return new CustomButton(onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text,
                 false, cooldown, -1f, usesLimit, hotkeyName)
-            { Order = order };
+        { Order = order };
     }
 
     /// <summary>
@@ -348,14 +348,13 @@ public class CustomButton
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()
                      .Where(b => b.ActionButton!.isActiveAndEnabled && b.AutoPosition).OrderBy(b => b.Order))
         {
-            var row = btn.Row;
-            btn.Row = Mathf.Clamp(row, 1, 2); // 限制按钮的行数
+            btn.Row = Mathf.Clamp(btn.Row, 1, 2); // 限制按钮的行数
             var y = 2 - btn.Row; // 对应y坐标（第一行 => y = 1; 第二行 => y = 0）
             var now = 1; // 确定每行会有几个自定义按钮
             if (y == 1) now = ++idx1;
             if (y == 0) now = ++idx2;
             var rowBtnPos = vectors.Where(p => p.y == y).OrderBy(p => p.x).ToList(); // 按序排列与当前按钮在同一行的原版按钮
-            
+
             float x = 0;
 
             if (rowBtnPos.Count != 0)
@@ -363,6 +362,19 @@ public class CustomButton
 
             var pos = new Vector3(x - now, y, -9); // 按钮的x坐标为最靠左的原版按钮x坐标减去当前按钮在同一行自定义按钮的Index
             btn.GameObject!.transform.localPosition = btn.Position = pos;
+
+            if (!Input.GetKeyDown(KeyCode.F1))
+                Main.Logger.LogInfo($"""
+                idx: {idx1} {idx2}
+                row: {btn.Row}
+                y: {y}
+                now: {now}
+                vectors: {vectors.AsString()}
+                rowBtnPos: {rowBtnPos.AsString()}
+                x: {x}
+                pos: {pos}
+                AllVanillaButtons.Where(b => b.isActiveAndEnabled): {AllVanillaButtons.Where(b => b.isActiveAndEnabled).AsString()}
+                """);
         }
     }
 }
