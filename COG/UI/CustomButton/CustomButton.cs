@@ -203,8 +203,7 @@ public class CustomButton
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 
-        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || !hasButton ||
-            PlayerStates.IsShowingMap())
+        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || !hasButton)
         {
             SetActive(false);
             return;
@@ -212,6 +211,8 @@ public class CustomButton
 
         SetActive(hasButton);
         if (!hasButton) return;
+        
+        if (PlayerStates.IsShowingMap()) SetActive(false);
         var lp = PlayerControl.LocalPlayer;
         if (isCoolingDown && !lp.inVent && lp.moveable) Timer -= Time.deltaTime;
         ActionButton!.SetCoolDown(Timer, Cooldown());
