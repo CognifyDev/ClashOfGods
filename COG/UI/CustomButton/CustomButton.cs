@@ -336,11 +336,19 @@ public class CustomButton
     internal static void ArrangePosition()
     {
         if (GameStates.IsMeeting || PlayerStates.IsShowingMap()) return;
-        List<(int x, int y, int z)> vectors = AllVanillaButtons.Where(b => b.isActiveAndEnabled).Select(b =>
+
+        bool exit = false;
+        
+        var vectors = AllVanillaButtons.Where(b => b.isActiveAndEnabled).Select(b =>
         {
             var pos = b.transform.localPosition;
-            return ((int)pos.x, (int)pos.y, (int)pos.z);
+            var (x, y, z) = (pos.x, pos.y, pos.z);
+            if ((x > 0 && x < 0.01) || (y > 0 && y < 0.01) || (z > 0 && z < 0.01)) exit = true;
+            return (x, y, z);
         }).ToList(); // 不知为何原来的select函数返回的集合中在靠近管理室地图下会返回一个极大的数字，只能这样了
+        
+        if (exit) return;
+        
         var idx1 = 0;
         var idx2 = 0;
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()
@@ -352,7 +360,7 @@ public class CustomButton
             var now = 1; // 确定每行会有几个自定义按钮
             if (y == 1) now = ++idx1;
             if (y == 0) now = ++idx2;
-            var rowBtnPos = vectors.Where(p => p.y == y).OrderBy(p => p.x).ToList(); // 按序排列与当前按钮在同一行的原版按钮
+            var rowBtnPos = vectors.Where(p => Mathf.Approximately(p.y, y)).OrderBy(p => p.x).ToList(); // 按序排列与当前按钮在同一行的原版按钮
             
             float x = 0;
 

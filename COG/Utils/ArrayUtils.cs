@@ -12,9 +12,10 @@ public static class ArrayUtils
     {
         var toReturn = "[";
         int i = 0;
-        foreach (var item in collection)
+        var enumerable = collection as T[] ?? collection.ToArray();
+        foreach (var item in enumerable)
         {
-            toReturn += item + (i == collection.Count() - 1 ? "" : ", ");
+            toReturn += item + (i == enumerable.Length - 1 ? "" : ", ");
             i++;
         }
         toReturn += "]";
@@ -26,9 +27,10 @@ public static class ArrayUtils
     {
         var toReturn = "[";
         int i = 0;
-        foreach (var item in collection)
+        var enumerable = collection as T[] ?? collection.ToArray();
+        foreach (var item in enumerable)
         {
-            toReturn += selector(item) + (i == collection.Count() - 1 ? "" : ", ");
+            toReturn += selector(item) + (i == enumerable.Length - 1 ? "" : ", ");
             i++;
         }
         toReturn += "]";
