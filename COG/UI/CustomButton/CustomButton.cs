@@ -343,7 +343,7 @@ public class CustomButton
         {
             var pos = b.transform.localPosition;
             var (x, y, z) = (pos.x, pos.y, pos.z);
-            if ((x > 0 && x < 0.01) || (y > 0 && y < 0.01) || (z > 0 && z < 0.01)) exit = true;
+            if (x < 0.01 || y < 0.01 || z < 0.01) exit = true;
             return (x, y, z);
         }).ToList(); // 不知为何原来的select函数返回的集合中在靠近管理室地图下会返回一个极大的数字，只能这样了
         
