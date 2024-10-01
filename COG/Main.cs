@@ -28,13 +28,11 @@ using COG.UI.ModOption;
 using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
-using InnerNet;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using COG.States;
 using GameStates = COG.States.GameStates;
 
 namespace COG;
@@ -149,7 +147,6 @@ public partial class Main : BasePlugin
             new Sheriff(),
             new Vigilante(),
             new SoulHunter(),
-            // new Technician(),
 
             // Impostor
             new Impostor(),
@@ -159,8 +156,7 @@ public partial class Main : BasePlugin
             new Jester(),
 
             // Sub-roles
-            new Lighter(),
-            // new Guesser()
+            new Guesser()
         });
 
         // Register mod options

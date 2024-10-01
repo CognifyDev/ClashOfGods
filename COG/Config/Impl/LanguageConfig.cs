@@ -72,11 +72,6 @@ public class LanguageConfig : Config
     public string GuesserGuessContinuously { get; private set; } = null!;
     public string GuesserGuessEnabledRolesOnly { get; private set; } = null!;
     public string GuesserCanGuessSubRoles { get; private set; } = null!;
-    
-    public string LoverDescription { get; private set; } = null!;
-    public string LoverCountOptionName { get; private set; } = null!;
-    public string LoversDieTogetherOptionName { get; private set; } = null!;
-    public string LoverEnablePrivateChat { get; private set; } = null!;
 
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
@@ -130,8 +125,7 @@ public class LanguageConfig : Config
 
     public string DefaultEjectText { get; private set; } = null!;
     public string AlivePlayerInfo { get; private set; } = null!;
-    public string LoverEjectText { get; private set; } = null!;
-
+    
     public string SystemMessage { get; private set; } = null!;
 
     private void SetTranslations()
@@ -155,16 +149,11 @@ public class LanguageConfig : Config
 
         // Neutral
         
-        
+        // Sub-Roles
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
         GuesserGuessEnabledRolesOnly = GetString("role.sub-roles.guesser.guess-enabled-roles-only");
         GuesserCanGuessSubRoles = GetString("role.sub-roles.guesser.can-guess-sub-roles");
-
-        LoverDescription = GetString("role.sub-roles.lover.description");
-        LoverCountOptionName = GetString("role.sub-roles.lover.count-option");
-        LoversDieTogetherOptionName = GetString("role.sub-roles.lover.die-together");
-        LoverEnablePrivateChat = GetString("role.sub-roles.lover.private-chat");
 
         Enable = GetString("option.enable");
         Disable = GetString("option.disable");
@@ -217,11 +206,11 @@ public class LanguageConfig : Config
 
         DefaultEjectText = GetString("game.exile.default");
         AlivePlayerInfo = GetString("game.exile.alive-player-info");
-        LoverEjectText = GetString("game.exile.lover-message");
 
         SystemMessage = GetString("game.chat.system-message");
 
-        if (!FirstTimeLoad) OnLanguageLoaded.GetInvocationList().ForEach(d => d.DynamicInvoke(null));
+        // if (!FirstTimeLoad) OnLanguageLoaded.GetInvocationList().ForEach(d => d.DynamicInvoke(null));
+        // dont use this
     }
 
 

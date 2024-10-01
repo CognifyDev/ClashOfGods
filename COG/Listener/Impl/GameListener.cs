@@ -13,7 +13,6 @@ using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
-using COG.Listener.Event.Impl.TPBehaviour;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Role;
 using COG.Role.Impl.Crewmate;
@@ -27,7 +26,6 @@ using UnityEngine;
 using Action = Il2CppSystem.Action;
 using GameStates = COG.States.GameStates;
 using Random = System.Random;
-using Il2CppStringBuilder = Il2CppSystem.Text.StringBuilder;
 using COG.UI.CustomButton;
 
 namespace COG.Listener.Impl;

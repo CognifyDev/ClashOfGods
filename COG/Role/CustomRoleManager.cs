@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using COG.Role.Impl;
 using COG.Utils;
 
 namespace COG.Role;
@@ -35,7 +36,9 @@ public class CustomRoleManager
 
     public List<CustomRole> GetRoles()
     {
-        return _roles;
+        var customRoles = new List<CustomRole>(_roles);
+        customRoles.Remove(GetTypeRoleInstance<Unknown>());
+        return customRoles;
     }
 
     public CustomRole? GetRoleByClassName(string name, bool ignoreCase = false)
@@ -66,6 +69,12 @@ public class CustomRoleManager
         return Manager;
     }
 
+    /// <summary>
+    /// 不要使用这个方法
+    /// 这个方法会使职业类重新执行构造方法，从而使构造方法重复注册按钮之类的
+    /// </summary>
+    
+    // FIXME
     public void ReloadRoles()
     {
         ReloadingRoles = true;

@@ -1,6 +1,5 @@
 ﻿using AmongUs.GameOptions;
 using COG.States;
-using COG.Utils;
 using UnityEngine;
 
 // ReSharper disable InconsistentNaming

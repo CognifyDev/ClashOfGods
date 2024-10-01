@@ -104,11 +104,12 @@ public static class MainMenuPatch
     {
         if (PopupCreated) return;
         var popup = Object.Instantiate(DiscordManager.Instance.discordPopup);
+        popup.destroyOnClose = true;
         var bg = popup.transform.Find("Background").GetComponent<SpriteRenderer>();
-        var size = bg.size;
+        var bgSize = bg.size;
+        bgSize.x *= 2.5f;
+        bg.size = bgSize;
         popup.name = "COGPopup";
-        size.x *= 2.5f;
-        bg.size = size;
         popup.TextAreaTMP.fontSizeMin = popup.TextAreaTMP.fontSizeMax = popup.TextAreaTMP.fontSize;
         Object.DontDestroyOnLoad(popup);
         GameUtils.PopupPrefab = popup;

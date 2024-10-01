@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using COG.Config.Impl;
+using COG.Role;
 using COG.UI.CustomButton;
 using COG.Utils;
 using UnityEngine;
@@ -16,7 +17,16 @@ public static class ButtonConstant
             PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
         },
         () => KillButton.ResetCooldown(),
-        () => PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance) != null,
+        () =>
+        {
+            var closestPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance);
+            if (closestPlayer == null) return false;
+
+            if (closestPlayer.GetMainRole().CampType == CampType.Impostor &&
+                PlayerControl.LocalPlayer.GetMainRole().CampType == CampType.Impostor) return false;
+
+            return true;
+        },
         () =>
         {
             var role = PlayerControl.LocalPlayer.GetPlayerData();

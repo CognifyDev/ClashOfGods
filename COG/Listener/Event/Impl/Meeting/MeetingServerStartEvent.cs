@@ -1,7 +1,8 @@
 ﻿namespace COG.Listener.Event.Impl.Meeting;
 
 /// <summary>
-/// Postfix only
+/// Postfix Only.
+/// Only host can handle.
 /// </summary>
 public class MeetingServerStartEvent : MeetingEvent
 {

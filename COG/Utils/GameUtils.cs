@@ -23,9 +23,8 @@ public static class GameUtils
         get
         {
             if (!PopupPrefab) return null;
-            var popup = Object.Instantiate(PopupPrefab)!;
-            popup.transform.SetParent(Camera.main.transform);
-            popup.transform.localPosition = new(0, 0, 0);
+            var popup = Object.Instantiate(PopupPrefab, Camera.main!.transform, true)!;
+            popup.transform.localPosition = new Vector3(0, 0, 0);
             return popup;
         }
     }

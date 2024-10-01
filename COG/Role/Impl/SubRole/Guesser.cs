@@ -17,9 +17,7 @@ public class Guesser : CustomRole, IListener
     public CustomOption EnabledRolesOnly { get; }
     public CustomOption CanGuessSubRoles { get; }
 
-    public int HaveGuessedTime { get; } = 0;
-
-    public bool HasGuessed { get; private set; } 
+    public int GuessedTime { get; internal set; } = 0;
     
     public Guesser() : base(new Color(192, 0, 0, 100), CampType.Unknown, true)
     {
@@ -28,19 +26,28 @@ public class Guesser : CustomRole, IListener
         GuessContinuously = CreateOption(() => LanguageConfig.Instance.GuesserGuessContinuously, 
             new BoolOptionValueRule(true));
         EnabledRolesOnly = CreateOption(() => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
-            new BoolOptionValueRule(true));
+            new BoolOptionValueRule(false));
         CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
             new BoolOptionValueRule(false));
     }
     
     [EventHandler(EventHandlerType.Postfix)]
-    public void AfterMeetingHudServerStart(MeetingServerStartEvent @event)
+    public void AfterMeetingHudServerStart(MeetingStartEvent @event)
     {
         var player = PlayerControl.LocalPlayer;
         if (!player.IsRole(this) || !player.IsAlive()) return;
-        HasGuessed = false;
         var meetingHud = @event.MeetingHud;
         var debugEnabled = GlobalCustomOptionConstant.DebugMode.GetBool();
+        
+        if (GuessedTime >= MaxGuessTime.GetInt())
+        {
+            GuessButton.Buttons.ForEach(guessButton => guessButton.Destroy());
+            GuessButton.Buttons.Clear();
+        }
+        
+        GuessButton.Buttons.Clear();
+        
+        // NO FOREACH
         for (var i = 0; i < meetingHud.playerStates.Count; i++)
         {
             var playerVoteArea = meetingHud.playerStates[i];

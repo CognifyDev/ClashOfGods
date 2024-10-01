@@ -15,7 +15,7 @@ public class Cleaner : CustomRole, IListener
     public Cleaner() : base(Palette.ImpostorRed, CampType.Impostor)
     {
         BaseRoleType = RoleTypes.Impostor;
-        CanKill = false;
+        CanKill = true;
         CanVent = true;
         CanSabotage = true;
 
@@ -29,7 +29,7 @@ public class Cleaner : CustomRole, IListener
                 var body = PlayerUtils.GetClosestBody();
                 if (!body) return;
                 body!.RpcCleanDeadBody();
-                KillButton?.ResetCooldown();
+                ButtonConstant.KillButton.ResetCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
             () => PlayerUtils.GetClosestBody() != null,
@@ -42,39 +42,11 @@ public class Cleaner : CustomRole, IListener
             0
         );
 
-        KillButton = CustomButton.Create(
-            () =>
-            {
-                PlayerControl.LocalPlayer.CmdCheckMurder(ClosestTarget);
-                CleanBodyButton.ResetCooldown();
-            },
-            () => KillButton?.ResetCooldown(),
-            () =>
-            {
-                var target = ClosestTarget = PlayerControl.LocalPlayer;
-                if (target == null) return false;
-                var localPlayer = PlayerControl.LocalPlayer;
-                var localLocation = localPlayer.GetTruePosition();
-                var targetLocation = target.GetTruePosition();
-                var distance = Vector2.Distance(localLocation, targetLocation);
-                return GameUtils.GetGameOptions().KillDistance >= distance;
-            },
-            () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
-            1,
-            KeyCode.Q,
-            LanguageConfig.Instance.KillAction,
-            () => CleanBodyCd?.GetFloat() ?? 30f,
-            -1
-        );
-
         AddButton(CleanBodyButton);
     }
 
     private CustomOption? CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
-    private CustomButton KillButton { get; }
-    private static PlayerControl? ClosestTarget { get; set; }
 
     public override IListener GetListener()
     {

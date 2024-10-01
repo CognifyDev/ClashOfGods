@@ -12,5 +12,6 @@ public enum KnownRpc : uint
     Mark = 106,
     ShareOptions = 107,
     ClearSabotages = 108,
-    ShareWinners = 109
+    ShareWinners = 109,
+    KillPlayerCompletely = 110
 }
