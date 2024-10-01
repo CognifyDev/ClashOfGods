@@ -147,7 +147,6 @@ public partial class Main : BasePlugin
             new Sheriff(),
             new Vigilante(),
             new SoulHunter(),
-            // new Technician(),
 
             // Impostor
             new Impostor(),
@@ -157,7 +156,6 @@ public partial class Main : BasePlugin
             new Jester(),
 
             // Sub-roles
-            new Lighter(),
             new Guesser()
         });
 
