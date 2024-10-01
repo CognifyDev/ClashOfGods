@@ -570,21 +570,6 @@ public class GameListener : IListener
 
         Arrow.CreatedArrows.RemoveAll(a => !a.ArrowObject);
         Arrow.CreatedArrows.ForEach(a => a.Update());
-
-        var localRole = GameUtils.GetLocalPlayerRole();
-        bool isImpostorRole = localRole.CampType == CampType.Impostor;
-
-        var sb = new StringBuilder();
-
-        sb.Append(localRole.GetColorName()).Append("：".Color(localRole.Color))
-            .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n");
-
-        if (isImpostorRole)
-            sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
-
-        var impText = Object.FindObjectOfType<ImportantTextTask>();
-        if (impText)
-            impText.Text = sb.ToString();
     }
 
     private static void ShareRoles()
@@ -594,9 +579,7 @@ public class GameListener : IListener
         writer.WritePacked(GameUtils.PlayerData.Count);
         
         foreach (var bytes in GameUtils.PlayerData.Select(SerializablePlayerData.Of).Select(data => data.SerializeToData()))
-        {
             writer.WriteBytesAndSize(bytes);
-        }
         
         writer.Finish();
     }
@@ -652,6 +635,24 @@ public class GameListener : IListener
         CustomButton.ResetAllCooldown();
 
         ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
+
+        var localRole = GameUtils.GetLocalPlayerRole();
+        bool isImpostorRole = localRole.CampType == CampType.Impostor;
+
+        var sb = new StringBuilder();
+
+        sb.Append(localRole.GetColorName()).Append("：".Color(localRole.Color))
+            .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n");
+
+        if (isImpostorRole)
+            sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
+
+        var impText = Object.FindObjectOfType<ImportantTextTask>();
+        if (!impText)
+            impText = PlayerTask.GetOrCreateTask<ImportantTextTask>(PlayerControl.LocalPlayer);
+
+        impText.name = "RoleHintTask";
+        impText.Text = sb.ToString();
 
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
             foreach (var player in PlayerControl.AllPlayerControls)

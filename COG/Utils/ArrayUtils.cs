@@ -10,32 +10,12 @@ public static class ArrayUtils
 {
     public static string AsString<T>(this IEnumerable<T> collection)
     {
-        var toReturn = "[";
-        int i = 0;
-        var enumerable = collection as T[] ?? collection.ToArray();
-        foreach (var item in enumerable)
-        {
-            toReturn += item + (i == enumerable.Length - 1 ? "" : ", ");
-            i++;
-        }
-        toReturn += "]";
-
-        return toReturn;
+        return string.Join(", ", collection);
     }
 
     public static string AsString<T>(this IEnumerable<T> collection, Func<T, string> selector)
     {
-        var toReturn = "[";
-        int i = 0;
-        var enumerable = collection as T[] ?? collection.ToArray();
-        foreach (var item in enumerable)
-        {
-            toReturn += selector(item) + (i == enumerable.Length - 1 ? "" : ", ");
-            i++;
-        }
-        toReturn += "]";
-
-        return toReturn;
+        return string.Join(", ", collection.Select(selector));
     }
 
     public static T[] ToSingleElementArray<T>(this T obj)
