@@ -73,37 +73,8 @@ public class RpcListener : IListener
                 var killer = reader.ReadNetObject<PlayerControl>();
                 var target = reader.ReadNetObject<PlayerControl>();
                 var showAnimationToEverybody = reader.ReadBoolean();
-                
-                target.Exiled();
-                if (MeetingHud.Instance)
-                {
-                    foreach (var pva in MeetingHud.Instance.playerStates)
-                    {
-                        if (pva.TargetPlayerId == target.PlayerId)
-                        {
-                            pva.SetDead(pva.DidReport, true);
-                            pva.Overlay.gameObject.SetActive(true);
-                        }
-                        if (pva.VotedFor != target.PlayerId) continue;
-                        pva.UnsetVote();
-                        if (!target.AmOwner) continue;
-                        MeetingHud.Instance.ClearVote();
-                    }
-                    if (AmongUsClient.Instance.AmHost)
-                        MeetingHud.Instance.CheckForEndVoting();
-                }
 
-                foreach (var player in PlayerUtils.GetAllAlivePlayers())
-                {
-                    if (player.PlayerId == target.PlayerId)
-                    {
-                        HudManager.Instance.KillOverlay.ShowKillAnimation(killer.Data, target.Data);
-                        continue;
-                    }
-                    
-                    HudManager.Instance.KillOverlay.ShowKillAnimation(target.Data, target.Data);
-                }
-                
+                killer.KillPlayerCompletely(target, showAnimationToEverybody);
                 break;
             }
         }

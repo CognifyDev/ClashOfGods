@@ -96,11 +96,48 @@ public static class PlayerUtils
     /// <param name="showAnimationToEverybody"></param>
     public static void RpcKillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false)
     {
+        KillPlayerCompletely(killer, target, showAnimationToEverybody);
+
         var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillPlayerCompletely, GetAllPlayers().ToArray());
         rpc.WriteNetObject(killer);
         rpc.WriteNetObject(target);
         rpc.Write(showAnimationToEverybody);
         rpc.Finish();
+    }
+
+    public static void KillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false)
+    {
+        _ = new DeadPlayer(DateTime.Now, DeathReason.Default, target.Data, killer.Data);
+        target.Exiled();
+        if (MeetingHud.Instance)
+        {
+            foreach (var pva in MeetingHud.Instance.playerStates)
+            {
+                if (pva.TargetPlayerId == target.PlayerId)
+                {
+                    pva.SetDead(pva.DidReport, true);
+                    pva.Overlay.gameObject.SetActive(true);
+                }
+                if (pva.VotedFor != target.PlayerId) continue;
+                pva.UnsetVote();
+                if (!target.AmOwner) continue;
+                MeetingHud.Instance.ClearVote();
+            }
+            if (AmongUsClient.Instance.AmHost)
+                MeetingHud.Instance.CheckForEndVoting();
+        }
+
+        foreach (var player in GetAllAlivePlayers())
+        {
+            if (player.PlayerId == target.PlayerId)
+            {
+                HudManager.Instance.KillOverlay.ShowKillAnimation(killer.Data, target.Data);
+                continue;
+            }
+
+            if (showAnimationToEverybody)
+                HudManager.Instance.KillOverlay.ShowKillAnimation(target.Data, target.Data);
+        }
     }
 
     public static List<PlayerControl> GetAllPlayers()
