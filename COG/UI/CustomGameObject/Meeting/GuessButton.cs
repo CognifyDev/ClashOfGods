@@ -5,11 +5,13 @@ using COG.Constant;
 using COG.Role;
 using COG.Role.Impl.SubRole;
 using COG.Utils;
+using COG.Utils.Coding;
 using TMPro;
 using UnityEngine;
 
 namespace COG.UI.CustomGameObject.Meeting;
 
+[ShitCode]
 public class GuessButton : TemplatedCustomGameObject
 {
     public static List<GuessButton> Buttons { get; } = new();

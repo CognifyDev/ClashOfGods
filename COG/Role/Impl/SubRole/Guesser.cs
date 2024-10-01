@@ -6,12 +6,10 @@ using COG.UI.CustomGameObject.Meeting;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using COG.Utils.Coding;
 using UnityEngine;
 
 namespace COG.Role.Impl.SubRole;
 
-[WorkInProgress]
 public class Guesser : CustomRole, IListener
 {
     public CustomOption MaxGuessTime { get; }
