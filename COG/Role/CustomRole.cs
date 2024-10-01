@@ -278,16 +278,6 @@ public abstract class CustomRole
         return "";
     }
 
-    /// <summary>
-    ///     改写在分配该职业时的逻辑
-    /// </summary>
-    /// <param name="roles">职业列表</param>
-    /// <returns>如果返回true，则跳过根据 <seealso cref="RoleNumberOption" /> 添加此职业待分配数量而仅执行该方法的逻辑</returns>
-    public virtual bool OnRoleSelection(List<CustomRole> roles)
-    {
-        return false;
-    }
-
     public virtual void AfterSharingRoles()
     {
     }

@@ -158,7 +158,7 @@ public partial class Main : BasePlugin
 
             // Sub-roles
             new Lighter(),
-            // new Guesser()
+            new Guesser()
         });
 
         // Register mod options

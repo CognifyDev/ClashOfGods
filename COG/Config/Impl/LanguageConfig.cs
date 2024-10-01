@@ -221,7 +221,8 @@ public class LanguageConfig : Config
 
         SystemMessage = GetString("game.chat.system-message");
 
-        if (!FirstTimeLoad) OnLanguageLoaded.GetInvocationList().ForEach(d => d.DynamicInvoke(null));
+        // if (!FirstTimeLoad) OnLanguageLoaded.GetInvocationList().ForEach(d => d.DynamicInvoke(null));
+        // dont use this
     }
 
 

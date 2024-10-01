@@ -68,6 +68,38 @@ public static class PlayerUtils
 
         return closestPlayer;
     }
+    
+    public const MurderResultFlags SucceededFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
+
+    public static void RpcAdvancedMurderPlayer(this PlayerControl killer, PlayerControl target)
+    {
+        if (target == null)
+        {
+            target = killer;
+        }
+        
+        if (AmongUsClient.Instance.AmClient)
+        {
+            killer.MurderPlayer(target, SucceededFlags);
+        }
+        var messageWriter = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.None);
+        messageWriter.WriteNetObject(target);
+        messageWriter.Write((int) SucceededFlags);
+        AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+    }
+
+    /// <summary>
+    /// 杀死一个玩家不留下鸡腿
+    /// </summary>
+    /// <param name="killer"></param>
+    /// <param name="target"></param>
+    public static void RpcKillPlayerCompletely(this PlayerControl killer, PlayerControl target)
+    {
+        var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillPlayerCompletely, GetAllPlayers().ToArray());
+        rpc.WriteNetObject(killer);
+        rpc.WriteNetObject(target);
+        rpc.Finish();
+    }
 
     public static List<PlayerControl> GetAllPlayers()
     {
@@ -229,7 +261,7 @@ public static class PlayerUtils
 
     public static bool IsRole(this PlayerControl player, CustomRole role)
     {
-        return player?.Data?.IsRole(role) ?? false;
+        return player.Data?.IsRole(role) ?? false;
     }
 
     public static bool IsRole(this NetworkedPlayerInfo player, CustomRole role)
@@ -237,7 +269,7 @@ public static class PlayerUtils
         if (!player) return false; // 在对局内只要是游戏正式开始时在游戏内的玩家，玩家的NetworkedPlayerInfo绝对不为空
         
         var targetRole = player.GetPlayerData();
-        return targetRole != null && (targetRole.Role.Id.Equals(role.Id) || targetRole.SubRoles.Contains(role));
+        return targetRole != null && (targetRole.Role.Id.Equals(role.Id) || targetRole.SubRoles.Select(customRole => customRole.Id).Contains(role.Id));
     }
 
     public static DeadBody? GetClosestBody(List<DeadBody>? unTargetAble = null)

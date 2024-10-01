@@ -11,6 +11,7 @@ internal class RPCHandlerPatch
         [HarmonyArgument(1)] MessageReader reader)
     {
         Main.Logger.LogDebug($"Rpc {callId} received, rpc length => {reader.Length}");
+        
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader), EventHandlerType.Postfix);
     }

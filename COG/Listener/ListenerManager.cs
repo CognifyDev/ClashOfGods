@@ -48,23 +48,10 @@ public class ListenerManager
 
     public Handler[] AsHandlers(IListener listener)
     {
-        var list = new List<Handler>();
-        
-        foreach (var methodInfo in listener.GetType().GetMethods(BindingFlags.Instance |
-                                                                 BindingFlags.Public |
-                                                                 BindingFlags.NonPublic |
-                                                                 BindingFlags.Static |
-                                                                 BindingFlags.DeclaredOnly))
-        {
-            var attributes = methodInfo.GetCustomAttributes(typeof(EventHandlerAttribute), false);
-            if (attributes.Length < 1) continue;
-            var attribute = attributes[0] as EventHandlerAttribute;
-            var type = attribute!.EventHandlerType;
-            var handler = new Handler(listener, methodInfo, type);
-            list.Add(handler);
-        }
-
-        return list.ToArray();
+        return (from methodInfo in listener.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+            let attributes = methodInfo.GetCustomAttributes(typeof(EventHandlerAttribute), false) 
+            where attributes.Length >= 1 let attribute = attributes[0] as EventHandlerAttribute 
+            let type = attribute!.EventHandlerType select new Handler(listener, methodInfo, type)).ToArray();
     }
 
     /// <summary>
