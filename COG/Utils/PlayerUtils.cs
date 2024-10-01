@@ -93,11 +93,13 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="killer"></param>
     /// <param name="target"></param>
-    public static void RpcKillPlayerCompletely(this PlayerControl killer, PlayerControl target)
+    /// <param name="showAnimationToEverybody"></param>
+    public static void RpcKillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false)
     {
         var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillPlayerCompletely, GetAllPlayers().ToArray());
         rpc.WriteNetObject(killer);
         rpc.WriteNetObject(target);
+        rpc.Write(showAnimationToEverybody);
         rpc.Finish();
     }
 
