@@ -98,7 +98,7 @@ public static class PlayerUtils
     {
         KillPlayerCompletely(killer, target, showAnimationToEverybody);
 
-        var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillPlayerCompletely, GetAllPlayers().ToArray());
+        var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillPlayerCompletely);
         rpc.WriteNetObject(killer);
         rpc.WriteNetObject(target);
         rpc.Write(showAnimationToEverybody);
