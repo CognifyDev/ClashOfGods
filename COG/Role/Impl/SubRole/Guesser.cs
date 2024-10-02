@@ -61,12 +61,7 @@ public class Guesser : CustomRole, IListener
             guessButton.SetupListeners();
         }
     }
-
-    public override CustomRole NewInstance()
-    {
-        return new Guesser();
-    }
-
+    
     public override IListener GetListener()
     {
         return this;

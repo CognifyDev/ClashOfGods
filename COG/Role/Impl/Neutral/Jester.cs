@@ -34,7 +34,7 @@ public class Jester : CustomRole, IListener, IWinnable
         if (!deadPlayers.Any()) return;
 
         data.WinnableCampType = CampType; 
-        data.WinText = "Jester wins";
+        data.WinText = "Jester wins"; // SO WE STILL HAVEN'T CHANGE THIS
         data.WinColor = Color;
         data.WinnablePlayers.Clear();
         data.WinnablePlayers.Add(deadPlayers[0].Data);
@@ -66,10 +66,5 @@ public class Jester : CustomRole, IListener, IWinnable
     public override IListener GetListener()
     {
         return this;
-    }
-
-    public override CustomRole NewInstance()
-    {
-        return new Jester();
     }
 }

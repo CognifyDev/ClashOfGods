@@ -86,6 +86,7 @@ public class LanguageConfig : Config
     public string KillCooldown { get; private set; } = null!;
     public string NoMoreDescription { get; private set; } = null!;
     public string RoleCode { get; private set; } = null!;
+    public string MaxUseTime { get; private set; } = null!;
 
     public string QQ { get; private set; } = null!;
     public string Discord { get; private set; } = null!;
@@ -103,6 +104,8 @@ public class LanguageConfig : Config
 
     public string KillAction { get; private set; } = null!;
     public string CleanAction { get; private set; } = null!;
+    public string DispatchAction { get; private set; } = null!;
+    
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
     public string Alive { get; private set; } = null!;
@@ -170,6 +173,7 @@ public class LanguageConfig : Config
         KillCooldown = GetString("role.global.kill-cooldown");
         NoMoreDescription = GetString("role.global.no-more-description");
         RoleCode = GetString("role.global.role-code");
+        MaxUseTime = GetString("role.global.max-use-time");
 
         UnknownCamp = GetString("camp.unknown.name");
         ImpostorCamp = GetString("camp.impostor.name");
@@ -184,6 +188,7 @@ public class LanguageConfig : Config
 
         KillAction = GetString("action.kill");
         CleanAction = GetString("action.clean");
+        DispatchAction = GetString("action.dispatch");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 

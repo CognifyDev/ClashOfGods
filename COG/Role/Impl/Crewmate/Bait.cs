@@ -43,9 +43,4 @@ public class Bait : CustomRole, IListener
     {
         return this;
     }
-
-    public override CustomRole NewInstance()
-    {
-        return new Bait();
-    }
 }

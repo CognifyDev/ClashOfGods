@@ -69,32 +69,6 @@ public class CustomRoleManager
         return Manager;
     }
 
-    /// <summary>
-    /// 不要使用这个方法
-    /// 这个方法会使职业类重新执行构造方法，从而使构造方法重复注册按钮之类的
-    /// </summary>
-    
-    // FIXME
-    public void ReloadRoles()
-    {
-        ReloadingRoles = true;
-
-        var newInstanceRoles = _roles.Select(role =>
-        {
-            var newInstance = role.NewInstance();
-            newInstance.RoleChanceOption = role.RoleChanceOption;
-            newInstance.RoleNumberOption = role.RoleNumberOption;
-            newInstance.RoleCode = role.RoleCode;
-            newInstance.AllOptions = role.AllOptions;
-            return newInstance;
-        }).ToList();
-
-        _roles.Clear();
-        _roles.AddRange(newInstanceRoles);
-
-        ReloadingRoles = false;
-    }
-
     private class RoleGetter : IGetter<CustomRole>
     {
         private List<CustomRole> CustomRoles { get; } = new();

@@ -59,9 +59,4 @@ public class Sheriff : CustomRole, IListener
 
     private CustomOption? SheriffKillCd { get; }
     private CustomButton SheriffKillButton { get; }
-
-    public override CustomRole NewInstance()
-    {
-        return new Sheriff();
-    }
 }

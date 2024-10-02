@@ -19,9 +19,8 @@ public class Cleaner : CustomRole, IListener
         CanVent = true;
         CanSabotage = true;
 
-        if (ShowInOptions)
-            CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown,
-                new FloatOptionValueRule(10f, 5f, 60f, 30f));
+        CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown,
+            new FloatOptionValueRule(10f, 5f, 60f, 30f));
 
         CleanBodyButton = CustomButton.Create(
             () =>
@@ -45,16 +44,11 @@ public class Cleaner : CustomRole, IListener
         AddButton(CleanBodyButton);
     }
 
-    private CustomOption? CleanBodyCd { get; }
+    private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
 
     public override IListener GetListener()
     {
         return this;
-    }
-
-    public override CustomRole NewInstance()
-    {
-        return new Cleaner();
     }
 }

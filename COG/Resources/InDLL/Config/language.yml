@@ -12,6 +12,7 @@ role:
     kill-cooldown: "击杀冷却时间"
     no-more-description: "没有详细信息"
     role-code: "职业特征码"
+    max-use-time: "最大使用次数"
   impostor:
     impostor:
       name: "伪装者"
@@ -22,6 +23,10 @@ role:
       description: "清除作案痕迹"
       long-description: "清洁工可以清理船员的尸体。清洁工可以击杀，但是击杀和清理共用冷却"
       clean-cd: "清理尸体冷却"
+    assassin:
+      name: "暗刃杀手"
+      description: "不留破绽地行刺"
+      long-description: "拥有两次击杀不发生位移的机会"
   crewmate:
     crewmate:
       name: "船员"
@@ -111,6 +116,7 @@ option:
 action:
   kill: "击杀"
   clean: "清理"
+  dispatch: "处决"
 game:
   end:
     show-players-roles-message: "玩家职业:"

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
@@ -24,7 +25,8 @@ namespace COG.Role;
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
-public abstract class CustomRole
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+public class CustomRole
 {
     private static int _order;
     
@@ -51,7 +53,7 @@ public abstract class CustomRole
             CampType.Crewmate => RoleTeamTypes.Crewmate,
             CampType.Impostor => RoleTeamTypes.Impostor,
             CampType.Neutral => (RoleTeamTypes)99,
-            _ or CampType.Unknown => (RoleTeamTypes)100
+            _ => (RoleTeamTypes)100
         };
         // ReSharper disable once Unity.IncorrectMonoBehaviourInstantiation
         VanillaRole = new RoleBehaviour
@@ -252,6 +254,7 @@ public abstract class CustomRole
     ///     添加一个按钮
     /// </summary>
     /// <param name="button">要添加的按钮</param>
+    /// <param name="hasButton"></param>
     public void AddButton(CustomButton button, Func<bool>? hasButton = null)
     {
         hasButton ??= () => PlayerControl.LocalPlayer.IsRole(this);
@@ -307,9 +310,7 @@ public abstract class CustomRole
     {
         return IListener.EmptyListener;
     }
-
-    public abstract CustomRole NewInstance();
-
+    
     ~CustomRole()
     {
         ClearRoleGameData();

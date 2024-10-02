@@ -40,10 +40,5 @@ public class RoleController
         private new Color Color { get; }
         private new CampType CampType { get; }
         private new bool ShowInOptions { get; }
-
-        public override CustomRole NewInstance()
-        {
-            return new CustomRoleImplement(Name, Color, CampType, ShowInOptions);
-        }
     }
 }

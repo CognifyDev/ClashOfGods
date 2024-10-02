@@ -12,9 +12,4 @@ public class Impostor : CustomRole
         CanSabotage = true;
         BaseRoleType = RoleTypes.Impostor;
     }
-
-    public override CustomRole NewInstance()
-    {
-        return new Impostor();
-    }
 }

@@ -71,9 +71,4 @@ public class Vigilante : CustomRole, IListener
     {
         return this;
     }
-
-    public override CustomRole NewInstance()
-    {
-        return new Vigilante();
-    }
 }

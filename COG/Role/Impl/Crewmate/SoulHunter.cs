@@ -118,9 +118,4 @@ public class SoulHunter : CustomRole, IListener
     {
         return this;
     }
-
-    public override CustomRole NewInstance()
-    {
-        return new SoulHunter();
-    }
 }

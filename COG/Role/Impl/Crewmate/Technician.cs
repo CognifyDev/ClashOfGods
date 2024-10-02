@@ -112,9 +112,4 @@ public class Technician : CustomRole
                 mixup.currentSecondsUntilHeal = 0.1f;
         }
     }
-
-    public override CustomRole NewInstance()
-    {
-        return new Technician();
-    }
 }

@@ -125,8 +125,6 @@ public partial class Main : BasePlugin
             new CustomWinnerListener()
         });
         
-        LanguageConfig.OnLanguageLoaded += () => CustomRoleManager.GetManager().ReloadRoles();
-        
         // Register CustomWinners
         CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
         {
