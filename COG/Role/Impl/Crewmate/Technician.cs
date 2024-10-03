@@ -16,7 +16,7 @@ public class Technician : CustomRole
     {
         CanVent = true;
 
-        RepairButton = CustomButton.Create(() =>
+        RepairButton = CustomButton.Of(() =>
         {
             RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ClearSabotages).Finish();
             RepairSabotages();

@@ -20,7 +20,7 @@ public class Sheriff : CustomRole, IListener
             SheriffKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
                 new FloatOptionValueRule(10f, 5f, 60f, 30f));
 
-        SheriffKillButton = CustomButton.Create(
+        SheriffKillButton = CustomButton.Of(
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();

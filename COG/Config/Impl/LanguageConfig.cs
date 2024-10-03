@@ -65,6 +65,8 @@ public class LanguageConfig : Config
     // Impostor
     public string CleanBodyCooldown { get; private set; } = null!;
 
+    public string ReaperTimeToReduce { get; private set; } = null!;
+
     // Neutral
 
     // Sub-roles
@@ -149,6 +151,7 @@ public class LanguageConfig : Config
 
         // Impostors
         CleanBodyCooldown = GetString("role.impostor.cleaner.clean-cd");
+        ReaperTimeToReduce = GetString("role.impostor.reaper.time-to-reduce");
 
         // Neutral
         

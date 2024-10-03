@@ -22,7 +22,7 @@ public class Cleaner : CustomRole, IListener
         CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown,
             new FloatOptionValueRule(10f, 5f, 60f, 30f));
 
-        CleanBodyButton = CustomButton.Create(
+        CleanBodyButton = CustomButton.Of(
             () =>
             {
                 var body = PlayerUtils.GetClosestBody();

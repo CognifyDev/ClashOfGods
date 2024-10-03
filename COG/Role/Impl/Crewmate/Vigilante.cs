@@ -25,7 +25,7 @@ public class Vigilante : CustomRole, IListener
         CanKill = false;
         CanVent = false;
 
-        _killButton = CustomButton.Create(
+        _killButton = CustomButton.Of(
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();

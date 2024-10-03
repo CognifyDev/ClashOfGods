@@ -28,6 +28,11 @@ role:
       name: "暗刃杀手"
       description: "不留破绽地行刺"
       long-description: "拥有两次击杀不发生位移的机会"
+    reaper:
+      name: "收割者"
+      description: "通往终局的加速进程"
+      long-description: "初始冷却略微延长，场上每死亡一名玩家，冷却时间略微缩短"
+      time-to-reduce: "冷却减少时间"
   crewmate:
     crewmate:
       name: "船员"

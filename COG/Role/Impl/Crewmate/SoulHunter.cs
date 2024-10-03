@@ -32,7 +32,7 @@ public class SoulHunter : CustomRole, IListener
         SoulHunterKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
             new IntOptionValueRule(1, 1, 40, 20));
         
-        _killButton = CustomButton.Create(
+        _killButton = CustomButton.Of(
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();

@@ -150,6 +150,7 @@ public partial class Main : BasePlugin
             new Impostor(),
             new Cleaner(),
             new Assassin(),
+            new Reaper(),
 
             // Neutral
             new Jester(),

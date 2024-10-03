@@ -97,7 +97,7 @@ public class CustomButton
     /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
+    public static CustomButton Of(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
         Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
@@ -121,7 +121,7 @@ public class CustomButton
     /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton,
+    public static CustomButton Of(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton,
         Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit,
         string hotkeyName = "", int order = -1)
     {
@@ -136,7 +136,7 @@ public class CustomButton
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton,
+    public static CustomButton Of(Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton,
         Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit,
         string hotkeyName = "", int order = -1)
     {
@@ -153,7 +153,7 @@ public class CustomButton
     /// </summary>
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
-    public static CustomButton Create(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
+    public static CustomButton Of(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
         Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
