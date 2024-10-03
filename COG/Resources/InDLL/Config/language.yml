@@ -76,6 +76,11 @@ role:
       guess-continuously: "连续赌注"
       guess-enabled-roles-only: "仅能赌注启用职业"
       can-guess-sub-roles: "启用赌注副职业"
+    speed-booster:
+      name: "敏捷"
+      description: "我是闪电侠！"
+      long-description: "移动速度提升"
+      increasing-speed: "增加速度"
 camp:
   unknown:
     name: "未知阵营"

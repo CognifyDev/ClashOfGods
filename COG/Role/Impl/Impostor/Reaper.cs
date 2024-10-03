@@ -80,7 +80,7 @@ public class Reaper : CustomRole, IListener
 
         if (_cooldown > 1)
         {
-            _cooldown --;
+            _cooldown = TimeToReduce.GetFloat();
         }
     }
 

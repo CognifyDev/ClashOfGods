@@ -75,6 +75,8 @@ public class LanguageConfig : Config
     public string GuesserGuessEnabledRolesOnly { get; private set; } = null!;
     public string GuesserCanGuessSubRoles { get; private set; } = null!;
 
+    public string SpeedBoosterIncreasingSpeed { get; private set; } = null!;
+
     public string Enable { get; private set; } = null!;
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;
@@ -160,6 +162,8 @@ public class LanguageConfig : Config
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
         GuesserGuessEnabledRolesOnly = GetString("role.sub-roles.guesser.guess-enabled-roles-only");
         GuesserCanGuessSubRoles = GetString("role.sub-roles.guesser.can-guess-sub-roles");
+
+        SpeedBoosterIncreasingSpeed = GetString("role.sub-roles.speed-booster.increasing-speed");
 
         Enable = GetString("option.enable");
         Disable = GetString("option.disable");

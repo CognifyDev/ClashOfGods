@@ -17,7 +17,7 @@ public class Guesser : CustomRole, IListener
     public CustomOption EnabledRolesOnly { get; }
     public CustomOption CanGuessSubRoles { get; }
 
-    public int GuessedTime { get; internal set; } = 0;
+    public int GuessedTime { get; internal set; }
     
     public Guesser() : base(new Color(192, 0, 0, 100), CampType.Unknown, true)
     {
