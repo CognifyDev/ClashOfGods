@@ -15,7 +15,7 @@ public class SpeedBooster : CustomRole, IListener
     public SpeedBooster() : base(Color.cyan, CampType.Unknown, true)
     {
         IncreasingSpeed = CreateOption(() => LanguageConfig.Instance.SpeedBoosterIncreasingSpeed,
-            new FloatOptionValueRule(0.5F, 0.5F, 10F, 1F));
+            new FloatOptionValueRule(0.5F, 0.5F, 10F, 1F, NumberSuffixes.Multiplier));
     }
 
     [EventHandler(EventHandlerType.Postfix)]

@@ -28,9 +28,9 @@ public class SoulHunter : CustomRole, IListener
     public SoulHunter() : base(Color.green, CampType.Crewmate)
     {
         ReviveAfter = CreateOption(() => LanguageConfig.Instance.SoulHunterReviveAfter,
-            new IntOptionValueRule(1, 1, 60, 5));
+            new FloatOptionValueRule(1F, 1F, 60F, 5F, NumberSuffixes.Seconds));
         SoulHunterKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
-            new IntOptionValueRule(1, 1, 40, 20));
+            new FloatOptionValueRule(1F, 1F, 40F, 20F, NumberSuffixes.Seconds));
         
         _killButton = CustomButton.Of(
             () =>
@@ -49,7 +49,7 @@ public class SoulHunter : CustomRole, IListener
             2,
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
-            () => SoulHunterKillCd.GetInt(),
+            () => SoulHunterKillCd.GetFloat(),
             0);
 
         _killButton.UsesRemaining = 1;
@@ -70,7 +70,7 @@ public class SoulHunter : CustomRole, IListener
 
         IEnumerator Revive()
         {
-            yield return new WaitForSeconds(ReviveAfter.GetInt());
+            yield return new WaitForSeconds(ReviveAfter.GetFloat());
             var deadBody = target.GetDeadBody();
             if (deadBody != null)
             {

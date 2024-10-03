@@ -54,7 +54,7 @@ public class IntOptionValueRule : INumberValueRule<int>
 public class FloatOptionValueRule : INumberValueRule<float>
 {
     public FloatOptionValueRule(float min, float step, float max, float defaultValue,
-        NumberSuffixes suffix = NumberSuffixes.Seconds)
+        NumberSuffixes suffix = NumberSuffixes.None)
     {
         Min = min;
         Step = step;

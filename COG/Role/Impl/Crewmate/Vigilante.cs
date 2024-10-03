@@ -48,7 +48,7 @@ public class Vigilante : CustomRole, IListener
         AddButton(_killButton);
         
         _minCrewmateNumber = CreateOption(() => LanguageConfig.Instance.VigilanteMinCrewmateNumber,
-            new IntOptionValueRule(1, 1, 15, 3));
+            new FloatOptionValueRule(1F, 1F, 15F, 3F));
     }
 
     public override void ClearRoleGameData()
@@ -62,7 +62,7 @@ public class Vigilante : CustomRole, IListener
     {
         var crewmates
             = PlayerUtils.GetAllAlivePlayers().Where(p => p.GetMainRole().CampType == CampType.Crewmate);
-        if (crewmates.Count() > _minCrewmateNumber.GetInt() || _hasGiven) return;
+        if (crewmates.Count() > _minCrewmateNumber.GetFloat() || _hasGiven) return;
         _killTimes++;
         _hasGiven = true;
     }

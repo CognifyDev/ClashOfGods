@@ -127,7 +127,7 @@ public class GuessButton : TemplatedCustomGameObject
                         Exit(guesserUI);
                     }
                     
-                    if (!Guesser.GuessContinuously.GetBool() || Guesser.GuessedTime >= Guesser.MaxGuessTime.GetInt())
+                    if (!Guesser.GuessContinuously.GetBool() || Guesser.GuessedTime >= Guesser.MaxGuessTime.GetFloat())
                     {
                         Buttons.ForEach(guessButton => guessButton.Destroy());
                         Buttons.Clear();

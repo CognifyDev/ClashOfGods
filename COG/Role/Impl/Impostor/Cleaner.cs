@@ -20,7 +20,7 @@ public class Cleaner : CustomRole, IListener
         CanSabotage = true;
 
         CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown,
-            new FloatOptionValueRule(10f, 5f, 60f, 30f));
+            new FloatOptionValueRule(10F, 5F, 60F, 30F, NumberSuffixes.Seconds));
 
         CleanBodyButton = CustomButton.Of(
             () =>

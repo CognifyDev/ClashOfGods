@@ -30,7 +30,7 @@ public class Reaper : CustomRole, IListener
         CanSabotage = true;
         
         TimeToReduce = CreateOption(() => LanguageConfig.Instance.ReaperTimeToReduce,
-            new FloatOptionValueRule(1F, 0.5F, 15F, 1.5F));
+            new FloatOptionValueRule(1F, 0.5F, 15F, 1.5F, NumberSuffixes.Seconds));
 
         KillButton = CustomButton.Of(
             () =>

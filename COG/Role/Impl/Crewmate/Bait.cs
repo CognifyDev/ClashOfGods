@@ -17,7 +17,7 @@ public class Bait : CustomRole, IListener
     public Bait() : base(ColorUtils.AsColor("#00F7FF"), CampType.Crewmate)
     {
         KillerSelfReportDelay = CreateOption(() => GetContextFromLanguage("killer-report-delay"), 
-            new FloatOptionValueRule(0, 1, 5, 1));
+            new FloatOptionValueRule(0, 1, 5, 1, NumberSuffixes.Seconds));
         WarnKiller = CreateOption(() => GetContextFromLanguage("warn-killer"), new BoolOptionValueRule(true));
     }
 

@@ -14,11 +14,10 @@ public class Sheriff : CustomRole, IListener
 {
     public Sheriff() : base(Color.yellow, CampType.Crewmate)
     {
-        BaseRoleType = RoleTypes.Crewmate;
-
-        if (ShowInOptions)
-            SheriffKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
-                new FloatOptionValueRule(10f, 5f, 60f, 30f));
+        BaseRoleType = RoleTypes.Crewmate; 
+        
+        SheriffKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
+                new FloatOptionValueRule(10f, 5f, 60f, 30f, NumberSuffixes.Seconds));
 
         SheriffKillButton = CustomButton.Of(
             () =>
@@ -57,6 +56,6 @@ public class Sheriff : CustomRole, IListener
         AddButton(SheriffKillButton);
     }
 
-    private CustomOption? SheriffKillCd { get; }
+    private CustomOption SheriffKillCd { get; }
     private CustomButton SheriffKillButton { get; }
 }

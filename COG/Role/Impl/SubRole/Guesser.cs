@@ -22,7 +22,7 @@ public class Guesser : CustomRole, IListener
     public Guesser() : base(new Color(192, 0, 0, 100), CampType.Unknown, true)
     {
         MaxGuessTime = CreateOption(() => LanguageConfig.Instance.GuesserMaxGuessTime,
-            new IntOptionValueRule(1, 1, 15, 3));
+            new FloatOptionValueRule(1F, 1F, 15F, 3F));
         GuessContinuously = CreateOption(() => LanguageConfig.Instance.GuesserGuessContinuously, 
             new BoolOptionValueRule(true));
         EnabledRolesOnly = CreateOption(() => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
@@ -39,7 +39,7 @@ public class Guesser : CustomRole, IListener
         var meetingHud = @event.MeetingHud;
         var debugEnabled = GlobalCustomOptionConstant.DebugMode.GetBool();
         
-        if (GuessedTime >= MaxGuessTime.GetInt())
+        if (GuessedTime >= MaxGuessTime.GetFloat())
         {
             GuessButton.Buttons.ForEach(guessButton => guessButton.Destroy());
             GuessButton.Buttons.Clear();

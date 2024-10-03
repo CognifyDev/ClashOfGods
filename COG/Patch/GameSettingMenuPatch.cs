@@ -4,6 +4,7 @@ using COG.UI.CustomOption;
 using COG.Utils;
 using System;
 using System.Linq;
+using COG.UI.CustomOption.ValueRules.Impl;
 
 namespace COG.Patch;
 
@@ -97,7 +98,7 @@ internal static class GameSettingMenuPatch
 
         GameSettingMenu.Instance.GameSettingsTab.Children?.ForEach(new Action<OptionBehaviour>(o =>
         {
-            if (CustomOption.TryGetOption(o, out var customOption)) return;
+            if (CustomOption.TryGetOption(o, out _)) return;
             NumberOption numberOption;
             StringOption stringOption;
             ToggleOption toggleOption;

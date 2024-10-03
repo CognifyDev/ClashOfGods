@@ -147,36 +147,6 @@ internal class ControllerManagerPatch
         ListenerManager.GetManager()
             .ExecuteHandlers(new ControllerManagerUpdateEvent(__instance), EventHandlerType.Postfix);
     }
-
-    [HarmonyPatch(nameof(ControllerManager.OpenOverlayMenu))]
-    [HarmonyPrefix]
-    public static bool OnOpenOverlayMenu(ControllerManager __instance,
-        [HarmonyArgument(0)] string menuName,
-        [HarmonyArgument(1)] UiElement backButton,
-        [HarmonyArgument(2)] UiElement defaultSelection,
-        [HarmonyArgument(3)] List<UiElement> selectableElements,
-        [HarmonyArgument(4)] bool gridNav)
-    {
-        return ListenerManager.GetManager()
-            .ExecuteHandlers(
-                new ControllerManagerOpenOverlayMenuEvent(__instance, menuName, backButton, defaultSelection,
-                    selectableElements.ToArray(), gridNav), EventHandlerType.Prefix);
-    }
-    
-    [HarmonyPatch(nameof(ControllerManager.OpenOverlayMenu))]
-    [HarmonyPostfix]
-    public static void AfterOpenOverlayMenu(ControllerManager __instance,
-        [HarmonyArgument(0)] string menuName,
-        [HarmonyArgument(1)] UiElement backButton,
-        [HarmonyArgument(2)] UiElement defaultSelection,
-        [HarmonyArgument(3)] List<UiElement> selectableElements,
-        [HarmonyArgument(4)] bool gridNav)
-    {
-        ListenerManager.GetManager()
-            .ExecuteHandlers(
-                new ControllerManagerOpenOverlayMenuEvent(__instance, menuName, backButton, defaultSelection,
-                    selectableElements.ToArray(), gridNav), EventHandlerType.Postfix);
-    }
 }
 
 [HarmonyPatch(typeof(Vent), nameof(Vent.CanUse))]

@@ -176,7 +176,7 @@ public sealed class CustomOption
     {
         if (ValueRule is FloatOptionValueRule rule)
             return rule.Selections[Selection];
-        else if (ValueRule is IntOptionValueRule intRule)
+        if (ValueRule is IntOptionValueRule intRule)
         {
             Main.Logger.LogWarning($"Trying to get float value from int option: {Name()}({Id})");
             return intRule.Selections[Selection];

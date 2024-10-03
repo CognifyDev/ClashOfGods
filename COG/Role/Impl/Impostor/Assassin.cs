@@ -24,7 +24,7 @@ public class Assassin : CustomRole
         CanVent = true;
         CanSabotage = true;
 
-        MaxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new IntOptionValueRule(1, 1, 15, 2));
+        MaxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new FloatOptionValueRule(1F, 1F, 15F, 2F));
         
         DispatchButton = CustomButton.Of(
             () =>
@@ -39,7 +39,7 @@ public class Assassin : CustomRole
                 _hasBeenKilled ++;
             },
             () => DispatchButton?.ResetCooldown(),
-            () => PlayerControl.LocalPlayer.GetClosestPlayer() != null && _hasBeenKilled < MaxUseTime.GetInt(),
+            () => PlayerControl.LocalPlayer.GetClosestPlayer() != null && _hasBeenKilled < MaxUseTime.GetFloat(),
             () => true,
             ResourceUtils.LoadSprite(ResourcesConstant.DispatchButton)!,
             2,
