@@ -1,5 +1,6 @@
 using COG.Constant;
 using COG.Listener;
+using COG.Listener.Event.Impl;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.PPhysics;
@@ -281,6 +282,26 @@ internal class AdjustLightPatch
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerAdjustLightingEvent(__instance), EventHandlerType.Postfix);
+    }
+}
+
+[HarmonyPatch(typeof(PassiveButton))]
+internal class PlayerInteractPatch
+{
+    [HarmonyPatch(nameof(PassiveButton.ReceiveClickUp))]
+    [HarmonyPrefix]
+    public static bool OnClick(PassiveButton __instance)
+    {
+        return ListenerManager.GetManager()
+            .ExecuteHandlers(new PassiveButtonEvent(__instance), EventHandlerType.Prefix);
+    }
+
+    [HarmonyPatch(nameof(PassiveButton.ReceiveClickDown))]
+    [HarmonyPostfix]
+    public static void AfterClick(PassiveButton __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new PassiveButtonEvent(__instance), EventHandlerType.Postfix);
     }
 }
 

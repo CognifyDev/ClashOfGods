@@ -2,9 +2,10 @@ lobby:
   make-public-message: "禁止设置为公开"
 role:
   unknown:
-    name: "未知"
-    description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
-    long-description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
+    unknown:
+      name: "未知"
+      description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
+      long-description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
   global:
     max-num: "最大职业数量"
     allow-start-meeting: "允许启动会议"

@@ -50,7 +50,7 @@ public class SoulHunter : CustomRole, IListener
             KeyCode.Q,
             LanguageConfig.Instance.KillAction,
             () => SoulHunterKillCd.GetInt(),
-            -1);
+            0);
 
         _killButton.UsesRemaining = 1;
         

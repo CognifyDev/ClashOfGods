@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace COG.UI.CustomGameObject.Arrow;
 
-public class Arrow
+public class Arrow : ICustomGameObject
 {
     public Arrow(Vector3 target, Color? color = null)
     {
@@ -22,6 +22,7 @@ public class Arrow
             Renderer.color = Color.Value;
         else
             Renderer.color = UnityEngine.Color.yellow;
+        
         Renderer.sprite = ResourceUtils.LoadSprite(ResourcesConstant.ArrowImage, 200f);
 
         Behaviour.image = Renderer;

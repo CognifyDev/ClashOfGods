@@ -10,6 +10,7 @@ public static class ResourcesConstant
     public const string CleanDeadBodyButton = "COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png";
     public const string GeneralKillButton = "COG.Resources.InDLL.Images.Buttons.GeneralKill.png";
     public const string GuessButton = "COG.Resources.InDLL.Images.Buttons.Guess.png";
+    public const string AssassinButton = "COG.Resources.InDLL.Images.Buttons.Assassin.png";
     public const string ArrowImage = "COG.Resources.InDLL.Images.Arrow.png";
     
     // RolePreviews

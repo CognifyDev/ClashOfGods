@@ -149,6 +149,7 @@ public partial class Main : BasePlugin
             // Impostor
             new Impostor(),
             new Cleaner(),
+            new Assassin(),
 
             // Neutral
             new Jester(),

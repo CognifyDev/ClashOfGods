@@ -36,18 +36,20 @@ public class Assassin : CustomRole
                 }
                 
                 player.RpcMurderPlayer(player, true);
-                ButtonConstant.KillButton.ResetCooldown();
+                _hasBeenKilled ++;
             },
             () => DispatchButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.GetClosestPlayer() != null && _hasBeenKilled < MaxUseTime.GetInt(),
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
+            ResourceUtils.LoadSprite(ResourcesConstant.AssassinButton)!,
             2,
             KeyCode.C,
             LanguageConfig.Instance.DispatchAction,
             () => GameUtils.GetGameOptions().KillCooldown,
             0
         );
+        
+        AddButton(DispatchButton);
     }
 
     public override void ClearRoleGameData()
