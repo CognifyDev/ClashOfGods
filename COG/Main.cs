@@ -156,7 +156,8 @@ public partial class Main : BasePlugin
             new Jester(),
 
             // Sub-roles
-            new Guesser()
+            new Guesser(),
+            new SpeedBooster()
         });
 
         // Register mod options
