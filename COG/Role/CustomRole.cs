@@ -261,7 +261,8 @@ public class CustomRole
         button.HasButton += hasButton;
         CustomButtonManager.GetManager().RegisterCustomButton(button);
         if (CustomRoleManager.GetManager().ReloadingRoles)
-            CustomButtonManager.GetManager().GetButtons().RemoveAll(b => AllButtons.Contains(b));
+            CustomButtonManager.GetManager().GetButtons().RemoveAll(AllButtons.Contains);
+        button.Text = button.Text.Color(Color);
         AllButtons.Add(button);
     }
 
