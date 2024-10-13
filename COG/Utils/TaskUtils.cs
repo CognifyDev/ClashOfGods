@@ -30,4 +30,17 @@ public static class TaskUtils
             action();
         }
     }
+
+    public static void RunTaskAfter(uint frames, Action action)
+    {
+        Coroutines.Start(Run());
+        return;
+
+        IEnumerator Run()
+        {
+            for (uint i = 0; i < frames; i++)
+                yield return null;
+            action();
+        }
+    }
 }
