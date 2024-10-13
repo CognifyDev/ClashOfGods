@@ -30,7 +30,7 @@ public static class ButtonConstant
         () =>
         {
             var role = PlayerControl.LocalPlayer.GetPlayerData();
-            if (role == null)
+            if (role == null || role.MainRole == null || role.SubRoles == null)
             {
                 return false;
             }
