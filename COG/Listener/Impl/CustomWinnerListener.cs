@@ -164,8 +164,8 @@ public class CustomWinnerListener : IListener
                 foreach (var role in subRoles)
                     subRoleNameBuilder.Append(' ').Append(role.GetColorName());
 
-            text.text = $"{data.PlayerName}\n{data.Role.Name}{subRoleNameBuilder}";
-            text.color = data.Role.Color;
+            text.text = $"{data.PlayerName}\n{data.MainRole.Name}{subRoleNameBuilder}";
+            text.color = data.MainRole.Color;
         });
     }
 
@@ -206,7 +206,7 @@ public class CustomWinnerListener : IListener
         {
             var deadPlayer = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
             summary.Append(role.PlayerName.PadRight(10)).Append(' ')
-                .Append(role.Role.Color.ToColorString(role.Role.Name));
+                .Append(role.MainRole.Color.ToColorString(role.MainRole.Name));
             summary.Append(' ').Append((deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed).ToColorString(
                 deadPlayer == null ? LanguageConfig.Instance.Alive :
                 deadPlayer.DeathReason == null ? LanguageConfig.Instance.UnknownKillReason :

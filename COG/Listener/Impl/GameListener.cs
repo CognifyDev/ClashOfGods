@@ -56,7 +56,7 @@ public class GameListener : IListener
                     var bytes = reader.ReadBytesAndSize().ToArray();
                     var data = bytes.DeserializeToData<SerializablePlayerData>().AsPlayerData();
                     GameUtils.PlayerData.Add(data);
-                    data.Player.SetCustomRole(data.Role, data.SubRoles);
+                    data.Player.SetCustomRole(data.MainRole, data.SubRoles);
                 }
 /*
                 var originalText = reader.ReadString()!;
@@ -70,7 +70,7 @@ public class GameListener : IListener
 */
                 foreach (var playerRole in GameUtils.PlayerData)
                     Main.Logger.LogInfo($"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
-                                        $" => {playerRole.Role.GetNormalName()}{playerRole.SubRoles.AsString()}");
+                                        $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}");
 
                 break;
             }
@@ -146,10 +146,10 @@ public class GameListener : IListener
         if (PlayerControl.LocalPlayer.IsSamePlayer(player))
         {
             var playerRole = player.GetPlayerData();
-            if (playerRole is null) return;
+            if (playerRole is null || playerRole.MainRole is null) return;
 
             var subRoles = playerRole.SubRoles;
-            var mainRole = playerRole.Role;
+            var mainRole = playerRole.MainRole;
             var nameText = player.cosmetics.nameText;
             nameText.color = mainRole.Color;
 
@@ -377,7 +377,7 @@ public class GameListener : IListener
         // 打印职业分配信息
         foreach (var playerRole in GameUtils.PlayerData)
             Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
-                                $" => {playerRole.Role.GetNormalName()}" +
+                                $" => {playerRole.MainRole.GetNormalName()}" +
                                 $"{playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}");
     }
 
@@ -392,7 +392,7 @@ public class GameListener : IListener
         Main.Logger.LogInfo("Share roles for players...");
         ShareRoles();
 
-        var roleList = GameUtils.PlayerData.Select(pr => pr.Role).ToList();
+        var roleList = GameUtils.PlayerData.Select(pr => pr.MainRole).ToList();
         roleList.AddRange(GameUtils.PlayerData.SelectMany(pr => pr.SubRoles));
 
         foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
@@ -642,7 +642,7 @@ public class GameListener : IListener
         var sb = new StringBuilder();
 
         sb.Append(localRole.GetColorName()).Append("：".Color(localRole.Color))
-            .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n");
+            .Append(localRole.ShortDescription.Color(localRole.Color)).Append("\r\n\r\n");
 
         if (isImpostorRole)
             sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
