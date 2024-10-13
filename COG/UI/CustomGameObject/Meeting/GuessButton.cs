@@ -113,7 +113,7 @@ public class GuessButton : TemplatedCustomGameObject
                     var target = _target!;
                     var playerData = target.GetPlayerData()!;
 
-                    if (role.Id == playerData.Role.Id 
+                    if (role.Id == playerData.MainRole.Id 
                         || playerData.SubRoles.Select(data => data.Id).Contains(role.Id))
                     {
                         Shoot();

@@ -26,7 +26,7 @@ public class Bait : CustomRole, IListener
     {
         var killer = @event.Player;
         var target = @event.Target;
-        if (!IsLocalPlayerRole(target)) return;
+        if (!PlayerControl.LocalPlayer.IsSamePlayer(killer)) return; // Only the killer executes this
         if (killer == null || target == null) return;
         if (target.IsRole(this)) Coroutines.Start(CoDelayedReport());
 
@@ -34,6 +34,10 @@ public class Bait : CustomRole, IListener
         {
             var delay = KillerSelfReportDelay.GetFloat();
             var victim = target.Data; // Prevent exceptions when the bait quits
+
+            yield return HudManager.Instance.CoFadeFullScreen(Color.clear, Color);
+            yield return HudManager.Instance.CoFadeFullScreen(Color, Color.clear);
+
             if (delay != 0) yield return new WaitForSeconds(delay);
             killer.CmdReportDeadBody(victim);
         }

@@ -1,3 +1,4 @@
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.VentImpl;
@@ -5,12 +6,13 @@ using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.Utils;
 using COG.Utils.Coding;
+using System.Linq;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-[WorkInProgress]
-public class Technician : CustomRole
+// TODO: Fix vent outline
+public class Technician : CustomRole, IListener
 {
     public Technician() : base(Palette.Orange, CampType.Crewmate)
     {
@@ -22,12 +24,12 @@ public class Technician : CustomRole
             RepairSabotages();
         },
         () => RepairButton.ResetCooldown(),
+        () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(t => PlayerTask.TaskIsEmergency(t)),
         () => true,
-        () => true,
-        ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Buttons.Repair.png")!,
+        ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Buttons.Repair.png")!, // IDK WHY THE SPRITE CANT BE SHOWN
         2,
         KeyCode.R,
-        "REPAIR",
+        LanguageConfig.Instance.RepairAction,
         () => 0f,
         2
         );
@@ -46,6 +48,8 @@ public class Technician : CustomRole
         if (!IsLocalPlayerRole(player)) return;
         if (PlayerControl.LocalPlayer.AllTasksCompleted())
         {
+            HudManager.Instance.ImpostorVentButton.Show();
+
             var dist = float.MaxValue;
             var couldUse = (!player.MustCleanVent(vent.Id) || (player.inVent && Vent.currentVent == vent))
                 && !data.IsDead && (player.CanMove || player.inVent);
@@ -111,5 +115,10 @@ public class Technician : CustomRole
             if (mixup.IsActive)
                 mixup.currentSecondsUntilHeal = 0.1f;
         }
+    }
+
+    public override IListener GetListener()
+    {
+        return this;
     }
 }

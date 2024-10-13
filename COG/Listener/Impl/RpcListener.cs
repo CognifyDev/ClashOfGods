@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using COG.Listener.Event.Impl.Player;
+using COG.Patch;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption;
@@ -75,6 +77,16 @@ public class RpcListener : IListener
                 var showAnimationToEverybody = reader.ReadBoolean();
 
                 killer.KillPlayerCompletely(target, showAnimationToEverybody);
+                break;
+            }
+
+            case KnownRpc.MurderAndModifyKillAnimation:
+            {
+                var target = reader.ReadNetObject<PlayerControl>();
+                var toModify = reader.ReadNetObject<PlayerControl>();
+
+                KillAnimationPatch.NextKillerToBeReplaced = toModify.Data;
+                @event.Player.MurderPlayer(target, PlayerUtils.SucceededFlags);
                 break;
             }
         }

@@ -7,7 +7,7 @@ namespace COG.Utils;
 public static class DeadBodyUtils
 {
     public static List<DeadBody> GetDeadBodies() => 
-        Object.FindObjectsOfType<DeadBody>().Where(body => body != null).ToList();
+        Object.FindObjectsOfType<DeadBody>().ToList();
     
     public static void RpcCleanDeadBody(this DeadBody body)
     {

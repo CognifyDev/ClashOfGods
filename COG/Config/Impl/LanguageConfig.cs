@@ -1,6 +1,7 @@
 using System;
 using COG.Utils;
 using COG.Utils.Coding;
+using UnityEngine;
 
 // ReSharper disable All
 
@@ -109,7 +110,8 @@ public class LanguageConfig : Config
     public string KillAction { get; private set; } = null!;
     public string CleanAction { get; private set; } = null!;
     public string DispatchAction { get; private set; } = null!;
-    
+    public string RepairAction { get; private set; }
+
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
     public string Alive { get; private set; } = null!;
@@ -196,6 +198,7 @@ public class LanguageConfig : Config
         KillAction = GetString("action.kill");
         CleanAction = GetString("action.clean");
         DispatchAction = GetString("action.dispatch");
+        RepairAction = GetString("action.repair");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 

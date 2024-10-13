@@ -30,11 +30,11 @@ public static class ButtonConstant
         () =>
         {
             var role = PlayerControl.LocalPlayer.GetPlayerData();
-            if (role == null)
+            if (role == null || role.MainRole == null || role.SubRoles == null)
             {
                 return false;
             }
-            return role.Role.CanKill || role.SubRoles.Any(subRole => subRole.CanKill);
+            return role.MainRole.CanKill || role.SubRoles.Any(subRole => subRole.CanKill);
         },
         ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
         1,

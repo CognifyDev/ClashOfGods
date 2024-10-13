@@ -59,7 +59,7 @@ public class Reaper : CustomRole, IListener
                     return false;
                 }
 
-                return role.Role.CanKill || role.SubRoles.Any(subRole => subRole.CanKill);
+                return role.MainRole.CanKill || role.SubRoles.Any(subRole => subRole.CanKill);
             },
             ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
             1,

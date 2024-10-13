@@ -31,13 +31,13 @@ public static class PlayerUtils
     public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
 
     public static IEnumerable<PlayerData> AllImpostors =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.Role.CampType == CampType.Impostor);
+        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Impostor);
 
     public static IEnumerable<PlayerData> AllCrewmates =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.Role.CampType == CampType.Crewmate);
+        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Crewmate);
 
     public static IEnumerable<PlayerData> AllNeutrals =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.Role.CampType == CampType.Neutral);
+        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Neutral);
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家
@@ -244,13 +244,13 @@ public static class PlayerUtils
 
     public static CustomRole GetMainRole(this PlayerControl player)
     {
-        return GameUtils.PlayerData.FirstOrDefault(d => d.Player.IsSamePlayer(player))?.Role ??
+        return GameUtils.PlayerData.FirstOrDefault(d => d.Player.IsSamePlayer(player))?.MainRole ??
                CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
     }
 
     public static CustomRole GetMainRole(this NetworkedPlayerInfo player)
     {
-        return GameUtils.PlayerData.FirstOrDefault(d => d.Data.IsSamePlayer(player))?.Role ??
+        return GameUtils.PlayerData.FirstOrDefault(d => d.Data.IsSamePlayer(player))?.MainRole ??
                CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
 
@@ -308,7 +308,7 @@ public static class PlayerUtils
         if (!player) return false; // 在对局内只要是游戏正式开始时在游戏内的玩家，玩家的NetworkedPlayerInfo绝对不为空
         
         var targetRole = player.GetPlayerData();
-        return targetRole != null && (targetRole.Role.Id.Equals(role.Id) || targetRole.SubRoles.Select(customRole => customRole.Id).Contains(role.Id));
+        return targetRole?.MainRole != null && (targetRole.MainRole.Id == role.Id || targetRole.SubRoles.Select(customRole => customRole.Id).Contains(role.Id));
     }
 
     public static DeadBody? GetClosestBody(List<DeadBody>? unTargetAble = null)
@@ -442,6 +442,11 @@ public static class PlayerUtils
     public static void SetCustomRole(this PlayerControl pc, CustomRole role, CustomRole[]? subRoles = null)
     {
         if (!pc) return;
+        if (role == null)
+        {
+            Main.Logger.LogError("It shouldn't be possible but the role to set is null. Try check if you're using a generic SetCustomRole<T> method and setting a role which is not registered yet.");
+            return;
+        }
 
         var playerRole = GameUtils.PlayerData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
         if (playerRole is not null) GameUtils.PlayerData.Remove(playerRole);
@@ -506,6 +511,13 @@ public static class PlayerUtils
     public static bool CanKill(this PlayerControl pc)
     {
         return pc.GetMainRole().CanKill;
+    }
+
+    public static void RpcMurderAndModifyKillAnimation(this PlayerControl pc, PlayerControl target, PlayerControl toShowAsKiller)
+    {
+        pc.MurderPlayer(target, SucceededFlags);
+        RpcUtils.StartRpcImmediately(pc, KnownRpc.MurderAndModifyKillAnimation)
+            .WriteNetObject(target).WriteNetObject(toShowAsKiller).Finish();
     }
 }
 
@@ -622,7 +634,7 @@ public class SerializablePlayerData
     
     public static SerializablePlayerData Of(PlayerData playerData)
     {
-        return new SerializablePlayerData(playerData.PlayerId, playerData.Role.Id,
+        return new SerializablePlayerData(playerData.PlayerId, playerData.MainRole.Id,
             playerData.SubRoles.Select(role => role.Id).ToArray());
     }
 }
@@ -633,7 +645,7 @@ public class PlayerData
     {
         Player = data.Object;
         Data = data;
-        Role = role;
+        MainRole = role;
         PlayerName = data.PlayerName;
         PlayerId = data.PlayerId;
         ColorId = data.DefaultOutfit.ColorId;
@@ -646,7 +658,7 @@ public class PlayerData
     public PlayerControl Player { get; }
     public NetworkedPlayerInfo Data { get; }
     public bool IsDisconnected => Data.Disconnected;
-    public CustomRole Role { get; }
+    public CustomRole MainRole { get; }
     public string PlayerName { get; }
     public byte PlayerId { get; }
     public int ColorId { get; }
