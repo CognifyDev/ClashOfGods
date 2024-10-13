@@ -5,6 +5,7 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using System;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
@@ -34,8 +35,8 @@ public class Assassin : CustomRole
                 {
                     return;
                 }
-                
-                player.RpcMurderPlayer(player, true);
+
+                PlayerControl.LocalPlayer.RpcMurderAndModifyKillAnimation(player, player);
                 _hasBeenKilled ++;
             },
             () => DispatchButton?.ResetCooldown(),

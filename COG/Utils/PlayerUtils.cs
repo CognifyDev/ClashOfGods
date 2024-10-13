@@ -512,6 +512,13 @@ public static class PlayerUtils
     {
         return pc.GetMainRole().CanKill;
     }
+
+    public static void RpcMurderAndModifyKillAnimation(this PlayerControl pc, PlayerControl target, PlayerControl toShowAsKiller)
+    {
+        pc.MurderPlayer(target, SucceededFlags);
+        RpcUtils.StartRpcImmediately(pc, KnownRpc.MurderAndModifyKillAnimation)
+            .WriteNetObject(target).WriteNetObject(toShowAsKiller).Finish();
+    }
 }
 
 public enum DeathReason
