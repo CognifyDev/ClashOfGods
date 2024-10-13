@@ -262,7 +262,7 @@ public class CustomRole
         CustomButtonManager.GetManager().RegisterCustomButton(button);
         if (CustomRoleManager.GetManager().ReloadingRoles)
             CustomButtonManager.GetManager().GetButtons().RemoveAll(AllButtons.Contains);
-        button.Text = button.Text.Color(Color);
+        button.Text = button.Text.Color(Color); // However because of the material of the font, the color string doesnt work
         AllButtons.Add(button);
     }
 

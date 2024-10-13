@@ -570,6 +570,11 @@ public class GameListener : IListener
 
         Arrow.CreatedArrows.RemoveAll(a => !a.ArrowObject);
         Arrow.CreatedArrows.ForEach(a => a.Update());
+
+        var hint = GameObject.Find("RoleHintTask");
+        if (!hint) return;
+
+        hint.GetComponent<ImportantTextTask>().Text = GetRoleHintText();
     }
 
     private static void ShareRoles()
@@ -636,6 +641,20 @@ public class GameListener : IListener
 
         ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
 
+        var impText = Object.FindObjectOfType<ImportantTextTask>();
+        if (!impText)
+            impText = PlayerTask.GetOrCreateTask<ImportantTextTask>(PlayerControl.LocalPlayer);
+
+        impText.name = "RoleHintTask";
+        impText.Text = GetRoleHintText();
+
+        if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
+            foreach (var player in PlayerControl.AllPlayerControls)
+                player.RpcSetCustomRole<Crewmate>();
+    }
+
+    private string GetRoleHintText()
+    {
         var localRole = GameUtils.GetLocalPlayerRole();
         bool isImpostorRole = localRole.CampType == CampType.Impostor;
 
@@ -646,16 +665,7 @@ public class GameListener : IListener
 
         if (isImpostorRole)
             sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
-
-        var impText = Object.FindObjectOfType<ImportantTextTask>();
-        if (!impText)
-            impText = PlayerTask.GetOrCreateTask<ImportantTextTask>(PlayerControl.LocalPlayer);
-
-        impText.name = "RoleHintTask";
-        impText.Text = sb.ToString();
-
-        if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
-            foreach (var player in PlayerControl.AllPlayerControls)
-                player.RpcSetCustomRole<Crewmate>();
+        
+        return sb.ToString();
     }
 }
