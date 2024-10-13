@@ -128,6 +128,7 @@ action:
   kill: "击杀"
   clean: "清理"
   dispatch: "处决"
+  repair: "修复"
 game:
   end:
     show-players-roles-message: "玩家职业:"

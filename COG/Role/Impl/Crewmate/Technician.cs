@@ -1,3 +1,4 @@
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.VentImpl;
@@ -5,6 +6,7 @@ using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.Utils;
 using COG.Utils.Coding;
+using System.Linq;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -22,12 +24,12 @@ public class Technician : CustomRole
             RepairSabotages();
         },
         () => RepairButton.ResetCooldown(),
-        () => true,
+        () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(t => PlayerTask.TaskIsEmergency(t)),
         () => true,
         ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Buttons.Repair.png")!,
         2,
         KeyCode.R,
-        "REPAIR",
+        LanguageConfig.Instance.RepairAction,
         () => 0f,
         2
         );
