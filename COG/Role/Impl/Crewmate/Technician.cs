@@ -5,8 +5,8 @@ using COG.Listener.Event.Impl.VentImpl;
 using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.Utils;
-using COG.Utils.Coding;
 using System.Linq;
+using COG.Constant;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -17,16 +17,18 @@ public class Technician : CustomRole, IListener
     public Technician() : base(Palette.Orange, CampType.Crewmate)
     {
         CanVent = true;
+        CanKill = false;
+        CanSabotage = false;
 
         RepairButton = CustomButton.Of(() =>
         {
             RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ClearSabotages).Finish();
             RepairSabotages();
         },
-        () => RepairButton.ResetCooldown(),
-        () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(t => PlayerTask.TaskIsEmergency(t)),
+        () => RepairButton?.ResetCooldown(),
+        () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency),
         () => true,
-        ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.Buttons.Repair.png")!, // IDK WHY THE SPRITE CANT BE SHOWN
+        ResourceUtils.LoadSprite(ResourcesConstant.RepairButton)!,
         2,
         KeyCode.R,
         LanguageConfig.Instance.RepairAction,
@@ -88,7 +90,7 @@ public class Technician : CustomRole, IListener
             RepairSabotages();
     }
 
-    public void RepairSabotages()
+    private static void RepairSabotages()
     {
         var ship = ShipStatus.Instance;
         var mapId = (MapNames)(AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay ?

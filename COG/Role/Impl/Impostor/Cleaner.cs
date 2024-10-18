@@ -37,7 +37,7 @@ public class Cleaner : CustomRole, IListener
             2,
             KeyCode.C,
             LanguageConfig.Instance.CleanAction,
-            () => CleanBodyCd?.GetFloat() ?? 30f,
+            () => CleanBodyCd.GetFloat(),
             0
         );
 

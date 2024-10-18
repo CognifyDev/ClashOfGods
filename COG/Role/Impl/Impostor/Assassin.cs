@@ -5,7 +5,6 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using System;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
