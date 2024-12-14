@@ -44,6 +44,32 @@ public class Yaml
         return null;
     }
 
+    public bool? GetBool(string location)
+    {
+        var str = GetString(location);
+        if (str == null)
+        {
+            return null;
+        }
+
+        if (bool.TryParse(str, out var result)) return result;
+
+        return null;
+    }
+
+    public double? GetDouble(string location)
+    {
+        var str = GetString(location);
+        if (str == null)
+        {
+            return null;
+        }
+
+        if (double.TryParse(str, out var result)) return result;
+
+        return null;
+    }
+
     public List<string>? GetStringList(string location)
     {
         var locations = location.Contains('.') ? location.Split(".") : new[] { location };
@@ -155,14 +181,19 @@ public class Yaml
         yamlObject[parts[^1]] = value;
     }
 
-    public static Yaml? LoadFromString(string text)
+    public static Yaml LoadFromString(string text)
     {
         return new Yaml(text);
     }
 
-    public static Yaml? LoadFromFile(string path)
+    public static Yaml LoadFromFile(string path)
     {
         return LoadFromString(File.ReadAllText(path));
+    }
+
+    public static Yaml LoadFromBytes(byte[] bytes)
+    {
+        return LoadFromString(Encoding.UTF8.GetString(bytes));
     }
 
     public void WriteTo(string path, bool replace = true, Encoding? encoding = null)
@@ -172,7 +203,7 @@ public class Yaml
         if (!File.Exists(path)) File.WriteAllText(path, Text, encoding ?? Encoding.UTF8);
     }
 
-    public static Yaml? NewEmptyYaml()
+    public static Yaml NewEmptyYaml()
     {
         return LoadFromString("");
     }

@@ -16,7 +16,7 @@ using COG.Game.CustomWinner.Winnable;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Patch;
-using COG.Plugin.Manager;
+using COG.Plugin.Impl;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
@@ -83,23 +83,18 @@ public partial class Main : BasePlugin
             "BepInEx/core/YamlDotNet.xml",
             "COG.Resources.InDLL.Depends.YamlDotNet.xml");
         ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/NLua.dll",
-            "COG.Resources.InDLL.Depends.NLua.dll");
+            "BepInEx/core/Jint.dll",
+            "COG.Resources.InDLL.Depends.Jint.dll");
         ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/KeraLua.dll",
-            "COG.Resources.InDLL.Depends.KeraLua.dll");
-        ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/KeraLua.xml",
-            "COG.Resources.InDLL.Depends.KeraLua.xml");
-        ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/lua54.dll",
-            "COG.Resources.InDLL.Depends.lua54.dll");
+            "BepInEx/core/Jint.xml",
+            "COG.Resources.InDLL.Depends.Jint.xml");
 /*
         ModUpdater.FetchUpdate();
         Logger.LogInfo(
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
 */
 
+/*
         // Load plugins
         try
         {
@@ -109,7 +104,7 @@ public partial class Main : BasePlugin
         {
             Logger.LogError(e.Message);
         }
-
+*/
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
@@ -208,15 +203,23 @@ public partial class Main : BasePlugin
         CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
         
         Harmony.PatchAll();
-
-        foreach (var plugin in PluginManager.GetPlugins()) plugin.OnEnable();
-
+        
+        // Start to load plugins
+        if (!Directory.Exists(JsPluginManager.PluginDirectoryPath)) Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
+        var files = Directory.GetDirectories(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
+        var enumerable = files as string[] ?? files.ToArray();
+        Logger.LogInfo($"{enumerable.Length} plugins to load.");
+        foreach (var file in enumerable)
+        {
+            JsPluginManager.GetManager().LoadPlugin(file);
+        }
+        
         _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
     }
 
     public override bool Unload()
     {
-        foreach (var plugin in PluginManager.GetPlugins()) plugin.OnDisable();
+        JsPluginManager.GetManager().GetPlugins().ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();

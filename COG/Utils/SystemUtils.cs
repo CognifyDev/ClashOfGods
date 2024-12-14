@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Security.Principal;
 using COG.Utils.WinAPI;
+using Il2CppSystem.Diagnostics;
 using Microsoft.Win32;
 
 namespace COG.Utils;
@@ -18,6 +19,12 @@ public static class SystemUtils
         var ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
         var timeStamp = isMillisecond ? Convert.ToInt64(ts.TotalMilliseconds) : Convert.ToInt64(ts.TotalSeconds);
         return timeStamp;
+    }
+
+    public static double GetCPUUsage()
+    {
+        var performanceCounter = new PerformanceCounter();
+        return performanceCounter.NextValue();
     }
 
     public static int GetLanguageAsLcid()

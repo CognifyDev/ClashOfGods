@@ -13,7 +13,6 @@ public class LanguageConfig : Config
     {
         Instance = new LanguageConfig();
         LoadLanguageConfig();
-        FirstTimeLoad = false;
     }
 
 
@@ -42,9 +41,7 @@ public class LanguageConfig : Config
             Instance = new LanguageConfig();
         }
     }
-
-    private static bool FirstTimeLoad = true;
-
+    
     public static Action OnLanguageLoaded { get; set;  } = new(() => { });
 
     public static LanguageConfig Instance { get; private set; }
