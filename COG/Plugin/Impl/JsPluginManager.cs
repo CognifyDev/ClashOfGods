@@ -85,10 +85,7 @@ public class JsPluginManager : IPluginManager
 
         var engine = new Engine(options =>
         {
-            if (SettingsConfig.Instance.AllowAllClr)
-            {
-                options.AllowClr();
-            }
+            options.AllowClr();
 
             if (!SettingsConfig.Instance.TimeZone.ToLower().Equals("default"))
             {
@@ -122,7 +119,7 @@ public class JsPluginManager : IPluginManager
         }));
 
         engine.SetValue("logger", new PluginLogger(description));
-
+        
         var plugin = new JsPlugin(description, engine);
         _plugins.Add(plugin);
         Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been loaded.");

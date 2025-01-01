@@ -1,7 +1,5 @@
 ﻿plugin:
   enable: true
-  allow-all-clr: true
-  max-cpu-usage: 0.8
   time-zone: "default"
   culture: "default"
   strict: true

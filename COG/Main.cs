@@ -196,13 +196,16 @@ public partial class Main : BasePlugin
         Harmony.PatchAll();
         
         // Start to load plugins
-        if (!Directory.Exists(JsPluginManager.PluginDirectoryPath)) Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
-        var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
-        var enumerable = files as string[] ?? files.ToArray();
-        Logger.LogInfo($"{enumerable.Length} plugins to load.");
-        foreach (var file in enumerable)
+        if (SettingsConfig.Instance.EnablePluginSystem)
         {
-            JsPluginManager.GetManager().LoadPlugin(file);
+            if (!Directory.Exists(JsPluginManager.PluginDirectoryPath)) Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
+            var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
+            var enumerable = files as string[] ?? files.ToArray();
+            Logger.LogInfo($"{enumerable.Length} plugins to load.");
+            foreach (var file in enumerable)
+            {
+                JsPluginManager.GetManager().LoadPlugin(file);
+            }
         }
         
         _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
@@ -210,7 +213,10 @@ public partial class Main : BasePlugin
 
     public override bool Unload()
     {
-        JsPluginManager.GetManager().GetPlugins().ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
+        if (SettingsConfig.Instance.EnablePluginSystem)
+        {
+            JsPluginManager.GetManager().GetPlugins().ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
+        }
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
