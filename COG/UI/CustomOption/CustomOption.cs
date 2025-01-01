@@ -135,7 +135,7 @@ public sealed class CustomOption
     {
         try
         {
-            var realPath = path.EndsWith(".cog") ? path : path + ".cog";
+            var realPath = path.EndsWith(".cfg") ? path : path + ".cfg";
             using StreamWriter writer = new(realPath, false, Encoding.UTF8);
             foreach (var option in Options.OrderBy(o => o.Id))
                 writer.WriteLine(option.Id + " " + option.Selection);
@@ -148,14 +148,14 @@ public sealed class CustomOption
 
     public static void SavePresetWithDialogue()
     {
-        var file = OpenFileDialogue.Open(Mode.Save, "Preset File(*.cog)\0*.cog\0\0");
+        var file = OpenFileDialogue.Open(Mode.Save, "Preset File(*.cfg)\0*.cfg\0\0");
         if (file.FilePath is null or "") return;
         SaveCurrentOption(file.FilePath);
     }
 
     public static void LoadPresetWithDialogue()
     {
-        var file = OpenFileDialogue.Open(Mode.Open, "Preset File(*.cog)\0*.cog\0\0");
+        var file = OpenFileDialogue.Open(Mode.Open, "Preset File(*.cfg)\0*.cfg\0\0");
         if (file.FilePath is null or "") return;
         LoadOptionFromPreset(file.FilePath);
     }
