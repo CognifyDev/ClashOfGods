@@ -61,6 +61,7 @@ public partial class Main : BasePlugin
     public override void Load()
     {
         Instance = this;
+        
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
         VersionInfo = PluginVersion.Equals("Unknown")
             ? VersionInfo.Empty
@@ -74,20 +75,7 @@ public partial class Main : BasePlugin
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.SelectRoles)));
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.OnRpcReceived)));
 #endif
-
-        // Add dependencies to core directory
-        ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/YamlDotNet.dll",
-            "COG.Resources.InDLL.Depends.YamlDotNet.dll");
-        ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/YamlDotNet.xml",
-            "COG.Resources.InDLL.Depends.YamlDotNet.xml");
-        ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/Jint.dll",
-            "COG.Resources.InDLL.Depends.Jint.dll");
-        ResourceUtils.WriteToFileFromResource(
-            "BepInEx/core/Jint.xml",
-            "COG.Resources.InDLL.Depends.Jint.xml");
+        
 /*
         ModUpdater.FetchUpdate();
         Logger.LogInfo(
@@ -155,6 +143,9 @@ public partial class Main : BasePlugin
             new Guesser(),
             new SpeedBooster()
         });
+        
+        // Register settings
+        SettingsConfig.Instance.LoadConfig();
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]

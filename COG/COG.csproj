@@ -4,7 +4,7 @@
         <LangVersion>latest</LangVersion>
         <DebugType>embedded</DebugType>
 
-        <Description>A new-term mod for Among Us with plugin system that allows you to make your own plugin by EASY computer language Lua for Among Us</Description>
+        <Description>A new-term mod for Among Us with plugin system that allows you to make your own plugin by EASY computer language JavaScript for Among Us</Description>
         <Authors>CognifyDev</Authors>
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>
@@ -22,7 +22,6 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Resources\InDLL\Config\*.*" />
-        <EmbeddedResource Include="Resources\InDLL\Depends\*.*" />
     </ItemGroup>
 
     <ItemGroup>

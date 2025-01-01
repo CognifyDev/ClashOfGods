@@ -28,6 +28,6 @@ public class SettingsConfig : Config
     static SettingsConfig()
     {
         Instance = new SettingsConfig();
-        Instance.LoadConfig();
+        Instance.LoadConfig(true);
     }
 }
