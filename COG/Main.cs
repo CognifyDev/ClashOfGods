@@ -197,7 +197,7 @@ public partial class Main : BasePlugin
         
         // Start to load plugins
         if (!Directory.Exists(JsPluginManager.PluginDirectoryPath)) Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
-        var files = Directory.GetDirectories(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
+        var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
         var enumerable = files as string[] ?? files.ToArray();
         Logger.LogInfo($"{enumerable.Length} plugins to load.");
         foreach (var file in enumerable)

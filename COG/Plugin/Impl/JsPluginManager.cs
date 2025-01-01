@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using COG.Config.Impl;
 using COG.Utils;
@@ -27,6 +28,7 @@ public class JsPluginManager : IPluginManager
         jsPlugin.Enabled = true;
         var description = plugin.GetDescription();
         Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been enabled.");
+        jsPlugin.OnEnable();
     }
 
     public void DisablePlugin(IPlugin plugin)
@@ -35,6 +37,7 @@ public class JsPluginManager : IPluginManager
         jsPlugin.Enabled = false;
         var description = plugin.GetDescription();
         Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been disabled.");
+        jsPlugin.OnDisable();
     }
 
     public IPlugin LoadPlugin(string path)
@@ -60,7 +63,7 @@ public class JsPluginManager : IPluginManager
             }
         }
 
-        var mainScript = zip.GetEntry($"scripts/{description.Main.Replace(".", "/")}");
+        var mainScript = GetEntry(zip, $"scripts/{description.Main}");
         if (mainScript == null)
         {
             throw new System.Exception($"{path} is not a available plugin!");
@@ -72,7 +75,7 @@ public class JsPluginManager : IPluginManager
             var spilt = module.Split("|");
             var modulePath = spilt[0];
             var moduleName = spilt[1];
-            var entry = zip.GetEntry($"scripts/{modulePath.Replace(".", "/")}");
+            var entry = zip.GetEntry($"scripts/{modulePath}");
             if (entry == null)
             {
                 continue;
@@ -118,20 +121,28 @@ public class JsPluginManager : IPluginManager
             return _resources.TryGetValue(descriptionByPath, out var value) ? value : Array.Empty<byte>();
         }));
 
+        engine.SetValue("logger", new PluginLogger(description));
+
         var plugin = new JsPlugin(description, engine);
         _plugins.Add(plugin);
         Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been loaded.");
+        plugin.OnLoad();
         EnablePlugin(plugin);
 
         return plugin;
     }
 
+    private static ZipArchiveEntry? GetEntry(ZipArchive zipArchive, string fullName)
+    {
+        return zipArchive.Entries.FirstOrDefault(entry => entry.FullName.Equals(fullName));
+    }
+
     private static PluginDescription? GetDescription(ZipArchive zipArchive)
     {
-        var scriptsEntry = zipArchive.GetEntry("scripts");
+        var scriptsEntry = GetEntry(zipArchive, "scripts/");
         var pluginYmlEntry = zipArchive.GetEntry("plugin.yml");
-        var resourcesEntry = zipArchive.GetEntry("resources");
-        var configsEntry = zipArchive.GetEntry("configs");
+        var resourcesEntry = GetEntry(zipArchive, "resources/");
+        var configsEntry = GetEntry(zipArchive, "configs/");
         if (scriptsEntry == null || pluginYmlEntry == null ||
             resourcesEntry == null || configsEntry == null)
         {

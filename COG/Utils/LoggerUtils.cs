@@ -17,7 +17,7 @@ public class StackTraceLogger
 
     public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
     public List<MethodInfo> DisabledMethodSource { get; } = new();
-    private ManualLogSource BepInExLogger { get; }
+    public ManualLogSource BepInExLogger { get; }
 
     public void DisableSource(Type toDisable)
     {
