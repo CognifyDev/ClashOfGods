@@ -8,7 +8,9 @@ using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.States;
+using COG.Utils;
 using Il2CppSystem.Collections.Generic;
+using UnityEngine;
 
 namespace COG.Patch;
 
@@ -349,5 +351,22 @@ public static class LocalPlayerExitPatch
     public static void Postfix()
     {
         GameStates.InGame = false;
+    }
+}
+
+[HarmonyPatch(typeof(Vent), nameof(Vent.SetOutline))]
+public static class VentOutlinePatch
+{
+    public static bool Prefix(Vent __instance, bool on, bool mainTarget)
+    {
+        var myRole = PlayerControl.LocalPlayer.GetMainRole();
+        if (myRole is { CanVent: false }) return true;
+
+        var color = myRole.Color;
+        __instance.myRend.material.SetFloat("_Outline", on ? 1 : 0);
+        __instance.myRend.material.SetColor("_OutlineColor", color);
+        __instance.myRend.material.SetColor("_AddColor", mainTarget ? color : Color.clear);
+
+        return false;
     }
 }
