@@ -54,10 +54,7 @@ public class JsPluginManager : IPluginManager
             if (entry.FullName.StartsWith("scripts"))
             {
                 _resources.Add(new ResourceDescription(entry.FullName, description, ResourceType.Script), entry.Open().ToBytes());
-            } else if (entry.FullName.StartsWith("configs"))
-            {
-                _resources.Add(new ResourceDescription(entry.FullName, description, ResourceType.Config), entry.Open().ToBytes());
-            } else if (entry.FullName.StartsWith("resources"))
+            }  else if (entry.FullName.StartsWith("resources"))
             {
                 _resources.Add(new ResourceDescription(entry.FullName, description, ResourceType.Resource), entry.Open().ToBytes());
             }
@@ -139,9 +136,8 @@ public class JsPluginManager : IPluginManager
         var scriptsEntry = GetEntry(zipArchive, "scripts/");
         var pluginYmlEntry = zipArchive.GetEntry("plugin.yml");
         var resourcesEntry = GetEntry(zipArchive, "resources/");
-        var configsEntry = GetEntry(zipArchive, "configs/");
         if (scriptsEntry == null || pluginYmlEntry == null ||
-            resourcesEntry == null || configsEntry == null)
+            resourcesEntry == null)
         {
             return null;
         }
