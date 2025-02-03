@@ -8,4 +8,12 @@ namespace COG.Utils.Coding;
 [AttributeUsage(AttributeTargets.All, Inherited = false)]
 public sealed class WorkInProgressAttribute : Attribute
 {
+    // ReSharper disable once UnusedParameter.Local
+    public WorkInProgressAttribute(string message)
+    {
+    }
+    
+    public WorkInProgressAttribute()
+    {
+    }
 }

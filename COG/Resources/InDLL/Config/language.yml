@@ -67,6 +67,11 @@ role:
       name: "小丑"
       description: "承受一切诋毁，然后放声大笑"
       long-description: "被投票放逐直接获胜"
+    reporter:
+      name: "记者"
+      description: "抓住太空中的头牌新闻"
+      long-description: "记者不能启动会议，只能报告鸡腿，且不会向其他人显示报告者是自己，只提示会议是记者召开的。报告一定次数鸡腿后召开紧急会议且当轮会议上不被击杀或放逐则直接获胜。"
+      neededReportTimes: "需要报告次数"
   sub-roles:
     guesser:
       name: "赌怪"

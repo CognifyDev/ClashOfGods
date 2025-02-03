@@ -65,7 +65,8 @@ public class LanguageConfig : Config
     public string ReaperTimeToReduce { get; private set; } = null!;
 
     // Neutral
-
+    public string NeededReportTimes { get; private set; } = null!;
+    
     // Sub-roles
     public string GuesserMaxGuessTime { get; private set; } = null!;
     public string GuesserGuessContinuously { get; private set; } = null!;
@@ -154,6 +155,7 @@ public class LanguageConfig : Config
         ReaperTimeToReduce = GetString("role.impostor.reaper.time-to-reduce");
 
         // Neutral
+        NeededReportTimes = GetString("role.neutral.reporter.neededReportTimes");
         
         // Sub-Roles
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");

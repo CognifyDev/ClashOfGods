@@ -63,7 +63,7 @@ public class Vigilante : CustomRole, IListener
         var crewmates
             = PlayerUtils.GetAllAlivePlayers().Where(p => p.GetMainRole().CampType == CampType.Crewmate);
         if (crewmates.Count() > _minCrewmateNumber.GetFloat() || _hasGiven) return;
-        _killTimes++;
+        _killTimes ++;
         _hasGiven = true;
     }
 

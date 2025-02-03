@@ -34,9 +34,8 @@ public class Jester : CustomRole, IListener, IWinnable
         if (!deadPlayers.Any()) return;
 
         data.WinnableCampType = CampType; 
-        data.WinText = "Jester wins"; // SO WE STILL HAVEN'T CHANGE THIS
+        data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(deadPlayers[0].Data.PlayerName);
         data.WinColor = Color;
-        data.WinnablePlayers.Clear();
         data.WinnablePlayers.Add(deadPlayers[0].Data);
         data.Winnable = true;
     }

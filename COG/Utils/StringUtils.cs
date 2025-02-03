@@ -27,40 +27,49 @@ public static class StringUtils
 
     public static string CustomFormat(this string text, params object[] args)
     {
-        var isInArg = false;
-        string temp = "", result = text;
-        List<string> argsStr = new();
+        if (text is null || args is null)
+            throw new ArgumentNullException(text is null ? nameof(text) : nameof(args));
 
-        if (text == null || args == null) throw new ArgumentNullException();
-        if (argsStr.Count > args.Length) throw new IndexOutOfRangeException();
+        var result = new StringBuilder(text.Length);
+        var argIndex = 0;
+        var isInPlaceholder = false;
 
-        foreach (var c in text)
+        // 单次遍历同时完成格式解析和替换
+        foreach (var t in text)
         {
-            if (c == '%')
+            if (t == '%')
             {
-                isInArg = !isInArg;
-                temp += '%';
-                if (!isInArg)
+                if (!isInPlaceholder)
                 {
-                    argsStr.Add(temp);
-                    temp = "";
+                    // 记录占位符起始位置
+                    isInPlaceholder = true;
                 }
+                else
+                {
+                    // 检测到闭合占位符
+                    if (argIndex >= args.Length)
+                        throw new ArgumentOutOfRangeException(nameof(args), "参数数量不足");
 
+                    // 直接追加参数值（跳过占位符内容）
+                    result.Append(args[argIndex++]?.ToString() ?? string.Empty);
+                    isInPlaceholder = false;
+                }
                 continue;
             }
 
-            if (isInArg) temp += c;
+            if (!isInPlaceholder)
+            {
+                result.Append(t);
+            }
         }
 
-        if (isInArg) throw new FormatException("The ending % character is missing.");
+        // 最终状态检查
+        if (isInPlaceholder)
+            throw new FormatException("未闭合的占位符");
 
-        var count = 0;
-        foreach (var arg in argsStr)
-        {
-            result = result.Replace(arg, args[count].ToString());
-            count++;
-        }
+        if (argIndex != args.Length)
+            throw new ArgumentException($"参数数量不匹配，需要 {argIndex} 个参数，实际提供 {args.Length} 个");
 
-        return result;
+        return result.ToString();
     }
 }
