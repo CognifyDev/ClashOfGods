@@ -16,7 +16,6 @@ using Random = System.Random;
 namespace COG.Role.Impl.Neutral;
 
 [NotTested]
-[WorkInProgress("未完成：会向其他人显示报告者是自己")]
 public class Reporter : CustomRole, IListener, IWinnable
 {
     private int _reportedTimes;
