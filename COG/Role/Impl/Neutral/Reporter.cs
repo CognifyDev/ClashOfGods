@@ -11,6 +11,7 @@ using COG.Utils.Coding;
 using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
+using Random = System.Random;
 
 namespace COG.Role.Impl.Neutral;
 
@@ -39,12 +40,18 @@ public class Reporter : CustomRole, IListener, IWinnable
             new IntOptionValueRule(1, 1, 14, 2));
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerReport(PlayerReportDeadBodyEvent @event)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnPlayerReport(PlayerReportDeadBodyEvent @event)
     {
         var player = @event.Player;
-        if (!player.IsRole(this) || !PlayerControl.LocalPlayer.IsSamePlayer(player)) return;
+        var target = @event.Target;
+        if (!player.IsRole(this) || !PlayerControl.LocalPlayer.IsSamePlayer(player)) return true;
+        var allAlivePlayers = PlayerUtils.GetAllAlivePlayers();
+        var randomPlayer = allAlivePlayers[new Random().Next(0, allAlivePlayers.Count - 1)];
         _reportedTimes ++;
+        
+        randomPlayer.ReportDeadBody(target);
+        return false;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
