@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using COG.Game.CustomWinner.Data;
 using COG.Role;
 using COG.Utils;

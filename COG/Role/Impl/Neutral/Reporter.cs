@@ -7,7 +7,6 @@ using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using COG.Utils.Coding;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 using Random = System.Random;
