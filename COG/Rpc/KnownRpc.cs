@@ -14,6 +14,5 @@ public enum KnownRpc : uint
     ClearSabotages = 108,
     ShareWinners = 109,
     KillPlayerCompletely = 110,
-    MurderAndModifyKillAnimation = 111,
-    ReporterFinishReporting = 112
+    MurderAndModifyKillAnimation = 111
 }

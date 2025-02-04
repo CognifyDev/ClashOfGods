@@ -1,42 +1,34 @@
-﻿using COG.Config.Impl;
+﻿using System.Collections.Generic;
+using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
-using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.Coding;
-using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 using Random = System.Random;
 
 namespace COG.Role.Impl.Neutral;
 
-[NotTested]
 public class Reporter : CustomRole, IListener, IWinnable
 {
-    private int _reportedTimes;
-    private bool _finishedReporting;
-
-    private PlayerControl? _winnablePlayer;
+    private readonly Dictionary<PlayerControl, uint> _reportersWhoReported = new();
     
     public override void ClearRoleGameData()
     {
-        _reportedTimes = 0;
-        _finishedReporting = false;
-
-        _winnablePlayer = null;
+        _reportersWhoReported.Clear();
     }
 
     private readonly CustomOption _neededReportTimes;
     
-    public Reporter() : base(new Color(158, 30, 26, 100), CampType.Neutral)
+    public Reporter() : base(Color.gray, CampType.Neutral)
     {
         _neededReportTimes = CreateOption(() => LanguageConfig.Instance.NeededReportTimes,
-            new IntOptionValueRule(1, 1, 14, 2));
+            new FloatOptionValueRule(1F, 1F, 14F, 3F));
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -44,35 +36,23 @@ public class Reporter : CustomRole, IListener, IWinnable
     {
         var player = @event.Player;
         var target = @event.Target;
-        if (!player.IsRole(this) || !PlayerControl.LocalPlayer.IsSamePlayer(player)) return true;
+        if (!player.IsRole(this)) return true;
+
+        if (target == null) return false;
+        
         var allAlivePlayers = PlayerUtils.GetAllAlivePlayers();
         var randomPlayer = allAlivePlayers[new Random().Next(0, allAlivePlayers.Count - 1)];
-        _reportedTimes ++;
-        
         randomPlayer.ReportDeadBody(target);
-        return false;
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent _)
-    {
-        if (!_finishedReporting && _reportedTimes < _neededReportTimes.GetInt())
+        
+        if (_reportersWhoReported.TryGetValue(player, out var times))
         {
-            _finishedReporting = true;
-
-            var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ReporterFinishReporting);
-            rpc.WriteNetObject(PlayerControl.LocalPlayer);
+            _reportersWhoReported[player] = ++times;
         }
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnHandleRpc(PlayerHandleRpcEvent @event)
-    {
-        if (!AmongUsClient.Instance.AmHost) return;
-        if ((byte) KnownRpc.ReporterFinishReporting != @event.CallId) return;
-        var reader = @event.Reader;
-        var winner = reader.ReadNetObject<PlayerControl>();
-        _winnablePlayer = winner;
+        else
+        {
+            _reportersWhoReported.Add(player, 1);
+        }
+        return false;
     }
 
     public override IListener GetListener()
@@ -83,13 +63,17 @@ public class Reporter : CustomRole, IListener, IWinnable
     public void CheckWin(WinnableData data)
     {
         if (GameStates.IsMeeting) return;
-        if (_winnablePlayer == null) return;
         
-        data.WinnableCampType = CampType; 
-        data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(_winnablePlayer);
-        data.WinColor = Color;
-        data.WinnablePlayers.Add(_winnablePlayer.Data);
-        data.Winnable = true;
+        foreach (var (target, times) in _reportersWhoReported)
+        {
+            if (times < _neededReportTimes.GetFloat()) return;
+            
+            data.WinnableCampType = CampType; 
+            data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(target);
+            data.WinColor = Color;
+            data.WinnablePlayers.Add(target.Data);
+            data.Winnable = true;
+        }
     }
 
     public uint GetWeight()

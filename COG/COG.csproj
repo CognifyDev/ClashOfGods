@@ -4,12 +4,12 @@
         <LangVersion>preview</LangVersion>
         <DebugType>embedded</DebugType>
 
-        <Description>A new-term mod for Among Us with plugin system that allows you to make your own plugin by EASY computer language JavaScript for Among Us</Description>
+        <Description>A new-term mod for Among Us with plugin system that allows you to make your own plugin by EASY computer language for Among Us</Description>
         <Authors>CognifyDev</Authors>
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Version>1.0.0-beta.23</Version>
+        <Version>1.0.0-beta.24</Version>
         <Title>ClashOfGods</Title>
         <Copyright>CognifyDev</Copyright>
         <PackageProjectUrl>https://github.com/CognifyDev/ClashOfGods</PackageProjectUrl>
