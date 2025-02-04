@@ -157,7 +157,7 @@ public static class PlayerUtils
 
     public static bool IsSamePlayer(this PlayerControl? player, PlayerControl? target)
     { 
-        if (player == null || target == null) return false; 
+        if (player == null || target == null) return false;
         return player.PlayerId == target.PlayerId;
     }
 
