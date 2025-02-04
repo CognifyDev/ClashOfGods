@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>preview</LangVersion>
         <DebugType>embedded</DebugType>
 
         <Description>A new-term mod for Among Us with plugin system that allows you to make your own plugin by EASY computer language JavaScript for Among Us</Description>
