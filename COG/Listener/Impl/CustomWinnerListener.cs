@@ -43,7 +43,6 @@ public class CustomWinnerListener : IListener
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareWinners);
         writer.WriteBytesAndSize(SerializableWinnableData.Of(data).SerializeToData());
         writer.Finish();
-            
         TaskUtils.RunTaskAfter(1.5f, () =>
             GameManager.Instance.RpcEndGame(checkForGameEnd.GameOverReason, false));
         return false;

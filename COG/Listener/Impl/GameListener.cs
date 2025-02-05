@@ -58,16 +58,7 @@ public class GameListener : IListener
                     GameUtils.PlayerData.Add(data);
                     data.Player.SetCustomRole(data.MainRole, data.SubRoles);
                 }
-/*
-                var originalText = reader.ReadString()!;
-                foreach (var s in originalText.Split(","))
-                {
-                    var texts = s.Split("|");
-                    var player = PlayerUtils.GetPlayerById(Convert.ToByte(texts[0]));
-                    var role = CustomRoleManager.GetManager().GetRoleById(Convert.ToInt32(texts[1]));
-                    player!.SetCustomRole(role!);
-                }
-*/
+                
                 foreach (var playerRole in GameUtils.PlayerData)
                     Main.Logger.LogInfo($"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
                                         $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}");
@@ -384,8 +375,6 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
     {
-        if (!AmongUsClient.Instance.AmHost) return;
-        
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
 

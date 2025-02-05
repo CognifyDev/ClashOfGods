@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
+using COG.Rpc;
 using Reactor.Utilities;
 using UnityEngine;
+using Array = Il2CppSystem.Array;
 
 namespace COG.Utils;
 

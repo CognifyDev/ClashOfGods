@@ -3,6 +3,9 @@ using COG.Listener.Event.Impl.RManager;
 
 namespace COG.Listener.Impl;
 
+/*
+ * 这个类尝试修复树懒留下的逆天BUG
+ */
 public class VanillaBugFixListener : IListener
 {
     [EventHandler(EventHandlerType.Postfix)]

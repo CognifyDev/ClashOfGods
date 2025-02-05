@@ -65,7 +65,8 @@ public class LanguageConfig : Config
     public string ReaperTimeToReduce { get; private set; } = null!;
 
     // Neutral
-    public string NeededReportTimes { get; private set; } = null!;
+    public string ReporterNeededReportTimes { get; private set; } = null!;
+    public string DeathBringerNeededPlayerNumber { get; private set; } = null!;
     
     // Sub-roles
     public string GuesserMaxGuessTime { get; private set; } = null!;
@@ -104,14 +105,15 @@ public class LanguageConfig : Config
     public string NeutralCampDescription { get; private set; } = null!;
     public string CrewmateCampDescription { get; private set; } = null!;
 
-    public string KillAction { get; private set; } = null!;
-    public string CleanAction { get; private set; } = null!;
-    public string DispatchAction { get; private set; } = null!;
+    public string KillAction { get; private set; }
+    public string CleanAction { get; private set; }
+    public string DispatchAction { get; private set; }
     public string RepairAction { get; private set; }
+    public string StareAction { get; private set; }
 
-    public string ShowPlayersRolesMessage { get; private set; } = null!;
+    public string ShowPlayersRolesMessage { get; private set; }
 
-    public string Alive { get; private set; } = null!;
+    public string Alive { get; private set; }
     public string Disconnected { get; private set; } = null!;
     public string DefaultKillReason { get; private set; } = null!;
     public string UnknownKillReason { get; private set; } = null!;
@@ -155,7 +157,8 @@ public class LanguageConfig : Config
         ReaperTimeToReduce = GetString("role.impostor.reaper.time-to-reduce");
 
         // Neutral
-        NeededReportTimes = GetString("role.neutral.reporter.neededReportTimes");
+        ReporterNeededReportTimes = GetString("role.neutral.reporter.neededReportTimes");
+        DeathBringerNeededPlayerNumber = GetString("role.neutral.death-bringer.neededPlayerNumber");
         
         // Sub-Roles
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
@@ -197,6 +200,7 @@ public class LanguageConfig : Config
         CleanAction = GetString("action.clean");
         DispatchAction = GetString("action.dispatch");
         RepairAction = GetString("action.repair");
+        StareAction = GetString("action.stare");
 
         ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
 

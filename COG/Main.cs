@@ -139,6 +139,7 @@ public partial class Main : BasePlugin
             // Neutral
             new Jester(),
             new Reporter(),
+            new DeathBringer(),
 
             // Sub-roles
             new Guesser(),

@@ -30,7 +30,7 @@ public class SoulHunter : CustomRole, IListener
         ReviveAfter = CreateOption(() => LanguageConfig.Instance.SoulHunterReviveAfter,
             new FloatOptionValueRule(1F, 1F, 60F, 5F, NumberSuffixes.Seconds));
         SoulHunterKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
-            new FloatOptionValueRule(1F, 1F, 40F, 20F, NumberSuffixes.Seconds));
+            new FloatOptionValueRule(1F, 1F, 60F, 20F, NumberSuffixes.Seconds));
         
         _killButton = CustomButton.Of(
             () =>
@@ -101,7 +101,6 @@ public class SoulHunter : CustomRole, IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnReportBody(PlayerReportDeadBodyEvent @event)
     {
-        if (!AmongUsClient.Instance.AmHost) return;
         var targets = PlayerUtils.GetAllAlivePlayers().Where(player => player.HasMarkAs(HasRevivedTag));
         targets.ForEach(target =>
         {

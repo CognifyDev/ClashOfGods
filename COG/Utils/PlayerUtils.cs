@@ -140,6 +140,7 @@ public static class PlayerUtils
         }
     }
 
+    [SuppressMessage("ReSharper", "UseCollectionExpression")]
     public static List<PlayerControl> GetAllPlayers()
     {
         return new List<PlayerControl>(PlayerControl.AllPlayerControls.ToArray());
@@ -439,7 +440,7 @@ public static class PlayerUtils
         return null;
     }
 
-    public static void SetCustomRole(this PlayerControl pc, CustomRole role, CustomRole[]? subRoles = null)
+    public static void SetCustomRole(this PlayerControl pc, CustomRole? role, CustomRole[]? subRoles = null)
     {
         if (!pc) return;
         if (role == null)

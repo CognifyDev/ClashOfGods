@@ -72,6 +72,11 @@ role:
       description: "抓住太空中的头牌新闻"
       long-description: "记者不能启动会议，只能报告鸡腿，且不会向其他人显示报告者是自己，只提示会议是记者召开的。报告一定次数鸡腿后召开紧急会议且当轮会议上不被击杀或放逐则直接获胜。"
       neededReportTimes: "需要报告次数"
+    death-bringer:
+      name: "死亡使者"
+      description: "悄无声息地带走时间已尽的人"
+      long-description: "无法进行常规击杀。每轮可以凝视一名玩家，该玩家将在下轮会议开始前出局。当场上人数少于等于指定人数时可以进行常规击杀。"
+      neededPlayerNumber: "所需的玩家数目"
   sub-roles:
     guesser:
       name: "赌怪"
@@ -134,6 +139,7 @@ action:
   clean: "清理"
   dispatch: "处决"
   repair: "修复"
+  stare: "凝视"
 game:
   end:
     show-players-roles-message: "玩家职业:"

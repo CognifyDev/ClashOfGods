@@ -12,6 +12,7 @@ public static class ResourcesConstant
     public const string GuessButton = "COG.Resources.InDLL.Images.Buttons.Guess.png";
     public const string DispatchButton = "COG.Resources.InDLL.Images.Buttons.Dispatch.png";
     public const string RepairButton = "COG.Resources.InDLL.Images.Buttons.Repair.png";
+    public const string StareButton = "COG.Resources.InDLL.Images.Buttons.Stare.png";
     
     public const string ArrowImage = "COG.Resources.InDLL.Images.Arrow.png";
     
