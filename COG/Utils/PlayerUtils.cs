@@ -127,17 +127,8 @@ public static class PlayerUtils
                 MeetingHud.Instance.CheckForEndVoting();
         }
 
-        foreach (var player in GetAllAlivePlayers())
-        {
-            if (player.PlayerId == target.PlayerId)
-            {
-                HudManager.Instance.KillOverlay.ShowKillAnimation(killer.Data, target.Data);
-                continue;
-            }
-
-            if (showAnimationToEverybody)
-                HudManager.Instance.KillOverlay.ShowKillAnimation(target.Data, target.Data);
-        }
+        if (showAnimationToEverybody || PlayerControl.LocalPlayer.PlayerId == target.PlayerId)
+            HudManager.Instance.KillOverlay.ShowKillAnimation(target.Data, target.Data);
     }
 
     [SuppressMessage("ReSharper", "UseCollectionExpression")]
