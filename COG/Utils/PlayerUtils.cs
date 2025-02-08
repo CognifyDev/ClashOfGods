@@ -105,10 +105,17 @@ public static class PlayerUtils
         rpc.Finish();
     }
 
-    public static void KillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false)
+    /// <summary>
+    ///     Kill without dead body
+    /// </summary>
+    /// <param name="killer"></param>
+    /// <param name="target"></param>
+    /// <param name="showAnimationToEverybody"></param>
+    public static void KillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = false)
     {
         _ = new DeadPlayer(DateTime.Now, DeathReason.Default, target.Data, killer.Data);
         target.Exiled();
+
         if (MeetingHud.Instance)
         {
             foreach (var pva in MeetingHud.Instance.playerStates)
@@ -127,8 +134,12 @@ public static class PlayerUtils
                 MeetingHud.Instance.CheckForEndVoting();
         }
 
-        if (showAnimationToEverybody || PlayerControl.LocalPlayer.PlayerId == target.PlayerId)
-            HudManager.Instance.KillOverlay.ShowKillAnimation(target.Data, target.Data);
+        var displayedKiller = anonymousKiller ? target : killer;
+
+        if (target.IsSamePlayer(PlayerControl.LocalPlayer))
+            HudManager.Instance.KillOverlay.ShowKillAnimation(killer.Data, target.Data); // Always show the real killer to the victim
+        else if (showAnimationToEverybody)
+            HudManager.Instance.KillOverlay.ShowKillAnimation(displayedKiller.Data, target.Data);
     }
 
     [SuppressMessage("ReSharper", "UseCollectionExpression")]
@@ -446,7 +457,7 @@ public static class PlayerUtils
         GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
 
-        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has set to {role.GetNormalName()}");
+        Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }
 
     public static void SetCustomRole<T>(this PlayerControl pc) where T : CustomRole
