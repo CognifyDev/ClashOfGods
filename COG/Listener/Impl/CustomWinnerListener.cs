@@ -203,7 +203,7 @@ public class CustomWinnerListener : IListener
         summary.Append(Environment.NewLine);
         foreach (var role in GameUtils.PlayerData)
         {
-            var deadPlayer = DeadPlayerManager.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
+            var deadPlayer = DeadPlayer.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
             summary.Append(role.PlayerName.PadRight(10)).Append(' ')
                 .Append(role.MainRole.Color.ToColorString(role.MainRole.Name));
             summary.Append(' ').Append((deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed).ToColorString(

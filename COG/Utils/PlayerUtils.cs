@@ -14,7 +14,6 @@ using InnerNet;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 
-
 namespace COG.Utils;
 
 public enum ColorType
@@ -94,7 +93,7 @@ public static class PlayerUtils
     /// <param name="killer"></param>
     /// <param name="target"></param>
     /// <param name="showAnimationToEverybody"></param>
-    public static void RpcKillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false)
+    public static void RpcKillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
         KillPlayerCompletely(killer, target, showAnimationToEverybody);
 
@@ -102,6 +101,7 @@ public static class PlayerUtils
         rpc.WriteNetObject(killer);
         rpc.WriteNetObject(target);
         rpc.Write(showAnimationToEverybody);
+        rpc.Write(anonymousKiller);
         rpc.Finish();
     }
 
@@ -111,9 +111,9 @@ public static class PlayerUtils
     /// <param name="killer"></param>
     /// <param name="target"></param>
     /// <param name="showAnimationToEverybody"></param>
-    public static void KillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = false)
+    public static void KillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
-        _ = new DeadPlayer(DateTime.Now, DeathReason.Default, target.Data, killer.Data);
+        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
         target.Exiled();
 
         if (MeetingHud.Instance)
@@ -348,12 +348,15 @@ public static class PlayerUtils
         };
     }
 
-    public static string GetLanguageDeathReason(this DeathReason? deathReason)
+    public static string GetLanguageDeathReason(this CustomDeathReason? deathReason)
     {
+        var handler = new LanguageConfig.TextHandler("game.survival-data");
         return deathReason switch
         {
-            DeathReason.Default => LanguageConfig.Instance.DefaultKillReason,
-            DeathReason.Disconnected => LanguageConfig.Instance.Disconnected,
+            CustomDeathReason.Default => handler.GetString("default"),
+            CustomDeathReason.Disconnected => handler.GetString("disconnected"),
+            CustomDeathReason.Exiled => handler.GetString("exiled"),
+            CustomDeathReason.Misfire => handler.GetString("misfire"),
             _ => LanguageConfig.Instance.UnknownKillReason
         };
     }
@@ -501,7 +504,7 @@ public static class PlayerUtils
         return data.SubRoles;
     }
 
-    public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, DeathReason reason,
+    public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, CustomDeathReason reason,
         bool showCorpse = true)
     {
         _ = new DeadPlayer(DateTime.Now, reason, target.Data, pc.Data);
@@ -524,13 +527,13 @@ public static class PlayerUtils
     }
 }
 
-public enum DeathReason
+public enum CustomDeathReason
 {
     Unknown = -1,
     Disconnected,
     Default,
     Exiled,
-    LoverSuicide
+    Misfire
 }
 
 [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
@@ -542,10 +545,9 @@ public class DeadPlayerListener : IListener
         var target = @event.Target;
         var killer = @event.Player;
         if (!(target.Data.IsDead && killer && target)) return;
-        if (DeadPlayerManager.DeadPlayers.Any(p => p.PlayerId == target.PlayerId)) return;
+        if (DeadPlayer.IsMarkedAsDead(target)) return;
 
-        var reason = DeadPlayerManager.GetDeathReason(killer, target);
-        _ = new DeadPlayer(DateTime.Now, reason, target.Data, killer.Data);
+        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -553,15 +555,15 @@ public class DeadPlayerListener : IListener
     {
         var data = @event.ClientData;
         if (!GameStates.InGame) return;
-        _ = new DeadPlayer(DateTime.Now, DeathReason.Disconnected, data.Character.Data, null);
+        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Disconnected, data.Character.Data, null);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
     private void OnPlayerExile(PlayerExileEndEvent @event)
     {
         var exiled = @event.ExileController.initData.networkedPlayer;
-        if (exiled == null || DeadPlayerManager.DeadPlayers.Any(p => p.PlayerId == exiled.PlayerId)) return;
-        _ = new DeadPlayer(DateTime.Now, DeathReason.Exiled, exiled, null);
+        if (exiled == null || DeadPlayer.DeadPlayers.Any(p => p.PlayerId == exiled.PlayerId)) return;
+        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Exiled, exiled, null);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -571,27 +573,11 @@ public class DeadPlayerListener : IListener
     }
 }
 
-public class DeadPlayerManager
+public class DeadPlayer
 {
     public static List<DeadPlayer> DeadPlayers { get; } = new();
 
-
-    internal static DeathReason GetDeathReason(PlayerControl killer, PlayerControl target)
-    {
-        try
-        {
-            return DeathReason.Default;
-        }
-        catch
-        {
-            return DeathReason.Unknown;
-        }
-    }
-}
-
-public class DeadPlayer
-{
-    public DeadPlayer(DateTime deadTime, DeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer)
+    public DeadPlayer(DateTime deadTime, CustomDeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer)
     {
         DeadTime = deadTime;
         DeathReason = deathReason;
@@ -600,16 +586,20 @@ public class DeadPlayer
         VictimRole = playerInfo.GetMainRole();
         KillerRole = killer?.GetMainRole();
         PlayerId = playerInfo.PlayerId;
-        DeadPlayerManager.DeadPlayers.Add(this);
+
+        DeadPlayers.Add(this);
     }
 
     public DateTime DeadTime { get; private set; }
-    public DeathReason? DeathReason { get; }
+    public CustomDeathReason? DeathReason { get; }
     public NetworkedPlayerInfo Data { get; }
     public NetworkedPlayerInfo? Killer { get; }
     public CustomRole? VictimRole { get; private set; }
     public CustomRole? KillerRole { get; private set; }
     public byte PlayerId { get; }
+
+    public static bool IsMarkedAsDead(NetworkedPlayerInfo player) => DeadPlayers.Any(p => p.PlayerId == player.PlayerId);
+    public static bool IsMarkedAsDead(PlayerControl player) => IsMarkedAsDead(player.Data);
 }
 
 [Serializable]

@@ -151,6 +151,8 @@ game:
     alive: "存活"
     disconnected: "掉线"
     default: "死亡"
+    exiled: "驱逐"
+    misfire: "走火"
     unknown: "未知"
   exile:
     default: "%player% 是 %role%。"

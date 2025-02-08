@@ -74,8 +74,9 @@ public class RpcListener : IListener
                 var killer = reader.ReadNetObject<PlayerControl>();
                 var target = reader.ReadNetObject<PlayerControl>();
                 var showAnimationToEverybody = reader.ReadBoolean();
+                var anonymousKiller = reader.ReadBoolean();
 
-                killer.KillPlayerCompletely(target, showAnimationToEverybody);
+                killer.KillPlayerCompletely(target, showAnimationToEverybody, anonymousKiller);
                 break;
             }
 

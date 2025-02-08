@@ -6,6 +6,7 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using System;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -24,12 +25,15 @@ public class Sheriff : CustomRole, IListener
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
                 if (!target) return;
+
+                var localData = PlayerControl.LocalPlayer.Data;
                 if (target!.GetMainRole().CampType != CampType.Crewmate)
                 {
                     PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
                 }
                 else
                 {
+                    _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Misfire, localData, localData);
                     PlayerControl.LocalPlayer.RpcMurderPlayer(PlayerControl.LocalPlayer, true);
                 }
             },
