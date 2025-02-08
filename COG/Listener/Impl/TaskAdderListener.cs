@@ -9,7 +9,7 @@ using COG.Utils;
 
 namespace COG.Listener.Impl;
 
-public class TaskAdderListener : IListener
+public class TaskAdderListener : IListener // Bug
 {
     public static TaskFolder? RoleFolder;
     public static TaskAddButton? LastClicked;

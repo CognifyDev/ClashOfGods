@@ -27,8 +27,8 @@ public class Jester : CustomRole, IListener, IWinnable
 
     public void CheckWin(WinnableData data)
     {
-        var jesters = DeadPlayerManager.DeadPlayers.Where(dp =>
-            dp.Data.IsRole(this) && dp.DeathReason == Utils.DeathReason.Exiled);
+        var jesters = DeadPlayer.DeadPlayers.Where(dp =>
+            dp.Data.IsRole(this) && dp.DeathReason == CustomDeathReason.Exiled); // Only one jester can win so only one will die due to kill
 
         var deadPlayers = jesters.ToArray();
         if (!deadPlayers.Any()) return;

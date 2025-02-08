@@ -26,7 +26,7 @@ public static class GameStates
             if (!value)
             {
                 GameUtils.PlayerData.Clear();
-                DeadPlayerManager.DeadPlayers.Clear();
+                DeadPlayer.DeadPlayers.Clear();
             }
         }
     }

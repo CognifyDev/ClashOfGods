@@ -410,14 +410,15 @@ public class GameListener : IListener
     public bool OnSetUpRoleText(IntroCutsceneShowRoleEvent @event)
     {
         var intro = @event.IntroCutscene;
-        Main.Logger.LogInfo("Setup role text for the player...");
+        Main.Logger.LogInfo("Set up role text for the player...");
 
         var myRole = GameUtils.GetLocalPlayerRole();
 
-        var list = new List<IEnumerator>();
-
-        list.Add(Effects.Action((Action)SetupRoles));
-        list.Add(Effects.Wait(2.5f));
+        var list = new List<IEnumerator>
+        {
+            Effects.Action((Action)SetupRoles),
+            Effects.Wait(2.5f)
+        };
 
         void Action()
         {
