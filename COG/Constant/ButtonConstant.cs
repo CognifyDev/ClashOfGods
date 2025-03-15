@@ -10,6 +10,7 @@ namespace COG.Constant;
 public static class ButtonConstant
 {
     public static readonly CustomButton KillButton = CustomButton.Of(
+        "general-kill",
         () =>
         {
             var target = PlayerControl.LocalPlayer.GetClosestPlayer();

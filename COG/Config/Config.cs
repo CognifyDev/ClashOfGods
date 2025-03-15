@@ -23,6 +23,7 @@ public class Config
         Name = name;
         Path = path;
         Text = resourceFile.GetResourcesText();
+        Configs.Add(this);
         LoadConfig();
     }
 
@@ -30,8 +31,9 @@ public class Config
     {
         Name = name;
         Path = path;
-        Text = File.ReadAllText(Path, Encoding.UTF8);
-        YamlReader = Yaml.LoadFromString(Text);
+        Text = "";
+        Configs.Add(this);
+        LoadConfig();
     }
 
     public static List<Config> Configs { get; } = new();
@@ -46,10 +48,10 @@ public class Config
         if (!File.Exists(Path) || replace)
         {
             if (replace && File.Exists(Path)) File.Delete(Path);
-            File.WriteAllText(Path, Text, Encoding.Unicode);
+            File.WriteAllText(Path, Text, Encoding.UTF8);
         }
 
-        var text = File.ReadAllText(Path, Encoding.Unicode);
+        var text = File.ReadAllText(Path, Encoding.UTF8);
         YamlReader = Yaml.LoadFromString(text);
     }
 }

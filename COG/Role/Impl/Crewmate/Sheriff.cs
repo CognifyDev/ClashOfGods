@@ -21,6 +21,7 @@ public class Sheriff : CustomRole, IListener
                 new FloatOptionValueRule(10f, 5f, 60f, 30f, NumberSuffixes.Seconds));
 
         SheriffKillButton = CustomButton.Of(
+            "sheriff-kill",
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();

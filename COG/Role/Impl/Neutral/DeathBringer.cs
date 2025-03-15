@@ -29,6 +29,7 @@ public class DeathBringer : CustomRole, IListener
             new FloatOptionValueRule(1F, 1F, 15F, 5F));
         
         _stareButton = CustomButton.Of(
+            "death-bringer-stare",
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
@@ -47,6 +48,7 @@ public class DeathBringer : CustomRole, IListener
             -1);
         
         _killButton = CustomButton.Of(
+            "death-bringer-kill",
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();

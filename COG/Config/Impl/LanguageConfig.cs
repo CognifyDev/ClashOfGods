@@ -25,10 +25,7 @@ public class LanguageConfig : Config
         SetTranslations();
     }
 
-    private LanguageConfig(string path) : base(
-        "Language",
-        path
-    )
+    private LanguageConfig(string path) : base("Language", path)
     {
         try
         {
@@ -105,15 +102,15 @@ public class LanguageConfig : Config
     public string NeutralCampDescription { get; private set; } = null!;
     public string CrewmateCampDescription { get; private set; } = null!;
 
-    public string KillAction { get; private set; }
-    public string CleanAction { get; private set; }
-    public string DispatchAction { get; private set; }
-    public string RepairAction { get; private set; }
-    public string StareAction { get; private set; }
+    public string KillAction { get; private set; } = null!;
+    public string CleanAction { get; private set; } = null!;
+    public string DispatchAction { get; private set; } = null!;
+    public string RepairAction { get; private set; } = null!;
+    public string StareAction { get; private set; } = null!;
 
-    public string ShowPlayersRolesMessage { get; private set; }
+    public string ShowPlayersRolesMessage { get; private set; } = null!;
 
-    public string Alive { get; private set; }
+    public string Alive { get; private set; } = null!;
     public string Disconnected { get; private set; } = null!;
     public string DefaultKillReason { get; private set; } = null!;
     public string UnknownKillReason { get; private set; } = null!;
@@ -247,7 +244,6 @@ public class LanguageConfig : Config
 
     private static void LoadLanguageConfig()
     {
-        Instance.LoadConfig(true);
         Instance = new LanguageConfig();
     }
 

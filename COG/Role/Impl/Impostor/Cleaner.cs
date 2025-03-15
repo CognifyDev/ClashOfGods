@@ -23,6 +23,7 @@ public class Cleaner : CustomRole, IListener
             new FloatOptionValueRule(10F, 5F, 60F, 30F, NumberSuffixes.Seconds));
 
         CleanBodyButton = CustomButton.Of(
+            "cleaner-clean",
             () =>
             {
                 var body = PlayerUtils.GetClosestBody();
