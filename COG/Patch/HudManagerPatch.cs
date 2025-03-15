@@ -1,5 +1,8 @@
 using COG.Listener;
 using COG.Listener.Event.Impl.HManager;
+using COG.UI.CustomButton;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace COG.Patch;
 
@@ -27,3 +30,14 @@ internal class HudManagerPatch
         ListenerManager.GetManager().ExecuteHandlers(new HudManagerDestroyEvent(__instance), EventHandlerType.Postfix);
     }
 }
+
+//[HarmonyPatch(typeof(GridArrange), nameof(GridArrange.GetChildsActive))]
+//internal static class AbilityButtonArrangementPatch
+//{
+//    private static void Postfix()
+//    {
+//        GridArrange.currentChildren = new(new List<Transform>(
+//            GridArrange.currentChildren.ToArray())
+//            .RemoveAll(t => t.name.StartsWith(CustomButton.ModdedFlag))); // Let vanilla only arrange for its buttons
+//    }
+//}

@@ -10,12 +10,12 @@ public static class ArrayUtils
 {
     public static string AsString<T>(this IEnumerable<T> collection)
     {
-        return string.Join(", ", collection);
+        return $"[{string.Join(", ", collection)}]";
     }
 
     public static string AsString<T>(this IEnumerable<T> collection, Func<T, string> selector)
     {
-        return string.Join(", ", collection.Select(selector));
+        return $"[{string.Join(", ", collection.Select(selector))}]";
     }
 
     public static T[] ToSingleElementArray<T>(this T obj)

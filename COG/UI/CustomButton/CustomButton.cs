@@ -17,7 +17,7 @@ namespace COG.UI.CustomButton;
 [ShitCode]
 public class CustomButton
 {
-    internal static List<ActionButton> AllVanillaButtons = new();
+    public const string ModdedFlag = "Modded_";
 
     private CustomButton(Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
         Func<bool> hasButton,
@@ -294,11 +294,16 @@ public class CustomButton
     {
         CustomButtonManager.GetManager().GetButtons().ForEach(b => b.ResetCooldown());
     }
-    internal static void Init(HudManager? hud)
+    internal static void Init(HudManager hud)
     {
+        var moddedParent = new GameObject("ModdedBottomRight");
+        var vanillaParent = hud.AbilityButton.transform.parent;
+        moddedParent.transform.SetParent(vanillaParent.parent);
+        moddedParent.transform.localPosition = vanillaParent.localPosition;
+
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
         {
-            button.ActionButton = Object.Instantiate(hud!.AbilityButton, hud.AbilityButton.transform.parent);
+            button.ActionButton = Object.Instantiate(hud!.AbilityButton, moddedParent.transform);
 
             button.Hud = hud;
             button.SpriteRenderer = button.ActionButton.graphic;
@@ -313,7 +318,7 @@ public class CustomButton
 
             button.Material = button.SpriteRenderer.material;
             button.GameObject = button.ActionButton.gameObject;
-            button.GameObject.name = button.Text;
+            button.GameObject.name = ModdedFlag + button.Text;
             button.PassiveButton = button.ActionButton.GetComponent<PassiveButton>();
             button.TextMesh = button.ActionButton.buttonLabelText;
             button.TextMesh.text = button.Text;
@@ -328,27 +333,18 @@ public class CustomButton
         Initialized = true;
     }
 
-    internal static void GetAllVanillaButtons()
-    {
-        var buttons = GameObject.Find("Main Camera/Hud/Buttons/BottomRight/");
-        if (!buttons) return;
-        AllVanillaButtons.Clear();
-        AllVanillaButtons.AddRange(buttons.GetComponentsInChildren<ActionButton>(true));
-    }
-
     internal static void ArrangePosition()
     {
         if (GameStates.IsMeeting || PlayerStates.IsShowingMap()) return;
 
         bool exit = false;
         
-        var vectors = AllVanillaButtons.Where(b => b.isActiveAndEnabled).Select(b =>
+        var vectors = GridArrange.currentChildren.ToArray().Select(b =>
         {
             var pos = b.transform.localPosition;
-            var (x, y, z) = (pos.x, pos.y, pos.z);
-            if (x < 0.01 || y < 0.01 || z < 0.01) exit = true;
+            var (x, y, z) = ((int)pos.x, (int)pos.y, (int)pos.z);
             return (x, y, z);
-        }).ToList(); // 不知为何原来的select函数返回的集合中在靠近管理室地图下会返回一个极大的数字，只能这样了
+        }).ToList();
         
         if (exit) return;
         
@@ -362,17 +358,17 @@ public class CustomButton
             var now = 1; // 确定每行会有几个自定义按钮
             if (y == 1) now = ++idx1;
             if (y == 0) now = ++idx2;
-            var rowBtnPos = vectors.Where(p => Mathf.Approximately(p.y, y)).OrderBy(p => p.x).ToList(); // 按序排列与当前按钮在同一行的原版按钮
+            var rowBtnPos = vectors.Where(p => p.y == y).OrderBy(p => p.x).ToList(); // 按序排列与当前按钮在同一行的原版按钮
             
             float x = 0;
 
-            if (rowBtnPos.Count != 0)
+            if (rowBtnPos.Any())
                 x = rowBtnPos.FirstOrDefault().x; // 如果数量不为0则取最左侧按钮的x坐标
 
             var pos = new Vector3(x - now, y, -9); // 按钮的x坐标为最靠左的原版按钮x坐标减去当前按钮在同一行自定义按钮的Index
             btn.GameObject!.transform.localPosition = btn.Position = pos;
 
-            if (!Input.GetKeyDown(KeyCode.F1))
+            if (Input.GetKeyDown(KeyCode.F1))
                 Main.Logger.LogInfo($"""
                 idx: {idx1} {idx2}
                 row: {btn.Row}
@@ -382,7 +378,6 @@ public class CustomButton
                 rowBtnPos: {rowBtnPos.AsString()}
                 x: {x}
                 pos: {pos}
-                AllVanillaButtons.Where(b => b.isActiveAndEnabled): {AllVanillaButtons.Where(b => b.isActiveAndEnabled).AsString()}
                 """);
         }
     }

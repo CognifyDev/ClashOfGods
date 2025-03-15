@@ -15,7 +15,6 @@ internal class CustomButtonListener : IListener
         IEnumerator CoInitCustomButton()
         {
             yield return new WaitForSeconds(1f);
-            CustomButton.GetAllVanillaButtons();
             CustomButton.Init(@event.Manager);
         }
         
