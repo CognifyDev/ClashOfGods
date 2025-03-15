@@ -28,7 +28,7 @@ public static class MainMenuPatch
         if (!template) return;
 
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.2f, 0.38f),
-            LanguageConfig.Instance.Github,
+            LanguageConfig.Instance.GitHub,
             () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); }, Color.blue);
 
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.7f, 0.38f),

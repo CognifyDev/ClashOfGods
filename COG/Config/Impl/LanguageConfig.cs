@@ -11,7 +11,6 @@ public class LanguageConfig : Config
 {
     static LanguageConfig()
     {
-        Instance = new LanguageConfig();
         LoadLanguageConfig();
     }
 
@@ -77,7 +76,7 @@ public class LanguageConfig : Config
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;
     public string LoadCustomLanguage { get; private set; } = null!;
-    public string Github { get; private set; } = null!;
+    public string GitHub { get; private set; } = null!;
     public string UpdateButtonString { get; private set; } = null!;
 
     public string MaxNumMessage { get; private set; } = null!;
@@ -169,7 +168,7 @@ public class LanguageConfig : Config
         Disable = GetString("option.disable");
         CogOptions = GetString("option.main.cog-options");
         LoadCustomLanguage = GetString("option.main.load-custom-lang");
-        Github = GetString("option.main.github");
+        GitHub = GetString("option.main.github");
         QQ = GetString("option.main.qq");
         Discord = GetString("option.main.discord");
         UpdateButtonString = GetString("option.main.update-button-string");
@@ -222,11 +221,7 @@ public class LanguageConfig : Config
         AlivePlayerInfo = GetString("game.exile.alive-player-info");
 
         SystemMessage = GetString("game.chat.system-message");
-
-        // if (!FirstTimeLoad) OnLanguageLoaded.GetInvocationList().ForEach(d => d.DynamicInvoke(null));
-        // dont use this
     }
-
 
     private string GetString(string location)
     {

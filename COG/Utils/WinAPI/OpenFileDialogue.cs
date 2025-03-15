@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace COG.Utils.WinAPI;
@@ -47,6 +48,7 @@ public static class OpenFileDialogue
     {
         var ofn = new OPENFILENAME();
         ofn.lStructSize = Marshal.SizeOf(ofn);
+        ofn.hwndOwner = Process.GetCurrentProcess().Handle;
         ofn.stringFilter = filter;
         ofn.stringTitle = title;
         ofn.stringInitialDir = defaultDir;
@@ -56,20 +58,19 @@ public static class OpenFileDialogue
             Open(ofn);
         else
             Save(ofn);
+
         Main.Logger.LogInfo(
-            $"Opened file: {(ofn.stringFile.Equals("") || ofn.stringFile == null ? "None" : ofn.stringFile)}");
+            $"Opened file: {(ofn.stringFile.IsNullOrWhiteSpace() || ofn.stringFile == null ? "None" : ofn.stringFile)}");
         return new OpenedFileInfo(ofn.stringFile, ofn.stringFileTitle);
     }
 
 #nullable disable
-    // Class(Struct) from commdlg.h
-    // 这玩意最好一点都别动，包括成员顺序！！！！！！名字随便改但顺序不能改！！！！！！
-    // Windows 底层的东西可不能乱来！
+    // Class (struct) from commdlg.h
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public class OPENFILENAME // 这玩意最好一点都别动，包括成员顺序！！！！！！名字随便改但顺序不能改！！！！！！
+    public class OPENFILENAME
     {
         public int lStructSize;
-        public IntPtr IntPtrOwner;
+        public IntPtr hwndOwner;
         public IntPtr hInstance;
         public string stringFilter;
         public string stringCustomFilter;

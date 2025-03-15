@@ -2,7 +2,6 @@ using COG.States;
 using COG.Utils;
 using COG.Utils.Coding;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -21,7 +20,7 @@ public class CustomButton
 
     private CustomButton(string identifier, Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
         Func<bool> hasButton,
-        Sprite sprite, Vector3? position, KeyCode? hotkey, string text, bool hasEffect, Func<float> cooldown,
+        Sprite sprite, Vector3? position, KeyCode? defaultHotkey, string text, bool hasEffect, Func<float> cooldown,
         float effectTime,
         int usesLimit, string hotkeyName)
     {
@@ -34,7 +33,7 @@ public class CustomButton
         Sprite = sprite;
         Position = position ?? Vector3.zero;
         if (position is null) AutoPosition = true;
-        Hotkey = hotkey;
+        Hotkey = defaultHotkey;
         Text = text;
         HasEffect = hasEffect;
         Cooldown = cooldown;
@@ -57,6 +56,7 @@ public class CustomButton
     public Func<bool> HasButton { get; set; }
     public bool HasEffect { get; set; }
     public KeyCode? Hotkey { get; set; }
+    [Obsolete("WIP")]
     public string HotkeyName { get; set; }
 
     public HudManager? Hud { get; set; }
@@ -204,7 +204,7 @@ public class CustomButton
                         HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
         var isCoolingDown = Timer > 0f;
         var hotkeyText = "";
-        if (HotkeyName == "") hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
+        if (HotkeyName.IsNullOrWhiteSpace()) hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 

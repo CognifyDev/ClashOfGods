@@ -146,8 +146,9 @@ public partial class Main : BasePlugin
             new SpeedBooster()
         });
         
-        // Register settings
-        SettingsConfig.Instance.LoadConfig();
+        // Read configs by calling static constructors
+        _ = SettingsConfig.Instance;
+        _ = ButtonHotkeyConfig.Instance;
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]
@@ -202,7 +203,7 @@ public partial class Main : BasePlugin
         {
             if (!Directory.Exists(JsPluginManager.PluginDirectoryPath)) Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
             var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
-            var enumerable = files as string[] ?? files.ToArray();
+            var enumerable = files.ToArray();
             Logger.LogInfo($"{enumerable.Length} plugins to load.");
             foreach (var file in enumerable)
             {

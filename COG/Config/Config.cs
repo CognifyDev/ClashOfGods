@@ -15,7 +15,8 @@ public class Config
         Path = path;
         Text = text;
         Configs.Add(this);
-        LoadConfig();
+
+        LoadConfigs();
     }
 
     protected Config(string name, string path, ResourceFile resourceFile)
@@ -24,7 +25,8 @@ public class Config
         Path = path;
         Text = resourceFile.GetResourcesText();
         Configs.Add(this);
-        LoadConfig();
+
+        LoadConfigs();
     }
 
     public Config(string name, string path)
@@ -33,7 +35,8 @@ public class Config
         Path = path;
         Text = "";
         Configs.Add(this);
-        LoadConfig();
+
+        LoadConfigs();
     }
 
     public static List<Config> Configs { get; } = new();
@@ -42,7 +45,7 @@ public class Config
     public string Text { get; }
     public Yaml? YamlReader { get; private set; }
 
-    public void LoadConfig(bool replace = false)
+    public void LoadConfigs(bool replace = false)
     {
         if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
         if (!File.Exists(Path) || replace)
