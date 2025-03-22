@@ -57,6 +57,19 @@ public static class SystemUtils
         return value;
     }
 
+    private static void SetRegistryValue(string keyPath, string valueName, string value)
+    {
+        try
+        {
+            using var key = Registry.LocalMachine.CreateSubKey(keyPath);
+            key.SetValue(valueName, value);
+        }
+        catch (System.Exception e)
+        {
+            Main.Logger.LogError($"Fail to set registry value: {e.Message}");
+        }
+    }
+
     public static MessageBoxDialogue.ClickedButton OpenMessageBox(string text, string title,
         MessageBoxDialogue.OpenTypes type = MessageBoxDialogue.OpenTypes.MB_DEFBUTTON1 |
                                             MessageBoxDialogue.OpenTypes.MB_ICONINFORMATION)

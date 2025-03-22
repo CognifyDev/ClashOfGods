@@ -132,6 +132,8 @@ public class LanguageConfig : ConfigBase
     public string AlivePlayerInfo { get; private set; } = null!;
     
     public string SystemMessage { get; private set; } = null!;
+    public string HotkeySettingName { get; private set; } = null!;
+    public string PressKeyToSet { get; internal set; } = null!;
 
     private void SetTranslations()
     {
@@ -169,10 +171,12 @@ public class LanguageConfig : ConfigBase
         Disable = GetString("option.disable");
         CogOptions = GetString("option.main.cog-options");
         LoadCustomLanguage = GetString("option.main.load-custom-lang");
-        GitHub = GetString("option.main.github");
-        QQ = GetString("option.main.qq");
-        Discord = GetString("option.main.discord");
-        UpdateButtonString = GetString("option.main.update-button-string");
+        GitHub = GetString("main-menu.github");
+        QQ = GetString("main-menu.qq");
+        Discord = GetString("main-menu.discord");
+        UpdateButtonString = GetString("main-menu.update-button-string");
+        HotkeySettingName = GetString("option.hotkey.name");
+        PressKeyToSet = GetString("option.hotkey.press-key-to-set");
 
         MaxNumMessage = GetString("role.global.max-num");
         AllowStartMeeting = GetString("role.global.allow-start-meeting");
@@ -199,7 +203,7 @@ public class LanguageConfig : ConfigBase
         RepairAction = GetString("action.repair");
         StareAction = GetString("action.stare");
 
-        ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
+        ShowPlayersRolesMessage = GetString("game.end.summary-message");
 
         Alive = GetString("game.survival-data.alive");
         Disconnected = GetString("game.survival-data.disconnected");
@@ -210,13 +214,13 @@ public class LanguageConfig : ConfigBase
         UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
         UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
 
-        UpToDate = GetString("option.main.update.up-to-date");
-        NonCheck = GetString("option.main.update.non-check");
-        FetchedString = GetString("option.main.update.fetched");
+        UpToDate = GetString("main-menu.update.up-to-date");
+        NonCheck = GetString("main-menu.update.check-failed");
+        FetchedString = GetString("main-menu.update.fetched");
 
-        ImpostorsWinText = GetString("game.end.wins.impostor");
-        CrewmatesWinText = GetString("game.end.wins.crewmate");
-        NeutralsWinText = GetString("game.end.wins.neutral");
+        ImpostorsWinText = GetString("game.end.winners.impostor");
+        CrewmatesWinText = GetString("game.end.winners.crewmate");
+        NeutralsWinText = GetString("game.end.winners.neutral");
 
         DefaultEjectText = GetString("game.exile.default");
         AlivePlayerInfo = GetString("game.exile.alive-player-info");
@@ -238,28 +242,15 @@ public class LanguageConfig : ConfigBase
 
     public TextHandler GetHandler(string location) => new(location);
 
-    private static void LoadLanguageConfig()
-    {
-        Instance = new LanguageConfig();
-    }
-
-    internal static void LoadLanguageConfig(string path)
-    {
-        Instance = new LanguageConfig(path);
-    }
-
+    private static void LoadLanguageConfig() => Instance = new();
+    internal static void LoadLanguageConfig(string path) => Instance = new(path);
+    
     public class TextHandler
     {
-        internal TextHandler(string location)
-        {
-            Location = location;
-        }
-
+        internal TextHandler(string location) => Location = location;
+        
         public string Location { get; }
 
-        public string GetString(string target)
-        {
-            return Instance.GetString($"{Location}.{target}");
-        }
+        public string GetString(string target) => Instance.GetString($"{Location}.{target}");
     }
 }

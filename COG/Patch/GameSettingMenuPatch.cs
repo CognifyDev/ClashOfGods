@@ -68,14 +68,11 @@ internal static class GameSettingMenuPatch
         // This patch is for clients who are previewing the settings
         // and hosts who has loaded the preset to update options when the host has changed settings
 
-        foreach (var role in CustomRoleManager.GetManager().GetRoles()
-                     .Where(r => r is { IsBaseRole: false, ShowInOptions: true }))
+        foreach (var role in CustomRoleManager.GetManager().GetModRoles().Where(r => r.ShowInOptions))
         {
             var roleRoleNumberOption = role.RoleNumberOption;
-            if (roleRoleNumberOption == null)
-            {
-                continue;
-            }
+            if (roleRoleNumberOption == null) continue;
+            
             roleRoleNumberOption.OptionBehaviour?.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
             role.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
             {

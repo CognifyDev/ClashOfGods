@@ -15,9 +15,17 @@ internal class ModOptionsPatch
             .ExecuteHandlers(new OptionsMenuBehaviourStartEvent(__instance), EventHandlerType.Postfix);
     }
 
+    [HarmonyPatch(nameof(OptionsMenuBehaviour.Update))]
+    [HarmonyPostfix]
+    public static void OptionMenuBehaviourUpdatePostfix(OptionsMenuBehaviour __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new OptionsMenuBehaviourUpdateEvent(__instance), EventHandlerType.Postfix);
+    }
+
     [HarmonyPatch(nameof(OptionsMenuBehaviour.Close))]
     [HarmonyPostfix]
-    public static void OptionMenuBehaviour_ClosePostfix()
+    public static void OptionMenuBehaviourClosePostfix()
     {
         foreach (var btn in ModOption.Buttons)
             if (btn.ToggleButton != null)

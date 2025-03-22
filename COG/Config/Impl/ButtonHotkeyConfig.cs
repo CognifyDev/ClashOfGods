@@ -55,12 +55,12 @@ public class ButtonHotkeyConfig : ConfigBase
 
             if (Enum.TryParse<KeyCode>(keyName, out var keyCode))
             {
-                var modDefaultKey = button.Hotkey.HasValue ? button.Hotkey.Value.ToString() : "(null)";
+                var lastKey = button.Hotkey.HasValue ? button.Hotkey.Value.ToString() : "(null)";
 
-                if (modDefaultKey != keyName)
+                if (lastKey != keyName)
                 {
                     button.Hotkey = keyCode;
-                    Main.Logger.LogInfo($"Hotkey change from default: {modDefaultKey} => {keyCode}");
+                    Main.Logger.LogInfo($"Hotkey change: {lastKey} => {keyCode}");
                 }
             }
         }

@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using COG.Config.Impl;
 using COG.Listener.Event.Impl.Game;
+using COG.Role;
+using COG.UI.CustomButton;
 using COG.UI.ModOption;
+using COG.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -11,16 +15,25 @@ namespace COG.Listener.Impl;
 
 internal class ModOptionListener : IListener
 {
-    private static readonly List<Transform> Vanillas = new();
+    private static readonly List<Transform> _vanillaObjects = new();
 
-    public List<Transform> GetVanillas()
-    {
-        return new List<Transform>(Vanillas);
-    }
+    private const float TimerCountdown = 5f;
+
+    private bool _isSettingHotkey = false;
+    private ModOption? _currentBeingSet = null;
+    private CustomButton? _currentCustomButton = null;
+    private float _timer = TimerCountdown;
+    private string _namePrefix = "";
+
+    public static List<GameObject> HotkeyButtons { get; } = new();
+
+    private string GetHotkeyPrefix(CustomRole role, CustomButton button) => $"{role.Name} - {button.Text}";
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSettingInit(OptionsMenuBehaviourStartEvent @event)
     {
+        HotkeyButtons.Clear();
+
         var menu = @event.Object;
         var transform1 = menu.CensorChatButton.transform;
         Vector3? position = transform1.localPosition;
@@ -51,17 +64,54 @@ internal class ModOptionListener : IListener
         modOptionsButton.OnClick = new Button.ButtonClickedEvent();
         modOptionsButton.OnClick.AddListener((Action)(() =>
         {
-            LoadButtons(menu);
+            LoadNormalButtons(menu);
+            LoadHotkeyButtons(menu);
             HideVanillaButtons(menu);
             foreach (var btn in ModOption.Buttons)
-                if (btn.ToggleButton != null)
-                    btn.ToggleButton.gameObject.SetActive(true);
+                if (btn.ToggleButton)
+                    btn.ToggleButton!.gameObject.SetActive(true);
         }));
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnSettingUpdate(OptionsMenuBehaviourUpdateEvent @event)
+    {
+        if (_isSettingHotkey)
+        {
+            _timer -= Time.deltaTime;
+            if (_timer <= 0)
+            {
+                Reset();
+                return;
+            }
+
+            var textMesh = _currentBeingSet!.ToggleButton!.Text;
+            textMesh.text = LanguageConfig.Instance.PressKeyToSet.CustomFormat(Mathf.CeilToInt(_timer));
+
+            foreach (var keyCode in Enum.GetValues<KeyCode>())
+            {
+                if (Input.GetKeyDown(keyCode))
+                {
+                    textMesh.text = $"{_namePrefix} : {keyCode}";
+                    ButtonHotkeyConfig.Instance.SetHotkey(_currentCustomButton!, keyCode);
+                    Reset();
+                }
+            }
+        }
+
+        void Reset()
+        {
+            _isSettingHotkey = false;
+            _currentBeingSet = null;
+            _currentCustomButton = null;
+            _timer = TimerCountdown;
+            _namePrefix = "";
+        }
     }
 
     private void HideVanillaButtons(OptionsMenuBehaviour menu)
     {
-        Vanillas.Clear();
+        _vanillaObjects.Clear();
         for (var i = 0; i < menu.transform.childCount; i++)
         {
             var child = menu.transform.GetChild(i);
@@ -72,20 +122,44 @@ internal class ModOptionListener : IListener
                 child.name == "GeneralButton" ||
                 child.name == "GraphicsButton" ||
                 !child.gameObject.active) continue;
-            Vanillas.Add(child);
+            _vanillaObjects.Add(child);
             child.gameObject.SetActive(false);
         }
     }
 
-    private void LoadButtons(OptionsMenuBehaviour menu)
+    private void LoadNormalButtons(OptionsMenuBehaviour menu)
     {
         ModOption.Buttons.Clear();
         foreach (var modOption in ModOptionManager.GetManager().GetOptions()) modOption.Register();
         var a = 0;
         foreach (var btn in ModOption.Buttons)
+            CreateButton(menu, a++, btn);
+    }
+
+    private void LoadHotkeyButtons(OptionsMenuBehaviour menu)
+    {
+        var a = 0;
+        foreach (var role in CustomRoleManager.GetManager().GetModRoles())
         {
-            CreateButton(menu, a, btn);
-            a++;
+            foreach (var button in role.AllButtons)
+            {
+                ModOption modOption = default!;
+
+                modOption = new ModOption($"{GetHotkeyPrefix(role, button)} : {(button.Hotkey.ToString() == "" ? "null" : button.Hotkey)}",
+                    () =>
+                    {
+                        _currentBeingSet = modOption;
+                        _currentCustomButton = button;
+                        _isSettingHotkey = true;
+                        _timer = TimerCountdown;
+                        _namePrefix = GetHotkeyPrefix(role, button);
+
+                        return false;
+                    }, false);
+
+                CreateButton(menu, a++, modOption);
+                HotkeyButtons.Add(modOption.ToggleButton!.gameObject);
+            }
         }
     }
 
@@ -99,7 +173,7 @@ internal class ModOptionListener : IListener
     {
         var template = menu.CensorChatButton;
         var button = Object.Instantiate(template, menu.transform);
-        Vector3 pos = new(idx % 2 == 0 ? -1.17f : 1.17f, 1.7f - idx / 2 * 0.8f, -0.5f);
+        Vector3 pos = new(idx % 2 == 0 ? -1.17f : 1.17f, 1.7f - idx / 2 * 0.4f, -0.5f);
 
         button.transform.localPosition = pos;
         button.onState = option.DefaultValue;

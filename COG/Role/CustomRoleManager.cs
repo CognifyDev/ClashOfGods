@@ -41,6 +41,8 @@ public class CustomRoleManager
         return customRoles;
     }
 
+    public List<CustomRole> GetModRoles() => GetRoles().Where(r => !r.IsBaseRole).ToList();
+
     public CustomRole? GetRoleByClassName(string name, bool ignoreCase = false)
     {
         return _roles.FirstOrDefault(r =>

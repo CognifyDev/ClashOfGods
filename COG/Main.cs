@@ -184,6 +184,13 @@ public partial class Main : BasePlugin
                     Unload();
                     GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
+                }, false),
+            new(LanguageConfig.Instance.HotkeySettingName,
+                () =>
+                {
+                    ModOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
+                    ModOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
+                    return false;
                 }, false)
         });
 
