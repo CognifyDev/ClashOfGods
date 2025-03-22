@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using COG.Utils.Version;
-using Newtonsoft.Json.Linq;
 
 namespace COG.Utils;
 
@@ -22,15 +21,14 @@ public static class ModUpdater
 
         try
         {
-            return;
-            var webText = WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest");
-            var jsonObject =
-                JObject.Parse(webText);
-            var tagNameToken = jsonObject["tag_name"];
-            var tagBodyToken = jsonObject["body"];
+            //var webText = WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest");
+            //var jsonObject =
+            //    JObject.Parse(webText);
+            //var tagNameToken = jsonObject["tag_name"];
+            //var tagBodyToken = jsonObject["body"];
 
-            if (tagNameToken is { Type: JTokenType.String }) latestVersionString = tagNameToken.ToString();
-            if (tagBodyToken is { Type: JTokenType.String }) description = tagBodyToken.ToString();
+            //if (tagNameToken is { Type: JTokenType.String }) latestVersionString = tagNameToken.ToString();
+            //if (tagBodyToken is { Type: JTokenType.String }) description = tagBodyToken.ToString();
         }
         catch
         {

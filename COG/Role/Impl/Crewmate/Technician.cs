@@ -1,4 +1,5 @@
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.VentImpl;
@@ -6,7 +7,6 @@ using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.Utils;
 using System.Linq;
-using COG.Constant;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -21,22 +21,24 @@ public class Technician : CustomRole, IListener
         CanKill = false;
         CanSabotage = false;
 
-        RepairButton = CustomButton.Of(() =>
-        {
-            RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ClearSabotages).Finish();
-            RepairSabotages();
-        },
-        () => RepairButton?.ResetCooldown(),
-        () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency),
-        () => true,
-        ResourceUtils.LoadSprite(ResourcesConstant.RepairButton)!,
-        2,
-        KeyCode.R,
-        LanguageConfig.Instance.RepairAction,
-        () => 0f,
-        2
+        RepairButton = CustomButton.Of(
+            "technician-repair",
+            () =>
+            {
+                RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ClearSabotages).Finish();
+                RepairSabotages();
+            },
+            () => RepairButton?.ResetCooldown(),
+            () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency),
+            () => true,
+            ResourceUtils.LoadSprite(ResourcesConstant.RepairButton)!,
+            2,
+            KeyCode.R,
+            LanguageConfig.Instance.RepairAction,
+            () => 0f,
+            2
         );
-        
+
         AddButton(RepairButton);
     }
 

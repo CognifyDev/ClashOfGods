@@ -27,6 +27,7 @@ public class Assassin : CustomRole
         MaxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new FloatOptionValueRule(1F, 1F, 15F, 2F));
         
         DispatchButton = CustomButton.Of(
+            "assassin-dispatch",
             () =>
             {
                 var player = PlayerControl.LocalPlayer.GetClosestPlayer();

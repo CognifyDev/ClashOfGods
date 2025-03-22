@@ -33,6 +33,7 @@ public class Reaper : CustomRole, IListener
             new FloatOptionValueRule(1F, 0.5F, 15F, 1.5F, NumberSuffixes.Seconds));
 
         KillButton = CustomButton.Of(
+            "reaper-kill",
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();

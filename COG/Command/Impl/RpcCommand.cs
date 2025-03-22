@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace COG.Command.Impl;
 
-public class RpcCommand : Command
+public class RpcCommand : CommandBase
 {
     private RpcUtils.RpcWriter? _writer;
 

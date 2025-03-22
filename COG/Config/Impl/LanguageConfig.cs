@@ -7,14 +7,14 @@ using COG.Utils.Coding;
 namespace COG.Config.Impl;
 
 [ShitCode]
-public class LanguageConfig : Config
+public class LanguageConfig : ConfigBase
 {
+#nullable disable
     static LanguageConfig()
     {
-        Instance = new LanguageConfig();
         LoadLanguageConfig();
     }
-
+#nullable restore
 
     private LanguageConfig() : base(
         "Language",
@@ -25,10 +25,7 @@ public class LanguageConfig : Config
         SetTranslations();
     }
 
-    private LanguageConfig(string path) : base(
-        "Language",
-        path
-    )
+    private LanguageConfig(string path) : base("Language", path)
     {
         try
         {
@@ -80,7 +77,7 @@ public class LanguageConfig : Config
     public string Disable { get; private set; } = null!;
     public string CogOptions { get; private set; } = null!;
     public string LoadCustomLanguage { get; private set; } = null!;
-    public string Github { get; private set; } = null!;
+    public string GitHub { get; private set; } = null!;
     public string UpdateButtonString { get; private set; } = null!;
 
     public string MaxNumMessage { get; private set; } = null!;
@@ -105,15 +102,15 @@ public class LanguageConfig : Config
     public string NeutralCampDescription { get; private set; } = null!;
     public string CrewmateCampDescription { get; private set; } = null!;
 
-    public string KillAction { get; private set; }
-    public string CleanAction { get; private set; }
-    public string DispatchAction { get; private set; }
-    public string RepairAction { get; private set; }
-    public string StareAction { get; private set; }
+    public string KillAction { get; private set; } = null!;
+    public string CleanAction { get; private set; } = null!;
+    public string DispatchAction { get; private set; } = null!;
+    public string RepairAction { get; private set; } = null!;
+    public string StareAction { get; private set; } = null!;
 
-    public string ShowPlayersRolesMessage { get; private set; }
+    public string ShowPlayersRolesMessage { get; private set; } = null!;
 
-    public string Alive { get; private set; }
+    public string Alive { get; private set; } = null!;
     public string Disconnected { get; private set; } = null!;
     public string DefaultKillReason { get; private set; } = null!;
     public string UnknownKillReason { get; private set; } = null!;
@@ -135,6 +132,8 @@ public class LanguageConfig : Config
     public string AlivePlayerInfo { get; private set; } = null!;
     
     public string SystemMessage { get; private set; } = null!;
+    public string HotkeySettingName { get; private set; } = null!;
+    public string PressKeyToSet { get; internal set; } = null!;
 
     private void SetTranslations()
     {
@@ -172,16 +171,18 @@ public class LanguageConfig : Config
         Disable = GetString("option.disable");
         CogOptions = GetString("option.main.cog-options");
         LoadCustomLanguage = GetString("option.main.load-custom-lang");
-        Github = GetString("option.main.github");
-        QQ = GetString("option.main.qq");
-        Discord = GetString("option.main.discord");
-        UpdateButtonString = GetString("option.main.update-button-string");
+        GitHub = GetString("main-menu.github");
+        QQ = GetString("main-menu.qq");
+        Discord = GetString("main-menu.discord");
+        UpdateButtonString = GetString("main-menu.update-button-string");
+        HotkeySettingName = GetString("option.hotkey.name");
+        PressKeyToSet = GetString("option.hotkey.press-key-to-set");
 
         MaxNumMessage = GetString("role.global.max-num");
         AllowStartMeeting = GetString("role.global.allow-start-meeting");
         AllowReportDeadBody = GetString("role.global.allow-report-body");
         KillCooldown = GetString("role.global.kill-cooldown");
-        NoMoreDescription = GetString("role.global.no-more-description");
+        NoMoreDescription = GetString("role.global.no-details");
         RoleCode = GetString("role.global.role-code");
         MaxUseTime = GetString("role.global.max-use-time");
 
@@ -202,7 +203,7 @@ public class LanguageConfig : Config
         RepairAction = GetString("action.repair");
         StareAction = GetString("action.stare");
 
-        ShowPlayersRolesMessage = GetString("game.end.show-players-roles-message");
+        ShowPlayersRolesMessage = GetString("game.end.summary-message");
 
         Alive = GetString("game.survival-data.alive");
         Disconnected = GetString("game.survival-data.disconnected");
@@ -213,23 +214,19 @@ public class LanguageConfig : Config
         UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
         UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
 
-        UpToDate = GetString("option.main.update.up-to-date");
-        NonCheck = GetString("option.main.update.non-check");
-        FetchedString = GetString("option.main.update.fetched");
+        UpToDate = GetString("main-menu.update.up-to-date");
+        NonCheck = GetString("main-menu.update.check-failed");
+        FetchedString = GetString("main-menu.update.fetched");
 
-        ImpostorsWinText = GetString("game.end.wins.impostor");
-        CrewmatesWinText = GetString("game.end.wins.crewmate");
-        NeutralsWinText = GetString("game.end.wins.neutral");
+        ImpostorsWinText = GetString("game.end.winners.impostor");
+        CrewmatesWinText = GetString("game.end.winners.crewmate");
+        NeutralsWinText = GetString("game.end.winners.neutral");
 
         DefaultEjectText = GetString("game.exile.default");
         AlivePlayerInfo = GetString("game.exile.alive-player-info");
 
         SystemMessage = GetString("game.chat.system-message");
-
-        // if (!FirstTimeLoad) OnLanguageLoaded.GetInvocationList().ForEach(d => d.DynamicInvoke(null));
-        // dont use this
     }
-
 
     private string GetString(string location)
     {
@@ -245,29 +242,15 @@ public class LanguageConfig : Config
 
     public TextHandler GetHandler(string location) => new(location);
 
-    private static void LoadLanguageConfig()
-    {
-        Instance.LoadConfig(true);
-        Instance = new LanguageConfig();
-    }
-
-    internal static void LoadLanguageConfig(string path)
-    {
-        Instance = new LanguageConfig(path);
-    }
-
+    private static void LoadLanguageConfig() => Instance = new();
+    internal static void LoadLanguageConfig(string path) => Instance = new(path);
+    
     public class TextHandler
     {
-        internal TextHandler(string location)
-        {
-            Location = location;
-        }
-
+        internal TextHandler(string location) => Location = location;
+        
         public string Location { get; }
 
-        public string GetString(string target)
-        {
-            return Instance.GetString($"{Location}.{target}");
-        }
+        public string GetString(string target) => Instance.GetString($"{Location}.{target}");
     }
 }

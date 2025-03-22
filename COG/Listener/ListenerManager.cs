@@ -42,7 +42,7 @@ public class ListenerManager
         {
             _handlers.Add(handler);
             Main.Logger.LogDebug(
-                $"Registered listener handler => {handler.Method.Name} from {handler.Listener.GetType().Name} by type of {handler.EventHandlerType.ToString()}");
+                $"Registered listener handler => {handler.Method.Name} from {handler.Listener.GetType().Name} by type of {handler.EventHandlerType}");
         });
     }
 

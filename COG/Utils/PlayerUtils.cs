@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using AmongUs.Data;
 using COG.Config.Impl;
 using COG.Listener;
@@ -11,6 +7,10 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using InnerNet;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 
@@ -67,7 +67,7 @@ public static class PlayerUtils
 
         return closestPlayer;
     }
-    
+
     public const MurderResultFlags SucceededFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
 
     public static void RpcAdvancedMurderPlayer(this PlayerControl killer, PlayerControl target)
@@ -76,14 +76,14 @@ public static class PlayerUtils
         {
             target = killer;
         }
-        
+
         if (AmongUsClient.Instance.AmClient)
         {
             killer.MurderPlayer(target, SucceededFlags);
         }
         var messageWriter = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.None);
         messageWriter.WriteNetObject(target);
-        messageWriter.Write((int) SucceededFlags);
+        messageWriter.Write((int)SucceededFlags);
         AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
     }
 
@@ -159,14 +159,14 @@ public static class PlayerUtils
     }
 
     public static bool IsSamePlayer(this PlayerControl? player, PlayerControl? target)
-    { 
+    {
         if (player == null || target == null) return false;
         return player.PlayerId == target.PlayerId;
     }
 
     public static DeadBody? GetDeadBody(this PlayerControl target)
     {
-        var deadBodies = DeadBodyUtils.GetDeadBodies().Where(body => 
+        var deadBodies = DeadBodyUtils.GetDeadBodies().Where(body =>
             body.GetPlayer().IsSamePlayer(target)).ToList();
         return deadBodies.Count > 0 ? deadBodies[0] : null;
     }
@@ -227,7 +227,7 @@ public static class PlayerUtils
         var tags = target.GetPlayerData()?.Tags;
         return tags != null && tags.Contains(tag);
     }
-    
+
     /// <summary>
     /// 复活一个玩家
     /// </summary>
@@ -237,10 +237,10 @@ public static class PlayerUtils
         player.Revive();
 
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.Revive);
-        
+
         // 写入对象实例
         writer.WriteNetObject(player);
-        
+
         // 发送Rpc
         writer.Finish();
     }
@@ -309,7 +309,7 @@ public static class PlayerUtils
     public static bool IsRole(this NetworkedPlayerInfo player, CustomRole role)
     {
         if (!player) return false; // 在对局内只要是游戏正式开始时在游戏内的玩家，玩家的NetworkedPlayerInfo绝对不为空
-        
+
         var targetRole = player.GetPlayerData();
         return targetRole?.MainRole != null && (targetRole.MainRole.Id == role.Id || targetRole.SubRoles.Select(customRole => customRole.Id).Contains(role.Id));
     }
@@ -327,7 +327,7 @@ public static class PlayerUtils
         {
             var vector = body.TruePosition - position;
             var magnitude = vector.magnitude;
-            if (magnitude <= num && !PhysicsHelpers.AnyNonTriggersBetween(position, vector.normalized, 
+            if (magnitude <= num && !PhysicsHelpers.AnyNonTriggersBetween(position, vector.normalized,
                     magnitude, Constants.ShipAndObjectsMask))
             {
                 result = body;
@@ -587,7 +587,8 @@ public class DeadPlayer
         KillerRole = killer?.GetMainRole();
         PlayerId = playerInfo.PlayerId;
 
-        DeadPlayers.Add(this);
+        if (!DeadPlayers.Any(d => d.PlayerId == PlayerId))
+            DeadPlayers.Add(this);
     }
 
     public DateTime DeadTime { get; private set; }
@@ -606,11 +607,11 @@ public class DeadPlayer
 public class SerializablePlayerData
 {
     public byte PlayerId { get; }
-    
+
     public int MainRoleId { get; }
-    
+
     public int[] SubRoleIds { get; }
-    
+
     private SerializablePlayerData(byte playerId, int mainRoleId, int[] subRoleIds)
     {
         PlayerId = playerId;
@@ -624,7 +625,7 @@ public class SerializablePlayerData
             CustomRoleManager.GetManager().GetRoleById(MainRoleId)!,
             SubRoleIds.Select(id => CustomRoleManager.GetManager().GetRoleById(id)).ToArray()!);
     }
-    
+
     public static SerializablePlayerData Of(PlayerData playerData)
     {
         return new SerializablePlayerData(playerData.PlayerId, playerData.MainRole.Id,
@@ -647,7 +648,7 @@ public class PlayerData
             ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
             : Array.Empty<CustomRole>();
     }
-    
+
     public PlayerControl Player { get; }
     public NetworkedPlayerInfo Data { get; }
     public bool IsDisconnected => Data.Disconnected;
@@ -656,6 +657,6 @@ public class PlayerData
     public byte PlayerId { get; }
     public int ColorId { get; }
     public CustomRole[] SubRoles { get; }
-    
+
     public List<string> Tags { get; }
 }

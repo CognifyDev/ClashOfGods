@@ -21,7 +21,7 @@ public static class SystemUtils
         return timeStamp;
     }
 
-    public static double GetCPUUsage()
+    public static double GetCpuUsage()
     {
         var performanceCounter = new PerformanceCounter();
         return performanceCounter.NextValue();
@@ -38,23 +38,36 @@ public static class SystemUtils
         return WindowsIdentity.GetCurrent().User!.Value.GetSHA1Hash();
     }
 
-    private static string GetRegistryValue(string keyPath, string valueName)
+    public static string? GetRegistryValue(string keyPath, string valueName)
     {
         var value = string.Empty;
 
         try
         {
-            using (var key = Registry.LocalMachine.OpenSubKey(keyPath))
-            {
-                if (key != null) value = key.GetValue(valueName)?.ToString()?.Trim()!;
-            }
+            using var key = Registry.LocalMachine.OpenSubKey(keyPath);
+            if (key != null) value = key.GetValue(valueName)?.ToString()?.Trim()!;
         }
-        catch (System.Exception)
+        catch
         {
-            value = string.Empty;
+            value = null;
         }
 
         return value;
+    }
+
+    public static bool SetRegistryValue(string keyPath, string valueName, string value)
+    {
+        try
+        {
+            using (var key = Registry.LocalMachine.CreateSubKey(keyPath))
+                key.SetValue(valueName, value, RegistryValueKind.String);
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Main.Logger.LogError($"Fail to set registry value: {e}");
+            return false;
+        }
     }
 
     public static MessageBoxDialogue.ClickedButton OpenMessageBox(string text, string title,

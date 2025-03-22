@@ -10,13 +10,14 @@ namespace COG.Constant;
 public static class ButtonConstant
 {
     public static readonly CustomButton KillButton = CustomButton.Of(
+        "general-kill",
         () =>
         {
             var target = PlayerControl.LocalPlayer.GetClosestPlayer();
             if (target == null) return;
             PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
         },
-        () => KillButton.ResetCooldown(),
+        () => KillButton?.ResetCooldown(),
         () =>
         {
             var closestPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance);

@@ -33,6 +33,7 @@ public class SoulHunter : CustomRole, IListener
             new FloatOptionValueRule(1F, 1F, 60F, 20F, NumberSuffixes.Seconds));
         
         _killButton = CustomButton.Of(
+            "soul-hunter-kill",
             () =>
             {
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();

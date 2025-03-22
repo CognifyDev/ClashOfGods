@@ -1,6 +1,9 @@
 using COG.Listener;
 using COG.Listener.Event.Impl.Game;
+using COG.Listener.Impl;
 using COG.UI.ModOption;
+using COG.Utils;
+using System.Linq;
 
 namespace COG.Patch;
 
@@ -15,23 +18,31 @@ internal class ModOptionsPatch
             .ExecuteHandlers(new OptionsMenuBehaviourStartEvent(__instance), EventHandlerType.Postfix);
     }
 
+    [HarmonyPatch(nameof(OptionsMenuBehaviour.Update))]
+    [HarmonyPostfix]
+    public static void OptionMenuBehaviourUpdatePostfix(OptionsMenuBehaviour __instance)
+    {
+        ListenerManager.GetManager()
+            .ExecuteHandlers(new OptionsMenuBehaviourUpdateEvent(__instance), EventHandlerType.Postfix);
+    }
+
     [HarmonyPatch(nameof(OptionsMenuBehaviour.Close))]
     [HarmonyPostfix]
-    public static void OptionMenuBehaviour_ClosePostfix()
+    public static void OptionMenuBehaviourClosePostfix()
     {
-        foreach (var btn in ModOption.Buttons)
-            if (btn.ToggleButton != null)
-                btn.ToggleButton.gameObject.SetActive(false);
+        ModOption.Buttons.Where(b => b.ToggleButton).Select(b => b.ToggleButton!.gameObject).
+            Concat(ModOptionListener.HotkeyButtons).Do(o => o.Destroy());
+        ModOptionListener.ResetHotkeyState();
     }
 }
 
 [HarmonyPatch(typeof(TabGroup), nameof(TabGroup.Open))]
 internal class OnTabGroupOpen
 {
-    private static void Postfix(TabGroup __instance)
+    private static void Postfix()
     {
-        foreach (var btn in ModOption.Buttons)
-            if (btn.ToggleButton != null)
-                btn.ToggleButton.gameObject.SetActive(false);
+        ModOption.Buttons.Where(b => b.ToggleButton).Select(b => b.ToggleButton!.gameObject).
+            Concat(ModOptionListener.HotkeyButtons).Do(o => o.Destroy());
+        ModOptionListener.ResetHotkeyState();
     }
 }

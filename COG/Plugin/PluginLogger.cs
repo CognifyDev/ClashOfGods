@@ -16,31 +16,31 @@ public class PluginLogger
 
     public void LogDebug(object? msg)
     {
-        Main.Logger.BepInExLogger.LogDebug(GetFullString(msg));
+        Main.Logger.NativeLogger.LogDebug(GetFullString(msg));
     }
 
     public void LogInfo(object? msg)
     {
-        Main.Logger.BepInExLogger.LogInfo(GetFullString(msg));
+        Main.Logger.NativeLogger.LogInfo(GetFullString(msg));
     }
 
     public void LogWarning(object? msg)
     {
-        Main.Logger.BepInExLogger.LogWarning(GetFullString(msg));
+        Main.Logger.NativeLogger.LogWarning(GetFullString(msg));
     }
 
     public void LogFatal(object? msg)
     {
-        Main.Logger.BepInExLogger.LogFatal(GetFullString(msg));
+        Main.Logger.NativeLogger.LogFatal(GetFullString(msg));
     }
 
     public void LogError(object? msg)
     {
-        Main.Logger.BepInExLogger.LogError(GetFullString(msg));
+        Main.Logger.NativeLogger.LogError(GetFullString(msg));
     }
 
     public void LogMessage(object? msg)
     {
-        Main.Logger.BepInExLogger.LogMessage(GetFullString(msg));
+        Main.Logger.NativeLogger.LogMessage(GetFullString(msg));
     }
 }

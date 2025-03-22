@@ -8,6 +8,7 @@ namespace COG.UI.CustomGameObject.Arrow;
 
 public class Arrow : ICustomGameObject
 {
+#nullable disable
     public Arrow(Vector3 target, Color? color = null)
     {
         if (!GameStates.InGame) return;
@@ -31,6 +32,7 @@ public class Arrow : ICustomGameObject
 
         CreatedArrows.Add(this);
     }
+#nullable restore
 
     public static List<Arrow> CreatedArrows { get; } = new();
 

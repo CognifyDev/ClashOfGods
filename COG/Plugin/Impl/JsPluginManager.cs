@@ -14,7 +14,7 @@ public class JsPluginManager : IPluginManager
 {
     private static JsPluginManager? _manager;
     
-    public const string PluginDirectoryPath = Config.Config.DataDirectoryName + "\\plugins";
+    public const string PluginDirectoryPath = Config.ConfigBase.DataDirectoryName + "\\plugins";
 
     public static JsPluginManager GetManager() => _manager ??= new JsPluginManager();
 

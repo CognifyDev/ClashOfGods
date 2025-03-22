@@ -34,6 +34,7 @@ using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using GameStates = COG.States.GameStates;
+using COG.Config;
 
 namespace COG;
 
@@ -75,24 +76,45 @@ public partial class Main : BasePlugin
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.SelectRoles)));
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.OnRpcReceived)));
 #endif
-        
-/*
-        ModUpdater.FetchUpdate();
-        Logger.LogInfo(
-            $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
-*/
 
-/*
-        // Load plugins
+        var longVersionInfo = $"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}";
+        var storagedInfo = "";
+
         try
         {
-            PluginManager.LoadPlugins();
+            storagedInfo = File.ReadAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat");
         }
-        catch (System.Exception e)
+        catch { }
+
+        ConfigBase.AutoReplace = true;
+
+        if (!storagedInfo.IsNullOrEmptyOrWhiteSpace())
         {
-            Logger.LogError(e.Message);
+            if (storagedInfo != longVersionInfo)
+                Logger.LogInfo("Current mod version doesnt equal to version of last mod running on this machine. Schedule to replace config files...");
+            else
+                ConfigBase.AutoReplace = false;
         }
-*/
+
+        File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
+
+        /*
+                ModUpdater.FetchUpdate();
+                Logger.LogInfo(
+                    $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
+        */
+
+        /*
+                // Load plugins
+                try
+                {
+                    PluginManager.LoadPlugins();
+                }
+                catch (System.Exception e)
+                {
+                    Logger.LogError(e.Message);
+                }
+        */
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
@@ -146,8 +168,9 @@ public partial class Main : BasePlugin
             new SpeedBooster()
         });
         
-        // Register settings
-        SettingsConfig.Instance.LoadConfig();
+        // Read configs by calling static constructors
+        _ = SettingsConfig.Instance;
+        _ = ButtonHotkeyConfig.Instance;
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]
@@ -161,8 +184,8 @@ public partial class Main : BasePlugin
                         return false;
                     }
                     var p = OpenFileDialogue.Open(Mode.Open, "*",
-                        defaultDir: @$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
-                    if (p.FilePath is null or "") return false;
+                        defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
+                    if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
@@ -182,11 +205,18 @@ public partial class Main : BasePlugin
                     Unload();
                     GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
+                }, false),
+            new(LanguageConfig.Instance.HotkeySettingName,
+                () =>
+                {
+                    ModOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
+                    ModOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
+                    return false;
                 }, false)
         });
 
         // Register Commands
-        CommandManager.GetManager().RegisterCommands(new Command.Command[]
+        CommandManager.GetManager().RegisterCommands(new CommandBase[]
         {
             new RpcCommand(),
             new OptionCommand()
@@ -201,13 +231,13 @@ public partial class Main : BasePlugin
         if (SettingsConfig.Instance.EnablePluginSystem)
         {
             if (!Directory.Exists(JsPluginManager.PluginDirectoryPath)) Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
+            
             var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
-            var enumerable = files as string[] ?? files.ToArray();
+            var enumerable = files.ToArray();
             Logger.LogInfo($"{enumerable.Length} plugins to load.");
+
             foreach (var file in enumerable)
-            {
                 JsPluginManager.GetManager().LoadPlugin(file);
-            }
         }
         
         _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
@@ -216,9 +246,7 @@ public partial class Main : BasePlugin
     public override bool Unload()
     {
         if (SettingsConfig.Instance.EnablePluginSystem)
-        {
             JsPluginManager.GetManager().GetPlugins().ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
-        }
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();

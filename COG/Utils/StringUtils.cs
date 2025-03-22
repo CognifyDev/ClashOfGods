@@ -71,4 +71,6 @@ public static class StringUtils
 
         return result.ToString();
     }
+
+    public static bool IsNullOrEmptyOrWhiteSpace(this string? str) => string.IsNullOrWhiteSpace(str);
 }

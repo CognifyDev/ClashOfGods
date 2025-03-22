@@ -11,7 +11,7 @@ role:
     allow-start-meeting: "允许启动会议"
     allow-report-body: "允许报告尸体"
     kill-cooldown: "击杀冷却时间"
-    no-more-description: "没有详细信息"
+    no-details: "没有详细信息"
     role-code: "职业特征码"
     max-use-time: "最大使用次数"
   impostor:
@@ -124,16 +124,20 @@ option:
       name: "临时禁用模组"
       success: "模组已成功被临时禁用！\n如果您仍想要继续游玩模组，请重启游戏"
       error-in-game: "请先离开本局游戏再进行操作"
-    github: "Github"
-    qq: "QQ"
-    discord: "Discord"
-    update-button-string: "检查更新"
-    update:
-      up-to-date: "你已经更新到最新版本"
-      non-check: "未能找到最新版本"
-      fetched: "搜索到最新版：%version%\r\n%description%\r\n是否安装？"
+  hotkey:
+    name: "热键设置"
+    press-key-to-set: "请在%sec%秒内按下新热键"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
+main-menu:
+  github: "Github"
+  qq: "QQ"
+  discord: "Discord"
+  update-button-string: "检查更新"
+  update:
+    up-to-date: "你已经更新到最新版本"
+    check-failed: "未能找到最新版本"
+    fetched: "搜索到最新版：%version%\r\n%description%\r\n是否安装？"
 action:
   kill: "击杀"
   clean: "清理"
@@ -142,8 +146,8 @@ action:
   stare: "凝视"
 game:
   end:
-    show-players-roles-message: "玩家职业:"
-    wins:
+    summary-message: "玩家职业:"
+    winners:
       impostor: "伪装者胜利"
       crewmate: "船员胜利"
       neutral: "%player% 胜利"
