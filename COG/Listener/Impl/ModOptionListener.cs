@@ -19,11 +19,11 @@ internal class ModOptionListener : IListener
 
     private const float TimerCountdown = 5f;
 
-    private bool _isSettingHotkey = false;
-    private ModOption? _currentBeingSet = null;
-    private CustomButton? _currentCustomButton = null;
-    private float _timer = TimerCountdown;
-    private string _namePrefix = "";
+    private static bool _isSettingHotkey = false;
+    private static ModOption? _currentBeingSet = null;
+    private static CustomButton? _currentCustomButton = null;
+    private static float _timer = TimerCountdown;
+    private static string _namePrefix = "";
 
     public static List<GameObject> HotkeyButtons { get; } = new();
 
@@ -32,8 +32,6 @@ internal class ModOptionListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSettingInit(OptionsMenuBehaviourStartEvent @event)
     {
-        HotkeyButtons.Clear();
-
         var menu = @event.Object;
         var transform1 = menu.CensorChatButton.transform;
         Vector3? position = transform1.localPosition;
@@ -84,7 +82,7 @@ internal class ModOptionListener : IListener
             _timer -= Time.deltaTime;
             if (_timer <= 0)
             {
-                Reset();
+                ResetHotkeyState();
                 textMesh.text = origin;
                 return;
             }
@@ -93,23 +91,23 @@ internal class ModOptionListener : IListener
 
             foreach (var keyCode in Enum.GetValues<KeyCode>())
             {
-                if (Input.GetKeyDown(keyCode))
+                if (Input.GetKeyDown(keyCode) && !keyCode.ToString().StartsWith("Mouse"))
                 {
                     textMesh.text = $"{_namePrefix} : {keyCode}";
                     ButtonHotkeyConfig.Instance.SetHotkey(_currentCustomButton!, keyCode);
-                    Reset();
+                    ResetHotkeyState();
                 }
             }
         }
+    }
 
-        void Reset()
-        {
-            _isSettingHotkey = false;
-            _currentBeingSet = null;
-            _currentCustomButton = null;
-            _timer = TimerCountdown;
-            _namePrefix = "";
-        }
+    public static void ResetHotkeyState()
+    {
+        _isSettingHotkey = false;
+        _currentBeingSet = null;
+        _currentCustomButton = null;
+        _timer = TimerCountdown;
+        _namePrefix = "";
     }
 
     private void HideVanillaButtons(OptionsMenuBehaviour menu)
@@ -141,6 +139,7 @@ internal class ModOptionListener : IListener
 
     private void LoadHotkeyButtons(OptionsMenuBehaviour menu)
     {
+        HotkeyButtons.Clear();
         var a = 0;
         foreach (var role in CustomRoleManager.GetManager().GetModRoles())
         {
@@ -151,11 +150,14 @@ internal class ModOptionListener : IListener
                 modOption = new ModOption($"{GetHotkeyPrefix(role, button)} : {(button.Hotkey.ToString() == "" ? "null" : button.Hotkey)}",
                     () =>
                     {
-                        _currentBeingSet = modOption;
-                        _currentCustomButton = button;
-                        _isSettingHotkey = true;
-                        _timer = TimerCountdown;
-                        _namePrefix = GetHotkeyPrefix(role, button);
+                        if (!_isSettingHotkey)
+                        {
+                            _currentBeingSet = modOption;
+                            _currentCustomButton = button;
+                            _isSettingHotkey = true;
+                            _timer = TimerCountdown;
+                            _namePrefix = GetHotkeyPrefix(role, button);
+                        }
 
                         return false;
                     }, false);

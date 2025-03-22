@@ -198,7 +198,7 @@ public class CustomButton
         var isCoolingDown = Timer > 0f;
 
         var hotkeyText = string.Empty;
-        if (Hotkey.HasValue) hotkeyText = $" ({Hotkey.Value})";
+        if (Hotkey.HasValue) hotkeyText = $"<size=75%> ({Hotkey.Value})</size>";
 
         var buttonText = Text + hotkeyText;
 

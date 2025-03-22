@@ -25,13 +25,13 @@ public class ButtonHotkeyConfig : ConfigBase
             return;
         }
 
-        ApplyConfigs();
+        ApplyConfigsFromFile();
     }
 
-    public void SetHotkey(CustomButton button, KeyCode? hotkey)
+    public void SetHotkey(CustomButton button, KeyCode hotkey)
     {
         button.Hotkey = hotkey;
-        ApplyConfigs();
+        Main.Logger.LogInfo($"Hotkey set: {hotkey}");
         SaveConfigs();
     }
 
@@ -46,7 +46,7 @@ public class ButtonHotkeyConfig : ConfigBase
         Text = string.Join("\r\n", configurations);
     }
 
-    public void ApplyConfigs()
+    public void ApplyConfigsFromFile()
     {
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
         {
@@ -55,12 +55,12 @@ public class ButtonHotkeyConfig : ConfigBase
 
             if (Enum.TryParse<KeyCode>(keyName, out var keyCode))
             {
-                var lastKey = button.Hotkey.HasValue ? button.Hotkey.Value.ToString() : "(null)";
+                var defaultKey = button.Hotkey.HasValue ? button.Hotkey.Value.ToString() : "(null)";
 
-                if (lastKey != keyName)
+                if (defaultKey != keyName)
                 {
                     button.Hotkey = keyCode;
-                    Main.Logger.LogInfo($"Hotkey change: {lastKey} => {keyCode}");
+                    Main.Logger.LogInfo($"Hotkey change from default: {defaultKey} => {keyCode}");
                 }
             }
         }

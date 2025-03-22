@@ -2,6 +2,7 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Impl;
 using COG.UI.ModOption;
+using COG.Utils;
 using System.Linq;
 
 namespace COG.Patch;
@@ -30,7 +31,8 @@ internal class ModOptionsPatch
     public static void OptionMenuBehaviourClosePostfix()
     {
         ModOption.Buttons.Where(b => b.ToggleButton).Select(b => b.ToggleButton!.gameObject).
-            Concat(ModOptionListener.HotkeyButtons).Do(o => o.SetActive(false));
+            Concat(ModOptionListener.HotkeyButtons).Do(o => o.Destroy());
+        ModOptionListener.ResetHotkeyState();
     }
 }
 
@@ -40,6 +42,7 @@ internal class OnTabGroupOpen
     private static void Postfix()
     {
         ModOption.Buttons.Where(b => b.ToggleButton).Select(b => b.ToggleButton!.gameObject).
-            Concat(ModOptionListener.HotkeyButtons).Do(o => o.SetActive(false));
+            Concat(ModOptionListener.HotkeyButtons).Do(o => o.Destroy());
+        ModOptionListener.ResetHotkeyState();
     }
 }
