@@ -17,7 +17,7 @@ public static class ButtonConstant
             if (target == null) return;
             PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
         },
-        () => KillButton.ResetCooldown(),
+        () => KillButton?.ResetCooldown(),
         () =>
         {
             var closestPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance);

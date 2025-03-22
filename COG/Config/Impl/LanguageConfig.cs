@@ -9,11 +9,12 @@ namespace COG.Config.Impl;
 [ShitCode]
 public class LanguageConfig : Config
 {
+#nullable disable
     static LanguageConfig()
     {
         LoadLanguageConfig();
     }
-
+#nullable restore
 
     private LanguageConfig() : base(
         "Language",

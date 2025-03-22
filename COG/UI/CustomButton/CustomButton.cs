@@ -157,7 +157,7 @@ public class CustomButton
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool>? hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown,
+        Func<bool> hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, string hotkeyName = "", int order = -1)
     {
         return new CustomButton(identifier, onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
