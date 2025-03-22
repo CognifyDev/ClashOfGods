@@ -5,7 +5,7 @@ using COG.Utils;
 
 namespace COG.Command.Impl;
 
-public class OptionCommand : Command
+public class OptionCommand : CommandBase
 {
     public OptionCommand() : base("option")
     {

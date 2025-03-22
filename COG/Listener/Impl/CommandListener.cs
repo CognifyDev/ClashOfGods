@@ -49,7 +49,7 @@ public class CommandListener : IListener
         return toReturn;
     }
 
-    private bool ContainAliases(string text, Command.Command command)
+    private bool ContainAliases(string text, Command.CommandBase command)
     {
         foreach (var alias in command.Aliases)
             if (text.Split(" ")[0].ToLower().Equals("/" + alias.ToLower()))

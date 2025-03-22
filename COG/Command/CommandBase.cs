@@ -2,13 +2,13 @@ using System;
 
 namespace COG.Command;
 
-public abstract class Command
+public abstract class CommandBase
 {
     /// <summary>
     ///     构造一个Command
     /// </summary>
     /// <param name="name">命令名称</param>
-    protected Command(string name)
+    protected CommandBase(string name)
     {
         Name = name;
     }

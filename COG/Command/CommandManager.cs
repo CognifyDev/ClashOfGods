@@ -6,24 +6,24 @@ public class CommandManager
 {
     private static CommandManager? _manager;
 
-    private readonly List<Command> _commands = new();
+    private readonly List<CommandBase> _commands = new();
 
     public static CommandManager GetManager()
     {
         return _manager ??= new CommandManager();
     }
 
-    public void RegisterCommand(Command command)
+    public void RegisterCommand(CommandBase command)
     {
         _commands.Add(command);
     }
 
-    public void RegisterCommands(Command[] commands)
+    public void RegisterCommands(CommandBase[] commands)
     {
         _commands.AddRange(commands);
     }
 
-    public List<Command> GetCommands()
+    public List<CommandBase> GetCommands()
     {
         return _commands;
     }

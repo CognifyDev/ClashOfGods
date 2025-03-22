@@ -204,7 +204,7 @@ public class CustomButton
                         HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
         var isCoolingDown = Timer > 0f;
         var hotkeyText = "";
-        if (HotkeyName.IsNullOrWhiteSpace()) hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
+        if (HotkeyName.IsNullOrEmptyOrWhiteSpace()) hotkeyText = Hotkey.HasValue ? Hotkey.Value.ToString() : HotkeyName;
 
         var buttonText = $"{Text}<size=75%> ({hotkeyText})</size>";
 

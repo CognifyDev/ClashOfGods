@@ -34,6 +34,7 @@ using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using GameStates = COG.States.GameStates;
+using COG.Config;
 
 namespace COG;
 
@@ -162,7 +163,7 @@ public partial class Main : BasePlugin
                         return false;
                     }
                     var p = OpenFileDialogue.Open(Mode.Open, "*",
-                        defaultDir: @$"{Directory.GetCurrentDirectory()}\{COG.Config.ConfigBase.DataDirectoryName}");
+                        defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
                     if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
@@ -187,7 +188,7 @@ public partial class Main : BasePlugin
         });
 
         // Register Commands
-        CommandManager.GetManager().RegisterCommands(new Command.Command[]
+        CommandManager.GetManager().RegisterCommands(new CommandBase[]
         {
             new RpcCommand(),
             new OptionCommand()
@@ -202,13 +203,13 @@ public partial class Main : BasePlugin
         if (SettingsConfig.Instance.EnablePluginSystem)
         {
             if (!Directory.Exists(JsPluginManager.PluginDirectoryPath)) Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
+            
             var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
             var enumerable = files.ToArray();
             Logger.LogInfo($"{enumerable.Length} plugins to load.");
+
             foreach (var file in enumerable)
-            {
                 JsPluginManager.GetManager().LoadPlugin(file);
-            }
         }
         
         _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
@@ -217,9 +218,7 @@ public partial class Main : BasePlugin
     public override bool Unload()
     {
         if (SettingsConfig.Instance.EnablePluginSystem)
-        {
             JsPluginManager.GetManager().GetPlugins().ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
-        }
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();

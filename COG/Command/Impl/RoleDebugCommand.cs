@@ -7,7 +7,7 @@ namespace COG.Command.Impl;
 ///     仅用于调试<para />
 ///     添加请在ue的c#控制台执行COG.Command.CommandManager.GetManager().RegisterCommand(new COG.Command.Impl.RoleDebugCommand());
 /// </summary>
-public class RoleDebugCommand : Command
+public class RoleDebugCommand : CommandBase
 {
     public RoleDebugCommand() : base("role")
     {
