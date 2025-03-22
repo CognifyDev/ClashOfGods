@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace COG.Config.Impl;
 
-public class ButtonHotkeyConfig : Config
+public class ButtonHotkeyConfig : ConfigBase
 {
     public static ButtonHotkeyConfig Instance { get; private set; }
 

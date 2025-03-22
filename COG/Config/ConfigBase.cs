@@ -5,11 +5,11 @@ using COG.Utils;
 
 namespace COG.Config;
 
-public class Config
+public class ConfigBase
 {
     public const string DataDirectoryName = $"{Main.DisplayName}_DATA";
 
-    public Config(string name, string path, string text)
+    public ConfigBase(string name, string path, string text)
     {
         Name = name;
         Path = path;
@@ -19,7 +19,7 @@ public class Config
         LoadConfigs();
     }
 
-    protected Config(string name, string path, ResourceFile resourceFile)
+    protected ConfigBase(string name, string path, ResourceFile resourceFile)
     {
         Name = name;
         Path = path;
@@ -29,7 +29,7 @@ public class Config
         LoadConfigs();
     }
 
-    public Config(string name, string path)
+    public ConfigBase(string name, string path)
     {
         Name = name;
         Path = path;
@@ -39,7 +39,7 @@ public class Config
         LoadConfigs();
     }
 
-    public static List<Config> Configs { get; } = new();
+    public static List<ConfigBase> Configs { get; } = new();
     public string Name { get; }
     public string Path { get; }
     public string Text { get; protected set; }

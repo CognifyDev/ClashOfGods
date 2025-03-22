@@ -2,7 +2,7 @@
 
 namespace COG.Config.Impl;
 
-public class SettingsConfig : Config
+public class SettingsConfig : ConfigBase
 {
     public static SettingsConfig Instance { get; }
     

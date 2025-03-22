@@ -162,8 +162,8 @@ public partial class Main : BasePlugin
                         return false;
                     }
                     var p = OpenFileDialogue.Open(Mode.Open, "*",
-                        defaultDir: @$"{Directory.GetCurrentDirectory()}\{COG.Config.Config.DataDirectoryName}");
-                    if (p.FilePath is null or "") return false;
+                        defaultDir: @$"{Directory.GetCurrentDirectory()}\{COG.Config.ConfigBase.DataDirectoryName}");
+                    if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();

@@ -7,7 +7,7 @@ using COG.Utils.Coding;
 namespace COG.Config.Impl;
 
 [ShitCode]
-public class LanguageConfig : Config
+public class LanguageConfig : ConfigBase
 {
 #nullable disable
     static LanguageConfig()
