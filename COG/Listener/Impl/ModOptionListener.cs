@@ -173,7 +173,7 @@ internal class ModOptionListener : IListener
     {
         var template = menu.CensorChatButton;
         var button = Object.Instantiate(template, menu.transform);
-        Vector3 pos = new(idx % 2 == 0 ? -1.17f : 1.17f, 1.7f - idx / 2 * 0.4f, -0.5f);
+        Vector3 pos = new(idx % 2 == 0 ? -1.17f : 1.17f, 1.7f - idx / 2 * 0.5f, -0.5f);
 
         button.transform.localPosition = pos;
         button.onState = option.DefaultValue;
