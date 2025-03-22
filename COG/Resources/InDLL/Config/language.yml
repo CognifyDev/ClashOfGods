@@ -126,7 +126,7 @@ option:
       error-in-game: "请先离开本局游戏再进行操作"
   hotkey:
     name: "热键设置"
-    press-key-to-set: "请在%sec%内按下新热键"
+    press-key-to-set: "请在%sec%秒内按下新热键"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 main-menu:

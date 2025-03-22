@@ -78,14 +78,17 @@ internal class ModOptionListener : IListener
     {
         if (_isSettingHotkey)
         {
+            var textMesh = _currentBeingSet!.ToggleButton!.Text;
+            var origin = textMesh.text;
+
             _timer -= Time.deltaTime;
             if (_timer <= 0)
             {
                 Reset();
+                textMesh.text = origin;
                 return;
             }
 
-            var textMesh = _currentBeingSet!.ToggleButton!.Text;
             textMesh.text = LanguageConfig.Instance.PressKeyToSet.CustomFormat(Mathf.CeilToInt(_timer));
 
             foreach (var keyCode in Enum.GetValues<KeyCode>())

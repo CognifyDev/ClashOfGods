@@ -1,6 +1,8 @@
 using COG.Listener;
 using COG.Listener.Event.Impl.Game;
+using COG.Listener.Impl;
 using COG.UI.ModOption;
+using System.Linq;
 
 namespace COG.Patch;
 
@@ -27,19 +29,17 @@ internal class ModOptionsPatch
     [HarmonyPostfix]
     public static void OptionMenuBehaviourClosePostfix()
     {
-        foreach (var btn in ModOption.Buttons)
-            if (btn.ToggleButton != null)
-                btn.ToggleButton.gameObject.SetActive(false);
+        ModOption.Buttons.Where(b => b.ToggleButton).Select(b => b.ToggleButton!.gameObject).
+            Concat(ModOptionListener.HotkeyButtons).Do(o => o.SetActive(false));
     }
 }
 
 [HarmonyPatch(typeof(TabGroup), nameof(TabGroup.Open))]
 internal class OnTabGroupOpen
 {
-    private static void Postfix(TabGroup __instance)
+    private static void Postfix()
     {
-        foreach (var btn in ModOption.Buttons)
-            if (btn.ToggleButton != null)
-                btn.ToggleButton.gameObject.SetActive(false);
+        ModOption.Buttons.Where(b => b.ToggleButton).Select(b => b.ToggleButton!.gameObject).
+            Concat(ModOptionListener.HotkeyButtons).Do(o => o.SetActive(false));
     }
 }
