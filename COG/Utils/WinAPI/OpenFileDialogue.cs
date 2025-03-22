@@ -60,7 +60,7 @@ public static class OpenFileDialogue
             Save(ofn);
 
         Main.Logger.LogInfo(
-            $"Opened file: {(ofn.stringFile.IsNullOrWhiteSpace() || ofn.stringFile == null ? "None" : ofn.stringFile)}");
+            $"Opened file: {(ofn.stringFile.IsNullOrEmptyOrWhiteSpace() || ofn.stringFile == null ? "None" : ofn.stringFile)}");
         return new OpenedFileInfo(ofn.stringFile, ofn.stringFileTitle);
     }
 

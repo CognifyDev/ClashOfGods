@@ -42,19 +42,18 @@ public class Config
     public static List<Config> Configs { get; } = new();
     public string Name { get; }
     public string Path { get; }
-    public string Text { get; }
+    public string Text { get; protected set; }
     public Yaml? YamlReader { get; private set; }
 
     public void LoadConfigs(bool replace = false)
     {
         if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
-        if (!File.Exists(Path) || replace)
-        {
-            if (replace && File.Exists(Path)) File.Delete(Path);
-            File.WriteAllText(Path, Text, Encoding.UTF8);
-        }
 
-        var text = File.ReadAllText(Path, Encoding.UTF8);
-        YamlReader = Yaml.LoadFromString(text);
+        if (!File.Exists(Path) || replace)
+            File.WriteAllText(Path, Text, Encoding.UTF8); // Auto overwrite
+        else
+            Text = File.ReadAllText(Path, Encoding.UTF8); // Replace from disk
+
+        YamlReader = Yaml.LoadFromString(Text);
     }
 }

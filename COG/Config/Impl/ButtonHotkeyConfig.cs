@@ -1,4 +1,5 @@
 using COG.UI.CustomButton;
+using COG.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,16 +19,20 @@ public class ButtonHotkeyConfig : Config
 
     public ButtonHotkeyConfig() : base("Hotkeys", DataDirectoryName + "/hotkeys.yml")
     {
-        if (Text.IsNullOrWhiteSpace()) SaveConfigs();
-
-        foreach (var button in CustomButtonManager.GetManager().GetButtons())
+        if (Text.IsNullOrEmptyOrWhiteSpace())
         {
-            var keyName = YamlReader!.GetString(button.Identifier);
-            if (keyName.IsNullOrWhiteSpace()) continue;
-
-            if (Enum.TryParse<KeyCode>(keyName, out var keyCode))
-                button.Hotkey = keyCode;
+            SaveConfigs();
+            return;
         }
+
+        ApplyConfigs();
+    }
+
+    public void SetHotkey(CustomButton button, KeyCode? hotkey)
+    {
+        button.Hotkey = hotkey;
+        ApplyConfigs();
+        SaveConfigs();
     }
 
     public void SaveConfigs()
@@ -35,10 +40,29 @@ public class ButtonHotkeyConfig : Config
         List<string> configurations = new();
 
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
-            configurations.Add($"{button.Identifier}: \"{button.Hotkey}\"");
+            configurations.Add($"{button.Identifier}: {button.Hotkey}");
 
         File.WriteAllLines(Path, configurations, Encoding.UTF8);
+        Text = string.Join("\r\n", configurations);
+    }
 
-        Instance = new();
+    public void ApplyConfigs()
+    {
+        foreach (var button in CustomButtonManager.GetManager().GetButtons())
+        {
+            var keyName = YamlReader!.GetString(button.Identifier);
+            if (keyName.IsNullOrEmptyOrWhiteSpace()) continue;
+
+            if (Enum.TryParse<KeyCode>(keyName, out var keyCode))
+            {
+                var modDefaultKey = button.Hotkey.HasValue ? button.Hotkey.Value.ToString() : "(null)";
+
+                if (modDefaultKey != keyName)
+                {
+                    button.Hotkey = keyCode;
+                    Main.Logger.LogInfo($"Hotkey change from default: {modDefaultKey} => {keyCode}");
+                }
+            }
+        }
     }
 }
