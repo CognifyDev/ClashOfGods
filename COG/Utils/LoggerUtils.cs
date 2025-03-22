@@ -11,13 +11,13 @@ public class StackTraceLogger
 {
     public StackTraceLogger(string name)
     {
-        BepInExLogger = BepInEx.Logging.Logger.CreateLogSource(name);
+        NativeLogger = BepInEx.Logging.Logger.CreateLogSource(name);
         RegisteredCustomLogger.Add(this);
     }
 
     public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
     public List<MethodInfo> DisabledMethodSource { get; } = new();
-    public ManualLogSource BepInExLogger { get; }
+    public ManualLogSource NativeLogger { get; }
 
     public void DisableSource(Type toDisable)
     {
@@ -41,32 +41,32 @@ public class StackTraceLogger
 
     public void LogDebug(object? msg, string? customName = null)
     {
-        BepInExLogger.LogDebug(GetFullString(msg, customName));
+        NativeLogger.LogDebug(GetFullString(msg, customName));
     }
 
     public void LogInfo(object? msg, string? customName = null)
     {
-        BepInExLogger.LogInfo(GetFullString(msg, customName));
+        NativeLogger.LogInfo(GetFullString(msg, customName));
     }
 
     public void LogWarning(object? msg, string? customName = null)
     {
-        BepInExLogger.LogWarning(GetFullString(msg, customName));
+        NativeLogger.LogWarning(GetFullString(msg, customName));
     }
 
     public void LogFatal(object? msg, string? customName = null)
     {
-        BepInExLogger.LogFatal(GetFullString(msg, customName));
+        NativeLogger.LogFatal(GetFullString(msg, customName));
     }
 
     public void LogError(object? msg, string? customName = null)
     {
-        BepInExLogger.LogError(GetFullString(msg, customName));
+        NativeLogger.LogError(GetFullString(msg, customName));
     }
 
     public void LogMessage(object? msg, string? customName = null)
     {
-        BepInExLogger.LogMessage(GetFullString(msg, customName));
+        NativeLogger.LogMessage(GetFullString(msg, customName));
     }
 
     private string GetFullString(object? data, string? customName = null)

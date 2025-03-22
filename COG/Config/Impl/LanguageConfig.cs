@@ -182,7 +182,7 @@ public class LanguageConfig : ConfigBase
         AllowStartMeeting = GetString("role.global.allow-start-meeting");
         AllowReportDeadBody = GetString("role.global.allow-report-body");
         KillCooldown = GetString("role.global.kill-cooldown");
-        NoMoreDescription = GetString("role.global.no-more-description");
+        NoMoreDescription = GetString("role.global.no-details");
         RoleCode = GetString("role.global.role-code");
         MaxUseTime = GetString("role.global.max-use-time");
 

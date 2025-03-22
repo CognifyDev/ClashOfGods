@@ -9,6 +9,8 @@ public class ConfigBase
 {
     public const string DataDirectoryName = $"{Main.DisplayName}_DATA";
 
+    public static bool AutoReplace { get; set; } = false;
+
     public ConfigBase(string name, string path, string text)
     {
         Name = name;
@@ -49,11 +51,12 @@ public class ConfigBase
     {
         if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
 
-        if (!File.Exists(Path) || replace)
+        if (!File.Exists(Path) || replace || AutoReplace)
             File.WriteAllText(Path, Text, Encoding.UTF8); // Auto overwrite
         else
             Text = File.ReadAllText(Path, Encoding.UTF8); // Replace from disk
 
         YamlReader = Yaml.LoadFromString(Text);
+        AutoReplace = false;
     }
 }

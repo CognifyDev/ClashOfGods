@@ -76,24 +76,45 @@ public partial class Main : BasePlugin
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.SelectRoles)));
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.OnRpcReceived)));
 #endif
-        
-/*
-        ModUpdater.FetchUpdate();
-        Logger.LogInfo(
-            $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
-*/
 
-/*
-        // Load plugins
+        var longVersionInfo = $"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}";
+        var storagedInfo = "";
+
         try
         {
-            PluginManager.LoadPlugins();
+            storagedInfo = File.ReadAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat");
         }
-        catch (System.Exception e)
+        catch { }
+
+        ConfigBase.AutoReplace = true;
+
+        if (!storagedInfo.IsNullOrEmptyOrWhiteSpace())
         {
-            Logger.LogError(e.Message);
+            if (storagedInfo != longVersionInfo)
+                Logger.LogInfo("Current mod version doesnt equal to version of last mod running on this machine. Schedule to replace config files...");
+            else
+                ConfigBase.AutoReplace = false;
         }
-*/
+
+        File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
+
+        /*
+                ModUpdater.FetchUpdate();
+                Logger.LogInfo(
+                    $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
+        */
+
+        /*
+                // Load plugins
+                try
+                {
+                    PluginManager.LoadPlugins();
+                }
+                catch (System.Exception e)
+                {
+                    Logger.LogError(e.Message);
+                }
+        */
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
