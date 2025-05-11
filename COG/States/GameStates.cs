@@ -8,23 +8,27 @@ namespace COG.States;
 /// </summary>
 public static class GameStates
 {
-    private static bool _inGame;
+    private static bool _inRealGame = false;
 
     /// <summary>
-    ///     是否处于游戏中
+    ///     是否处于正式游戏中
     /// </summary>
-    public static bool InGame
+    public static bool InRealGame
     {
-        get => _inGame;
+        get => _inRealGame;
 
         set
         {
+            Main.Logger.LogMessage($"{nameof(GameStates)}::{nameof(_inRealGame)} being set to {value}. Clearing role data...");
+
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
             
-            _inGame = value;
+            _inRealGame = value;
 
             if (!value)
             {
+                Main.Logger.LogMessage("Player left game. Clearing in-game data...");
+
                 GameUtils.PlayerData.Clear();
                 DeadPlayer.DeadPlayers.Clear();
             }
@@ -39,7 +43,7 @@ public static class GameStates
     /// <summary>
     ///     是否处于会议中
     /// </summary>
-    public static bool IsMeeting => InGame && MeetingHud.Instance;
+    public static bool IsMeeting => InRealGame && MeetingHud.Instance;
 
     public static bool IsOnlineGame => AmongUsClient.Instance.NetworkMode == NetworkModes.OnlineGame;
 

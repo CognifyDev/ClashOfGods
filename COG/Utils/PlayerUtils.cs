@@ -554,7 +554,7 @@ public class DeadPlayerListener : IListener
     private void OnPlayerLeft(AmongUsClientLeaveEvent @event)
     {
         var data = @event.ClientData;
-        if (!GameStates.InGame) return;
+        if (!GameStates.InRealGame) return;
         _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Disconnected, data.Character.Data, null);
     }
 

@@ -11,7 +11,7 @@ public class Arrow : ICustomGameObject
 #nullable disable
     public Arrow(Vector3 target, Color? color = null)
     {
-        if (!GameStates.InGame) return;
+        if (!GameStates.InRealGame) return;
         Target = target;
         Color = color;
 

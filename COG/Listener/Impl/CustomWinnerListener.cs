@@ -66,7 +66,7 @@ public class CustomWinnerListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnRpcReceived(PlayerHandleRpcEvent @event)
     {
-        if (!GameStates.InGame) return;
+        if (!GameStates.InRealGame) return;
         if (@event.CallId != (byte)KnownRpc.ShareWinners) return;
         
         CustomWinnerManager.GetManager().WinnableData = new WinnableData();
@@ -84,7 +84,7 @@ public class CustomWinnerListener : IListener
         SetUpWinText(manager);
         SetUpRoleSummary(manager);
         
-        GameStates.InGame = false;
+        GameStates.InRealGame = false;
         _ending = false;
     }
 
