@@ -183,7 +183,7 @@ public partial class Main : BasePlugin
                         GameUtils.Popup?.Show("You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
                         return false;
                     }
-                    var p = OpenFileDialogue.Open(Mode.Open, "*",
+                    var p = OpenFileDialogue.Display(Mode.Open, "", 
                         defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
                     if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 

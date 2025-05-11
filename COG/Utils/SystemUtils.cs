@@ -65,7 +65,7 @@ public static class SystemUtils
         }
         catch (System.Exception e)
         {
-            Main.Logger.LogError($"Fail to set registry value: {e}");
+            Main.Logger.LogError($"Failed to set registry value: {e}");
             return false;
         }
     }

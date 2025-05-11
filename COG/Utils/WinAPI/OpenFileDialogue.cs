@@ -43,12 +43,12 @@ public static class OpenFileDialogue
     /// <param name="defaultDir">打开对话框后默认所在目录</param>
     /// <param name="defaultFilterIdx">默认文件筛选编号</param>
     /// <returns>文件名称与路径</returns>
-    public static OpenedFileInfo Open(OpenFileMode mode, string filter = "", string title = "", string defaultDir = "",
+    public static OpenedFileInfo Display(OpenFileMode mode, string filter = "", string title = "", string defaultDir = "",
         int? defaultFilterIdx = null)
     {
         var ofn = new OPENFILENAME();
         ofn.lStructSize = Marshal.SizeOf(ofn);
-        ofn.hwndOwner = Process.GetCurrentProcess().Handle;
+        ofn.hwndOwner = IntPtr.Zero; // Process.GetCurrentProcess().Handle not work
         ofn.stringFilter = filter;
         ofn.stringTitle = title;
         ofn.stringInitialDir = defaultDir;
@@ -60,7 +60,7 @@ public static class OpenFileDialogue
             Save(ofn);
 
         Main.Logger.LogInfo(
-            $"Opened file: {(ofn.stringFile.IsNullOrEmptyOrWhiteSpace() || ofn.stringFile == null ? "None" : ofn.stringFile)}");
+            $"Open file: {(ofn.stringFile.IsNullOrEmptyOrWhiteSpace() || ofn.stringFile == null ? "None" : ofn.stringFile)}");
         return new OpenedFileInfo(ofn.stringFile, ofn.stringFileTitle);
     }
 
