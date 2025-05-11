@@ -11,7 +11,7 @@ namespace COG.Utils;
 /// </summary>
 public static class ModUpdater
 {
-    public static VersionInfo? LatestVersion { get; private set; }
+    public static VersionInfo LatestVersion { get; private set; } = VersionInfo.Empty;
     public static string LatestDescription { get; private set; } = "";
 
     public static void FetchUpdate()
