@@ -76,7 +76,7 @@ public class GameListener : IListener
             }
             case KnownRpc.CleanDeadBody:
             {
-                if (!GameStates.InGame) return;
+                if (!GameStates.InRealGame) return;
                 var pid = reader.ReadByte();
                 var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
                 if (!body) return;
@@ -616,7 +616,7 @@ public class GameListener : IListener
     {
         Main.Logger.LogInfo("Game started!");
 
-        GameStates.InGame = true;
+        GameStates.InRealGame = true;
         
         if (!_handlers.IsEmpty())
         {

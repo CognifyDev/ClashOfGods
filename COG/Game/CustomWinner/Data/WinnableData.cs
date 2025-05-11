@@ -13,7 +13,7 @@ public class WinnableData
     public string? WinText { get; set; }
     public Color? WinColor { get; set; }
 
-    public GameOverReason GameOverReason { get; set; } = GameOverReason.ImpostorByKill;
+    public GameOverReason GameOverReason { get; set; } = GameOverReason.ImpostorsByKill;
 
     public List<NetworkedPlayerInfo> WinnablePlayers { get; } = new();
 

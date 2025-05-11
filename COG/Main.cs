@@ -178,12 +178,12 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
                 {
-                    if (GameStates.InGame)
+                    if (GameStates.InRealGame || GameStates.InLobby)
                     {
                         GameUtils.Popup?.Show("You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
                         return false;
                     }
-                    var p = OpenFileDialogue.Open(Mode.Open, "*",
+                    var p = OpenFileDialogue.Display(Mode.Open, "", 
                         defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
                     if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 
@@ -196,7 +196,7 @@ public partial class Main : BasePlugin
                 () =>
                 {
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-                    if (GameStates.InGame)
+                    if (GameStates.InRealGame)
                     {
                         GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
                         return false;

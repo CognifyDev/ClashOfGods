@@ -350,7 +350,7 @@ public static class LocalPlayerExitPatch
 {
     public static void Postfix()
     {
-        GameStates.InGame = false;
+        GameStates.InRealGame = false;
     }
 }
 

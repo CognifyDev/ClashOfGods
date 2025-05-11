@@ -148,14 +148,14 @@ public sealed class CustomOption
 
     public static void SavePresetWithDialogue()
     {
-        var file = OpenFileDialogue.Open(Mode.Save, "Preset File(*.cfg)\0*.cfg\0\0");
+        var file = OpenFileDialogue.Display(Mode.Save, "Preset File(*.cfg)\0*.cfg\0\0");
         if (file.FilePath is null or "") return;
         SaveCurrentOption(file.FilePath);
     }
 
     public static void LoadPresetWithDialogue()
     {
-        var file = OpenFileDialogue.Open(Mode.Open, "Preset File(*.cfg)\0*.cfg\0\0");
+        var file = OpenFileDialogue.Display(Mode.Open, "Preset File(*.cfg)\0*.cfg\0\0");
         if (file.FilePath is null or "") return;
         LoadOptionFromPreset(file.FilePath);
     }

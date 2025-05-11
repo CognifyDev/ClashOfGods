@@ -17,7 +17,7 @@ public class CrewmatesCustomWinner : IWinnable
             && PlayerUtils.GetAllAlivePlayers().Where(p => p.GetMainRole().CampType != CampType.Crewmate)
                 .Select(p => p.GetMainRole()).Where(role => role.CanKill).ToArray().Length <= 0)
         {
-            data.GameOverReason = taskComplete ? GameOverReason.HumansByTask : GameOverReason.HumansByVote;
+            data.GameOverReason = taskComplete ? GameOverReason.CrewmatesByTask : GameOverReason.CrewmatesByVote;
             data.WinnableCampType = CampType.Crewmate;
             data.WinnablePlayers.AddRange(PlayerUtils.AllCrewmates.Select(p => p.Data));
             data.WinText = LanguageConfig.Instance.CrewmatesWinText;

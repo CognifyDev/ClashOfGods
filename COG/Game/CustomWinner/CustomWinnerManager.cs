@@ -76,7 +76,7 @@ public class CustomWinnerManager
                 // 多阵营胜利的特殊处理
                 WinnableData.WinColor = Color.white;
                 WinnableData.WinnableCampType = CampType.Unknown;
-                WinnableData.GameOverReason = GameOverReason.HumansByTask;
+                WinnableData.GameOverReason = GameOverReason.CrewmatesByTask;
                 WinnableData.WinText = string.Join(" ", winTexts);
             }
             return WinnableData; // 高优先级胜利直接返回
