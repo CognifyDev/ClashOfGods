@@ -61,7 +61,9 @@ public static class PresetsButtonsPatch
         void ResetActiveState(PassiveButton button)
         {
             button.SelectButton(false);
-            __instance.ClickPresetButton(RulesPresets.Custom);
+            __instance.ClickPresetButton(RulesPresets.Custom, false);
+            __instance.StandardPresetButton.SelectButton(false);
+            __instance.SecondPresetButton.SelectButton(false);
         }
     }
 

@@ -92,7 +92,7 @@ public static class GameUtils
         return PlayerControl.LocalPlayer.GetMainRole();
     }
 
-    public static NormalGameOptionsV08 GetGameOptions()
+    public static NormalGameOptionsV09 GetGameOptions()
     {
         return GameOptionsManager.Instance.currentNormalGameOptions;
     }

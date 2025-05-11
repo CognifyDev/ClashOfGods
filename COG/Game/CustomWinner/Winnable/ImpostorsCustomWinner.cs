@@ -31,7 +31,7 @@ public class ImpostorsCustomWinner : IWinnable
 
     private static void EndGame(WinnableData data, bool kill)
     {
-        data.GameOverReason = kill ? GameOverReason.ImpostorByKill : GameOverReason.ImpostorBySabotage;
+        data.GameOverReason = kill ? GameOverReason.ImpostorsByKill : GameOverReason.ImpostorsBySabotage;
         data.WinnableCampType = CampType.Impostor;
         data.WinnablePlayers.AddRange(PlayerUtils.AllImpostors.Select(pr => pr.Data));
         data.WinText = LanguageConfig.Instance.ImpostorsWinText;

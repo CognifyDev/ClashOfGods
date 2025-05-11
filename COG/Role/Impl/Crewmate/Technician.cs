@@ -111,7 +111,7 @@ public class Technician : CustomRole, IListener
         ship.UpdateSystem(SystemTypes.Comms, PlayerControl.LocalPlayer, 16 | 0);
         ship.UpdateSystem(SystemTypes.Comms, PlayerControl.LocalPlayer, 16 | 1);
 
-        if (mapId != MapNames.Mira)
+        if (mapId != MapNames.MiraHQ)
             ship.AllDoors.ForEach(d => d.SetDoorway(true));
 
         if (mapId == MapNames.Fungle)

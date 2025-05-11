@@ -79,7 +79,6 @@ internal class PlayerShapeShiftPatch
 internal class HostStartPatch
 {
     public static float Timer = 600;
-    private static string _currentText = "";
     private static bool _update;
 
     public static void Prefix(GameStartManager __instance)
