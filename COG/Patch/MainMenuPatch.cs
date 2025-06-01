@@ -43,21 +43,21 @@ public static class MainMenuPatch
             LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); },
             Color.gray);
 
-        if (!VersionInfo.Empty.Equals(ModUpdater.LatestVersion) || 
-            (ModUpdater.LatestVersion != null && !ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo)))
-            CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
-                LanguageConfig.Instance.UpdateButtonString, () =>
-                {
-                    var result = SystemUtils.OpenMessageBox(
-                        LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion!.ToString(),
-                            ModUpdater.LatestDescription), "Update COG",
-                        MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
+        //if (!VersionInfo.Empty.Equals(ModUpdater.LatestVersion) || 
+        //    (ModUpdater.LatestVersion != null && !ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo)))
+        //    CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
+        //        LanguageConfig.Instance.UpdateButtonString, () =>
+        //        {
+        //            var result = SystemUtils.OpenMessageBox(
+        //                LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion!.ToString(),
+        //                    ModUpdater.LatestDescription), "Update COG",
+        //                MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
 
-                    if (result is MessageBoxDialogue.ClickedButton.IDNO) return;
+        //            if (result is MessageBoxDialogue.ClickedButton.IDNO) return;
 
-                    ModUpdater.DoUpdate();
-                    Application.Quit();
-                }, Color.yellow);
+        //            ModUpdater.DoUpdate();
+        //            Application.Quit();
+        //        }, Color.yellow);
     }
 
     /// <summary>
