@@ -96,6 +96,10 @@ public partial class Main : BasePlugin
                 ConfigBase.AutoReplace = false;
         }
 
+        // Read configs by calling static constructors
+        _ = SettingsConfig.Instance;
+        _ = ButtonHotkeyConfig.Instance;
+
         File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
 
         /*
@@ -167,10 +171,6 @@ public partial class Main : BasePlugin
             new Guesser(),
             new SpeedBooster()
         });
-        
-        // Read configs by calling static constructors
-        _ = SettingsConfig.Instance;
-        _ = ButtonHotkeyConfig.Instance;
 
         // Register mod options
         ModOptionManager.GetManager().RegisterModOptions(new ModOption[]
