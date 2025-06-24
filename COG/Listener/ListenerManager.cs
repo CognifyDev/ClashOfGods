@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using COG.Listener.Event;
+using COG.Role;
 using COG.Utils;
 
 namespace COG.Listener;
@@ -123,6 +124,11 @@ public class ListenerManager
             var handler = _handlers[i];
             if (!type.Equals(handler.EventHandlerType) ||
                 !handler.EventType.IsInstanceOfType(@event)) continue;
+
+            var attr = handler.Method.GetCustomAttribute<OnlyLocalPlayerInvokableAttribute>();
+            if (attr != null && handler.Listener is CustomRole role)
+                if (!role.IsLocalPlayerRole())
+                    continue;
 
             var returnType = handler.Method.ReturnType;
             var result = handler.Method.Invoke(handler.Listener, new object?[] { @event });

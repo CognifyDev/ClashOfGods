@@ -134,39 +134,12 @@ public class GameListener : IListener
             }
         }
 
-        if (PlayerControl.LocalPlayer.IsSamePlayer(player))
-        {
-            var playerRole = player.GetPlayerData();
-            if (playerRole is null || playerRole.MainRole is null) return;
+        var playersToDisplayInfo = new List<PlayerControl>() { PlayerControl.LocalPlayer };
 
-            var subRoles = playerRole.SubRoles;
-            var mainRole = playerRole.MainRole;
-            var nameText = player.cosmetics.nameText;
-            nameText.color = mainRole.Color;
+        if (!PlayerControl.LocalPlayer.IsAlive())
+            playersToDisplayInfo = PlayerControl.AllPlayerControls.ToArray().ToList();
 
-            var nameTextBuilder = new StringBuilder();
-            var subRoleNameBuilder = new StringBuilder();
-
-            if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
-                foreach (var role in subRoles)
-                    subRoleNameBuilder.Append(' ').Append(role.GetColorName());
-
-            nameTextBuilder.Append(mainRole.Name)
-                .Append(subRoleNameBuilder)
-                .Append('\n').Append(player.Data.PlayerName);
-
-            var adtnalTextBuilder = new StringBuilder();
-            foreach (var (color, text) in subRoles.ToList()
-                         .Select(r => (
-                             r.Color,
-                             r.HandleAdditionalPlayerName()
-                         )))
-                adtnalTextBuilder.Append(' ').Append(text.Color(color));
-
-            nameTextBuilder.Append(adtnalTextBuilder);
-
-            nameText.text = nameTextBuilder + adtnalTextBuilder.ToString();
-        }
+        playersToDisplayInfo.ForEach(p => p.DisplayPlayerInfoOnName());
     }
 
     public class PlayerGetter : IGetter<PlayerControl>

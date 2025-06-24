@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using GameStates = COG.States.GameStates;
 
@@ -524,6 +525,40 @@ public static class PlayerUtils
         pc.MurderPlayer(target, SucceededFlags);
         RpcUtils.StartRpcImmediately(pc, KnownRpc.MurderAndModifyKillAnimation)
             .WriteNetObject(target).WriteNetObject(toShowAsKiller).Finish();
+    }
+
+    public static void DisplayPlayerInfoOnName(this PlayerControl player)
+    {
+        var playerRole = player.GetPlayerData();
+        if (playerRole is null || playerRole.MainRole is null) return;
+
+        var subRoles = playerRole.SubRoles;
+        var mainRole = playerRole.MainRole;
+        var nameText = player.cosmetics.nameText;
+        nameText.color = mainRole.Color;
+
+        var nameTextBuilder = new StringBuilder();
+        var subRoleNameBuilder = new StringBuilder();
+
+        if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
+            foreach (var role in subRoles)
+                subRoleNameBuilder.Append(' ').Append(role.GetColorName());
+
+        nameTextBuilder.Append(mainRole.Name)
+            .Append(subRoleNameBuilder)
+            .Append('\n').Append(player.Data.PlayerName);
+
+        var adtnalTextBuilder = new StringBuilder();
+        foreach (var (color, text) in subRoles.ToList()
+                     .Select(r => (
+                         r.Color,
+                         r.HandleAdditionalPlayerName(player)
+                     )))
+            adtnalTextBuilder.Append(' ').Append(text.Color(color));
+
+        nameTextBuilder.Append(adtnalTextBuilder);
+
+        nameText.text = nameTextBuilder + adtnalTextBuilder.ToString();
     }
 }
 

@@ -286,7 +286,7 @@ public class CustomRole
         return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.PlayerName, sb.ToString());
     }
 
-    public virtual string HandleAdditionalPlayerName()
+    public virtual string HandleAdditionalPlayerName(PlayerControl player)
     {
         return "";
     }
@@ -325,6 +325,11 @@ public class CustomRole
     {
         ClearRoleGameData();
     }
+}
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+public sealed class OnlyLocalPlayerInvokableAttribute : Attribute
+{
 }
 
 #pragma warning restore CS0659
