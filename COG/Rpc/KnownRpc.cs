@@ -14,5 +14,6 @@ public enum KnownRpc : uint
     ClearSabotages,
     ShareWinners,
     KillPlayerCompletely,
-    MurderAndModifyKillAnimation
+    MurderAndModifyKillAnimation,
+    ShareAbilityOrVentUseForInspector
 }

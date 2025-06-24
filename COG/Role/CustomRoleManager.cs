@@ -12,8 +12,6 @@ public class CustomRoleManager
 
     private readonly List<CustomRole> _roles = new();
 
-    public bool ReloadingRoles { get; private set; } = false;
-
     public CustomRole[] GetTypeCampRoles(CampType campType)
     {
         return _roles.Where(role => role.CampType == campType).ToArray();

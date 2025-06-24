@@ -5,7 +5,7 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Crewmate : CustomRole
 {
-    public Crewmate() : base(Color.white, CampType.Crewmate, false, false)
+    public Crewmate() : base(Palette.CrewmateBlue, CampType.Crewmate, false, false)
     {
         IsBaseRole = true;
     }

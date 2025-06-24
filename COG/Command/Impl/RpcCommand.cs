@@ -11,6 +11,7 @@ namespace COG.Command.Impl;
 public class RpcCommand : CommandBase
 {
     private RpcUtils.RpcWriter? _writer;
+    private byte _current;
 
     public RpcCommand() : base("rpc")
     {
@@ -31,6 +32,7 @@ public class RpcCommand : CommandBase
                     var value = args[1];
                     if (int.TryParse(value, out var result))
                     {
+                        _current = (byte)result;
                         if (Enum.IsDefined((RpcCalls)result))
                             _writer = RpcUtils.StartRpcImmediately(player, (RpcCalls)result);
                         else if (Enum.IsDefined((KnownRpc)result))
@@ -68,7 +70,7 @@ public class RpcCommand : CommandBase
                     var typeName = args[1];
                     if (string.IsNullOrEmpty(typeName) || _writer == null)
                         throw new NullReferenceException(
-                            "You haven't started a RpcWriter instance yet or the name of the type you entered is null. (Normally, the second situation won't be happened.)");
+                            "You haven't started a RpcWriter instance yet or the name of the type you entered is null. (Normally, the second situation won't occur.)");
 
                     List<(string, string)> nameToClass = new()
                     {
@@ -79,6 +81,7 @@ public class RpcCommand : CommandBase
                         ("ulong", "UInt64"),
                         ("float", "Single")
                     };
+
                     if (typeName is not ("player" or "string" or "vector"))
                     {
                         typeName = typeName[0].ToString().ToUpper() + typeName[1..];
@@ -128,8 +131,8 @@ public class RpcCommand : CommandBase
 
                                 if (!pc) throw new NullReferenceException("Error getting player to write.");
                                 _writer.WriteNetObject(pc!);
-                            }
                                 break;
+                            }
                             case "string":
                             {
                                 List<string> strList = new(args);
@@ -144,8 +147,8 @@ public class RpcCommand : CommandBase
                                 }
 
                                 _writer.Write(sb.ToString());
-                            }
                                 break;
+                            }
                             case "vector":
                             {
                                 var (xStr, yStr) = (args[2], args[3]);
@@ -155,27 +158,32 @@ public class RpcCommand : CommandBase
                                     _writer.WriteVector2(new Vector2(x, y));
                                 else
                                     throw new InvalidCastException("The position of the vector is invalid.");
+                                    break;
                             }
-                                break;
                         }
                     }
 
                     GameUtils.SendSystemMessage("写入成功！");
-                }
                     break;
+                }
                 case "send":
                 {
                     if (_writer == null) throw new NullReferenceException("Writer is null.");
                     _writer.Finish();
                     _writer = null;
+
+                    var reader = new MessageReader();
+                    _writer!.GetWriters().First().Buffer.CopyTo(reader.Buffer, 0);
+                    PlayerControl.LocalPlayer.HandleRpc(_current, reader);
+
                     GameUtils.SendSystemMessage("Rpc已发送！");
-                }
                     break;
+                }
                 case "close":
                 {
                     _writer = null;
-                }
                     break;
+                }
             }
         }
         catch (System.Exception e)

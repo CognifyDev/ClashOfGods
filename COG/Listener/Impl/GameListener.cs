@@ -47,7 +47,7 @@ public class GameListener : IListener
                 // 清除原列表，防止干扰
                 GameUtils.PlayerData.Clear();
                 // 开始读入数据
-                Main.Logger.LogDebug("The role data from the host was received by us.");
+                Main.Logger.LogDebug("The role data from the host has been received.");
 
                 var count = reader.ReadPackedInt32();
 

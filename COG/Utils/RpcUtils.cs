@@ -20,6 +20,18 @@ public abstract class RpcUtils
         return StartRpcImmediately(playerControl, (byte)callId, targets);
     }
 
+    public static RpcWriter StartRpcImmediately(KnownRpc callId,
+        PlayerControl[]? targets = null)
+    {
+        return StartRpcImmediately(PlayerControl.LocalPlayer, (byte)callId, targets);
+    }
+
+    public static RpcWriter StartRpcImmediately(RpcCalls callId,
+        PlayerControl[]? targets = null)
+    {
+        return StartRpcImmediately(PlayerControl.LocalPlayer, (byte)callId, targets);
+    }
+
     public static RpcWriter StartRpcImmediately(PlayerControl playerControl, byte callId,
         PlayerControl[]? targets = null)
     {
@@ -34,6 +46,19 @@ public abstract class RpcUtils
 
         return new RpcWriter(writers.ToArray());
     }
+
+    public static void StartAndSendRpc(PlayerControl player, KnownRpc rpc, PlayerControl[]? targets = null)
+        => StartRpcImmediately(player, rpc, targets).Finish();
+
+    public static void StartAndSendRpc(PlayerControl player, RpcCalls rpc, PlayerControl[]? targets = null)
+        => StartRpcImmediately(player, rpc, targets).Finish();
+
+    public static void StartAndSendRpc(KnownRpc rpc, PlayerControl[]? targets = null)
+        => StartRpcImmediately(rpc, targets).Finish();
+
+    public static void StartAndSendRpc(RpcCalls rpc, PlayerControl[]? targets = null)
+        => StartRpcImmediately(rpc, targets).Finish();
+
 
     public class RpcWriter
     {
@@ -127,5 +152,7 @@ public abstract class RpcUtils
         {
             foreach (var messageWriter in _writers) AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
         }
+
+        public MessageWriter[] GetWriters() => _writers;
     }
 }

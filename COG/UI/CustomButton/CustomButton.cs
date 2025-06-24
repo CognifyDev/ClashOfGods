@@ -194,7 +194,7 @@ public class CustomButton
     public void Update()
     {
         var hasButton = !GameStates.IsMeeting && PlayerControl.LocalPlayer.IsAlive() &&
-                        HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
+                        HasButton.GetInvocationList().All(d => d.DynamicInvoke() == (object)true);
         var isCoolingDown = Timer > 0f;
 
         var hotkeyText = string.Empty;

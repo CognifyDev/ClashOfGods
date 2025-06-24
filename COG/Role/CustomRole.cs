@@ -188,6 +188,8 @@ public class CustomRole
         }
     }
 
+    public static Action<CustomRole> OnRoleAbilityUsed { get; set; } = (_) => { };
+
     public bool IsAvailable()
     {
         if (!Enabled || IsBaseRole || !ShowInOptions) return false;
@@ -206,7 +208,7 @@ public class CustomRole
     public virtual string GetNameInConfig() => GetType().Name.ToLower();
 
     public ReadOnlyCollection<PlayerControl> Players =>
-        new(GameUtils.PlayerData.Where(pr => pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
+        new(GameUtils.PlayerData.Where(pr => !pr.IsDisconnected && pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
 
     public List<CustomOption> AllOptions { get; internal set; }
 
@@ -226,8 +228,6 @@ public class CustomRole
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
-        if (CustomRoleManager.GetManager().ReloadingRoles)
-            return AllOptions.FirstOrDefault(o => o.Name() == nameGetter() && o.ValueRule.Equals(rule))!;
         var option = CustomOption.Of(GetTabType(this), nameGetter, rule).Register();
         AllOptions.Add(option);
         return option;
@@ -241,6 +241,11 @@ public class CustomRole
     public bool IsLocalPlayerRole(PlayerControl target)
     {
         return PlayerControl.LocalPlayer.IsSamePlayer(target) && target.IsRole(this);
+    }
+
+    public bool IsLocalPlayerRole()
+    {
+        return PlayerControl.LocalPlayer.IsRole(this);
     }
 
     protected CustomOption CreateOptionWithoutRegister(Func<string> nameGetter, IValueRule rule)
@@ -259,9 +264,13 @@ public class CustomRole
     {
         hasButton ??= () => PlayerControl.LocalPlayer.IsRole(this);
         button.HasButton += hasButton;
+        if (button.HasEffect)
+            button.OnEffect += () => OnRoleAbilityUsed(this);
+        else
+            button.OnClick += () => OnRoleAbilityUsed(this);
+
         CustomButtonManager.GetManager().RegisterCustomButton(button);
-        if (CustomRoleManager.GetManager().ReloadingRoles)
-            CustomButtonManager.GetManager().GetButtons().RemoveAll(AllButtons.Contains);
+
         button.Text = button.Text.Color(Color); // However because of the material of the font, the color string doesnt work
         AllButtons.Add(button);
     }
