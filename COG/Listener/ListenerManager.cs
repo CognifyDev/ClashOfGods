@@ -20,7 +20,7 @@ public class ListenerManager
     private readonly List<Handler> _handlers = new();
 
     /// <summary>
-    ///     Get the instance of listener manager
+    ///     Get the instance of a listener manager
     /// </summary>
     /// <returns>instance</returns>
     public static ListenerManager GetManager()
@@ -56,12 +56,12 @@ public class ListenerManager
     }
 
     /// <summary>
-    ///     Register a listener if it not exists
+    ///     Register a listener if it does not exist
     /// </summary>
     /// <param name="listener">the listener</param>
     public void RegisterListenerIfNotExists(IListener listener)
     {
-        if (!GetHandlers(listener).ToList().IsEmpty()) RegisterListener(listener);
+        if (GetHandlers(listener).ToList().IsEmpty()) RegisterListener(listener);
     }
 
     /// <summary>
