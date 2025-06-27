@@ -9,6 +9,7 @@ namespace COG.Patch;
 static class VanillaKillButtonPatch
 {
     private static bool _isHudActive = true;
+    private static int _remainingUses = -1;
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     [HarmonyPostfix]
@@ -19,11 +20,17 @@ static class VanillaKillButtonPatch
         __instance.Data.Role.CanUseKillButton = true;
 
         var killButton = HudManager.Instance.KillButton;
+
+        if (KillButtonManager.ShouldForceShow() && KillButtonManager.UsesLimit > 0)
+            killButton.SetUsesRemaining(_remainingUses);
+        else
+            killButton.SetInfiniteUses();
+
         killButton.ToggleVisible(KillButtonManager.ShouldForceShow() && _isHudActive);
 
         if (KillButtonManager.NecessaryKillCondition && _isHudActive) // Prevent meeting kill (as we canceled vanilla murder check)
         {
-            if (KillButtonManager.OnlyUsableWhenAlive && !__instance.IsAlive())
+            if ((KillButtonManager.OnlyUsableWhenAlive && !__instance.IsAlive()) || (KillButtonManager.UsesLimit > 0 && _remainingUses <= 0))
             {
                 killButton.SetTarget(null);
                 return;
@@ -31,7 +38,7 @@ static class VanillaKillButtonPatch
 
             __instance.SetKillTimer(__instance.killTimer - Time.fixedDeltaTime); // This needs CanUseKillButton to be true
 
-            if (KillButtonManager.CustomCondition)
+            if (KillButtonManager.CustomCondition())
             {
                 PlayerUtils.CheckClosestTargetInKillDistance(out var player);
                 if (!player) return;
@@ -40,6 +47,30 @@ static class VanillaKillButtonPatch
                 player!.cosmetics.SetOutline(true, new(KillButtonManager.TargetOutlineColor));
             }
         }
+    }
+
+    [HarmonyPatch(typeof(KillButton), nameof(KillButton.DoClick))]
+    [HarmonyPrefix]
+    static bool ClickPatch(KillButton __instance)
+    {
+        if (__instance.isActiveAndEnabled
+            && __instance.currentTarget
+            && !__instance.isCoolingDown
+            && PlayerControl.LocalPlayer.CanMove)
+        {
+            if (KillButtonManager.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())
+                return false;
+
+            PlayerControl.LocalPlayer.CmdCheckMurder(__instance.currentTarget);
+            __instance.SetTarget(null);
+
+            if (KillButtonManager.UsesLimit > 0)
+                _remainingUses--;
+
+            KillButtonManager.AfterClick();
+        }
+
+        return false;
     }
 
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.SetHudActive), new Type[] { typeof(PlayerControl), typeof(RoleBehaviour), typeof(bool) })]
