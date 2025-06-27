@@ -6,6 +6,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
+using Il2CppInterop.Runtime;
 using InnerNet;
 using System;
 using System.Collections.Generic;
@@ -26,9 +27,8 @@ public enum ColorType
 
 public static class PlayerUtils
 {
-    public static readonly int Outline = Shader.PropertyToID("_Outline");
-    public static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
-    public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
+    public static PoolablePlayer PoolablePlayerPrefab 
+            => Resources.FindObjectsOfTypeAll(Il2CppType.Of<PoolablePlayer>()).First().Cast<PoolablePlayer>();
 
     public static IEnumerable<PlayerData> AllImpostors =>
         GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Impostor);
@@ -47,7 +47,7 @@ public static class PlayerUtils
     /// <param name="closestDistance">限制距离</param>
     /// <returns>最近位置的玩家</returns>
     public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true,
-        float closestDistance = float.MaxValue)
+        float closestDistance = float.PositiveInfinity)
     {
         var targetLocation = target.GetTruePosition();
         var players = mustAlive ? GetAllAlivePlayers() : GetAllPlayers();
@@ -56,7 +56,7 @@ public static class PlayerUtils
 
         foreach (var player in players)
         {
-            if (player == target) continue;
+            if (player.IsSamePlayer(target)) continue;
 
             var playerLocation = player.GetTruePosition();
             var distance = Vector2.Distance(targetLocation, playerLocation);
@@ -71,22 +71,23 @@ public static class PlayerUtils
 
     public const MurderResultFlags SucceededFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
 
-    public static void RpcAdvancedMurderPlayer(this PlayerControl killer, PlayerControl target)
-    {
-        if (target == null)
-        {
-            target = killer;
-        }
+    // Whats this method for??
+    //public static void RpcAdvancedMurderPlayer(this PlayerControl killer, PlayerControl target)
+    //{
+    //    if (target == null)
+    //    {
+    //        target = killer;
+    //    }
 
-        if (AmongUsClient.Instance.AmClient)
-        {
-            killer.MurderPlayer(target, SucceededFlags);
-        }
-        var messageWriter = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.None);
-        messageWriter.WriteNetObject(target);
-        messageWriter.Write((int)SucceededFlags);
-        AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
-    }
+    //    if (AmongUsClient.Instance.AmClient)
+    //    {
+    //        killer.MurderPlayer(target, SucceededFlags);
+    //    }
+    //    var messageWriter = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.None);
+    //    messageWriter.WriteNetObject(target);
+    //    messageWriter.Write((int)SucceededFlags);
+    //    AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+    //}
 
     /// <summary>
     /// 杀死一个玩家不留下鸡腿
@@ -161,15 +162,13 @@ public static class PlayerUtils
 
     public static bool IsSamePlayer(this PlayerControl? player, PlayerControl? target)
     {
-        if (player == null || target == null) return false;
-        return player.PlayerId == target.PlayerId;
+        if (!(player && target)) return false;
+        return player!.GetInstanceID() == target!.GetInstanceID();
     }
 
     public static DeadBody? GetDeadBody(this PlayerControl target)
     {
-        var deadBodies = DeadBodyUtils.GetDeadBodies().Where(body =>
-            body.GetPlayer().IsSamePlayer(target)).ToList();
-        return deadBodies.Count > 0 ? deadBodies[0] : null;
+        return DeadBodyUtils.GetDeadBodies().FirstOrDefault(db => db.ParentId == target.PlayerId);
     }
 
     public static PlayerData? GetPlayerData(this PlayerControl player)
@@ -411,13 +410,12 @@ public static class PlayerUtils
     /// <param name="color">颜色</param>
     public static void SetOutline(this PlayerControl pc, Color color)
     {
-        pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 1f);
-        pc.cosmetics.currentBodySprite.BodySprite.material.SetColor(OutlineColor, color);
+        pc.cosmetics.SetOutline(true, new(color));
     }
 
     public static void ClearOutline(this PlayerControl pc)
     {
-        pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
+        pc.cosmetics.SetOutline(false, new());
     }
 
     public static bool IsRole<T>(this PlayerControl pc) where T : CustomRole
@@ -460,6 +458,7 @@ public static class PlayerUtils
 
         GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+        pc.Data.Role.CanUseKillButton = role.CanKill;
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }
@@ -559,6 +558,25 @@ public static class PlayerUtils
         nameTextBuilder.Append(adtnalTextBuilder);
 
         nameText.text = nameTextBuilder + adtnalTextBuilder.ToString();
+    }
+
+    /// <summary>
+    /// 检查 <see cref="GetClosestPlayer(PlayerControl, bool, float)"/> 返回的玩家是否在游戏设置击杀距离内
+    /// </summary>
+    /// <param name="closestPlayer"></param>
+    /// <param name="mustAlive"></param>
+    /// <param name="closestDistance"></param>
+    /// <returns></returns>
+    public static bool CheckClosestTargetInKillDistance(out PlayerControl? closestPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
+    {
+        if ((closestPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
+
+        var localPlayer = PlayerControl.LocalPlayer;
+        var localLocation = localPlayer.GetTruePosition();
+        var targetLocation = closestPlayer.GetTruePosition();
+        var distance = Vector2.Distance(localLocation, targetLocation);
+
+        return GameUtils.GetGameOptions().KillDistance >= distance;
     }
 }
 

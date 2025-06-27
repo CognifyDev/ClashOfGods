@@ -382,14 +382,14 @@ public class GameListener : IListener
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnSetUpRoleText(IntroCutsceneShowRoleEvent @event)
     {
-        var intro = @event.IntroCutscene;
+        var intro = @event.IntroCutscene!;
         Main.Logger.LogInfo("Set up role text for the player...");
 
         var myRole = GameUtils.GetLocalPlayerRole();
 
         var list = new List<IEnumerator>
         {
-            Effects.Action((Action)SetupRoles),
+            Effects.Action((Action)SetUpRoles),
             Effects.Wait(2.5f)
         };
 
@@ -407,7 +407,7 @@ public class GameListener : IListener
 
         return false;
 
-        void SetupRoles()
+        void SetUpRoles()
         {
             if (GameOptionsManager.Instance.currentGameMode != GameModes.Normal) return;
             intro.RoleText.text = myRole.Name;
@@ -440,14 +440,6 @@ public class GameListener : IListener
             transform.localScale = new Vector3(1f, 1f, 1f);
             intro.ourCrewmate.ToggleName(false);
         }
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnIntroDestroy(IntroCutsceneDestroyEvent @event)
-    {
-        var intro = @event.IntroCutscene;
-        PlayerUtils.PoolablePlayerPrefab = Object.Instantiate(intro.PlayerPrefab);
-        PlayerUtils.PoolablePlayerPrefab.gameObject.SetActive(false);
     }
 
     [EventHandler(EventHandlerType.Prefix)]

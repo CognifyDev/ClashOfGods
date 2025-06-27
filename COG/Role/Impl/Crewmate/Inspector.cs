@@ -46,17 +46,9 @@ public class Inspector : CustomRole, IListener
             },
             () =>
             {
-                if (_abilityUsedThisRound) return false;
-
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return false;
-
-                var localPlayer = PlayerControl.LocalPlayer;
-                var localLocation = localPlayer.GetTruePosition();
-                var targetLocation = target.GetTruePosition();
-                var distance = Vector2.Distance(localLocation, targetLocation);
-
-                return GameUtils.GetGameOptions().KillDistance >= distance;
+                if (_abilityUsedThisRound) 
+                    return false;
+                return PlayerUtils.CheckClosestTargetInKillDistance(out _);
             },
             () => true,
             null!,

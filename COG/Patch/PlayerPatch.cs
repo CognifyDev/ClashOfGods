@@ -35,15 +35,26 @@ internal class PlayerKillPatch
 {
     [HarmonyPatch(nameof(PlayerControl.CheckMurder))]
     [HarmonyPrefix]
-    public static bool CheckMurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
+    public static bool CheckMurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
-        return ListenerManager.GetManager()
+        var executeOrigin =  ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Prefix);
+
+        if (!target)
+        {
+            Main.Logger.LogError("Bad kill check with null target");
+            return false;
+        }
+
+        if (executeOrigin)
+            __instance.RpcMurderPlayer(target, true);
+
+        return false; // Always skip vanilla kill check
     }
 
     [HarmonyPatch(nameof(PlayerControl.MurderPlayer))]
     [HarmonyPostfix]
-    public static void MurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
+    public static void MurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Postfix);

@@ -24,31 +24,19 @@ public class Sheriff : CustomRole, IListener
             "sheriff-kill",
             () =>
             {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (!target) return;
-
                 var localData = PlayerControl.LocalPlayer.Data;
-                if (target!.GetMainRole().CampType != CampType.Crewmate)
+                if (_currentTarget!.GetMainRole().CampType != CampType.Crewmate)
                 {
-                    PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
+                    PlayerControl.LocalPlayer.CmdCheckMurder(_currentTarget);
                 }
                 else
                 {
                     _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Misfire, localData, localData);
-                    PlayerControl.LocalPlayer.RpcMurderPlayer(PlayerControl.LocalPlayer, true);
+                    PlayerControl.LocalPlayer.CmdCheckMurder(PlayerControl.LocalPlayer);
                 }
             },
             () => SheriffKillButton?.ResetCooldown(),
-            () =>
-            {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return false;
-                var localPlayer = PlayerControl.LocalPlayer;
-                var localLocation = localPlayer.GetTruePosition();
-                var targetLocation = target.GetTruePosition();
-                var distance = Vector2.Distance(localLocation, targetLocation);
-                return GameUtils.GetGameOptions().KillDistance >= distance;
-            },
+            () => PlayerUtils.CheckClosestTargetInKillDistance(out _currentTarget),
             () => true,
             ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
             2,
@@ -63,4 +51,6 @@ public class Sheriff : CustomRole, IListener
 
     private CustomOption SheriffKillCd { get; }
     private CustomButton SheriffKillButton { get; }
+
+    private PlayerControl? _currentTarget;
 }
