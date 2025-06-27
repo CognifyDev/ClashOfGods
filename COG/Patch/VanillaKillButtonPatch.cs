@@ -64,8 +64,7 @@ static class VanillaKillButtonPatch
             PlayerControl.LocalPlayer.CmdCheckMurder(__instance.currentTarget);
             __instance.SetTarget(null);
 
-            if (KillButtonManager.CustomCooldown > 0)
-                PlayerControl.LocalPlayer.SetKillTimer(KillButtonManager.CustomCooldown);
+            KillButtonManager.ResetCooldown();
 
             if (KillButtonManager.UsesLimit > 0)
                 _remainingUses--;

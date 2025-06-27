@@ -36,6 +36,13 @@ public static class KillButtonManager
     public static void AfterClick() => _afterClick.GetInvocationList().Do(dg => dg.DynamicInvoke());
     public static void AddAfterClick(Action action) => _afterClick += action;
 
+    public static void ResetCooldown()
+    {
+        PlayerControl.LocalPlayer.SetKillTimer(CustomCooldown < 0
+                            ? GameManager.Instance.LogicOptions.GetKillCooldown()
+                            : CustomCooldown);
+    }
+
     public static void ClearAll()
     {
         OnlyUsableWhenAlive = true;
