@@ -505,22 +505,16 @@ public class GameListener : IListener
         var manager = @event.Manager;
         var role = GameUtils.GetLocalPlayerRole();
 
-        manager.KillButton.SetDisabled();
-        manager.KillButton.ToggleVisible(false);
-        manager.KillButton.gameObject.SetActive(false);
-
         if (!role.CanVent)
         {
             manager.ImpostorVentButton.SetDisabled();
             manager.ImpostorVentButton.ToggleVisible(false);
-            manager.ImpostorVentButton.gameObject.SetActive(false);
         }
 
         if (!role.CanSabotage)
         {
             manager.SabotageButton.SetDisabled();
             manager.SabotageButton.ToggleVisible(false);
-            manager.SabotageButton.gameObject.SetActive(false);
         }
 
         Arrow.CreatedArrows.RemoveAll(a => !a.ArrowObject);

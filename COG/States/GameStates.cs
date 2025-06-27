@@ -1,4 +1,5 @@
 using COG.Role;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 
 namespace COG.States;
@@ -22,6 +23,7 @@ public static class GameStates
             Main.Logger.LogMessage($"{nameof(GameStates)}::{nameof(_inRealGame)} being set to {value}. Clearing role data...");
 
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
+            KillButtonManager.ClearAll();
             
             _inRealGame = value;
 

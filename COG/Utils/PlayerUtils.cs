@@ -6,6 +6,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
+using COG.UI.Vanilla.KillButton;
 using Il2CppInterop.Runtime;
 using InnerNet;
 using System;
@@ -30,14 +31,14 @@ public static class PlayerUtils
     public static PoolablePlayer PoolablePlayerPrefab 
             => Resources.FindObjectsOfTypeAll(Il2CppType.Of<PoolablePlayer>()).First().Cast<PoolablePlayer>();
 
-    public static IEnumerable<PlayerData> AllImpostors =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Impostor);
+    public static IEnumerable<PlayerData> AllImpostors => GetPlayersByCamp(CampType.Impostor);
 
-    public static IEnumerable<PlayerData> AllCrewmates =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Crewmate);
+    public static IEnumerable<PlayerData> AllCrewmates => GetPlayersByCamp(CampType.Crewmate);
 
-    public static IEnumerable<PlayerData> AllNeutrals =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Neutral);
+    public static IEnumerable<PlayerData> AllNeutrals => GetPlayersByCamp(CampType.Neutral);
+    
+    public static IEnumerable<PlayerData> GetPlayersByCamp(CampType camp)
+        => GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == camp);
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家
@@ -458,7 +459,10 @@ public static class PlayerUtils
 
         GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+
         pc.Data.Role.CanUseKillButton = role.CanKill;
+        KillButtonManager.ClearAll();
+        KillButtonManager.OverrideSetting(role.KillButtonSetting);
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }
@@ -563,20 +567,24 @@ public static class PlayerUtils
     /// <summary>
     /// 检查 <see cref="GetClosestPlayer(PlayerControl, bool, float)"/> 返回的玩家是否在游戏设置击杀距离内
     /// </summary>
-    /// <param name="closestPlayer"></param>
+    /// <param name="closestValidPlayer"></param>
     /// <param name="mustAlive"></param>
     /// <param name="closestDistance"></param>
     /// <returns></returns>
-    public static bool CheckClosestTargetInKillDistance(out PlayerControl? closestPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
+    public static bool CheckClosestTargetInKillDistance(out PlayerControl? closestValidPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
     {
-        if ((closestPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
+        if ((closestValidPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
 
         var localPlayer = PlayerControl.LocalPlayer;
         var localLocation = localPlayer.GetTruePosition();
-        var targetLocation = closestPlayer.GetTruePosition();
+        var targetLocation = closestValidPlayer.GetTruePosition();
         var distance = Vector2.Distance(localLocation, targetLocation);
+        var valid = GameUtils.GetGameOptions().KillDistance >= distance;
 
-        return GameUtils.GetGameOptions().KillDistance >= distance;
+        if (!valid)
+            closestValidPlayer = null;
+
+        return valid;
     }
 }
 

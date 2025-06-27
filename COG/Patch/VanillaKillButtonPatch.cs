@@ -1,3 +1,5 @@
+using COG.Role;
+using COG.States;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using System;
@@ -9,42 +11,41 @@ namespace COG.Patch;
 static class VanillaKillButtonPatch
 {
     private static bool _isHudActive = true;
-    private static int _remainingUses = -1;
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     [HarmonyPostfix]
     static void KillButtonUpdatePatch(PlayerControl __instance)
     {
         if (!__instance.AmOwner) return; // Only local player
+        if (!GameStates.InRealGame) return;
 
         __instance.Data.Role.CanUseKillButton = true;
 
         var killButton = HudManager.Instance.KillButton;
+        var setting = KillButtonManager.GetSetting();
 
-        if (KillButtonManager.ShouldForceShow() && KillButtonManager.UsesLimit > 0)
-            killButton.SetUsesRemaining(_remainingUses);
-        else
-            killButton.SetInfiniteUses();
+        if (KillButtonManager.ShouldForceShow() && setting.UsesLimit > 0)
+            killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) + $" ({setting.RemainingUses})");
 
         killButton.ToggleVisible(KillButtonManager.ShouldForceShow() && _isHudActive);
 
         if (KillButtonManager.NecessaryKillCondition && _isHudActive) // Prevent meeting kill (as we canceled vanilla murder check)
         {
-            if ((KillButtonManager.OnlyUsableWhenAlive && !__instance.IsAlive()) || (KillButtonManager.UsesLimit > 0 && _remainingUses <= 0))
+            if ((setting.OnlyUsableWhenAlive && !__instance.IsAlive()) || (setting.UsesLimit > 0 && setting.RemainingUses <= 0))
             {
                 killButton.SetTarget(null);
                 return;
             }
 
-            __instance.SetKillTimer(__instance.killTimer - Time.fixedDeltaTime); // This needs CanUseKillButton to be true
+            __instance.SetKillTimer(__instance.killTimer - Time.fixedDeltaTime); // This requires CanUseKillButton to be true
 
-            if (KillButtonManager.CustomCondition())
+            if (setting.CustomCondition())
             {
                 PlayerUtils.CheckClosestTargetInKillDistance(out var player);
                 if (!player) return;
 
                 killButton.SetTarget(player);
-                player!.cosmetics.SetOutline(true, new(KillButtonManager.TargetOutlineColor));
+                player!.cosmetics.SetOutline(true, new(setting.TargetOutlineColor));
             }
         }
     }
@@ -58,16 +59,20 @@ static class VanillaKillButtonPatch
             && !__instance.isCoolingDown
             && PlayerControl.LocalPlayer.CanMove)
         {
-            if (KillButtonManager.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())
+            var setting = KillButtonManager.GetSetting();
+
+            if (setting.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())
                 return false;
 
             PlayerControl.LocalPlayer.CmdCheckMurder(__instance.currentTarget);
             __instance.SetTarget(null);
 
-            if (KillButtonManager.UsesLimit > 0)
-                _remainingUses--;
+            KillButtonManager.ResetCooldown();
 
-            KillButtonManager.AfterClick();
+            if (setting.UsesLimit > 0)
+                setting.RemainingUses--;
+
+            setting.AfterClick();
         }
 
         return false;

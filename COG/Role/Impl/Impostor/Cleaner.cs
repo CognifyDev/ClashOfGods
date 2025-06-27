@@ -5,6 +5,7 @@ using COG.Listener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ public class Cleaner : CustomRole, IListener
                 var body = PlayerUtils.GetClosestBody();
                 if (!body) return;
                 body!.RpcCleanDeadBody();
-                ButtonConstant.KillButton.ResetCooldown();
+                KillButtonManager.ResetCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
             () => PlayerUtils.GetClosestBody() != null,
