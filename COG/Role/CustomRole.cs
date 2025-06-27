@@ -12,6 +12,7 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using UnityEngine;
 using Random = System.Random;
@@ -40,10 +41,13 @@ public class CustomRole
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
         CanSabotage = campType == CampType.Impostor;
-        Id = _order;
-        _order++;
+        Id = _order++;
         ShowInOptions = showInOptions;
         AllOptions = new List<CustomOption>();
+        KillButtonSetting = new()
+        {
+            ForceShow = () => CanKill
+        };
         
         Name = GetContextFromLanguage("name");
         ShortDescription = GetContextFromLanguage("description");
@@ -225,6 +229,8 @@ public class CustomRole
         AllGameSettings = RoleOptions.Select(o => o.ToVanillaOptionData()).ToList().ToIl2CppList(),
         Role = VanillaRole
     };
+
+    public KillButtonSetting KillButtonSetting { get; }
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {

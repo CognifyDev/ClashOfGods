@@ -19,7 +19,6 @@ static class VanillaKillButtonPatch
     {
         if (!__instance.AmOwner) return; // Only local player
         if (!GameStates.InRealGame) return;
-        if (__instance.GetMainRole().CampType != CampType.Impostor) return; // Not for impostor
 
         __instance.Data.Role.CanUseKillButton = true;
 
@@ -41,7 +40,7 @@ static class VanillaKillButtonPatch
 
             __instance.SetKillTimer(__instance.killTimer - Time.fixedDeltaTime); // This requires CanUseKillButton to be true
 
-            if (KillButtonManager.CustomCondition())
+            if (setting.CustomCondition())
             {
                 PlayerUtils.CheckClosestTargetInKillDistance(out var player);
                 if (!player) return;
@@ -74,7 +73,7 @@ static class VanillaKillButtonPatch
             if (setting.UsesLimit > 0)
                 _remainingUses--;
 
-            KillButtonManager.AfterClick();
+            setting.AfterClick();
         }
 
         return false;

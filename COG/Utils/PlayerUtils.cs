@@ -462,8 +462,7 @@ public static class PlayerUtils
 
         pc.Data.Role.CanUseKillButton = role.CanKill;
         KillButtonManager.ClearAll();
-        if (role is { CampType: not CampType.Impostor, CanKill: true }) 
-            KillButtonManager.ToggleForceVisible(true);
+        KillButtonManager.OverrideSetting(role.KillButtonSetting);
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }
