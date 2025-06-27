@@ -17,8 +17,6 @@ namespace COG.Role.Impl.Crewmate;
 public class SoulHunter : CustomRole, IListener
 {
     private const string HasRevivedTag = "hasRevived_SoulHunter";
-    
-    private readonly CustomButton _killButton;
 
     private Vector3? _position;
     
@@ -31,31 +29,11 @@ public class SoulHunter : CustomRole, IListener
             new FloatOptionValueRule(1F, 1F, 60F, 5F, NumberSuffixes.Seconds));
         SoulHunterKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
             new FloatOptionValueRule(1F, 1F, 60F, 20F, NumberSuffixes.Seconds));
-        
-        _killButton = CustomButton.Of(
-            "soul-hunter-kill",
-            () =>
-            {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return;
-                PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
-                _killButton!.UsesRemaining --;
-            },
-            () => _killButton!.ResetCooldown(),
-            () => 
-                PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance)
-            && _killButton!.UsesRemaining > 0,
-            () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
-            2,
-            KeyCode.Q,
-            LanguageConfig.Instance.KillAction,
-            () => SoulHunterKillCd.GetFloat(),
-            0);
 
-        _killButton.UsesRemaining = 1;
-        
-        AddButton(_killButton);
+        CanKill = true;
+
+        KillButtonSetting.UsesLimit = 1;
+        KillButtonSetting.CustomCooldown = SoulHunterKillCd.GetFloat;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -63,8 +41,10 @@ public class SoulHunter : CustomRole, IListener
     {
         if (!GameStates.InRealGame) return;
         var target = @event.Target;
+
         if (!IsLocalPlayerRole(target)) return;
         if (target.HasMarkAs(HasRevivedTag)) return;
+
         _position = target.transform.position;
         Coroutines.Start(Revive());
         return;
@@ -72,30 +52,26 @@ public class SoulHunter : CustomRole, IListener
         IEnumerator Revive()
         {
             yield return new WaitForSeconds(ReviveAfter.GetFloat());
+
             var deadBody = target.GetDeadBody();
+
             if (deadBody != null)
-            {
                 deadBody.RpcCleanDeadBody();
-            }
             else
-            {
                 yield break;
-            }
+            
 
             if (GameStates.IsMeeting)
-            {
                 yield break;
-            }
+            
             
             if (_position != null)
-            {
                 target.transform.position = (Vector3) _position;
-            }
-            target.RpcSetRole(BaseRoleType);
+            
             target.RpcSetCustomRole(this);
             target.RpcRevive();
             target.RpcMark(HasRevivedTag);
-            _killButton.UsesRemaining ++;
+            KillButtonSetting.RemainingUses++;
         }
     }
 

@@ -39,15 +39,14 @@ public static class KillButtonManager
         });
     }
 
-
     /// <summary>
     /// 重置冷却
     /// </summary>
     public static void ResetCooldown()
     {
-        PlayerControl.LocalPlayer.SetKillTimer(_setting.CustomCooldown < 0
+        PlayerControl.LocalPlayer.SetKillTimer(_setting.CustomCooldown() < 0
                             ? GameManager.Instance.LogicOptions.GetKillCooldown()
-                            : _setting.CustomCooldown);
+                            : _setting.CustomCooldown());
     }
 
     public static KillButtonSetting GetSetting() => _setting;
@@ -65,6 +64,8 @@ public static class KillButtonManager
             else
                 ResetCooldown();
         }
+
+        setting.RemainingUses = setting.UsesLimit;
     }
 
     /// <summary>
@@ -96,14 +97,19 @@ public class KillButtonSetting
     /// <summary>
     /// 自定义冷却（＜0为使用游戏默认值）
     /// </summary>
-    public float CustomCooldown { get; set; } = float.NegativeInfinity;
+    public Func<float> CustomCooldown { get; set; } = () => float.NegativeInfinity;
 
     /// <summary>
     /// 是否强制显示
     /// </summary>
     public Func<bool> ForceShow { get; set; } = () => false;
 
+    /// <summary>
+    /// 初始冷却（＜0为使用自定义或游戏击杀冷却）
+    /// </summary>
     public float InitialCooldown { get; set; } = float.NegativeInfinity;
+
+    public int RemainingUses { get; set; }
 
     private Action _afterClick = () => { };
     private Func<bool> _customCondition = () => true;

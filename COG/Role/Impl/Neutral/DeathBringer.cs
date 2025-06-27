@@ -7,6 +7,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using UnityEngine;
 
@@ -17,12 +18,14 @@ public class DeathBringer : CustomRole, IListener
 {
     private const string PlayerStaredAtTag = "staredAt_DeathBringer";
 
-    private readonly CustomButton _killButton, _stareButton;
+    private readonly CustomButton _stareButton;
 
     private readonly CustomOption _killCooldown, _neededPlayerNumber;
     
     public DeathBringer() : base(new Color(112, 48, 160, 100), CampType.Neutral)
     {
+        CanKill = true;
+
         _killCooldown = CreateOption(() => LanguageConfig.Instance.KillCooldown,
             new FloatOptionValueRule(1F, 1F, 60F, 30F, NumberSuffixes.Seconds));
         _neededPlayerNumber = CreateOption(() => LanguageConfig.Instance.DeathBringerNeededPlayerNumber,
@@ -35,7 +38,7 @@ public class DeathBringer : CustomRole, IListener
                 var target = PlayerControl.LocalPlayer.GetClosestPlayer();
                 if (target == null) return;
                 target.RpcMark(PlayerStaredAtTag);
-                _killButton?.ResetCooldown();
+                KillButtonManager.ResetCooldown();
             },
             () => _stareButton!.ResetCooldown(),
             () => PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance),
@@ -46,29 +49,10 @@ public class DeathBringer : CustomRole, IListener
             LanguageConfig.Instance.StareAction,
             () => _killCooldown.GetFloat(),
             -1);
-        
-        _killButton = CustomButton.Of(
-            "death-bringer-kill",
-            () =>
-            {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return;
-                PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
-                _stareButton.ResetCooldown();
-            },
-            () => _killButton!.ResetCooldown(),
-            () => 
-                PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance) &&
-            PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat(),
-            () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
-            2,
-            KeyCode.Q,
-            LanguageConfig.Instance.KillAction,
-            () => _killCooldown.GetFloat(),
-            -1);
-        
-        AddButton(_killButton);
+
+        KillButtonSetting.ForceShow = () => PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat();
+        KillButtonSetting.CustomCooldown = _killCooldown.GetFloat;
+
         AddButton(_stareButton);
     }
 
@@ -84,7 +68,7 @@ public class DeathBringer : CustomRole, IListener
             PlayerUtils.GetAllAlivePlayers().Where(player => player.HasMarkAs(PlayerStaredAtTag));
         foreach (var target in playersStaredAt)
         {
-            target.RpcMurderPlayer(target, true);
+            target.CmdCheckMurder(target);
             target.RemoveMark(PlayerStaredAtTag);
         }
     }

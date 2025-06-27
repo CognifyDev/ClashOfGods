@@ -31,14 +31,14 @@ public static class PlayerUtils
     public static PoolablePlayer PoolablePlayerPrefab 
             => Resources.FindObjectsOfTypeAll(Il2CppType.Of<PoolablePlayer>()).First().Cast<PoolablePlayer>();
 
-    public static IEnumerable<PlayerData> AllImpostors =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Impostor);
+    public static IEnumerable<PlayerData> AllImpostors => GetPlayersByCamp(CampType.Impostor);
 
-    public static IEnumerable<PlayerData> AllCrewmates =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Crewmate);
+    public static IEnumerable<PlayerData> AllCrewmates => GetPlayersByCamp(CampType.Crewmate);
 
-    public static IEnumerable<PlayerData> AllNeutrals =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Neutral);
+    public static IEnumerable<PlayerData> AllNeutrals => GetPlayersByCamp(CampType.Neutral);
+    
+    public static IEnumerable<PlayerData> GetPlayersByCamp(CampType camp)
+        => GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == camp);
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家

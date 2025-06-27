@@ -11,7 +11,6 @@ namespace COG.Patch;
 static class VanillaKillButtonPatch
 {
     private static bool _isHudActive = true;
-    private static int _remainingUses = -1;
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     [HarmonyPostfix]
@@ -26,13 +25,13 @@ static class VanillaKillButtonPatch
         var setting = KillButtonManager.GetSetting();
 
         if (KillButtonManager.ShouldForceShow() && setting.UsesLimit > 0)
-            killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) + $"({_remainingUses}/{setting.UsesLimit})");
+            killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) + $" ({setting.RemainingUses})");
 
         killButton.ToggleVisible(KillButtonManager.ShouldForceShow() && _isHudActive);
 
         if (KillButtonManager.NecessaryKillCondition && _isHudActive) // Prevent meeting kill (as we canceled vanilla murder check)
         {
-            if ((setting.OnlyUsableWhenAlive && !__instance.IsAlive()) || (setting.UsesLimit > 0 && _remainingUses <= 0))
+            if ((setting.OnlyUsableWhenAlive && !__instance.IsAlive()) || (setting.UsesLimit > 0 && setting.RemainingUses <= 0))
             {
                 killButton.SetTarget(null);
                 return;
@@ -71,7 +70,7 @@ static class VanillaKillButtonPatch
             KillButtonManager.ResetCooldown();
 
             if (setting.UsesLimit > 0)
-                _remainingUses--;
+                setting.RemainingUses--;
 
             setting.AfterClick();
         }
