@@ -1,3 +1,4 @@
+using COG.Role;
 using COG.States;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
@@ -18,19 +19,21 @@ static class VanillaKillButtonPatch
     {
         if (!__instance.AmOwner) return; // Only local player
         if (!GameStates.InRealGame) return;
+        if (__instance.GetMainRole().CampType != CampType.Impostor) return; // Not for impostor
 
         __instance.Data.Role.CanUseKillButton = true;
 
         var killButton = HudManager.Instance.KillButton;
+        var setting = KillButtonManager.GetSetting();
 
-        if (KillButtonManager.ShouldForceShow() && KillButtonManager.UsesLimit > 0)
-            killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) + $"({_remainingUses}/{KillButtonManager.UsesLimit})");
+        if (KillButtonManager.ShouldForceShow() && setting.UsesLimit > 0)
+            killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) + $"({_remainingUses}/{setting.UsesLimit})");
 
         killButton.ToggleVisible(KillButtonManager.ShouldForceShow() && _isHudActive);
 
         if (KillButtonManager.NecessaryKillCondition && _isHudActive) // Prevent meeting kill (as we canceled vanilla murder check)
         {
-            if ((KillButtonManager.OnlyUsableWhenAlive && !__instance.IsAlive()) || (KillButtonManager.UsesLimit > 0 && _remainingUses <= 0))
+            if ((setting.OnlyUsableWhenAlive && !__instance.IsAlive()) || (setting.UsesLimit > 0 && _remainingUses <= 0))
             {
                 killButton.SetTarget(null);
                 return;
@@ -44,7 +47,7 @@ static class VanillaKillButtonPatch
                 if (!player) return;
 
                 killButton.SetTarget(player);
-                player!.cosmetics.SetOutline(true, new(KillButtonManager.TargetOutlineColor));
+                player!.cosmetics.SetOutline(true, new(setting.TargetOutlineColor));
             }
         }
     }
@@ -58,7 +61,9 @@ static class VanillaKillButtonPatch
             && !__instance.isCoolingDown
             && PlayerControl.LocalPlayer.CanMove)
         {
-            if (KillButtonManager.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())
+            var setting = KillButtonManager.GetSetting();
+
+            if (setting.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())
                 return false;
 
             PlayerControl.LocalPlayer.CmdCheckMurder(__instance.currentTarget);
@@ -66,7 +71,7 @@ static class VanillaKillButtonPatch
 
             KillButtonManager.ResetCooldown();
 
-            if (KillButtonManager.UsesLimit > 0)
+            if (setting.UsesLimit > 0)
                 _remainingUses--;
 
             KillButtonManager.AfterClick();

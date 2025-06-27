@@ -222,9 +222,6 @@ public partial class Main : BasePlugin
             new OptionCommand()
         });
         
-        // Register custom buttons
-        CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
-        
         Harmony.PatchAll();
         
         // Start to load plugins

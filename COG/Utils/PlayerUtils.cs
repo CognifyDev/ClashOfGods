@@ -6,6 +6,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
+using COG.UI.Vanilla.KillButton;
 using Il2CppInterop.Runtime;
 using InnerNet;
 using System;
@@ -458,7 +459,11 @@ public static class PlayerUtils
 
         GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+
         pc.Data.Role.CanUseKillButton = role.CanKill;
+        KillButtonManager.ClearAll();
+        if (role is { CampType: not CampType.Impostor, CanKill: true }) 
+            KillButtonManager.ToggleForceVisible(true);
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }
