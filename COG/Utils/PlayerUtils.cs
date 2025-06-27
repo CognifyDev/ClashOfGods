@@ -563,20 +563,24 @@ public static class PlayerUtils
     /// <summary>
     /// 检查 <see cref="GetClosestPlayer(PlayerControl, bool, float)"/> 返回的玩家是否在游戏设置击杀距离内
     /// </summary>
-    /// <param name="closestPlayer"></param>
+    /// <param name="closestValidPlayer"></param>
     /// <param name="mustAlive"></param>
     /// <param name="closestDistance"></param>
     /// <returns></returns>
-    public static bool CheckClosestTargetInKillDistance(out PlayerControl? closestPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
+    public static bool CheckClosestTargetInKillDistance(out PlayerControl? closestValidPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
     {
-        if ((closestPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
+        if ((closestValidPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
 
         var localPlayer = PlayerControl.LocalPlayer;
         var localLocation = localPlayer.GetTruePosition();
-        var targetLocation = closestPlayer.GetTruePosition();
+        var targetLocation = closestValidPlayer.GetTruePosition();
         var distance = Vector2.Distance(localLocation, targetLocation);
+        var valid = GameUtils.GetGameOptions().KillDistance >= distance;
 
-        return GameUtils.GetGameOptions().KillDistance >= distance;
+        if (!valid)
+            closestValidPlayer = null;
+
+        return valid;
     }
 }
 

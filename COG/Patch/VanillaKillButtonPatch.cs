@@ -1,3 +1,4 @@
+using COG.States;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using System;
@@ -16,15 +17,14 @@ static class VanillaKillButtonPatch
     static void KillButtonUpdatePatch(PlayerControl __instance)
     {
         if (!__instance.AmOwner) return; // Only local player
+        if (!GameStates.InRealGame) return;
 
         __instance.Data.Role.CanUseKillButton = true;
 
         var killButton = HudManager.Instance.KillButton;
 
         if (KillButtonManager.ShouldForceShow() && KillButtonManager.UsesLimit > 0)
-            killButton.SetUsesRemaining(_remainingUses);
-        else
-            killButton.SetInfiniteUses();
+            killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) + $"({_remainingUses}/{KillButtonManager.UsesLimit})");
 
         killButton.ToggleVisible(KillButtonManager.ShouldForceShow() && _isHudActive);
 
@@ -36,7 +36,7 @@ static class VanillaKillButtonPatch
                 return;
             }
 
-            __instance.SetKillTimer(__instance.killTimer - Time.fixedDeltaTime); // This needs CanUseKillButton to be true
+            __instance.SetKillTimer(__instance.killTimer - Time.fixedDeltaTime); // This requires CanUseKillButton to be true
 
             if (KillButtonManager.CustomCondition())
             {
@@ -63,6 +63,9 @@ static class VanillaKillButtonPatch
 
             PlayerControl.LocalPlayer.CmdCheckMurder(__instance.currentTarget);
             __instance.SetTarget(null);
+
+            if (KillButtonManager.CustomCooldown > 0)
+                PlayerControl.LocalPlayer.SetKillTimer(KillButtonManager.CustomCooldown);
 
             if (KillButtonManager.UsesLimit > 0)
                 _remainingUses--;
