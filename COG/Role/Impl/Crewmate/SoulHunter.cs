@@ -18,7 +18,7 @@ public class SoulHunter : CustomRole, IListener
 {
     private const string HasRevivedTag = "hasRevived_SoulHunter";
 
-    private Vector3? _position;
+    private Vector2? _position;
     
     private CustomOption ReviveAfter { get; }
     private CustomOption SoulHunterKillCd { get; }
@@ -37,36 +37,37 @@ public class SoulHunter : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
+    [OnlyLocalPlayerInvokable]
+    [OnlyInRealGame]
     public void OnPlayerMurder(PlayerMurderEvent @event)
     {
-        if (!GameStates.InRealGame) return;
         var target = @event.Target;
 
         if (!IsLocalPlayerRole(target)) return;
         if (target.HasMarkAs(HasRevivedTag)) return;
 
-        _position = target.transform.position;
-        Coroutines.Start(Revive());
+        _position = target.GetTruePosition();
+        Coroutines.Start(CoRevive());
         return;
 
-        IEnumerator Revive()
+        IEnumerator CoRevive()
         {
             yield return new WaitForSeconds(ReviveAfter.GetFloat());
 
             var deadBody = target.GetDeadBody();
 
             if (deadBody != null)
-                deadBody.RpcCleanDeadBody();
+                deadBody.RpcHideDeadBody();
             else
                 yield break;
             
-
             if (GameStates.IsMeeting)
                 yield break;
-            
-            
-            if (_position != null)
-                target.transform.position = (Vector3) _position;
+
+            if (_position.HasValue)
+                target.NetTransform.RpcSnapTo(_position.Value);
+            else
+                Main.Logger.LogError($"{nameof(_position)} is null while reviving!");
             
             target.RpcSetCustomRole(this);
             target.RpcRevive();
@@ -78,11 +79,8 @@ public class SoulHunter : CustomRole, IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnReportBody(PlayerReportDeadBodyEvent @event)
     {
-        var targets = PlayerUtils.GetAllAlivePlayers().Where(player => player.HasMarkAs(HasRevivedTag));
-        targets.ForEach(target =>
-        {
-            target.RpcMurderPlayer(target, true);
-        });
+        var targets = Players.Where(player => player.HasMarkAs(HasRevivedTag));
+        targets.ForEach(target => target.RpcSuicide());
     }
 
     public override string GetNameInConfig()

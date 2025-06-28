@@ -9,9 +9,9 @@ public static class DeadBodyUtils
     public static List<DeadBody> GetDeadBodies() => 
         Object.FindObjectsOfType<DeadBody>().ToList();
     
-    public static void RpcCleanDeadBody(this DeadBody body)
+    public static void RpcHideDeadBody(this DeadBody body)
     {
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.CleanDeadBody);
+        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.HideDeadBody);
         writer.Write(body.ParentId);
         writer.Finish();
         

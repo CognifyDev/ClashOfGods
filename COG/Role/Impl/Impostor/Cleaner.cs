@@ -29,7 +29,7 @@ public class Cleaner : CustomRole, IListener
             {
                 var body = PlayerUtils.GetClosestBody();
                 if (!body) return;
-                body!.RpcCleanDeadBody();
+                body!.RpcHideDeadBody();
                 KillButtonManager.ResetCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),

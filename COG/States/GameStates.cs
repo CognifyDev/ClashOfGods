@@ -2,6 +2,7 @@ global using GameStates = COG.States.GameStates;
 using COG.Role;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
+using System;
 
 namespace COG.States;
 
@@ -56,4 +57,9 @@ public static class GameStates
     public static bool IsVoting => IsMeeting &&
                                    MeetingHud.Instance.state is MeetingHud.VoteStates.Voted
                                        or MeetingHud.VoteStates.NotVoted;
+}
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+public sealed class OnlyInRealGameAttribute : System.Attribute
+{
 }

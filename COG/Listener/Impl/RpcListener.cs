@@ -97,7 +97,7 @@ public class RpcListener : IListener
                 // 清除原列表，防止干扰
                 GameUtils.PlayerData.Clear();
                 // 开始读入数据
-                Main.Logger.LogDebug("The role data from the host has been received.");
+                Main.Logger.LogDebug("Received role assignment data, applying...");
 
                 var count = reader.ReadPackedInt32();
 
@@ -126,7 +126,7 @@ public class RpcListener : IListener
                 break;
             }
 
-            case KnownRpc.CleanDeadBody:
+            case KnownRpc.HideDeadBody:
             {
                 if (!GameStates.InRealGame) return;
                 var pid = reader.ReadByte();
@@ -164,7 +164,7 @@ public class RpcListener : IListener
                 }
                 catch
                 {
-                    Main.Logger.LogError($"Get invalid roleId while synchronizing role data: {roleId}");
+                    Main.Logger.LogError($"Get invalid {nameof(roleId)} while synchronizing role data: {roleId}");
                     return;
                 }
 

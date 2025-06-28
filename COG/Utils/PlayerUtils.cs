@@ -584,6 +584,8 @@ public static class PlayerUtils
 
         return valid;
     }
+
+    public static void RpcSuicide(this PlayerControl player) => player.CmdCheckMurder(player);
 }
 
 public enum CustomDeathReason

@@ -3,7 +3,7 @@ namespace COG.Rpc;
 public enum KnownRpc : uint
 {
     ShareRoles = 100,
-    CleanDeadBody,
+    HideDeadBody,
     UpdateOption,
     SetRole,
     Feedback,
