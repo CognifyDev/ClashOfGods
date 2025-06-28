@@ -8,6 +8,7 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Listener;
+using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
@@ -303,6 +304,21 @@ public class CustomRole
 
     public virtual void ClearRoleGameData()
     {
+    }
+
+    public virtual void OnRoleGameDataSynchronizing(MessageReader reader)
+    {
+    }
+
+    public virtual void OnRoleGameDataBeingSynchronized(RpcWriter writer)
+    {
+    }
+
+    public void SyncRoleGameData()
+    {
+        var writer = RpcUtils.StartRpcImmediately(KnownRpc.SyncRoleGameData).WritePacked(Id);
+        OnRoleGameDataBeingSynchronized(writer);
+        writer.Finish();
     }
 
     public string GetColorName()

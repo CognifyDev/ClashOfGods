@@ -1,5 +1,7 @@
+global using RpcWriter = COG.Utils.RpcUtils.RpcWriter;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using COG.Rpc;
 using InnerNet;
 using UnityEngine;
@@ -35,14 +37,18 @@ public abstract class RpcUtils
     public static RpcWriter StartRpcImmediately(PlayerControl playerControl, byte callId,
         PlayerControl[]? targets = null)
     {
+        List<string> parts = new();
+
         var writers = new List<MessageWriter>();
         targets ??= PlayerUtils.GetAllPlayers().Where(p => p.PlayerId != playerControl.PlayerId).ToArray();
         foreach (var control in targets)
         {
             writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable,
                 control.GetClientID()));
-            Main.Logger.LogDebug($"Rpc {callId} sent to {control.name}({control.PlayerId})");
+            parts.Add($"{control.name}({control.PlayerId})");
         }
+
+        Main.Logger.LogDebug($"Rpc {callId} sent to {string.Join(", ", parts)}");
 
         return new RpcWriter(writers.ToArray());
     }

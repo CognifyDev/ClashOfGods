@@ -15,5 +15,6 @@ public enum KnownRpc : uint
     ShareWinners,
     KillPlayerCompletely,
     MurderAndModifyKillAnimation,
-    ShareAbilityOrVentUseForInspector
+    ShareAbilityOrVentUseForInspector,
+    SyncRoleGameData
 }
