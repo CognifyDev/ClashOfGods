@@ -113,10 +113,14 @@ public class KillButtonSetting
 
     private Action _afterClick = () => { };
     private Func<bool> _customCondition = () => true;
+    private Func<global::KillButton, PlayerControl> _beforeMurder = b => b.currentTarget;
 
     public void AfterClick() => _afterClick.GetInvocationList().Do(dg => dg.DynamicInvoke());
     public void AddAfterClick(Action action) => _afterClick += action;
 
     public bool CustomCondition() => _customCondition.GetInvocationList().All(dg => dg.DynamicInvoke() == (object)true);
     public void AddCustomCondition(Func<bool> cond) => _customCondition += cond;
+
+    public PlayerControl BeforeMurder() => _beforeMurder(HudManager.Instance.KillButton);
+    public void SetBeforeMurder(Func<global::KillButton, PlayerControl> beforeMurder) => _beforeMurder = beforeMurder;
 }

@@ -64,7 +64,7 @@ static class VanillaKillButtonPatch
             if (setting.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())
                 return false;
 
-            PlayerControl.LocalPlayer.CmdCheckMurder(__instance.currentTarget);
+            PlayerControl.LocalPlayer.CmdCheckMurder(setting.BeforeMurder());
             __instance.SetTarget(null);
 
             KillButtonManager.ResetCooldown();
