@@ -33,7 +33,7 @@ public class Cleaner : CustomRole, IListener
                 KillButtonManager.ResetCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
-            () => PlayerUtils.GetClosestBody() != null,
+            () => PlayerUtils.GetClosestBody(),
             () => true,
             ResourceUtils.LoadSprite(ResourcesConstant.CleanDeadBodyButton)!,
             2,
