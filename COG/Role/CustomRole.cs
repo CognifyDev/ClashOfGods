@@ -306,7 +306,7 @@ public class CustomRole
     {
     }
 
-    public virtual void OnRoleGameDataSynchronizing(MessageReader reader)
+    public virtual void OnRoleGameDataGettingSynchronized(MessageReader reader)
     {
     }
 

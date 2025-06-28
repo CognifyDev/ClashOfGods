@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
@@ -18,88 +13,23 @@ using COG.Role;
 using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Rpc;
+using COG.UI.CustomButton;
 using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
 using Il2CppSystem.Collections;
-using InnerNet;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using Action = Il2CppSystem.Action;
-using GameStates = COG.States.GameStates;
 using Random = System.Random;
-using COG.UI.CustomButton;
 
 namespace COG.Listener.Impl;
 
 public class GameListener : IListener
 {
-    [EventHandler(EventHandlerType.Prefix)]
-    public void OnRpcReceived(PlayerHandleRpcEvent @event)
-    {
-        var callId = @event.CallId;
-        var reader = @event.Reader;
-        var knownRpc = (KnownRpc)callId;
-
-        switch (knownRpc)
-        {
-            case KnownRpc.ShareRoles:
-            {
-                if (AmongUsClient.Instance.AmHost) return;
-                // 清除原列表，防止干扰
-                GameUtils.PlayerData.Clear();
-                // 开始读入数据
-                Main.Logger.LogDebug("The role data from the host has been received.");
-
-                var count = reader.ReadPackedInt32();
-
-                for (var i = 0; i < count; i++)
-                {
-                    var bytes = reader.ReadBytesAndSize().ToArray();
-                    var data = bytes.DeserializeToData<SerializablePlayerData>().AsPlayerData();
-                    GameUtils.PlayerData.Add(data);
-                    data.Player.SetCustomRole(data.MainRole, data.SubRoles);
-                }
-                
-                foreach (var playerRole in GameUtils.PlayerData)
-                    Main.Logger.LogInfo($"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
-                                        $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}");
-
-                break;
-            }
-            case KnownRpc.Revive:
-            {
-                // 从Rpc中读入PlayerControl
-                var target = reader.ReadNetObject<PlayerControl>();
-                
-                // 复活目标玩家
-                target.Revive();
-                break;
-            }
-            case KnownRpc.CleanDeadBody:
-            {
-                if (!GameStates.InRealGame) return;
-                var pid = reader.ReadByte();
-                var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
-                if (!body) return;
-                body!.gameObject.SetActive(false);
-                break;
-            }
-            case KnownRpc.Mark:
-            {
-                var target = reader.ReadNetObject<PlayerControl>();
-                var tag = reader.ReadString();
-                var playerData = target.GetPlayerData();
-
-                if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
-                {
-                    playerData?.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
-                    break;
-                }
-                
-                playerData?.Tags.Add(tag);
-                break;
-            }
-        }
-    }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void AfterPlayerFixedUpdate(PlayerFixedUpdateEvent @event)

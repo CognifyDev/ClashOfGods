@@ -3,6 +3,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.Patch;
 using COG.Role;
 using COG.Rpc;
+using COG.States;
 using COG.UI.CustomOption;
 using COG.Utils;
 using InnerNet;
@@ -87,6 +88,88 @@ public class RpcListener : IListener
 
                 KillAnimationPatch.NextKillerToBeReplaced = toModify.Data;
                 @event.Player.MurderPlayer(target, PlayerUtils.SucceededFlags);
+                break;
+            }
+
+            case KnownRpc.ShareRoles:
+            {
+                if (AmongUsClient.Instance.AmHost) return;
+                // 清除原列表，防止干扰
+                GameUtils.PlayerData.Clear();
+                // 开始读入数据
+                Main.Logger.LogDebug("The role data from the host has been received.");
+
+                var count = reader.ReadPackedInt32();
+
+                for (var i = 0; i < count; i++)
+                {
+                    var bytes = reader.ReadBytesAndSize().ToArray();
+                    var data = bytes.DeserializeToData<SerializablePlayerData>().AsPlayerData();
+                    GameUtils.PlayerData.Add(data);
+                    data.Player.SetCustomRole(data.MainRole, data.SubRoles);
+                }
+                
+                foreach (var playerRole in GameUtils.PlayerData)
+                    Main.Logger.LogInfo($"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
+                                        $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}");
+
+                break;
+            }
+
+            case KnownRpc.Revive:
+            {
+                // 从Rpc中读入PlayerControl
+                var target = reader.ReadNetObject<PlayerControl>();
+                
+                // 复活目标玩家
+                target.Revive();
+                break;
+            }
+
+            case KnownRpc.CleanDeadBody:
+            {
+                if (!GameStates.InRealGame) return;
+                var pid = reader.ReadByte();
+                var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
+                if (!body) return;
+                body!.gameObject.SetActive(false);
+                break;
+            }
+
+            case KnownRpc.Mark:
+            {
+                var target = reader.ReadNetObject<PlayerControl>();
+                var tag = reader.ReadString();
+                var playerData = target.GetPlayerData();
+
+                if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
+                {
+                    playerData?.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
+                    break;
+                }
+                
+                playerData?.Tags.Add(tag);
+                break;
+            }
+
+            case KnownRpc.SyncRoleGameData:
+            {
+                int roleId = -1;
+                CustomRole role = null!;
+
+                try
+                {
+                    roleId = reader.ReadPackedInt32();
+                    role = CustomRoleManager.GetManager().GetRoleById(roleId) ?? throw new();
+                }
+                catch
+                {
+                    Main.Logger.LogError($"Get invalid roleId while synchronizing role data: {roleId}");
+                    return;
+                }
+
+                Main.Logger.LogMessage($"Syncing game data for {role.Name}...");
+                role.OnRoleGameDataGettingSynchronized(reader);
                 break;
             }
         }

@@ -1,3 +1,4 @@
+global using GameStates = COG.States.GameStates;
 using COG.Role;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
