@@ -65,7 +65,7 @@ public class DeathBringer : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerInvokable]
+    [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnPlayerReport(PlayerReportDeadBodyEvent @event)
     {
         foreach (var target in _staredPlayers)

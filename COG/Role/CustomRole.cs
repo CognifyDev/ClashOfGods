@@ -350,7 +350,7 @@ public class CustomRole
 }
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-public sealed class OnlyLocalPlayerInvokableAttribute : Attribute
+public sealed class OnlyLocalPlayerWithThisRoleInvokableAttribute : Attribute
 {
 }
 

@@ -37,13 +37,12 @@ public class SoulHunter : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerInvokable]
+    [OnlyLocalPlayerWithThisRoleInvokable]
     [OnlyInRealGame]
     public void OnPlayerMurder(PlayerMurderEvent @event)
     {
         var target = @event.Target;
 
-        if (!IsLocalPlayerRole(target)) return;
         if (target.HasMarkAs(HasRevivedTag)) return;
 
         _position = target.GetTruePosition();

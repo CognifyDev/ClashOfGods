@@ -45,12 +45,13 @@ public class Technician : CustomRole, IListener
     private CustomButton RepairButton { get; }
 
     [EventHandler(EventHandlerType.Postfix)]
+    [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnVentCheck(VentCheckEvent @event)
     {
         var data = @event.PlayerInfo;
         var player = data.Object;
         var vent = @event.Vent;
-        if (!IsLocalPlayerRole(player)) return;
+
         if (PlayerControl.LocalPlayer.AllTasksCompleted())
         {
             HudManager.Instance.ImpostorVentButton.Show();

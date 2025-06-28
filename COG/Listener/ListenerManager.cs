@@ -127,7 +127,7 @@ public class ListenerManager
             if (!type.Equals(handler.EventHandlerType) ||
                 !handler.EventType.IsInstanceOfType(@event)) continue;
 
-            var onlyLocal = handler.Method.GetCustomAttribute<OnlyLocalPlayerInvokableAttribute>();
+            var onlyLocal = handler.Method.GetCustomAttribute<OnlyLocalPlayerWithThisRoleInvokableAttribute>();
             if (onlyLocal != null && handler.Listener is CustomRole role)
                 if (!role.IsLocalPlayerRole())
                     continue;

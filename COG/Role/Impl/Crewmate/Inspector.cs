@@ -61,7 +61,7 @@ public class Inspector : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerInvokable]
+    [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnRpcReceived(PlayerHandleRpcEvent @event)
     {
         if (@event.CallId is (byte)KnownRpc.ShareAbilityOrVentUseForInspector or (byte)RpcCalls.EnterVent)
