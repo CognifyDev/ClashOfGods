@@ -522,11 +522,13 @@ public static class PlayerUtils
         return pc.GetMainRole().CanKill;
     }
 
-    public static void RpcMurderAndModifyKillAnimation(this PlayerControl pc, PlayerControl target, PlayerControl toShowAsKiller)
+    public static void RpcMurderAndModifyKillAnimation(this PlayerControl pc, PlayerControl target, PlayerControl toShowAsKiller, bool modifyDeathData)
     {
+        if (modifyDeathData)
+            _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, toShowAsKiller.Data);
         pc.MurderPlayer(target, SucceededFlags);
         RpcUtils.StartRpcImmediately(pc, KnownRpc.MurderAndModifyKillAnimation)
-            .WriteNetObject(target).WriteNetObject(toShowAsKiller).Finish();
+            .WriteNetObject(target).WriteNetObject(toShowAsKiller).Write(modifyDeathData).Finish();
     }
 
     public static void DisplayPlayerInfoOnName(this PlayerControl player)

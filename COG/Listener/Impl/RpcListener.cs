@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using COG.Listener.Event.Impl.Player;
 using COG.Patch;
@@ -85,8 +86,11 @@ public class RpcListener : IListener
             {
                 var target = reader.ReadNetObject<PlayerControl>();
                 var toModify = reader.ReadNetObject<PlayerControl>();
+                var modifyDeathData = reader.ReadBoolean();
 
                 KillAnimationPatch.NextKillerToBeReplaced = toModify.Data;
+                if (modifyDeathData)
+                    _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, toModify.Data);
                 @event.Player.MurderPlayer(target, PlayerUtils.SucceededFlags);
                 break;
             }

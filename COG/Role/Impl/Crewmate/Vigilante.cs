@@ -36,6 +36,7 @@ public class Vigilante : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
+    [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
         if (PlayerUtils.AllCrewmates.Count() > _minCrewmateNumber.GetFloat() || _hasGiven) return;

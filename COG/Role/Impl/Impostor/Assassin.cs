@@ -15,7 +15,7 @@ public class Assassin : CustomRole
     
     private CustomOption MaxUseTime { get; }
 
-    private int _hasBeenKilled;
+    private int _killedTimes;
     
     public Assassin() : base(Palette.ImpostorRed, CampType.Impostor)
     {
@@ -30,17 +30,13 @@ public class Assassin : CustomRole
             "assassin-dispatch",
             () =>
             {
-                var player = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (player == null)
-                {
-                    return;
-                }
+                if (!PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out var player)) return;
 
-                PlayerControl.LocalPlayer.RpcMurderAndModifyKillAnimation(player, player);
-                _hasBeenKilled ++;
+                player!.RpcMurderAndModifyKillAnimation(player!, PlayerControl.LocalPlayer, true);
+                _killedTimes ++;
             },
             () => DispatchButton?.ResetCooldown(),
-            () => PlayerControl.LocalPlayer.GetClosestPlayer() != null && _hasBeenKilled < MaxUseTime.GetFloat(),
+            () => PlayerControl.LocalPlayer.GetClosestPlayer() != null && _killedTimes < MaxUseTime.GetFloat(),
             () => true,
             ResourceUtils.LoadSprite(ResourcesConstant.DispatchButton)!,
             2,
@@ -55,6 +51,6 @@ public class Assassin : CustomRole
 
     public override void ClearRoleGameData()
     {
-        _hasBeenKilled = 0;
+        _killedTimes = 0;
     }
 }
