@@ -37,7 +37,7 @@ public class Reporter : CustomRole, IListener, IWinnable
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnPlayerReport(PlayerReportDeadBodyEvent @event)
+    public bool OnHostCheckPlayerReport(PlayerReportDeadBodyEvent @event)
     {
         var player = @event.Player;
         var target = @event.Target;

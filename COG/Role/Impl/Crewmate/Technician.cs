@@ -12,7 +12,7 @@ using UnityEngine;
 namespace COG.Role.Impl.Crewmate;
 
 // FIX: Ability button sprite still cant be displayed
-// The sprite has loaded correctly, but it cant be displayed
+// The sprite has been loaded correctly, but it cant be displayed
 public class Technician : CustomRole, IListener
 {
     public Technician() : base(Palette.Orange, CampType.Crewmate)

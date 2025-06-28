@@ -46,7 +46,7 @@ public class Jester : CustomRole, IListener, IWinnable
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnCheckStartMeeting(PlayerReportDeadBodyEvent @event)
+    public bool OnHostCheckStartMeeting(PlayerReportDeadBodyEvent @event)
     {
         if (!GameStates.InRealGame || GameStates.InLobby) return true;
         var victim = @event.Target;

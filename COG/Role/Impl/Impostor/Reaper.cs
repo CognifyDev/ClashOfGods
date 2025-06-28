@@ -1,16 +1,11 @@
-﻿using System.Linq;
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Constant;
 using COG.Listener;
-using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Player;
-using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
-using KeyCode = UnityEngine.KeyCode;
 
 
 namespace COG.Role.Impl.Impostor;

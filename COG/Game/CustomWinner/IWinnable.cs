@@ -8,7 +8,7 @@ namespace COG.Game.CustomWinner;
 public interface IWinnable
 {
     /// <summary>
-    /// 检测胜利
+    /// 检测胜利（只有房主会执行）
     /// </summary>
     /// <returns>判定数据</returns>
     public void CheckWin(WinnableData data);
