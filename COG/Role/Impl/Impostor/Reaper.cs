@@ -9,6 +9,7 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using UnityEngine;
 using KeyCode = UnityEngine.KeyCode;
 
 
@@ -17,8 +18,6 @@ namespace COG.Role.Impl.Impostor;
 public class Reaper : CustomRole, IListener
 {
     private CustomOption TimeToReduce { get; }
-    
-    private CustomButton KillButton { get; }
 
     private float _cooldown;
     
@@ -30,29 +29,16 @@ public class Reaper : CustomRole, IListener
         CanSabotage = true;
         
         TimeToReduce = CreateOption(() => LanguageConfig.Instance.ReaperTimeToReduce,
-            new FloatOptionValueRule(1F, 0.5F, 15F, 1.5F, NumberSuffixes.Seconds));
+            new FloatOptionValueRule(1F, 0.5F, 5F, 1.5F, NumberSuffixes.Seconds));
 
         KillButtonSetting.CustomCooldown = () => _cooldown;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
+    [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnPlayerMurder(PlayerMurderEvent @event)
     {
-        var target = @event.Target;
-        if (target.PlayerId == PlayerControl.LocalPlayer.PlayerId)
-        {
-            return;
-        }
-
-        if (_cooldown > 1)
-        {
-            _cooldown = TimeToReduce.GetFloat();
-        }
-    }
-
-    public void OnGameStart(GameStartEvent @event)
-    {
-        ClearRoleGameData();
+        _cooldown = Mathf.Clamp(_cooldown -= TimeToReduce.GetFloat(), 1f, float.MaxValue);
     }
 
     public override void ClearRoleGameData()
