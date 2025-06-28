@@ -48,7 +48,7 @@ public class Inspector : CustomRole, IListener
             {
                 if (_abilityUsedThisRound) 
                     return false;
-                return PlayerUtils.CheckClosestTargetInKillDistance(out _);
+                return PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _);
             },
             () => true,
             null!,

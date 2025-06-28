@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
@@ -21,6 +22,10 @@ public class DeathBringer : CustomRole, IListener
     private readonly CustomButton _stareButton;
 
     private readonly CustomOption _killCooldown, _neededPlayerNumber;
+
+    private readonly List<PlayerControl> _staredPlayers = new();
+
+    private PlayerControl? _target;
     
     public DeathBringer() : base(new Color(112, 48, 160, 100), CampType.Neutral)
     {
@@ -35,13 +40,11 @@ public class DeathBringer : CustomRole, IListener
             "death-bringer-stare",
             () =>
             {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return;
-                target.RpcMark(PlayerStaredAtTag);
+                _staredPlayers.Add(_target!);
                 KillButtonManager.ResetCooldown();
             },
             () => _stareButton!.ResetCooldown(),
-            () => PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance),
+            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
             () => true,
             ResourceUtils.LoadSprite(ResourcesConstant.StareButton)!,
             3,
@@ -62,15 +65,11 @@ public class DeathBringer : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
+    [OnlyLocalPlayerInvokable]
     public void OnPlayerReport(PlayerReportDeadBodyEvent @event)
     {
-        var playersStaredAt = 
-            PlayerUtils.GetAllAlivePlayers().Where(player => player.HasMarkAs(PlayerStaredAtTag));
-        foreach (var target in playersStaredAt)
-        {
+        foreach (var target in _staredPlayers)
             target.CmdCheckMurder(target);
-            target.RemoveMark(PlayerStaredAtTag);
-        }
     }
 
     public override string GetNameInConfig()

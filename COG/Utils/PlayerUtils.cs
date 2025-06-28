@@ -570,12 +570,11 @@ public static class PlayerUtils
     /// <param name="mustAlive"></param>
     /// <param name="closestDistance"></param>
     /// <returns></returns>
-    public static bool CheckClosestTargetInKillDistance(out PlayerControl? closestValidPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
+    public static bool CheckClosestTargetInKillDistance(this PlayerControl player, out PlayerControl? closestValidPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
     {
-        if ((closestValidPlayer = PlayerControl.LocalPlayer.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
+        if ((closestValidPlayer = player.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
 
-        var localPlayer = PlayerControl.LocalPlayer;
-        var localLocation = localPlayer.GetTruePosition();
+        var localLocation = player.GetTruePosition();
         var targetLocation = closestValidPlayer.GetTruePosition();
         var distance = Vector2.Distance(localLocation, targetLocation);
         var valid = GameUtils.GetGameOptions().KillDistance >= distance;

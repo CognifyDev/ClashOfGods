@@ -36,7 +36,7 @@ public class Sheriff : CustomRole, IListener
                 }
             },
             () => SheriffKillButton?.ResetCooldown(),
-            () => PlayerUtils.CheckClosestTargetInKillDistance(out _currentTarget),
+            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _currentTarget),
             () => true,
             ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
             2,

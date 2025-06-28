@@ -41,7 +41,7 @@ static class VanillaKillButtonPatch
 
             if (setting.CustomCondition())
             {
-                PlayerUtils.CheckClosestTargetInKillDistance(out var player);
+                PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out var player);
                 if (!player) return;
 
                 killButton.SetTarget(player);
