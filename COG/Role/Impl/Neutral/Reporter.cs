@@ -26,11 +26,14 @@ public class Reporter : CustomRole, IListener, IWinnable
 
     private readonly CustomOption _neededReportTimes;
     private static bool _isReporterReported = false;
+    private static Reporter _instance;
     
     public Reporter() : base(Color.gray, CampType.Neutral)
     {
         _neededReportTimes = CreateOption(() => LanguageConfig.Instance.ReporterNeededReportTimes,
             new FloatOptionValueRule(1F, 1F, 14F, 3F));
+
+        _instance = this;
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -83,7 +86,18 @@ public class Reporter : CustomRole, IListener, IWinnable
     static void MeetingIntroPatch(MeetingIntroAnimation._CoRun_d__17 __instance)
     {
         if (_isReporterReported)
-            __instance.__4__this.transform.FindChild("PlayerVoteArea(Clone)").gameObject.SetActive(false);
+        {
+            var pva = __instance.__4__this.transform.FindChild("PlayerVoteArea(Clone)").GetComponent<PlayerVoteArea>();
+            pva.Background.sprite = ShipStatus.Instance.CosmeticsCache.GetNameplate("nameplate_NoPlate").Image;
+
+            var icon = pva.PlayerIcon;
+            icon.UpdateFromPlayerOutfit(new(), PlayerMaterial.MaskType.ComplexUI, false, false);
+            icon.cosmetics.colorBlindText.text = string.Empty;
+            icon.cosmetics.nameText.text = _instance.Name;
+
+            var anonymousColor = ColorUtils.AsColor("#8995a4");
+            PlayerMaterial.SetColors(anonymousColor, icon.cosmetics.currentBodySprite.BodySprite);
+        }
     }
 
     [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]

@@ -102,7 +102,7 @@ public class CustomRole
     public Color Color { get; }
     
     /// <summary>
-    /// 角色的名称
+    ///     角色的名称
     /// </summary>
     public string Name { get; }
     

@@ -27,7 +27,7 @@ public static class ColorUtils
         var red = Convert.ToByte(color.Substring(1, 2), 16);
         var green = Convert.ToByte(color.Substring(3, 2), 16);
         var blue = Convert.ToByte(color.Substring(5, 2), 16);
-
-        return new Color(red, green, blue);
+        
+        return new Color(red / 256f, green / 256f, blue / 256f);
     }
 }
