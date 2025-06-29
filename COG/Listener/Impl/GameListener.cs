@@ -316,33 +316,15 @@ public class GameListener : IListener
         return false;
     }
 
-    [EventHandler(EventHandlerType.Prefix)]
-    public bool OnSetUpRoleText(IntroCutsceneShowRoleEvent @event)
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnSetUpRoleText(IntroCutsceneShowRoleEvent @event)
     {
         var intro = @event.IntroCutscene!;
         Main.Logger.LogInfo("Set up role text for the player...");
 
         var myRole = GameUtils.GetLocalPlayerRole();
 
-        var list = new List<IEnumerator>
-        {
-            Effects.Action((Action)SetUpRoles),
-            Effects.Wait(2.5f)
-        };
-
-        void Action()
-        {
-            intro.YouAreText.gameObject.SetActive(false);
-            intro.RoleText.gameObject.SetActive(false);
-            intro.RoleBlurbText.gameObject.SetActive(false);
-            intro.ourCrewmate.gameObject.SetActive(false);
-        }
-
-        list.Add(Effects.Action((Action)Action));
-
-        @event.SetResult(Effects.Sequence(list.ToArray()));
-
-        return false;
+        SetUpRoles();
 
         void SetUpRoles()
         {

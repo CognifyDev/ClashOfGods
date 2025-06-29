@@ -27,9 +27,7 @@ public class Cleaner : CustomRole, IListener
             "cleaner-clean",
             () =>
             {
-                var body = PlayerUtils.GetClosestBody();
-                if (!body) return;
-                body!.RpcHideDeadBody();
+                _body!.RpcHideDeadBody();
                 KillButtonManager.ResetCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
@@ -37,7 +35,7 @@ public class Cleaner : CustomRole, IListener
             {
                 if (_body) _body!.ClearOutline(); // Clear outline of previous target
                 _body = PlayerUtils.GetClosestBody();
-                _body!.SetOutline(Color);
+                if (_body) _body!.SetOutline(Color);
                 return _body;
             },
             () => true,

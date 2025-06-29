@@ -323,7 +323,7 @@ public static class PlayerUtils
         var position = PlayerControl.LocalPlayer.GetTruePosition();
 
         foreach (var body in Object.FindObjectsOfType<DeadBody>()
-                     .Where(b => unTargetAble?.Contains(b) ?? true))
+                     .Where(b => b.gameObject.active && (unTargetAble?.Contains(b) ?? true)))
         {
             var vector = body.TruePosition - position;
             var magnitude = vector.magnitude;

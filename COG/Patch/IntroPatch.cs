@@ -5,16 +5,13 @@ using Il2CppSystem.Collections.Generic;
 
 namespace COG.Patch;
 
-[HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.ShowRole))]
+[HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
 internal class SetUpRoleTextPatch
 {
-    [HarmonyPrefix]
-    public static bool Prefix(IntroCutscene __instance, ref IEnumerator __result)
+    public static void Postfix(IntroCutscene._ShowRole_d__41 __instance)
     {
-        var @event = new IntroCutsceneShowRoleEvent(__instance, __result);
-        var result = ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Prefix);
-        __result = @event.GetResult();
-        return result;
+        var @event = new IntroCutsceneShowRoleEvent(__instance);
+        ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Postfix);
     }
 }
 
