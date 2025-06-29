@@ -52,7 +52,7 @@ public class Reporter : CustomRole, IListener, IWinnable
         else
             _reportersWhoReported.Add(player, 1);
         
-        return false;
+        return true;
     }
 
     public override IListener GetListener()

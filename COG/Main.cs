@@ -89,7 +89,7 @@ public partial class Main : BasePlugin
         if (!storagedInfo.IsNullOrEmptyOrWhiteSpace())
         {
             if (storagedInfo != longVersionInfo)
-                Logger.LogInfo("Current mod version doesnt equal to version of last mod running on this machine. Schedule to replace config files...");
+                Logger.LogWarning("Current mod version doesnt equal to version of last mod running on this machine. Schedule to replace config files...");
             else
                 ConfigBase.AutoReplace = false;
         }

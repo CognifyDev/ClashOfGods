@@ -25,7 +25,8 @@ public static class GameStates
             Main.Logger.LogMessage($"{nameof(GameStates)}::{nameof(_inRealGame)} being set to {value}. Clearing role data...");
 
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-            KillButtonManager.ClearAll();
+            if (value == false)
+                KillButtonManager.ClearAll(); // Only clear when game ends
             
             _inRealGame = value;
 

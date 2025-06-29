@@ -1,3 +1,4 @@
+using COG.Constant;
 using COG.States;
 using COG.Utils;
 using COG.Utils.Coding;
@@ -47,7 +48,7 @@ public class CustomButton
     public int Id { get; }
     public string Identifier { get; }
 
-    public ActionButton? ActionButton { get; set; }
+    public AbilityButton? ButtonObject { get; set; }
     public Func<float> Cooldown { get; set; }
     public Func<bool> CouldUse { get; set; }
     public float EffectTime { get; set; }
@@ -63,7 +64,8 @@ public class CustomButton
     public PassiveButton? PassiveButton { get; set; }
     public Vector3 Position { get; set; }
     public Sprite Sprite { get; set; }
-    public SpriteRenderer? SpriteRenderer { get; set; }
+    public SpriteRenderer SpriteRenderer { get; set; }
+    public SpriteRenderer HotkeyRenderer { get; set; }
 
     public string Text { get; set; }
     public TextMeshPro? TextMesh { get; set; }
@@ -163,10 +165,7 @@ public class CustomButton
 
     public void SetActive(bool active)
     {
-        if (active)
-            ActionButton!.Show();
-        else
-            ActionButton!.Hide();
+        ButtonObject?.ToggleVisible(active);
     }
 
     public void ResetCooldown()
@@ -193,16 +192,18 @@ public class CustomButton
 
     public void Update()
     {
+        var debug = GlobalCustomOptionConstant.DebugMode.GetBool();
         var hasButton = !GameStates.IsMeeting && PlayerControl.LocalPlayer.IsAlive() &&
                         HasButton.GetInvocationList().All(d => d.DynamicInvoke() == (object)true);
+        if (debug)
+        {
+            Timer = 0;
+            hasButton = true;
+        }
+
         var isCoolingDown = Timer > 0f;
 
-        var hotkeyText = string.Empty;
-        if (Hotkey.HasValue) hotkeyText = $"<size=75%> ({Hotkey.Value})</size>";
-
-        var buttonText = Text + hotkeyText;
-
-        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || !hasButton)
+        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance)
         {
             SetActive(false);
             return;
@@ -212,14 +213,19 @@ public class CustomButton
         if (!hasButton) return;
         
         if (PlayerStates.IsShowingMap()) SetActive(false);
+
+        ButtonObject!.commsDown.SetActive(false);
+        HotkeyRenderer.gameObject.SetActive(true);
+
         var lp = PlayerControl.LocalPlayer;
         if (isCoolingDown && !lp.inVent && lp.moveable) Timer -= Time.deltaTime;
-        ActionButton!.SetCoolDown(Timer, Cooldown());
-        ActionButton.OverrideText(buttonText);
+
+        ButtonObject!.SetCoolDown(Timer, Cooldown());
+        ButtonObject.OverrideText(Text);
         if (UsesLimit > 0)
-            ActionButton.SetUsesRemaining(UsesRemaining);
+            ButtonObject.SetUsesRemaining(UsesRemaining);
         else
-            ActionButton.SetInfiniteUses();
+            ButtonObject.SetInfiniteUses();
 
         var desat = Shader.PropertyToID("_Desat");
         var couldUse = CouldUse.GetInvocationList().All(d => (bool)d.DynamicInvoke()!)
@@ -256,9 +262,12 @@ public class CustomButton
             if (HasEffect && IsEffectActive)
             {
                 IsEffectActive = false;
-                if (ActionButton != null) ActionButton.cooldownTimerText.color = Palette.EnabledColor;
-                Debug.Assert(OnEffect != null, $"{nameof(OnEffect)} != null");
+                if (ButtonObject != null) ButtonObject.cooldownTimerText.color = Palette.EnabledColor;
                 ResetCooldown();
+
+                if (OnEffect == null) 
+                    Main.Logger.LogError($"{nameof(OnEffect)} shouldn't be null");
+
                 OnEffect();
             }
             else
@@ -294,42 +303,47 @@ public class CustomButton
     }
     internal static void Init(HudManager hud)
     {
-        var moddedParent = new GameObject("ModdedBottomRight");
-        var vanillaParent = hud.AbilityButton.transform.parent;
-        moddedParent.transform.SetParent(vanillaParent.parent);
-        moddedParent.transform.localPosition = vanillaParent.localPosition;
+        //var moddedParent = new GameObject("ModdedBottomRight");
+        //var vanillaParent = hud.AbilityButton.transform.parent;
+        //moddedParent.transform.SetParent(vanillaParent.parent);
+        //moddedParent.transform.localPosition = vanillaParent.localPosition;
 
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
         {
-            button.ActionButton = Object.Instantiate(hud!.AbilityButton, moddedParent.transform);
+            button.ButtonObject = Object.Instantiate(hud.AbilityButton, hud.AbilityButton.transform.parent/*moddedParent.transform*/);
 
-            button.SpriteRenderer = button.ActionButton.graphic;
-            button.SpriteRenderer.sprite = button.Identifier == "general-kill" ? hud.KillButton.graphic.sprite : button.Sprite;
+            button.SpriteRenderer = button.ButtonObject.graphic;
+            button.SpriteRenderer.sprite = button.Sprite;
 
             if (button.UsesLimit > 0)
-                button.ActionButton.SetUsesRemaining(button.UsesLimit);
+                button.ButtonObject.SetUsesRemaining(button.UsesLimit);
             else
-                button.ActionButton.SetInfiniteUses();
+                button.ButtonObject.SetInfiniteUses();
 
             button.ResetCooldown();
 
             button.Material = button.SpriteRenderer.material;
-            button.GameObject = button.ActionButton.gameObject;
+            button.GameObject = button.ButtonObject.gameObject;
             button.GameObject.name = ModdedFlag + button.Text;
-            button.PassiveButton = button.ActionButton.GetComponent<PassiveButton>();
-            button.TextMesh = button.ActionButton.buttonLabelText;
+            button.PassiveButton = button.ButtonObject.GetComponent<PassiveButton>();
+            button.TextMesh = button.ButtonObject.buttonLabelText;
             button.TextMesh.text = button.Text;
-            var tm = button.TextMesh;
-            tm.fontSizeMax = tm.fontSizeMin = tm.fontSize;
-            button.PassiveButton.OnClick = new Button.ButtonClickedEvent();
 
+            button.HotkeyRenderer = Object.Instantiate(button.ButtonObject.usesRemainingSprite, button.ButtonObject.transform);
+            button.HotkeyRenderer.color = new(1, 1, 0.3f, 1);
+            button.HotkeyRenderer.transform.localPosition = new(0.459f, -0.226f, -0.1f);
+            button.HotkeyRenderer.transform.localScale = new(0.9f, 0.9f, 1);
+            button.HotkeyRenderer.GetComponentInChildren<TextMeshPro>().text = button.Hotkey.ToString();
+
+            button.PassiveButton.OnClick = new Button.ButtonClickedEvent();
             button.PassiveButton.OnClick.AddListener((UnityAction)button.CheckClick);
-            button.SetActive(false);
+            button.SetActive(GlobalCustomOptionConstant.DebugMode.GetBool());
         }
 
         Initialized = true;
     }
 
+    [Obsolete("Use vanilla button arrangement instead", true)]
     internal static void ArrangePosition()
     {
         if (GameStates.IsMeeting || PlayerStates.IsShowingMap()) return;
@@ -348,7 +362,7 @@ public class CustomButton
         var idx1 = 0;
         var idx2 = 0;
         foreach (var btn in CustomButtonManager.GetManager().GetButtons()
-                     .Where(b => b.ActionButton!.isActiveAndEnabled && b.AutoPosition).OrderBy(b => b.Order))
+                     .Where(b => b.ButtonObject!.isActiveAndEnabled && b.AutoPosition).OrderBy(b => b.Order))
         {
             btn.Row = Mathf.Clamp(btn.Row, 1, 2); // 限制按钮的行数
             var y = 2 - btn.Row; // 对应y坐标（第一行 => y = 1; 第二行 => y = 0）
