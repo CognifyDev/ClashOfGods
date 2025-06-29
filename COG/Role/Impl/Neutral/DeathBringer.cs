@@ -27,7 +27,7 @@ public class DeathBringer : CustomRole, IListener
 
     private PlayerControl? _target;
     
-    public DeathBringer() : base(new Color(112, 48, 160, 100), CampType.Neutral)
+    public DeathBringer() : base(ColorUtils.FromColor32(112, 48, 160, 100), CampType.Neutral)
     {
         CanKill = true;
 

@@ -19,7 +19,7 @@ public class Guesser : CustomRole, IListener
 
     public int GuessedTime { get; internal set; }
     
-    public Guesser() : base(new Color(192, 0, 0, 100))
+    public Guesser() : base(ColorUtils.FromColor32(192, 0, 0, 100))
     {
         MaxGuessTime = CreateOption(() => LanguageConfig.Instance.GuesserMaxGuessTime,
             new FloatOptionValueRule(1F, 1F, 15F, 3F));
