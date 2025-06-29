@@ -52,7 +52,7 @@ public class ConfigBase
         if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
 
         if (File.Exists(Path) && (replace || AutoReplace))
-            File.Copy(Path, Path + ".old"); // Backup
+            File.Copy(Path, Path + ".old", true); // Backup
 
         if (!File.Exists(Path) || replace || AutoReplace)
             File.WriteAllText(Path, Text, Encoding.UTF8); // Auto overwrite
