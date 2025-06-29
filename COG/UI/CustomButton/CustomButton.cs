@@ -21,7 +21,7 @@ public class CustomButton
 
     private CustomButton(string identifier, Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
         Func<bool> hasButton,
-        Sprite sprite, Vector3? position, KeyCode? defaultHotkey, string text, bool hasEffect, Func<float> cooldown,
+        Sprite sprite, Vector3? position, KeyCode defaultHotkey, string text, bool hasEffect, Func<float> cooldown,
         float effectTime,
         int usesLimit)
     {
@@ -32,8 +32,8 @@ public class CustomButton
         CouldUse = couldUse;
         HasButton = hasButton;
         Sprite = sprite;
-        Position = position ?? Vector3.zero;
-        if (position is null) AutoPosition = true;
+        Position = position.HasValue ? position.Value : Vector3.zero;
+        if (!position.HasValue) AutoPosition = true;
         Hotkey = defaultHotkey;
         Text = text;
         HasEffect = hasEffect;
@@ -64,8 +64,8 @@ public class CustomButton
     public PassiveButton? PassiveButton { get; set; }
     public Vector3 Position { get; set; }
     public Sprite Sprite { get; set; }
-    public SpriteRenderer SpriteRenderer { get; set; }
-    public SpriteRenderer HotkeyRenderer { get; set; }
+    public SpriteRenderer? SpriteRenderer { get; set; }
+    public SpriteRenderer? HotkeyRenderer { get; set; }
 
     public string Text { get; set; }
     public TextMeshPro? TextMesh { get; set; }
@@ -98,7 +98,7 @@ public class CustomButton
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown,
+        Func<bool> hasButton, Sprite sprite, Vector3 position, KeyCode hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, int order = -1)
     {
         return new CustomButton(identifier, onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, position, hotkey, text,
@@ -122,7 +122,7 @@ public class CustomButton
     /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton,
-        Sprite sprite, Vector3 position, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit, int order = -1)
+        Sprite sprite, Vector3 position, KeyCode hotkey, string text, Func<float> cooldown, int usesLimit, int order = -1)
     {
         return new CustomButton(identifier, onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, position, hotkey, text,
                 false, cooldown, -1f, usesLimit)
@@ -136,7 +136,7 @@ public class CustomButton
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     /// <returns>CustomButton 的实例</returns>
     public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnd, Func<bool> couldUse, Func<bool> hasButton,
-        Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown, int usesLimit, int order = -1)
+        Sprite sprite, int row, KeyCode hotkey, string text, Func<float> cooldown, int usesLimit, int order = -1)
     {
         return new CustomButton(identifier, onClick, onMeetingEnd, () => { }, couldUse, hasButton, sprite, null, hotkey, text,
             false, cooldown, -1f, usesLimit)
@@ -152,7 +152,7 @@ public class CustomButton
     /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
     /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
     public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
-        Func<bool> hasButton, Sprite sprite, int row, KeyCode? hotkey, string text, Func<float> cooldown,
+        Func<bool> hasButton, Sprite sprite, int row, KeyCode hotkey, string text, Func<float> cooldown,
         float effectTime, int usesLimit, int order = -1)
     {
         return new CustomButton(identifier, onClick, onMeetingEnd, onEffect, couldUse, hasButton, sprite, null, hotkey, text,
@@ -197,8 +197,8 @@ public class CustomButton
                         HasButton.GetInvocationList().All(d => d.DynamicInvoke() == (object)true);
         if (debug)
         {
-            Timer = 0;
             hasButton = true;
+            Timer = 0;
         }
 
         var isCoolingDown = Timer > 0f;
@@ -215,7 +215,7 @@ public class CustomButton
         if (PlayerStates.IsShowingMap()) SetActive(false);
 
         ButtonObject!.commsDown.SetActive(false);
-        HotkeyRenderer.gameObject.SetActive(true);
+        HotkeyRenderer!.gameObject.SetActive(true);
 
         var lp = PlayerControl.LocalPlayer;
         if (isCoolingDown && !lp.inVent && lp.moveable) Timer -= Time.deltaTime;
@@ -303,14 +303,14 @@ public class CustomButton
     }
     internal static void Init(HudManager hud)
     {
-        //var moddedParent = new GameObject("ModdedBottomRight");
-        //var vanillaParent = hud.AbilityButton.transform.parent;
-        //moddedParent.transform.SetParent(vanillaParent.parent);
-        //moddedParent.transform.localPosition = vanillaParent.localPosition;
+        var moddedParent = new GameObject("ModdedBottomRight");
+        var vanillaParent = hud.AbilityButton.transform.parent;
+        moddedParent.transform.SetParent(vanillaParent.parent);
+        moddedParent.transform.localPosition = vanillaParent.localPosition;
 
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
         {
-            button.ButtonObject = Object.Instantiate(hud.AbilityButton, hud.AbilityButton.transform.parent/*moddedParent.transform*/);
+            button.ButtonObject = Object.Instantiate(hud.AbilityButton, moddedParent.transform);
 
             button.SpriteRenderer = button.ButtonObject.graphic;
             button.SpriteRenderer.sprite = button.Sprite;
@@ -330,10 +330,11 @@ public class CustomButton
             button.TextMesh.text = button.Text;
 
             button.HotkeyRenderer = Object.Instantiate(button.ButtonObject.usesRemainingSprite, button.ButtonObject.transform);
+            button.HotkeyRenderer.name = "Hotkey";
             button.HotkeyRenderer.color = new(1, 1, 0.3f, 1);
             button.HotkeyRenderer.transform.localPosition = new(0.459f, -0.226f, -0.1f);
             button.HotkeyRenderer.transform.localScale = new(0.9f, 0.9f, 1);
-            button.HotkeyRenderer.GetComponentInChildren<TextMeshPro>().text = button.Hotkey.ToString();
+            button.HotkeyRenderer.transform.FindChild("Text_TMP").GetComponent<TextMeshPro>().text = button.Hotkey.ToString();
 
             button.PassiveButton.OnClick = new Button.ButtonClickedEvent();
             button.PassiveButton.OnClick.AddListener((UnityAction)button.CheckClick);
@@ -343,7 +344,6 @@ public class CustomButton
         Initialized = true;
     }
 
-    [Obsolete("Use vanilla button arrangement instead", true)]
     internal static void ArrangePosition()
     {
         if (GameStates.IsMeeting || PlayerStates.IsShowingMap()) return;

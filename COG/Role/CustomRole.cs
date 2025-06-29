@@ -47,7 +47,7 @@ public class CustomRole
     /// <param name="color"></param>
     /// <param name="campType"></param>
     /// <param name="showInOptions"></param>
-    public CustomRole(Color color, CampType campType, bool showInOptions = true):this(color, campType, false, showInOptions)
+    public CustomRole(Color color, CampType campType, bool showInOptions = true) : this(color, campType, false, showInOptions)
     {
     }
 
