@@ -218,7 +218,8 @@ public partial class Main : BasePlugin
         CommandManager.GetManager().RegisterCommands(new CommandBase[]
         {
             new RpcCommand(),
-            new OptionCommand()
+            new OptionCommand(),
+            new RoleDebugCommand()
         });
         
         Harmony.PatchAll();

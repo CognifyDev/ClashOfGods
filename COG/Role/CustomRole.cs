@@ -131,8 +131,7 @@ public class CustomRole
     {
         var campName = IsSubRole ? "sub-roles" : CampType.ToString().ToLower();
         var location = $"role.{campName}.{GetNameInConfig()}.{context}";
-        var toReturn = LanguageConfig.Instance.YamlReader!
-            .GetString(location);
+        var toReturn = LanguageConfig.Instance.YamlReader!.GetString(location);
         return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
     }
 

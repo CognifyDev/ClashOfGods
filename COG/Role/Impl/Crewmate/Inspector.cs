@@ -50,7 +50,7 @@ public class Inspector : CustomRole, IListener
             {
                 if (_abilityUsedThisRound) 
                     return false;
-                return PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _);
+                return PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _buttonTarget);
             },
             () => true,
             null!,
@@ -59,7 +59,9 @@ public class Inspector : CustomRole, IListener
             LanguageConfig.Instance.ExamineAction,
             AbilityCooldownOption.GetFloat,
             -1
-       );
+        );
+
+        AddButton(ExamineButton);
     }
 
     [OnlyLocalPlayerWithThisRoleInvokable]
