@@ -25,7 +25,7 @@ internal class CustomButtonListener : IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         if (!CustomButton.Initialized) return;
-        CustomButton.ArrangePosition();
+        //CustomButton.ArrangePosition();
         foreach (var button in CustomButtonManager.GetManager().GetButtons()) button.Update();
     }
 

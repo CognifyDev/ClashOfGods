@@ -531,7 +531,7 @@ public static class PlayerUtils
             .WriteNetObject(target).WriteNetObject(toShowAsKiller).Write(modifyDeathData).Finish();
     }
 
-    public static void DisplayPlayerInfoOnName(this PlayerControl player)
+    public static void DisplayPlayerInfoOnName(this PlayerControl player, bool onlyDisplayNameSuffix = false)
     {
         var playerRole = player.GetPlayerData();
         if (playerRole is null || playerRole.MainRole is null) return;
@@ -544,21 +544,37 @@ public static class PlayerUtils
         var nameTextBuilder = new StringBuilder();
         var subRoleNameBuilder = new StringBuilder();
 
-        if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
-            foreach (var role in subRoles)
-                subRoleNameBuilder.Append(' ').Append(role.GetColorName());
+        if (!onlyDisplayNameSuffix)
+        {
+            if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
+                foreach (var role in subRoles)
+                    subRoleNameBuilder.Append(' ').Append(role.GetColorName());
 
-        nameTextBuilder.Append(mainRole.Name)
-            .Append(subRoleNameBuilder)
-            .Append('\n').Append(player.Data.PlayerName);
+            nameTextBuilder.Append(mainRole.Name)
+                .Append(subRoleNameBuilder)
+                .Append('\n').Append(player.Data.PlayerName);
+        }
+        else
+        {
+            nameTextBuilder.Append(player.Data.PlayerName);
+        }
 
         var adtnalTextBuilder = new StringBuilder();
-        foreach (var (color, text) in subRoles.ToList()
+        if (!onlyDisplayNameSuffix)
+        {
+            foreach (var (color, text) in subRoles.ToList()
                      .Select(r => (
                          r.Color,
                          r.HandleAdditionalPlayerName(player)
                      )))
-            adtnalTextBuilder.Append(' ').Append(text.Color(color));
+                adtnalTextBuilder.Append(' ').Append(text.Color(color));
+        }
+        else
+        {
+            var data = PlayerControl.LocalPlayer.GetPlayerData()!;
+            foreach (var role in data.SubRoles.Concat(data.MainRole.ToSingleElementArray()))
+                adtnalTextBuilder.Append(role.HandleAdditionalPlayerName(player));
+        }
 
         nameTextBuilder.Append(adtnalTextBuilder);
 

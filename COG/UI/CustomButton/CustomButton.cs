@@ -66,6 +66,7 @@ public class CustomButton
     public Sprite Sprite { get; set; }
     public SpriteRenderer? SpriteRenderer { get; set; }
     public SpriteRenderer? HotkeyRenderer { get; set; }
+    public TextMeshPro HotkeyText { get; set; }
 
     public string Text { get; set; }
     public TextMeshPro? TextMesh { get; set; }
@@ -231,6 +232,7 @@ public class CustomButton
         var couldUse = CouldUse.GetInvocationList().All(d => (bool)d.DynamicInvoke()!)
             && !GameStates.IsMeeting
             && PlayerControl.LocalPlayer.IsAlive();
+
         if (hasButton && !isCoolingDown && couldUse)
         {
             SpriteRenderer!.color = TextMesh!.color = Palette.EnabledColor;
@@ -303,14 +305,14 @@ public class CustomButton
     }
     internal static void Init(HudManager hud)
     {
-        var moddedParent = new GameObject("ModdedBottomRight");
-        var vanillaParent = hud.AbilityButton.transform.parent;
-        moddedParent.transform.SetParent(vanillaParent.parent);
-        moddedParent.transform.localPosition = vanillaParent.localPosition;
+        //var moddedParent = new GameObject("ModdedBottomRight");
+        //var vanillaParent = hud.AbilityButton.transform.parent;
+        //moddedParent.transform.SetParent(vanillaParent.parent);
+        //moddedParent.transform.localPosition = vanillaParent.localPosition;
 
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
         {
-            button.ButtonObject = Object.Instantiate(hud.AbilityButton, moddedParent.transform);
+            button.ButtonObject = Object.Instantiate(hud.AbilityButton, hud.AbilityButton.transform.parent/*moddedParent.transform*/);
 
             button.SpriteRenderer = button.ButtonObject.graphic;
             button.SpriteRenderer.sprite = button.Sprite;
@@ -334,7 +336,9 @@ public class CustomButton
             button.HotkeyRenderer.color = new(1, 1, 0.3f, 1);
             button.HotkeyRenderer.transform.localPosition = new(0.459f, -0.226f, -0.1f);
             button.HotkeyRenderer.transform.localScale = new(0.9f, 0.9f, 1);
-            button.HotkeyRenderer.transform.FindChild("Text_TMP").GetComponent<TextMeshPro>().text = button.Hotkey.ToString();
+            button.HotkeyText = button.HotkeyRenderer.transform.FindChild("Text_TMP").GetComponent<TextMeshPro>();
+            button.HotkeyText.gameObject.SetActive(true);
+            button.HotkeyText.SetText(button.Hotkey.ToString());
 
             button.PassiveButton.OnClick = new Button.ButtonClickedEvent();
             button.PassiveButton.OnClick.AddListener((UnityAction)button.CheckClick);

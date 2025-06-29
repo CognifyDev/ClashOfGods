@@ -37,8 +37,6 @@ static class VanillaKillButtonPatch
                 return;
             }
 
-            __instance.SetKillTimer(__instance.killTimer - Time.fixedDeltaTime); // This requires CanUseKillButton to be true
-
             if (setting.CustomCondition())
             {
                 PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out var player);

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using COG.Rpc;
+using UnityEngine;
 
 namespace COG.Utils;
 
@@ -21,5 +22,19 @@ public static class DeadBodyUtils
     public static PlayerControl? GetPlayer(this DeadBody body)
     {
         return PlayerUtils.GetPlayerById(body.ParentId);
+    }
+
+    public static void SetOutline(this DeadBody body, Color color)
+    {
+        body.bodyRenderers.Do(r =>
+        {
+            r.material.SetInt("_Outline", 1);
+            r.material.SetColor("_OutlineColor", color);
+        });
+    }
+
+    public static void ClearOutline(this DeadBody body)
+    {
+        body.bodyRenderers.Do(r => r.material.SetInt("_Outline", 0));
     }
 }

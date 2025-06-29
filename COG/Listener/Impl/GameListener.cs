@@ -67,9 +67,16 @@ public class GameListener : IListener
         var playersToDisplayInfo = new List<PlayerControl>() { PlayerControl.LocalPlayer };
 
         if (!PlayerControl.LocalPlayer.IsAlive())
+        {
             playersToDisplayInfo = PlayerControl.AllPlayerControls.ToArray().ToList();
+            playersToDisplayInfo.ForEach(p => p.DisplayPlayerInfoOnName());
+        }
+        else
+        {
+            PlayerControl.AllPlayerControls.ToArray().Do(p => p.DisplayPlayerInfoOnName(true));
+        }
 
-        playersToDisplayInfo.ForEach(p => p.DisplayPlayerInfoOnName());
+
     }
 
     public class PlayerGetter : IGetter<PlayerControl>

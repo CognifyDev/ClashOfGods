@@ -33,7 +33,13 @@ public class Cleaner : CustomRole, IListener
                 KillButtonManager.ResetCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
-            () => PlayerUtils.GetClosestBody(),
+            () =>
+            {
+                if (_body) _body!.ClearOutline(); // Clear outline of previous target
+                _body = PlayerUtils.GetClosestBody();
+                _body!.SetOutline(Color);
+                return _body;
+            },
             () => true,
             ResourceUtils.LoadSprite(ResourcesConstant.CleanDeadBodyButton)!,
             2,
@@ -48,6 +54,8 @@ public class Cleaner : CustomRole, IListener
 
     private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
+
+    private DeadBody? _body;
 
     public override IListener GetListener()
     {

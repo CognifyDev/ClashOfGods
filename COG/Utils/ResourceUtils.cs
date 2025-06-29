@@ -47,8 +47,9 @@ public static class ResourceUtils
             sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
             return CachedSprites[path + pixelsPerUnit] = sprite;
         }
-        catch
+        catch (System.Exception e)
         {
+            Main.Logger.LogError($"Error while loading {path} ({pixelsPerUnit}): {e}");
             return null;
         }
     }
@@ -59,7 +60,8 @@ public static class ResourceUtils
         var texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
         using MemoryStream ms = new();
         stream?.CopyTo(ms);
-        ImageConversion.LoadImage(texture, ms.ToArray(), false);
+        bool succeed = ImageConversion.LoadImage(texture, ms.ToArray(), false);
+        if (!succeed) Main.Logger.LogError("Failed to load texture: " + path);
         return texture;
     }
 
