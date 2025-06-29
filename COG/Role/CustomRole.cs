@@ -45,10 +45,12 @@ public class CustomRole
         Id = _order++;
         ShowInOptions = showInOptions;
         AllOptions = new List<CustomOption>();
+
         KillButtonSetting = new()
         {
             ForceShow = () => CanKill
         };
+        KillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this));
         
         Name = GetContextFromLanguage("name");
         ShortDescription = GetContextFromLanguage("description");
@@ -311,6 +313,10 @@ public class CustomRole
     }
 
     public virtual void OnRoleGameDataBeingSynchronized(RpcWriter writer)
+    {
+    }
+
+    public virtual void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
     {
     }
 

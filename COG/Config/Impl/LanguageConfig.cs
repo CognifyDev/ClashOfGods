@@ -90,6 +90,7 @@ public class LanguageConfig : ConfigBase
     public string NoMoreDescription { get; private set; } = null!;
     public string RoleCode { get; private set; } = null!;
     public string MaxUseTime { get; private set; } = null!;
+    public string AbilityCooldown { get; private set; } = null!;
 
     public string QQ { get; private set; } = null!;
     public string Discord { get; private set; } = null!;
@@ -143,8 +144,8 @@ public class LanguageConfig : ConfigBase
     {
         MakePublicMessage = GetString("lobby.make-public-message");
 
-        Yes = GetString("global.yes");
-        No = GetString("global.no");
+        Yes = GetString("mod-global.yes");
+        No = GetString("mod-global.no");
 
         GeneralHeaderTitle = LoadPreset = GetString("game-setting.general.title");
         LoadPreset = GetString("game-setting.general.load-preset");
@@ -192,6 +193,7 @@ public class LanguageConfig : ConfigBase
         NoMoreDescription = GetString("role.global.no-details");
         RoleCode = GetString("role.global.role-code");
         MaxUseTime = GetString("role.global.max-use-time");
+        AbilityCooldown = GetString("role.global.ability-cooldown");
 
         UnknownCamp = GetString("camp.unknown.name");
         ImpostorCamp = GetString("camp.impostor.name");

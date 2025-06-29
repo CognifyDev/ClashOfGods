@@ -87,10 +87,9 @@ public class Technician : CustomRole, IListener
         }
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnRpcReceived(PlayerHandleRpcEvent @event)
+    public override void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
     {
-        if ((KnownRpc)@event.CallId == KnownRpc.ClearSabotages)
+        if ((KnownRpc)callId == KnownRpc.ClearSabotages)
             RepairSabotages();
     }
 

@@ -8,16 +8,16 @@ using System.Linq;
 using UnityEngine;
 using COG.UI.CustomButton;
 using COG.Config.Impl;
+using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
 
 namespace COG.Role.Impl.Crewmate;
 
 [NotTested]
 [NotUsed]
 [Todo("""
-    1. Optimize repeated target searching button
-    2. Add language strings
-    3. Add cooldown option
-    4. Add button sprite
+    1. Add button sprite
+    2. Test functions
     """)]
 public class Inspector : CustomRole, IListener
 {
@@ -26,12 +26,15 @@ public class Inspector : CustomRole, IListener
     private PlayerControl? _buttonTarget;
     private PlayerControl? _examinedTarget;
 
+    public CustomOption AbilityCooldownOption { get; }
     public CustomButton ExamineButton { get; }
 
     public Inspector() : base(Color.gray, CampType.Crewmate)
     {
         OnRoleAbilityUsed += role => NotifyInspector();
 
+        AbilityCooldownOption = CreateOption(() => LanguageConfig.Instance.AbilityCooldown,
+            new FloatOptionValueRule(10, 5, 60, 25, NumberSuffixes.Seconds));
         ExamineButton = CustomButton.Of("inspector-examine",
             () =>
             {
@@ -54,17 +57,16 @@ public class Inspector : CustomRole, IListener
             2,
             KeyCode.X,
             LanguageConfig.Instance.ExamineAction,
-            () => 0,
+            AbilityCooldownOption.GetFloat,
             -1
        );
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnRpcReceived(PlayerHandleRpcEvent @event)
+    public override void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
     {
-        if (@event.CallId is (byte)KnownRpc.ShareAbilityOrVentUseForInspector or (byte)RpcCalls.EnterVent)
-            _abilityUsedPlayers.Add(@event.Player);
+        if (callId is (byte)KnownRpc.ShareAbilityOrVentUseForInspector or (byte)RpcCalls.EnterVent)
+            _abilityUsedPlayers.Add(sender);
     }
 
     // The player of the role that vented/killed/used his ability performs this, so we gotta send RPC to notify

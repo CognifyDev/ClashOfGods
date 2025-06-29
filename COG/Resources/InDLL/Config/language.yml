@@ -1,6 +1,6 @@
 lobby:
   make-public-message: "禁止设置为公开"
-global:
+mod-global:
   yes: "是"
   no: "否"
 role:
@@ -14,6 +14,7 @@ role:
     allow-start-meeting: "允许启动会议"
     allow-report-body: "允许报告尸体"
     kill-cooldown: "击杀冷却时间"
+    ability-cooldown: "技能冷却时间"
     no-details: "没有详细信息"
     role-code: "职业特征码"
     max-use-time: "最大使用次数"

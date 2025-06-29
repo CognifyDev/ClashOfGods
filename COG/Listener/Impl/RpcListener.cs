@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using COG.Listener.Event.Impl.Player;
 using COG.Patch;
 using COG.Role;
@@ -174,6 +175,11 @@ public class RpcListener : IListener
 
                 Main.Logger.LogMessage($"Syncing game data for {role.Name}...");
                 role.OnRoleGameDataGettingSynchronized(reader);
+
+                var hasMark = role.GetType().GetMethod(nameof(CustomRole.OnRpcReceived), BindingFlags.Public)!
+                        .GetCustomAttribute<OnlyLocalPlayerWithThisRoleInvokableAttribute>() != null;
+                if (!hasMark || (hasMark && role.IsLocalPlayerRole()))
+                    role.OnRpcReceived(@event.Player, callId, reader);
                 break;
             }
         }
