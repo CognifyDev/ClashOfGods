@@ -159,7 +159,7 @@ public static class RoleOptionPatch
             CampType.Crewmate => LanguageConfig.Instance.CrewmateCamp,
             CampType.Impostor => LanguageConfig.Instance.ImpostorCamp,
             CampType.Neutral => LanguageConfig.Instance.NeutralCamp,
-            _ => LanguageConfig.Instance.AddonName
+            _ => LanguageConfig.Instance.SubRoleName
         };
         header.Background.color = camp switch
         {

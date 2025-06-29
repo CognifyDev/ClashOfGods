@@ -30,9 +30,28 @@ namespace COG.Role;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class CustomRole
 {
-    private static int _order;
-    
-    public CustomRole(Color color, CampType campType, bool isSubRole = false, bool showInOptions = true)
+    private static int _order = 0;
+
+    /// <summary>
+    /// Initializes a sub-role instance.
+    /// </summary>
+    /// <param name="color"></param>
+    /// <param name="showInOptions"></param>
+    public CustomRole(Color color, bool showInOptions = true) : this(color, CampType.Unknown, true, showInOptions)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a main role instance.
+    /// </summary>
+    /// <param name="color"></param>
+    /// <param name="campType"></param>
+    /// <param name="showInOptions"></param>
+    public CustomRole(Color color, CampType campType, bool showInOptions = true):this(color, campType, false, showInOptions)
+    {
+    }
+
+    private CustomRole(Color color, CampType campType, bool isSubRole, bool showInOptions)
     {
         IsBaseRole = false;
         Color = color;
@@ -237,8 +256,11 @@ public class CustomRole
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
+        if (!ShowInOptions) return null!;
+
         var option = CustomOption.Of(GetTabType(this), nameGetter, rule).Register();
         AllOptions.Add(option);
+
         return option;
     }
 

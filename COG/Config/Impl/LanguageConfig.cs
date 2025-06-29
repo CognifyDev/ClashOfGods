@@ -99,7 +99,7 @@ public class LanguageConfig : ConfigBase
     public string ImpostorCamp { get; private set; } = null!;
     public string NeutralCamp { get; private set; } = null!;
     public string CrewmateCamp { get; private set; } = null!;
-    public string AddonName { get; private set; } = null!;
+    public string SubRoleName { get; private set; } = null!;
 
     public string UnknownCampDescription { get; private set; } = null!;
     public string ImpostorCampDescription { get; private set; } = null!;
@@ -199,7 +199,7 @@ public class LanguageConfig : ConfigBase
         ImpostorCamp = GetString("camp.impostor.name");
         NeutralCamp = GetString("camp.neutral.name");
         CrewmateCamp = GetString("camp.crewmate.name");
-        AddonName = GetString("camp.addon");
+        SubRoleName = GetString("camp.sub-role");
 
         UnknownCampDescription = GetString("camp.unknown.description");
         ImpostorCampDescription = GetString("camp.impostor.description");

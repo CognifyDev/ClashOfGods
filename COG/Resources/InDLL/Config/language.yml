@@ -112,7 +112,7 @@ camp:
   crewmate:
     name: "船员阵营"
     description: "完成任务，找出内鬼"
-  addon: "附加职业"
+  sub-role: "附加职业"
 game-setting:
   view-description:
     general: "预览游戏大厅的常规设置。"

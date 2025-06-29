@@ -12,7 +12,7 @@ public class SpeedBooster : CustomRole, IListener
 {
     private CustomOption IncreasingSpeed { get; }
     
-    public SpeedBooster() : base(Color.cyan, CampType.Unknown, true)
+    public SpeedBooster() : base(Color.cyan)
     {
         IncreasingSpeed = CreateOption(() => LanguageConfig.Instance.SpeedBoosterIncreasingSpeed,
             new FloatOptionValueRule(0.5F, 0.5F, 10F, 1F, NumberSuffixes.Multiplier));

@@ -4,7 +4,7 @@ namespace COG.Role.Impl.Impostor;
 
 public class Impostor : CustomRole
 {
-    public Impostor() : base(Palette.ImpostorRed, CampType.Impostor, false, false)
+    public Impostor() : base(Palette.ImpostorRed, CampType.Impostor, false)
     {
         CanKill = true;
         CanVent = true;
