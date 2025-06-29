@@ -51,8 +51,8 @@ public class LanguageConfig : ConfigBase
     public string MaxSubRoleNumber { get; private set; } = null!;
     public string MaxNeutralNumber { get; private set; } = null!;
 
-    public string Yes { get; private set; }
-    public string No { get; private set; }
+    public string Yes { get; private set; } = null!;
+    public string No { get; private set; } = null!;
 
     // Crewmate
     public string VigilanteMinCrewmateNumber { get; private set; } = null!;
