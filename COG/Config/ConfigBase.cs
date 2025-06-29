@@ -52,9 +52,14 @@ public class ConfigBase
         if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
 
         if (!File.Exists(Path) || replace || AutoReplace)
+        {
+            if (File.Exists(Path) && (replace || AutoReplace))
+                File.Copy(Path, Path + ".old"); // Backup
+
             File.WriteAllText(Path, Text, Encoding.UTF8); // Auto overwrite
+        }
         else
-            Text = File.ReadAllText(Path, Encoding.UTF8); // Replace from disk
+            Text = File.ReadAllText(Path, Encoding.UTF8); // Replace variable from disk
 
         YamlReader = Yaml.LoadFromString(Text);
         AutoReplace = false;

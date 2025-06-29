@@ -107,7 +107,7 @@ public class CustomWinnerListener : IListener
             var winnerPoolable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
             if (winner == null!) continue;
             
-            // Variable names optimizing by ChatGPT
+            // Variable names optimization by ChatGPT
             var offsetMultiplier = num % 2 == 0 ? -1 : 1;
             var indexOffset = (num + 1) / 2;
             var lerpFactor = indexOffset / ceiling;
@@ -208,7 +208,7 @@ public class CustomWinnerListener : IListener
                 .Append(role.MainRole.Color.ToColorString(role.MainRole.Name));
             summary.Append(' ').Append((deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed).ToColorString(
                 deadPlayer == null ? LanguageConfig.Instance.Alive :
-                deadPlayer.DeathReason == null ? LanguageConfig.Instance.UnknownKillReason :
+                !deadPlayer.DeathReason.HasValue ? LanguageConfig.Instance.UnknownKillReason :
                 deadPlayer.DeathReason.GetLanguageDeathReason()));
             summary.Append(Environment.NewLine);
         }

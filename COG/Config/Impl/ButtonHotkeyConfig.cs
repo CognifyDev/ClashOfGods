@@ -31,7 +31,7 @@ public class ButtonHotkeyConfig : ConfigBase
     public void SetHotkey(CustomButton button, KeyCode hotkey)
     {
         button.Hotkey = hotkey;
-        Main.Logger.LogInfo($"Hotkey set: {hotkey}");
+        Main.Logger.LogInfo($"Hotkey being set: {hotkey}");
         SaveConfigs();
     }
 

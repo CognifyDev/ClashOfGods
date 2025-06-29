@@ -153,6 +153,7 @@ public partial class Main : BasePlugin
             new Vigilante(),
             new SoulHunter(),
             new Technician(),
+            new Inspector(),
 
             // Impostor
             new Impostor(),
