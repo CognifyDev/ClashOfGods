@@ -1,5 +1,8 @@
 lobby:
   make-public-message: "禁止设置为公开"
+global:
+  yes: "是"
+  no: "否"
 role:
   unknown:
     unknown:
@@ -62,6 +65,10 @@ role:
       name: "技术员"
       description: "解决飞船的一切疑难杂症"
       long-description: "可以进行2次修复，立刻结束破坏或封锁。完成所有任务后可以使用通风口。"
+    inspector:
+      name: "巡查员"
+      description: "检查可疑人员！"
+      long-description: "可以检察一名玩家本轮是否使用过击杀/通风口/主动技能，如有其中任意一项则结果为“是”，否则为“否”，结果会标记在其名称右方。技能每轮只能对同一玩家使用一次。"
   neutral:
     jester:
       name: "小丑"
@@ -144,6 +151,7 @@ action:
   dispatch: "处决"
   repair: "修复"
   stare: "凝视"
+  examine: "检察"
 game:
   end:
     summary-message: "玩家职业:"
@@ -153,7 +161,7 @@ game:
       neutral: "%player% 胜利"
   survival-data:
     alive: "存活"
-    disconnected: "掉线"
+    disconnected: "断连"
     default: "死亡"
     exiled: "驱逐"
     misfire: "走火"

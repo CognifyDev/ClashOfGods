@@ -51,6 +51,9 @@ public class LanguageConfig : ConfigBase
     public string MaxSubRoleNumber { get; private set; } = null!;
     public string MaxNeutralNumber { get; private set; } = null!;
 
+    public string Yes { get; private set; }
+    public string No { get; private set; }
+
     // Crewmate
     public string VigilanteMinCrewmateNumber { get; private set; } = null!;
 
@@ -107,6 +110,7 @@ public class LanguageConfig : ConfigBase
     public string DispatchAction { get; private set; } = null!;
     public string RepairAction { get; private set; } = null!;
     public string StareAction { get; private set; } = null!;
+    public string ExamineAction { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
@@ -139,13 +143,16 @@ public class LanguageConfig : ConfigBase
     {
         MakePublicMessage = GetString("lobby.make-public-message");
 
+        Yes = GetString("global.yes");
+        No = GetString("global.no");
+
         GeneralHeaderTitle = LoadPreset = GetString("game-setting.general.title");
         LoadPreset = GetString("game-setting.general.load-preset");
         SavePreset = GetString("game-setting.general.save-preset");
         DebugMode = GetString("game-setting.general.debug-mode");
         MaxSubRoleNumber = GetString("game-setting.general.max-sub-role-number");
         MaxNeutralNumber = GetString("game-setting.general.max-neutral-number");
-        
+
         // Crewmate
         VigilanteMinCrewmateNumber = GetString("role.crewmate.vigilante.min-crewmate-number");
 
@@ -202,6 +209,7 @@ public class LanguageConfig : ConfigBase
         DispatchAction = GetString("action.dispatch");
         RepairAction = GetString("action.repair");
         StareAction = GetString("action.stare");
+        ExamineAction = GetString("action.examine");
 
         ShowPlayersRolesMessage = GetString("game.end.summary-message");
 

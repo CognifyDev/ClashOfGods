@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using COG.UI.CustomButton;
+using COG.Config.Impl;
 
 namespace COG.Role.Impl.Crewmate;
 
@@ -25,8 +26,6 @@ public class Inspector : CustomRole, IListener
     private PlayerControl? _buttonTarget;
     private PlayerControl? _examinedTarget;
 
-    public string YesString { get; }
-    public string NoString { get; }
     public CustomButton ExamineButton { get; }
 
     public Inspector() : base(Color.gray, CampType.Crewmate)
@@ -54,7 +53,7 @@ public class Inspector : CustomRole, IListener
             null!,
             2,
             KeyCode.X,
-            "EXAMINE",
+            LanguageConfig.Instance.ExamineAction,
             () => 0,
             -1
        );
@@ -84,7 +83,7 @@ public class Inspector : CustomRole, IListener
     public override string HandleAdditionalPlayerName(PlayerControl player)
     {
         if (player.IsSamePlayer(_examinedTarget))
-            return $"({(_abilityUsedPlayers.Contains(player) ? YesString.Color(Palette.ImpostorRed) : NoString.Color(Palette.ImpostorRed))})";
+            return $"({(_abilityUsedPlayers.Contains(player) ? LanguageConfig.Instance.Yes.Color(Palette.ImpostorRed) : LanguageConfig.Instance.No.Color(Palette.AcceptedGreen))})";
         return base.HandleAdditionalPlayerName(player);
     }
 
