@@ -26,8 +26,8 @@ public class Bait : CustomRole, IListener
     {
         var killer = @event.Player;
         var target = @event.Target;
-        if (!PlayerControl.LocalPlayer.IsSamePlayer(killer)) return; // Only the killer executes this
-        if (killer == null || target == null) return;
+        if (!killer.AmOwner) return; // Only the killer executes this
+        if (!(killer && target)) return;
         if (target.IsRole(this)) Coroutines.Start(CoDelayedReport());
 
         IEnumerator CoDelayedReport()
