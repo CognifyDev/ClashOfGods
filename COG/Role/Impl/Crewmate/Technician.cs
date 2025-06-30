@@ -29,7 +29,7 @@ public class Technician : CustomRole, IListener
             () => RepairButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency),
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.RepairButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.RepairButton)!,
             2,
             KeyCode.R,
             LanguageConfig.Instance.RepairAction,

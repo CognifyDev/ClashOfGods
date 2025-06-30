@@ -1,10 +1,10 @@
 namespace COG.Constant;
 
 /// <summary>
-///     资源列表常量类
+///     资源列表常量类<para/>
 ///     记录了各种常用资源位置
 /// </summary>
-public static class ResourcesConstant
+public static class ResourceConstant
 {
     // Buttons
     public const string CleanDeadBodyButton = "COG.Resources.InDLL.Images.Buttons.CleanDeadBody.png";
@@ -13,6 +13,7 @@ public static class ResourcesConstant
     public const string DispatchButton = "COG.Resources.InDLL.Images.Buttons.Dispatch.png";
     public const string RepairButton = "COG.Resources.InDLL.Images.Buttons.Repair.png";
     public const string StareButton = "COG.Resources.InDLL.Images.Buttons.Stare.png";
+    public const string ExamineButton = "COG.Resources.InDLL.Images.Buttons.Examine.png";
     
     public const string ArrowImage = "COG.Resources.InDLL.Images.Arrow.png";
     

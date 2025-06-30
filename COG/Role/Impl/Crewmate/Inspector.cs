@@ -10,6 +10,7 @@ using COG.UI.CustomButton;
 using COG.Config.Impl;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.Constant;
 
 namespace COG.Role.Impl.Crewmate;
 
@@ -53,7 +54,7 @@ public class Inspector : CustomRole, IListener
                 return PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _buttonTarget);
             },
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.ExamineButton)!,
             2,
             KeyCode.X,
             LanguageConfig.Instance.ExamineAction,

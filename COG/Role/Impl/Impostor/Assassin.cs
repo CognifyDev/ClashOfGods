@@ -38,7 +38,7 @@ public class Assassin : CustomRole
             () => DispatchButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
             () =>  _killedTimes < MaxUseTime.GetFloat(),
-            ResourceUtils.LoadSprite(ResourcesConstant.DispatchButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.DispatchButton)!,
             2,
             KeyCode.C,
             LanguageConfig.Instance.DispatchAction,

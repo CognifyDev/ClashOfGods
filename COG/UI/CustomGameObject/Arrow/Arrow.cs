@@ -24,7 +24,7 @@ public class Arrow : ICustomGameObject
         else
             Renderer.color = UnityEngine.Color.yellow;
         
-        Renderer.sprite = ResourceUtils.LoadSprite(ResourcesConstant.ArrowImage, 200f);
+        Renderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.ArrowImage, 200f);
 
         Behaviour.image = Renderer;
         Behaviour.target = Target;

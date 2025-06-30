@@ -476,7 +476,7 @@ public class GameListener : IListener
         }
         
         controller.ImpostorText.text =
-            LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(crewCount, neutralCount, impCount);
+            LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(PlayerUtils.GetAllAlivePlayers().Count/*crewCount, neutralCount, impCount*/);
         return;
 
         int GetCount(IEnumerable<PlayerData> list)

@@ -33,7 +33,7 @@ public class GuessButton : TemplatedCustomGameObject
         GameObject.name = GuessButtonName;
         GameObject.transform.localPosition = LocalPosition;
         var renderer = GameObject.GetComponent<SpriteRenderer>();
-        renderer.sprite = ResourceUtils.LoadSprite(ResourcesConstant.GuessButton, 150F);
+        renderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.GuessButton, 150F);
         
         Buttons.Add(this);
     }

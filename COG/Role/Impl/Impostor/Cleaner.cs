@@ -39,7 +39,7 @@ public class Cleaner : CustomRole, IListener
                 return _body;
             },
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.CleanDeadBodyButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.CleanDeadBodyButton)!,
             2,
             KeyCode.C,
             LanguageConfig.Instance.CleanAction,
