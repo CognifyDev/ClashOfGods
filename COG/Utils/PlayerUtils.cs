@@ -539,7 +539,9 @@ public static class PlayerUtils
         var subRoles = playerRole.SubRoles;
         var mainRole = playerRole.MainRole;
         var nameText = player.cosmetics.nameText;
-        nameText.color = mainRole.Color;
+
+        if (!onlyDisplayNameSuffix)
+            nameText.color = mainRole.Color;
 
         var nameTextBuilder = new StringBuilder();
         var subRoleNameBuilder = new StringBuilder();
@@ -572,13 +574,13 @@ public static class PlayerUtils
         else
         {
             var data = PlayerControl.LocalPlayer.GetPlayerData()!;
-            foreach (var role in data.SubRoles.Concat(data.MainRole.ToSingleElementArray()))
+            foreach (var role in CustomRoleManager.GetManager().GetRoles())
                 adtnalTextBuilder.Append(role.HandleAdditionalPlayerName(player));
         }
 
         nameTextBuilder.Append(adtnalTextBuilder);
 
-        nameText.text = nameTextBuilder + adtnalTextBuilder.ToString();
+        nameText.text = nameTextBuilder.ToString();
     }
 
     /// <summary>

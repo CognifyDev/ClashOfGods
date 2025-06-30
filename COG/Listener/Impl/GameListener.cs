@@ -75,8 +75,6 @@ public class GameListener : IListener
         {
             PlayerControl.AllPlayerControls.ToArray().Do(p => p.DisplayPlayerInfoOnName(true));
         }
-
-
     }
 
     public class PlayerGetter : IGetter<PlayerControl>
