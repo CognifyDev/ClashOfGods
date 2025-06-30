@@ -14,12 +14,6 @@ using COG.Constant;
 
 namespace COG.Role.Impl.Crewmate;
 
-[NotTested]
-[NotUsed]
-[Todo("""
-    1. Add button sprite
-    2. Test functions
-    """)]
 public class Inspector : CustomRole, IListener
 {
     private bool _abilityUsedThisRound = false;
@@ -30,7 +24,7 @@ public class Inspector : CustomRole, IListener
     public CustomOption AbilityCooldownOption { get; }
     public CustomButton ExamineButton { get; }
 
-    public Inspector() : base(Color.gray, CampType.Crewmate)
+    public Inspector() : base(ColorUtils.FromColor32(46, 84, 160), CampType.Crewmate)
     {
         OnRoleAbilityUsed += role => NotifyInspector();
 

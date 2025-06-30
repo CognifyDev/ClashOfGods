@@ -17,10 +17,10 @@ public static class ColorUtils
     }
 
     public static Color FromColor32(this Color32 color32) 
-        => new(color32.r / 256f, color32.g / 256f, color32.b / 256f, color32.a / 256f);
+        => new(color32.r / byte.MaxValue, color32.g / byte.MaxValue, color32.b / byte.MaxValue, color32.a / byte.MaxValue);
 
-    public static Color FromColor32(byte r, byte g, byte b, byte a)
-        => new(r / 256f, g / 256f, b / 256f, a / 256f);
+    public static Color FromColor32(byte r, byte g, byte b, byte a = 255)
+        => new(r / byte.MaxValue, g / byte.MaxValue, b / byte.MaxValue, a / byte.MaxValue);
 
     private static byte ToByte(float f)
     {
@@ -34,6 +34,6 @@ public static class ColorUtils
         var green = Convert.ToByte(color.Substring(3, 2), 16);
         var blue = Convert.ToByte(color.Substring(5, 2), 16);
 
-        return FromColor32(red, green, blue, 255);
+        return FromColor32(red, green, blue, byte.MaxValue);
     }
 }

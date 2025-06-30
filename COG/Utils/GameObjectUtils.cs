@@ -21,6 +21,9 @@ public static class GameObjectUtils
 
     public static void DestroyComponent<T>(this GameObject obj) where T : Component
     {
-        obj.GetComponent<T>().Destroy();
+        if (!obj) return;
+        var comp = obj.GetComponent<T>();
+        if (!comp) return;
+        comp.Destroy();
     }
 }

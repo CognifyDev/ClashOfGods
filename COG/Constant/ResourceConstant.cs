@@ -14,6 +14,7 @@ public static class ResourceConstant
     public const string RepairButton = "COG.Resources.InDLL.Images.Buttons.Repair.png";
     public const string StareButton = "COG.Resources.InDLL.Images.Buttons.Stare.png";
     public const string ExamineButton = "COG.Resources.InDLL.Images.Buttons.Examine.png";
+    public const string BlockButton = "COG.Resources.InDLL.Images.Buttons.Block.png";
     
     public const string ArrowImage = "COG.Resources.InDLL.Images.Arrow.png";
     
