@@ -3,6 +3,7 @@ using COG.States;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace COG.Patch;
@@ -19,15 +20,24 @@ static class VanillaKillButtonPatch
         if (!__instance.AmOwner) return; // Only local player
         if (!GameStates.InRealGame) return;
 
+        //KillButtonManager.OverrideSetting(__instance.GetMainRole().KillButtonSetting);
+
         __instance.Data.Role.CanUseKillButton = true;
 
         var killButton = HudManager.Instance.KillButton;
-        var setting = KillButtonManager.GetSetting();
+        //var setting = KillButtonManager.GetSetting();
+        var settings = __instance.GetSubRoles().Concat(__instance.GetMainRole().ToSingleElementArray()).Select(r => r.KillButtonSetting);
+        
+        killButton.ToggleVisible(settings.Any(r => r.ForceShow()) && _isHudActive);
 
-        if (KillButtonManager.ShouldForceShow() && setting.UsesLimit > 0)
+        var activatedSettings = settings.Where(s => s.ForceShow());
+        if (activatedSettings.Count() == 0) return;
+        var setting = activatedSettings.First(); // there should be one settings active
+
+        // never log here since it will fill log file with trash
+
+        if (setting.ForceShow() && setting.UsesLimit > 0)
             killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) + $" ({setting.RemainingUses})");
-
-        killButton.ToggleVisible(KillButtonManager.ShouldForceShow() && _isHudActive);
 
         if (KillButtonManager.NecessaryKillCondition && _isHudActive) // Prevent meeting kill (as we canceled vanilla murder check)
         {
@@ -46,6 +56,7 @@ static class VanillaKillButtonPatch
                 player!.cosmetics.SetOutline(true, new(setting.TargetOutlineColor));
             }
         }
+        
     }
 
     [HarmonyPatch(typeof(KillButton), nameof(KillButton.DoClick))]
@@ -57,7 +68,13 @@ static class VanillaKillButtonPatch
             && !__instance.isCoolingDown
             && PlayerControl.LocalPlayer.CanMove)
         {
-            var setting = KillButtonManager.GetSetting();
+            var settings = PlayerControl.LocalPlayer.GetSubRoles().Concat(PlayerControl.LocalPlayer.GetMainRole().ToSingleElementArray()).Select(r => r.KillButtonSetting);
+
+            __instance.ToggleVisible(settings.Any(r => r.ForceShow()) && _isHudActive);
+
+            var activatedSettings = settings.Where(s => s.ForceShow());
+            if (activatedSettings.Count() == 0) return false;
+            var setting = activatedSettings.First();
 
             if (setting.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())
                 return false;

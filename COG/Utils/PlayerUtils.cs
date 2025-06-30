@@ -296,7 +296,6 @@ public static class PlayerUtils
     /// <returns></returns>
     public static bool IsAlive(this PlayerControl player)
     {
-        if (GameStates.InLobby) return true;
         if (player == null) return false;
         return !player.Data.IsDead;
     }
@@ -311,7 +310,9 @@ public static class PlayerUtils
         if (!player) return false; // 在对局内只要是游戏正式开始时在游戏内的玩家，玩家的NetworkedPlayerInfo绝对不为空
 
         var targetRole = player.GetPlayerData();
-        return targetRole?.MainRole != null && (targetRole.MainRole.Id == role.Id || targetRole.SubRoles.Select(customRole => customRole.Id).Contains(role.Id));
+        if (targetRole == null) return false;
+
+        return targetRole.SubRoles.Concat(targetRole.MainRole.ToSingleElementArray()).Contains(role);
     }
 
     public static DeadBody? GetClosestBody(List<DeadBody>? unTargetAble = null)

@@ -66,7 +66,7 @@ public class CustomButton
     public Sprite Sprite { get; set; }
     public SpriteRenderer? SpriteRenderer { get; set; }
     public SpriteRenderer? HotkeyRenderer { get; set; }
-    public TextMeshPro HotkeyText { get; set; }
+    public TextMeshPro? HotkeyText { get; set; }
 
     public string Text { get; set; }
     public TextMeshPro? TextMesh { get; set; }
@@ -194,8 +194,10 @@ public class CustomButton
     public void Update()
     {
         var debug = GlobalCustomOptionConstant.DebugMode.GetBool();
+        string log = "";
         var hasButton = !GameStates.IsMeeting && PlayerControl.LocalPlayer.IsAlive() &&
-                        HasButton.GetInvocationList().All(d => d.DynamicInvoke() == (object)true);
+                        HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
+        
         if (debug)
         {
             hasButton = true;
@@ -204,7 +206,7 @@ public class CustomButton
 
         var isCoolingDown = Timer > 0f;
 
-        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance)
+        if (!PlayerControl.LocalPlayer || GameStates.IsMeeting || ExileController.Instance || PlayerStates.IsShowingMap())
         {
             SetActive(false);
             return;
@@ -212,8 +214,6 @@ public class CustomButton
 
         SetActive(hasButton);
         if (!hasButton) return;
-        
-        if (PlayerStates.IsShowingMap()) SetActive(false);
 
         ButtonObject!.commsDown.SetActive(false);
         HotkeyRenderer!.gameObject.SetActive(true);
@@ -340,7 +340,7 @@ public class CustomButton
             button.HotkeyText.gameObject.SetActive(true);
             button.HotkeyText.SetText(button.Hotkey.ToString());
 
-            button.PassiveButton.OnClick = new Button.ButtonClickedEvent();
+            button.PassiveButton.OnClick = new();
             button.PassiveButton.OnClick.AddListener((UnityAction)button.CheckClick);
             button.SetActive(GlobalCustomOptionConstant.DebugMode.GetBool());
         }
@@ -348,6 +348,7 @@ public class CustomButton
         Initialized = true;
     }
 
+    // Disable temporarily
     internal static void ArrangePosition()
     {
         if (GameStates.IsMeeting || PlayerStates.IsShowingMap()) return;

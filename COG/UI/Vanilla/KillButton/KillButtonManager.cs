@@ -118,7 +118,7 @@ public class KillButtonSetting
     public void AfterClick() => _afterClick.GetInvocationList().Do(dg => dg.DynamicInvoke());
     public void AddAfterClick(Action action) => _afterClick += action;
 
-    public bool CustomCondition() => _customCondition.GetInvocationList().All(dg => dg.DynamicInvoke() == (object)true);
+    public bool CustomCondition() => _customCondition.GetInvocationList().All(dg => (bool)dg.DynamicInvoke()!);
     public void AddCustomCondition(Func<bool> cond) => _customCondition += cond;
 
     public PlayerControl BeforeMurder() => _beforeMurder(HudManager.Instance.KillButton);
