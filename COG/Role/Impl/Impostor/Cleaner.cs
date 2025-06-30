@@ -28,7 +28,7 @@ public class Cleaner : CustomRole, IListener
             () =>
             {
                 _body!.RpcHideDeadBody();
-                KillButtonManager.ResetCooldown();
+                PlayerControl.LocalPlayer.ResetKillCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
             () =>

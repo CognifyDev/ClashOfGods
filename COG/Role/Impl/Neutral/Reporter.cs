@@ -26,7 +26,7 @@ public class Reporter : CustomRole, IListener, IWinnable
 
     private readonly CustomOption _neededReportTimes;
     private static bool _isReporterReported = false;
-    private static Reporter _instance;
+    private static Reporter _instance = null!;
     
     public Reporter() : base(Color.gray, CampType.Neutral)
     {

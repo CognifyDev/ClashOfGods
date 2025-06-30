@@ -1,4 +1,5 @@
 global using GameStates = COG.States.GameStates;
+using COG.Patch;
 using COG.Role;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
@@ -25,8 +26,8 @@ public static class GameStates
             Main.Logger.LogMessage($"{nameof(GameStates)}::{nameof(_inRealGame)} being set to {value}. Clearing role data...");
 
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-            if (!value)
-                KillButtonManager.ClearAll(); // Only clear when game ends
+
+            VanillaKillButtonPatch.ActiveLastFrame = false;
             
             _inRealGame = value;
 

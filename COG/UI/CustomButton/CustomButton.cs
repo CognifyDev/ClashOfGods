@@ -194,7 +194,6 @@ public class CustomButton
     public void Update()
     {
         var debug = GlobalCustomOptionConstant.DebugMode.GetBool();
-        string log = "";
         var hasButton = !GameStates.IsMeeting && PlayerControl.LocalPlayer.IsAlive() &&
                         HasButton.GetInvocationList().All(d => (bool)d.DynamicInvoke()!);
         

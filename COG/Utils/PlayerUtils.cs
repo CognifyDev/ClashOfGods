@@ -3,6 +3,7 @@ using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Player;
+using COG.Patch;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
@@ -460,9 +461,9 @@ public static class PlayerUtils
         GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
 
-        pc.Data.Role.CanUseKillButton = role.CanKill;
-        KillButtonManager.ClearAll();
-        KillButtonManager.OverrideSetting(role.KillButtonSetting);
+        //pc.Data.Role.CanUseKillButton = role.CanKill;
+        //KillButtonManager.ClearAll();
+        //KillButtonManager.OverrideSetting(role.KillButtonSetting);
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }
@@ -607,6 +608,34 @@ public static class PlayerUtils
     }
 
     public static void RpcSuicide(this PlayerControl player) => player.CmdCheckMurder(player);
+
+    public static void ResetKillCooldown(this PlayerControl player)
+    {
+        if (!player.AmOwner) return;
+
+        var cooldown = player.GetKillButtonSetting()?.CustomCooldown() ?? -1;
+        player.SetKillTimer(cooldown < 0
+                            ? GameManager.Instance.LogicOptions.GetKillCooldown()
+                            : cooldown);
+    }
+
+    public static KillButtonSetting? GetKillButtonSetting(this PlayerControl player)
+    {
+        if (!player.AmOwner) return null;
+
+        var killButton = HudManager.Instance.KillButton;
+        //var setting = KillButtonManager.GetSetting();
+        var settings = GetRoles(player).Select(r => r.KillButtonSetting);
+
+        killButton.ToggleVisible(settings.Any(r => r.ForceShow()) && VanillaKillButtonPatch.IsHudActive);
+
+        var activatedSettings = settings.Where(s => s.ForceShow());
+        if (activatedSettings.Count() == 0) return null;
+        return activatedSettings.First(); // there should be one settings active
+    }
+
+    public static CustomRole[] GetRoles(this PlayerControl player) => player.GetSubRoles().Concat(player.GetMainRole().ToSingleElementArray()).ToArray();
+    
 }
 
 public enum CustomDeathReason

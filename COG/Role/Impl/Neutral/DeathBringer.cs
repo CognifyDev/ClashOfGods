@@ -41,7 +41,7 @@ public class DeathBringer : CustomRole, IListener
             () =>
             {
                 _staredPlayers.Add(_target!);
-                KillButtonManager.ResetCooldown();
+                PlayerControl.LocalPlayer.ResetKillCooldown();
             },
             () => _stareButton!.ResetCooldown(),
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
@@ -50,7 +50,7 @@ public class DeathBringer : CustomRole, IListener
             3,
             KeyCode.R,
             LanguageConfig.Instance.StareAction,
-            () => _killCooldown.GetFloat(),
+            _killCooldown.GetFloat,
             -1);
 
         KillButtonSetting.ForceShow = () => PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat();
@@ -70,6 +70,11 @@ public class DeathBringer : CustomRole, IListener
     {
         foreach (var target in _staredPlayers)
             target.CmdCheckMurder(target);
+    }
+
+    public override void ClearRoleGameData()
+    {
+        _staredPlayers.Clear();
     }
 
     public override string GetNameInConfig()
