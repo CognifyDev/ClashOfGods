@@ -70,6 +70,11 @@ role:
       name: "巡查员"
       description: "检查可疑人员！"
       long-description: "可以检察一名玩家本轮是否使用过击杀/通风口/主动技能，如有其中任意一项则结果为“是”，否则为“否”，结果会标记在其名称右方。技能每轮只能对同一玩家使用一次。"
+    doorman:
+      name: "守门人"
+      description: "飞船的设施都为我所用"
+      long-description: "每轮可以选择一处门进行封锁，封锁后可获得此时其内部的人员组成信息。"
+      no-player: "无玩家"
   neutral:
     jester:
       name: "小丑"
@@ -153,6 +158,7 @@ action:
   repair: "修复"
   stare: "凝视"
   examine: "检察"
+  block: "封锁"
 game:
   end:
     summary-message: "玩家职业:"

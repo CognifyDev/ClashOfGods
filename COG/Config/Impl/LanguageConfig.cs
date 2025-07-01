@@ -113,6 +113,7 @@ public class LanguageConfig : ConfigBase
     public string RepairAction { get; private set; } = null!;
     public string StareAction { get; private set; } = null!;
     public string ExamineAction { get; private set; } = null!;
+    public string BlockAction { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
@@ -213,6 +214,7 @@ public class LanguageConfig : ConfigBase
         RepairAction = GetString("action.repair");
         StareAction = GetString("action.stare");
         ExamineAction = GetString("action.examine");
+        BlockAction = GetString("action.block");
 
         ShowPlayersRolesMessage = GetString("game.end.summary-message");
 

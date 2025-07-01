@@ -1,3 +1,4 @@
+using COG.Config.Impl;
 using COG.Constant;
 using COG.UI.CustomButton;
 using COG.Utils;
@@ -12,10 +13,6 @@ using UnityEngine.Events;
 
 namespace COG.Role.Impl.Crewmate;
 
-[HarmonyPatch]
-[NotTested]
-[NotUsed]
-[WorkInProgress]
 public class Doorman : CustomRole
 {
     public const MapOptions.Modes CustomMode = (MapOptions.Modes)int.MaxValue;
@@ -25,7 +22,6 @@ public class Doorman : CustomRole
     private bool _usedThisRound = false;
 
     private static SystemTypes? _lastRoom = null;
-    private static TextMeshPro? _roomText = null;
     private static Doorman _instance = null!;
     private static bool _isShowing = false;
 
@@ -45,20 +41,14 @@ public class Doorman : CustomRole
             () =>
             {
                 _usedThisRound = false;
-
-                if (_lastRoom.HasValue && _roomText)
-                {
-                    _roomText!.text = TranslationController.Instance.GetString(_lastRoom.Value);
-                    _roomText = null;
-                    _lastRoom = null;
-                }
+                _lastRoom = null;
             },
             () => !_usedThisRound,
             () => true,
             ResourceUtils.LoadSprite(ResourceConstant.BlockButton)!,
             2,
             KeyCode.B,
-            "BLOCK",
+            LanguageConfig.Instance.BlockAction,
             () => 0f,
             -1);
 
@@ -67,6 +57,8 @@ public class Doorman : CustomRole
 
     public override void ClearRoleGameData()
     {
+        _isShowing = false;
+        _lastRoom = null;
         MapBehaviour.Instance.Destroy(); // destroy modified map, HudManager will auto instantiate when u open map next time
     }
 
@@ -89,16 +81,16 @@ public class Doorman : CustomRole
             {
                 var room = button.transform.parent.GetComponent<MapRoom>();
                 _lastRoom = room.room;
-                _roomText = texts.FirstOrDefault(tmp => tmp.GetComponent<TextTranslatorTMP>().TargetText == TranslationController.Instance.GetSystemName(_lastRoom.Value))!;
                 var shipRoom = ShipStatus.Instance.FastRooms[_lastRoom.Value];
 
-                var list = PlayerUtils.GetAllAlivePlayers().Where(player => shipRoom.roomArea.OverlapPoint(player.GetTruePosition()));
+                var nameList = PlayerUtils.GetAllAlivePlayers().Where(player => shipRoom.roomArea.OverlapPoint(player.GetTruePosition())).Select(player => player.Data.PlayerName.Color(player.Data.Color));
 
-                var finalString = string.Join('\n', list);
-                if (finalString == "") finalString = "NO_PLAYER";
+                var finalString = string.Join('\n', nameList);
+                if (finalString == "") finalString = _instance.GetContextFromLanguage("no-player");
 
                 __instance.Close();
                 HudManager.Instance.ShowPopUp(TranslationController.Instance.GetString(_lastRoom.Value) + ": \n\n" + finalString);
+                _instance._usedThisRound = true;
             }));
         }
 
