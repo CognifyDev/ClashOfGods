@@ -451,19 +451,20 @@ public static class PlayerUtils
         if (!pc) return;
         if (role == null)
         {
-            Main.Logger.LogError("It shouldn't be possible but the role to set is null. Try check if you're using a generic SetCustomRole<T> method and setting a role which is not registered yet.");
+            Main.Logger.LogError("It shouldn't be possible but the role to set is null. Try checking if you're using a generic SetCustomRole<T> method and setting a role which is not registered yet.");
             return;
         }
 
         var playerRole = GameUtils.PlayerData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
-        if (playerRole is not null) GameUtils.PlayerData.Remove(playerRole);
+        if (playerRole is not null)
+        {
+            playerRole.MainRole.ClearRoleGameData();
+            playerRole.SubRoles.Do(r => r.ClearRoleGameData());
+            GameUtils.PlayerData.Remove(playerRole);
+        }
 
         GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
-
-        //pc.Data.Role.CanUseKillButton = role.CanKill;
-        //KillButtonManager.ClearAll();
-        //KillButtonManager.OverrideSetting(role.KillButtonSetting);
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }

@@ -26,9 +26,13 @@ public class Doorman : CustomRole
 
     private static SystemTypes? _lastRoom = null;
     private static TextMeshPro? _roomText = null;
+    private static Doorman _instance = null!;
+    private static bool _isShowing = false;
 
     public Doorman() : base(Color.blue, CampType.Crewmate)
     {
+        _instance = this;
+
         BlockButton = CustomButton.Of("doorman-block",
             () =>
             {
@@ -57,13 +61,22 @@ public class Doorman : CustomRole
             "BLOCK",
             () => 0f,
             -1);
+
+        AddButton(BlockButton);
+    }
+
+    public override void ClearRoleGameData()
+    {
+        MapBehaviour.Instance.Destroy(); // destroy modified map, HudManager will auto instantiate when u open map next time
     }
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Show))]
     [HarmonyPrefix]
     static bool ShowMapPatch(MapBehaviour __instance, MapOptions opts)
     {
-        if (opts.Mode != CustomMode) return true;
+        if (opts.Mode != CustomMode || !_instance.IsLocalPlayerRole()) return true;
+
+        _isShowing = true;
 
         __instance.ShowSabotageMap();
         __instance.infectedOverlay.allButtons.Where(b => !b.name.Contains("Doors")).Do(b => b.gameObject.SetActive(false)); // Hide critical sabotage buttons
@@ -79,36 +92,24 @@ public class Doorman : CustomRole
                 _roomText = texts.FirstOrDefault(tmp => tmp.GetComponent<TextTranslatorTMP>().TargetText == TranslationController.Instance.GetSystemName(_lastRoom.Value))!;
                 var shipRoom = ShipStatus.Instance.FastRooms[_lastRoom.Value];
 
-                var collidersResult = new Collider2D[45];
-
-                var num = shipRoom.roomArea.OverlapCollider(new()
-                {
-                    useLayerMask = true,
-                    useTriggers = true,
-                    layerMask = Constants.LivingPlayersOnlyMask
-                }, collidersResult);
-
-                var list = new List<string>();
-
-                for (int i = 0; i < num; i++)
-                {
-                    var collider = collidersResult[i];
-
-                    if (!collider.isTrigger)
-                    {
-                        var player = collider.GetComponent<PlayerControl>();
-                        if (!player) continue;
-
-                        list.Add(player.Data.PlayerName);
-                    }
-                }
+                var list = PlayerUtils.GetAllAlivePlayers().Where(player => shipRoom.roomArea.OverlapPoint(player.GetTruePosition()));
 
                 var finalString = string.Join('\n', list);
-                _roomText.DestroyComponent<TextTranslatorTMP>();
-                _roomText.text = TranslationController.Instance.GetString(_lastRoom.Value) + "\n\n" + finalString;
+                if (finalString == "") finalString = "NO_PLAYER";
+
+                __instance.Close();
+                HudManager.Instance.ShowPopUp(TranslationController.Instance.GetString(_lastRoom.Value) + ": \n\n" + finalString);
             }));
         }
 
         return false;
+    }
+
+    [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Close))]
+    [HarmonyPostfix]
+    static void MapClosePatch(MapBehaviour __instance)
+    {
+        if (_isShowing)
+            __instance.gameObject.Destroy();
     }
 }

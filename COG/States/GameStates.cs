@@ -25,11 +25,13 @@ public static class GameStates
         {
             Main.Logger.LogMessage($"{nameof(GameStates)}::{nameof(_inRealGame)} being set to {value}. Clearing role data...");
 
+            _inRealGame = value;
+
+            if (!value) IsLeavingGame = true;
+
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
 
             VanillaKillButtonPatch.ActiveLastFrame = false;
-            
-            _inRealGame = value;
 
             if (!value)
             {
@@ -38,8 +40,12 @@ public static class GameStates
                 GameUtils.PlayerData.Clear();
                 DeadPlayer.DeadPlayers.Clear();
             }
+
+            IsLeavingGame = false;
         }
     }
+
+    public static bool IsLeavingGame { get; private set; }
 
     /// <summary>
     ///     是否在大厅中
