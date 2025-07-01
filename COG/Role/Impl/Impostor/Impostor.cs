@@ -1,3 +1,4 @@
+global using Impostor = COG.Role.Impl.Impostor.Impostor;
 using AmongUs.GameOptions;
 
 namespace COG.Role.Impl.Impostor;

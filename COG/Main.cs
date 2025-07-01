@@ -129,7 +129,10 @@ public partial class Main : BasePlugin
             new TaskAdderListener(),
             new VersionShowerListener(),
             new VanillaBugFixListener(),
-            new CustomWinnerListener()
+            new CustomWinnerListener(),
+            new LobbyListener(),
+            new RoleAssignmentListener(),
+            new IntroListener()
         });
         
         // Register CustomWinners

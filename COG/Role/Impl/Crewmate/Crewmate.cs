@@ -1,3 +1,4 @@
+global using Crewmate = COG.Role.Impl.Crewmate.Crewmate;
 using COG.Listener;
 
 namespace COG.Role.Impl.Crewmate;

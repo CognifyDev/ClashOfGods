@@ -3,7 +3,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace COG.Utils;
 
-public static class SerializeUtils
+public static class SerializationUtils
 {
     public static byte[] SerializeToData(this object obj)
     {
