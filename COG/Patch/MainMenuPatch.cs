@@ -14,7 +14,7 @@ namespace COG.Patch;
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuPatch
 {
-    public static GameObject? CustomBG;
+    public static GameObject? CustomBanner;
     public static readonly List<PassiveButton> Buttons = new();
     public static bool PopupCreated;
 
@@ -92,9 +92,9 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     private static void LoadImage()
     {
-        CustomBG = new GameObject("CustomBG");
-        CustomBG.transform.position = new Vector3(1.8f, 0.2f, 0f);
-        var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
+        CustomBanner = new GameObject("CustomBG");
+        CustomBanner.transform.position = new Vector3(1.8f, 0.2f, 0f);
+        var bgRenderer = CustomBanner.AddComponent<SpriteRenderer>();
         bgRenderer.sprite = ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 295f);
     }
 
@@ -119,10 +119,11 @@ public static class MainMenuPatch
     [HarmonyPatch(nameof(MainMenuManager.OpenAccountMenu))]
     [HarmonyPatch(nameof(MainMenuManager.OpenCredits))]
     [HarmonyPatch(nameof(MainMenuManager.OpenGameModeMenu))]
+    [HarmonyPatch(nameof(MainMenuManager.OpenOnlineMenu))]
     [HarmonyPostfix]
-    private static void HideModBG()
+    private static void HideModBannerPatch()
     {
-        if (CustomBG != null) CustomBG.SetActive(false);
+        if (CustomBanner != null) CustomBanner.SetActive(false);
         foreach (var btn in Buttons) btn.gameObject.SetActive(false);
     }
 
@@ -130,7 +131,7 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     private static void ShowModBG()
     {
-        if (CustomBG != null) CustomBG.SetActive(true);
+        if (CustomBanner != null) CustomBanner.SetActive(true);
         foreach (var btn in Buttons.Where(btn => btn != null && btn.gameObject != null)) btn.gameObject.SetActive(true);
     }
 }
