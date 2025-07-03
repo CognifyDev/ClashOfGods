@@ -465,6 +465,7 @@ public static class PlayerUtils
 
         GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+        VanillaKillButtonPatch.Initialize();
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }

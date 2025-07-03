@@ -34,9 +34,6 @@ static class VanillaKillButtonPatch
         
         killButton.ToggleVisible(show);
 
-        if (!ActiveLastFrame && show)
-            Initialize();
-
         ActiveLastFrame = show;
 
         if (!show) return;
@@ -65,9 +62,9 @@ static class VanillaKillButtonPatch
         
     }
 
-    static void Initialize()
+    public static void Initialize()
     {
-        Main.Logger.LogInfo("Button init");
+        Main.Logger.LogInfo("Button Initialization");
         PlayerControl.LocalPlayer.ResetKillCooldown();
     }
 

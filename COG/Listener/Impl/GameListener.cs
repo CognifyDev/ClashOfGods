@@ -1,30 +1,20 @@
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Constant;
 using COG.Listener.Event;
 using COG.Listener.Event.Impl.Game;
-using COG.Listener.Event.Impl.GSManager;
 using COG.Listener.Event.Impl.HManager;
-using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
-using COG.Listener.Event.Impl.RManager;
 using COG.Listener.Event.Impl.VentImpl;
+using COG.Patch;
 using COG.Role;
-using COG.Role.Impl.Crewmate;
-using COG.Role.Impl.Impostor;
-using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomGameObject.Arrow;
 using COG.Utils;
-using Il2CppSystem.Collections;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using Action = Il2CppSystem.Action;
-using Random = System.Random;
 
 namespace COG.Listener.Impl;
 
@@ -183,6 +173,7 @@ public class GameListener : IListener
             listener => _handlers.AddRange(ListenerManager.GetManager().AsHandlers(listener)));
 
         CustomButton.ResetAllCooldown();
+        VanillaKillButtonPatch.Initialize();
 
         ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
 
