@@ -67,7 +67,8 @@ public class CustomRole
 
         KillButtonSetting = new()
         {
-            ForceShow = () => CanKill
+            ForceShow = () => CanKill,
+            TargetOutlineColor = Color
         };
         KillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this));
         

@@ -96,7 +96,7 @@ public static class RoleOptionPatch
         var rolePreview = ResourceUtils.LoadSprite(
             $"COG.Resources.InDLL.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png", 
             300);
-        __instance.roleScreenshot.sprite = rolePreview == null ?
+        __instance.roleScreenshot.sprite = !rolePreview ?
             ResourceUtils.LoadSprite(ResourceConstant.DefaultRolePreview, 185) : rolePreview;
         __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground").GetComponent<SpriteRenderer>().color =
             new Color(1, 1, 1, 1);
