@@ -179,6 +179,15 @@ public class RpcListener : IListener
             }
         }
 
-        CustomRoleManager.GetManager().GetRoles().ForEach(cr => cr.OnRpcReceived(@event.Player, callId, reader));
+        CustomRoleManager.GetManager().GetRoles().ForEach(cr =>
+        {
+            cr.OnRpcReceived(@event.Player, callId, reader);
+            cr.RpcHandlers.ForEach(h =>
+            {
+                dynamic handler = h;
+                if (handler.CallId != callId) return;
+                h.OnReceive(reader);
+            });
+        });
     }
 }

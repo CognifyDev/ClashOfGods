@@ -19,13 +19,12 @@ public class Technician : CustomRole, IListener
         CanKill = false;
         CanSabotage = false;
 
+        var repairRpcHandler = new RpcUtils.RpcHandler((byte)KnownRpc.ClearSabotages, RepairSabotages);
+        RegisterRpcHandler(repairRpcHandler);
+
         RepairButton = CustomButton.Of(
             "technician-repair",
-            () =>
-            {
-                RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ClearSabotages).Finish();
-                RepairSabotages();
-            },
+            repairRpcHandler.Send,
             () => RepairButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency),
             () => true,
@@ -83,12 +82,6 @@ public class Technician : CustomRole, IListener
             @event.SetCouldUse(false);
             @event.SetResult(float.MaxValue);
         }
-    }
-
-    public override void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
-    {
-        if ((KnownRpc)callId == KnownRpc.ClearSabotages)
-            RepairSabotages();
     }
 
     private static void RepairSabotages()
