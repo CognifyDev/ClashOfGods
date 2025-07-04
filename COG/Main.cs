@@ -101,21 +101,21 @@ public partial class Main : BasePlugin
         File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
 
         /*
-                ModUpdater.FetchUpdate();
-                Logger.LogInfo(
-                    $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
+        ModUpdater.FetchUpdate();
+        Logger.LogInfo(
+            $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
         /*
-                // Load plugins
-                try
-                {
-                    PluginManager.LoadPlugins();
-                }
-                catch (System.Exception e)
-                {
-                    Logger.LogError(e.Message);
-                }
+        // Load plugins
+        try
+        {
+            PluginManager.LoadPlugins();
+        }
+        catch (System.Exception e)
+        {
+            Logger.LogError(e.Message);
+        }
         */
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {

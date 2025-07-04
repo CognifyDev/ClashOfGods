@@ -334,7 +334,7 @@ public class CustomRole
     {
     }
 
-    public virtual void OnRoleGameDataBeingSynchronized(RpcWriter writer)
+    public virtual void OnRoleGameDataSynchronizing(RpcWriter writer)
     {
     }
 
@@ -345,7 +345,7 @@ public class CustomRole
     public void SyncRoleGameData()
     {
         var writer = RpcUtils.StartRpcImmediately(KnownRpc.SyncRoleGameData).WritePacked(Id);
-        OnRoleGameDataBeingSynchronized(writer);
+        OnRoleGameDataSynchronizing(writer);
         writer.Finish();
     }
 
