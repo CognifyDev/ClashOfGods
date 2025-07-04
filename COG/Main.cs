@@ -75,7 +75,7 @@ public partial class Main : BasePlugin
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.OnRpcReceived)));
 #endif
 
-        var longVersionInfo = $"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}";
+        var longVersionInfo = StringUtils.EncodeToBase64($"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}");
         var storagedInfo = "";
 
         try

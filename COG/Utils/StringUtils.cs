@@ -73,4 +73,8 @@ public static class StringUtils
     }
 
     public static bool IsNullOrEmptyOrWhiteSpace(this string? str) => string.IsNullOrWhiteSpace(str);
+
+    public static string EncodeToBase64(string origin) => Convert.ToBase64String(Encoding.UTF8.GetBytes(origin));
+
+    public static string DecodeAsBase64(string encoded) => Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
 }

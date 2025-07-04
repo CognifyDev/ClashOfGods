@@ -166,8 +166,10 @@ public sealed class CustomOption
         try
         {
             if (!File.Exists(path)) return;
-            using StreamReader reader = new(path, Encoding.UTF8);
-            while (reader.ReadLine() is { } line)
+            var decoded = StringUtils.DecodeAsBase64(File.ReadAllText(path));
+            var lines = decoded.Split("\r\n");
+
+            foreach (var line in lines)
             {
                 var optionInfo = line.Split(" ");
                 var optionID = optionInfo[0];
@@ -189,9 +191,13 @@ public sealed class CustomOption
         try
         {
             var realPath = path.EndsWith(".cfg") ? path : path + ".cfg";
-            using StreamWriter writer = new(realPath, false, Encoding.UTF8);
+            var builder = new StringBuilder();
+
             foreach (var option in Options.OrderBy(o => o.Id))
-                writer.WriteLine(option.Id + " " + option.Selection);
+                builder.Append(option.Id + " " + option.Selection + "\r\n");
+
+            var encoded = StringUtils.EncodeToBase64(builder.ToString());
+            File.WriteAllText(realPath, encoded);
         }
         catch (System.Exception e)
         {
