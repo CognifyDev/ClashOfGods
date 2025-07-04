@@ -183,7 +183,7 @@ public static class RoleOptionPatch
         if (camp is CampType.Unknown or CampType.Neutral)
             header.Title.color = Color.white;
 
-        Main.Logger.LogDebug("Role header has created. Now set up role buttons...");
+        Main.Logger.LogDebug("Role header has been created. Now set up role buttons...");
 
         var initialX = RolesSettingsMenu.X_START_CHANCE;
         const float initialY = 0.14f;
@@ -221,7 +221,6 @@ public static class RoleOptionPatch
             passive.OnMouseOver = new UnityEvent();
             passive.OnClick = new Button.ButtonClickedEvent();
             
-
             if (role.RoleOptions.Count != 0)
             {
                 passive.OnMouseOut.AddListener((UnityAction)new Action(() => label.color = color));
@@ -337,7 +336,7 @@ public static class RoleOptionPatch
         CurrentButton = button;
         CurrentTab = tabToOpen;
         SetButtonActive(button, true);
-        if (tabToOpen != null) 
+        if (tabToOpen) 
             tabToOpen.SetActive(true);
     }
 

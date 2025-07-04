@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using COG.Utils.WinAPI;
+using Reactor.Utilities;
 using UnityEngine;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 // ReSharper disable InconsistentNaming
@@ -61,14 +63,65 @@ public sealed class CustomOption
         set
         {
             _selection = value;
-            var roleMenu = Object.FindObjectOfType<RolesSettingsMenu>();
-            var optionMenu = Object.FindObjectOfType<GameOptionsMenu>();
-            if (roleMenu)
+
+            Coroutines.Start(CoRefreshCustomOptions());
+
+            static IEnumerator CoRefreshCustomOptions()
             {
-                RoleOptionPatch.OnMenuUpdate(roleMenu); // Try to update vanilla options
-                roleMenu?.RefreshChildren();
-                optionMenu?.RefreshChildren();
+                yield return null;
+
+                if (!GameSettingMenu.Instance)
+                    yield break;
+
+                if (GameSettingMenu.Instance.RoleSettingsTab)
+                {
+                    GameSettingMenu.Instance.RoleSettingsTab.RefreshChildren();
+
+                    foreach (var role in CustomRoleManager.GetManager().GetModRoles().Where(r => r.ShowInOptions))
+                    {
+                        var roleRoleNumberOption = role.RoleNumberOption;
+                        if (roleRoleNumberOption == null) continue;
+                        var roleBehaviour = roleRoleNumberOption.OptionBehaviour;
+                        if (!roleBehaviour) continue;
+
+                        roleBehaviour!.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
+
+                        Main.Logger.LogDebug("TEXT UPDATE FOR " + role.Name);
+
+                        role.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
+                        {
+                            var behaviour = o.OptionBehaviour!;
+                            if (behaviour.TryGetComponent<NumberOption>(out var numberOption))
+                                numberOption.Value = o.GetFloat();
+                            else if (behaviour.TryGetComponent<StringOption>(out var stringOption))
+                                stringOption.Value = o.Selection;
+                            else if (behaviour.TryGetComponent<ToggleOption>(out var toggleOption))
+                                toggleOption.CheckMark.enabled = o.GetBool();
+                        });
+                    }
+                }
+
+                Main.Logger.LogDebug("Trying to update setting options");
+
+                if (GameSettingMenu.Instance.GameSettingsTab)
+                {
+                    GameSettingMenu.Instance.GameSettingsTab.RefreshChildren();
+                    GameSettingMenu.Instance.GameSettingsTab.Children?.ForEach(new Action<OptionBehaviour>(o =>
+                    {
+                        if (TryGetOption(o, out _)) return;
+
+                        if (o.TryGetComponent<NumberOption>(out var numberOption))
+                            numberOption.oldValue = int.MinValue;
+                        else if (o.TryGetComponent<StringOption>(out var stringOption))
+                            stringOption.oldValue = -1;
+                        else if (o.TryGetComponent<ToggleOption>(out var toggleOption))
+                            toggleOption.oldValue = !toggleOption.CheckMark.enabled;
+                        else
+                            Main.Logger.LogDebug("Didnt update!");
+                    }));
+                }
             }
+
             NotifySettingChange();
         }
     }
