@@ -20,8 +20,22 @@ namespace COG.Listener.Impl;
 public class CustomWinnerListener : IListener
 {
     private bool _isEnding;
-    
+    private readonly RpcHandler<byte[]> _winnerDataHandler;
+
     private static readonly int Color1 = Shader.PropertyToID("_Color");
+
+    public CustomWinnerListener()
+    {
+        _winnerDataHandler = new(KnownRpc.ShareWinners, 
+            d =>
+            {
+                CustomWinnerManager.GetManager().WinnableData = new WinnableData();
+                CustomWinnerManager.GetManager().WinnableData = d.ToArray().DeserializeToData<SerializableWinnableData>().ToWinnableData();
+
+                UpdateWinners();
+            }, 
+            (w, r) => w.WriteBytesAndSize(r), r => r.ReadBytesAndSize());
+    }
     
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent _)
@@ -66,8 +80,7 @@ public class CustomWinnerListener : IListener
 
         void RpcSendWinnableData(WinnableData data)
         {
-            var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareWinners);
-            writer.WriteBytesAndSize(SerializableWinnableData.Of(data).SerializeToData()).Finish();
+            _winnerDataHandler.Send(SerializableWinnableData.Of(data).SerializeToData()); // Just send, no performing
         }
     }
 
@@ -84,19 +97,6 @@ public class CustomWinnerListener : IListener
         EndGameResult.CachedWinners.Clear();
         EndGameResult.CachedWinners = CustomWinnerManager.GetManager()
             .WinnableData.GetWinnablePlayersAsCachedPlayerData().ToIl2CppList();
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnRpcReceived(PlayerHandleRpcEvent @event)
-    {
-        if (!GameStates.InRealGame) return;
-        if (@event.CallId != (byte)KnownRpc.ShareWinners) return;
-        
-        CustomWinnerManager.GetManager().WinnableData = new WinnableData();
-        CustomWinnerManager.GetManager().WinnableData = @event.Reader.ReadBytesAndSize().ToArray()
-            .DeserializeToData<SerializableWinnableData>().ToWinnableData();
-            
-        UpdateWinners();
     }
 
     [EventHandler(EventHandlerType.Postfix)]

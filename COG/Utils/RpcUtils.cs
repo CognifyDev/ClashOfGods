@@ -214,19 +214,19 @@ public class RpcHandler<T> : IRpcHandler where T : notnull
     public Action<RpcWriter, T> OnSend { get; }
     public Action<MessageReader> OnReceive { get; }
 
-    public RpcHandler(byte callId, Action<T> onPerform, Action<RpcWriter, T> onSend, Action<MessageReader> onReceive)
+    public RpcHandler(byte callId, Action<T> onPerform, Action<RpcWriter, T> onSend, Func<MessageReader, T> onReceive)
     {
         CallId = callId;
         OnPerform = onPerform;
         OnSend = onSend;
-        OnReceive = onReceive;
+        OnReceive = (r) => onPerform(onReceive(r));
     }
 
-    public RpcHandler(KnownRpc callId, Action<T> onPerform, Action<RpcWriter, T> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(KnownRpc callId, Action<T> onPerform, Action<RpcWriter, T> onSend, Func<MessageReader, T> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
-    public RpcHandler(RpcCalls callId, Action<T> onPerform, Action<RpcWriter, T> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(RpcCalls callId, Action<T> onPerform, Action<RpcWriter, T> onSend, Func<MessageReader, T> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
@@ -244,19 +244,23 @@ public class RpcHandler<T1, T2> : IRpcHandler where T1 : notnull where T2 : notn
     public Action<RpcWriter, T1, T2> OnSend { get; }
     public Action<MessageReader> OnReceive { get; }
 
-    public RpcHandler(byte callId, Action<T1, T2> onPerform, Action<RpcWriter, T1, T2> onSend, Action<MessageReader> onReceive)
+    public RpcHandler(byte callId, Action<T1, T2> onPerform, Action<RpcWriter, T1, T2> onSend, Func<MessageReader, (T1, T2)> onReceive)
     {
         CallId = callId;
         OnPerform = onPerform;
         OnSend = onSend;
-        OnReceive = onReceive;
+        OnReceive = (r) =>
+        {
+            var (arg1, arg2) = onReceive(r);
+            onPerform(arg1, arg2);
+        };
     }
 
-    public RpcHandler(KnownRpc callId, Action<T1, T2> onPerform, Action<RpcWriter, T1, T2> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(KnownRpc callId, Action<T1, T2> onPerform, Action<RpcWriter, T1, T2> onSend, Func<MessageReader, (T1, T2)> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
-    public RpcHandler(RpcCalls callId, Action<T1, T2> onPerform, Action<RpcWriter, T1, T2> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(RpcCalls callId, Action<T1, T2> onPerform, Action<RpcWriter, T1, T2> onSend, Func<MessageReader, (T1, T2)> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
@@ -275,19 +279,23 @@ public class RpcHandler<T1, T2, T3> : IRpcHandler where T1 : notnull where T2 : 
     public Action<RpcWriter, T1, T2, T3> OnSend { get; }
     public Action<MessageReader> OnReceive { get; }
 
-    public RpcHandler(byte callId, Action<T1, T2, T3> onPerform, Action<RpcWriter, T1, T2, T3> onSend, Action<MessageReader> onReceive)
+    public RpcHandler(byte callId, Action<T1, T2, T3> onPerform, Action<RpcWriter, T1, T2, T3> onSend, Func<MessageReader, (T1, T2, T3)> onReceive)
     {
         CallId = callId;
         OnPerform = onPerform;
         OnSend = onSend;
-        OnReceive = onReceive;
+        OnReceive = (r) =>
+        {
+            var (arg1, arg2, arg3) = onReceive(r);
+            onPerform(arg1, arg2, arg3);
+        };
     }
 
-    public RpcHandler(KnownRpc callId, Action<T1, T2, T3> onPerform, Action<RpcWriter, T1, T2, T3> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(KnownRpc callId, Action<T1, T2, T3> onPerform, Action<RpcWriter, T1, T2, T3> onSend, Func<MessageReader, (T1, T2, T3)> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
-    public RpcHandler(RpcCalls callId, Action<T1, T2, T3> onPerform, Action<RpcWriter, T1, T2, T3> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(RpcCalls callId, Action<T1, T2, T3> onPerform, Action<RpcWriter, T1, T2, T3> onSend, Func<MessageReader, (T1, T2, T3)> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
@@ -303,19 +311,23 @@ public class RpcHandler<T1, T2, T3, T4> : IRpcHandler where T1 : notnull where T
     public Action<RpcWriter, T1, T2, T3, T4> OnSend { get; }
     public Action<MessageReader> OnReceive { get; }
 
-    public RpcHandler(byte callId, Action<T1, T2, T3, T4> onPerform, Action<RpcWriter, T1, T2, T3, T4> onSend, Action<MessageReader> onReceive)
+    public RpcHandler(byte callId, Action<T1, T2, T3, T4> onPerform, Action<RpcWriter, T1, T2, T3, T4> onSend, Func<MessageReader, (T1, T2, T3, T4)> onReceive)
     {
         CallId = callId;
         OnPerform = onPerform;
         OnSend = onSend;
-        OnReceive = onReceive;
+        OnReceive = (r) =>
+        {
+            var (arg1, arg2, arg3, arg4) = onReceive(r);
+            onPerform(arg1, arg2, arg3, arg4);
+        };
     }
 
-    public RpcHandler(KnownRpc callId, Action<T1, T2, T3, T4> onPerform, Action<RpcWriter, T1, T2, T3, T4> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(KnownRpc callId, Action<T1, T2, T3, T4> onPerform, Action<RpcWriter, T1, T2, T3, T4> onSend, Func<MessageReader, (T1, T2, T3, T4)> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
-    public RpcHandler(RpcCalls callId, Action<T1, T2, T3, T4> onPerform, Action<RpcWriter, T1, T2, T3, T4> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(RpcCalls callId, Action<T1, T2, T3, T4> onPerform, Action<RpcWriter, T1, T2, T3, T4> onSend, Func<MessageReader, (T1, T2, T3, T4)> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
@@ -332,19 +344,23 @@ public class RpcHandler<T1, T2, T3, T4, T5> : IRpcHandler where T1 : notnull whe
     public Action<RpcWriter, T1, T2, T3, T4, T5> OnSend { get; }
     public Action<MessageReader> OnReceive { get; }
 
-    public RpcHandler(byte callId, Action<T1, T2, T3, T4, T5> onPerform, Action<RpcWriter, T1, T2, T3, T4, T5> onSend, Action<MessageReader> onReceive)
+    public RpcHandler(byte callId, Action<T1, T2, T3, T4, T5> onPerform, Action<RpcWriter, T1, T2, T3, T4, T5> onSend, Func<MessageReader, (T1, T2, T3, T4, T5)> onReceive)
     {
         CallId = callId;
         OnPerform = onPerform;
         OnSend = onSend;
-        OnReceive = onReceive;
+        OnReceive = (r) =>
+        {
+            var (arg1, arg2, arg3, arg4, arg5) = onReceive(r);
+            onPerform(arg1, arg2, arg3, arg4, arg5);
+        };
     }
 
-    public RpcHandler(KnownRpc callId, Action<T1, T2, T3, T4, T5> onPerform, Action<RpcWriter, T1, T2, T3, T4, T5> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(KnownRpc callId, Action<T1, T2, T3, T4, T5> onPerform, Action<RpcWriter, T1, T2, T3, T4, T5> onSend, Func<MessageReader, (T1, T2, T3, T4, T5)> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
-    public RpcHandler(RpcCalls callId, Action<T1, T2, T3, T4, T5> onPerform, Action<RpcWriter, T1, T2, T3, T4, T5> onSend, Action<MessageReader> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
+    public RpcHandler(RpcCalls callId, Action<T1, T2, T3, T4, T5> onPerform, Action<RpcWriter, T1, T2, T3, T4, T5> onSend, Func<MessageReader, (T1, T2, T3, T4, T5)> onReceive) : this((byte)callId, onPerform, onSend, onReceive)
     {
     }
 
