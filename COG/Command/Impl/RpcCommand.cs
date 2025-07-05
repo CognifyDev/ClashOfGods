@@ -10,7 +10,7 @@ namespace COG.Command.Impl;
 
 public class RpcCommand : CommandBase
 {
-    private RpcUtils.RpcWriter? _writer;
+    private RpcWriter? _writer;
     private byte _current;
 
     public RpcCommand() : base("rpc")

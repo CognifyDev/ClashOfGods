@@ -255,7 +255,7 @@ public class CustomRole
 
     public KillButtonSetting KillButtonSetting { get; }
 
-    public List<RpcUtils.IRpcHandler> RpcHandlers { get; }
+    public List<IRpcHandler> RpcHandlers { get; }
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
@@ -357,7 +357,7 @@ public class CustomRole
         return Name.Color(Color);
     }
 
-    public void RegisterRpcHandler(RpcUtils.IRpcHandler handler) => RpcHandlers.Add(handler);
+    public void RegisterRpcHandler(IRpcHandler handler) => RpcHandlers.Add(handler);
 
     public static CustomOption.TabType GetTabType(CustomRole role)
     {

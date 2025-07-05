@@ -19,12 +19,12 @@ public class Technician : CustomRole, IListener
         CanKill = false;
         CanSabotage = false;
 
-        var repairRpcHandler = new RpcUtils.RpcHandler((byte)KnownRpc.ClearSabotages, RepairSabotages);
+        var repairRpcHandler = new RpcHandler(KnownRpc.ClearSabotages, RepairSabotages);
         RegisterRpcHandler(repairRpcHandler);
 
         RepairButton = CustomButton.Of(
             "technician-repair",
-            repairRpcHandler.Send,
+            repairRpcHandler.PerformAndSend,
             () => RepairButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency),
             () => true,
