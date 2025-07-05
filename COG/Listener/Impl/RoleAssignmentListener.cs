@@ -34,10 +34,8 @@ public class RoleAssignmentListener : IListener
 
                 foreach (var playerData in data)
                     writer.WriteBytesAndSize(SerializablePlayerData.Of(playerData).SerializeToData());
-                
-                writer.Finish();
 
-                Main.Logger.LogInfo("Successfully sent role assignment data");
+                Main.Logger.LogInfo("Successfully sent role assignment data!");
             },
             reader =>
             {
@@ -228,17 +226,6 @@ public class RoleAssignmentListener : IListener
                                 $"{playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}");
     }
 
-    private static void ShareRoles()
-    {
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareRoles);
-
-        writer.WritePacked(GameUtils.PlayerData.Count);
-
-        foreach (var bytes in GameUtils.PlayerData.Select(SerializablePlayerData.Of).Select(data => data.SerializeToData()))
-            writer.WriteBytesAndSize(bytes);
-
-        writer.Finish();
-    }
 
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -248,7 +235,8 @@ public class RoleAssignmentListener : IListener
         SelectRoles();
 
         Main.Logger.LogInfo("Share roles for players...");
-        ShareRoles();
+        var playerData = GameUtils.PlayerData.ToArray();
+        _roleSelectionShareRpcHandler.Send(playerData.Length, playerData);
 
         var roleList = GameUtils.PlayerData.Select(pr => pr.MainRole).ToList();
         roleList.AddRange(GameUtils.PlayerData.SelectMany(pr => pr.SubRoles));

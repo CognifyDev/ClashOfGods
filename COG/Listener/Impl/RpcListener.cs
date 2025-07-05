@@ -96,26 +96,6 @@ public class RpcListener : IListener
                 break;
             }
 
-            case KnownRpc.ShareRoles:
-            {
-                if (AmongUsClient.Instance.AmHost) return;
-                
-
-                var count = reader.ReadPackedInt32();
-
-                for (var i = 0; i < count; i++)
-                {
-                    var bytes = reader.ReadBytesAndSize().ToArray();
-                    var data = bytes.DeserializeToData<SerializablePlayerData>().AsPlayerData();
-                    GameUtils.PlayerData.Add(data);
-                    data.Player.SetCustomRole(data.MainRole, data.SubRoles);
-                }
-                
-                
-
-                break;
-            }
-
             case KnownRpc.Revive:
             {
                 // ¥”Rpc÷–∂¡»ÎPlayerControl

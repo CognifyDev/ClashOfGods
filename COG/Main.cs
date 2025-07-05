@@ -129,6 +129,7 @@ public partial class Main : BasePlugin
             Logger.LogError(e.Message);
         }
         */
+
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
@@ -204,7 +205,7 @@ public partial class Main : BasePlugin
 
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-                    SceneManager.LoadScene("MainMenu");
+                    SceneManager.LoadScene(Constants.MAIN_MENU_SCENE);
                     return false;
                 }, false),
             new(LanguageConfig.Instance.UnloadModButtonName,

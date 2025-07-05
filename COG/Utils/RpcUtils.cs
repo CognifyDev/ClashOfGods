@@ -103,6 +103,7 @@ public abstract class RpcUtils
 public class RpcWriter
 {
     private readonly MessageWriter[] _writers;
+    private bool _finished = false;
 
     internal RpcWriter(MessageWriter[] writers)
     {
@@ -183,7 +184,9 @@ public class RpcWriter
 
     public void Finish()
     {
+        if (_finished) return;
         foreach (var messageWriter in _writers) AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        _finished = true;
     }
 
     public MessageWriter[] GetWriters() => _writers;
@@ -240,7 +243,11 @@ public class RpcHandler<T> : IRpcHandler where T : notnull
     {
         CallId = callId;
         OnPerform = onPerform;
-        OnSend = onSend;
+        OnSend = (writer, arg) =>
+        {
+            onSend(writer, arg);
+            writer.Finish();
+        };
         OnReceive = (r) => onPerform(onReceive(r));
     }
 
@@ -270,7 +277,11 @@ public class RpcHandler<T1, T2> : IRpcHandler where T1 : notnull where T2 : notn
     {
         CallId = callId;
         OnPerform = onPerform;
-        OnSend = onSend;
+        OnSend = (writer, arg1, arg2) =>
+        {
+            onSend(writer, arg1, arg2);
+            writer.Finish();
+        };
         OnReceive = (r) =>
         {
             var (arg1, arg2) = onReceive(r);
@@ -305,7 +316,11 @@ public class RpcHandler<T1, T2, T3> : IRpcHandler where T1 : notnull where T2 : 
     {
         CallId = callId;
         OnPerform = onPerform;
-        OnSend = onSend;
+        OnSend = (writer, arg1, arg2, arg3) =>
+        {
+            onSend(writer, arg1, arg2, arg3);
+            writer.Finish();
+        };
         OnReceive = (r) =>
         {
             var (arg1, arg2, arg3) = onReceive(r);
@@ -337,7 +352,11 @@ public class RpcHandler<T1, T2, T3, T4> : IRpcHandler where T1 : notnull where T
     {
         CallId = callId;
         OnPerform = onPerform;
-        OnSend = onSend;
+        OnSend = (writer, arg1, arg2, arg3, arg4) =>
+        {
+            onSend(writer, arg1, arg2, arg3, arg4);
+            writer.Finish();
+        };
         OnReceive = (r) =>
         {
             var (arg1, arg2, arg3, arg4) = onReceive(r);
@@ -370,7 +389,11 @@ public class RpcHandler<T1, T2, T3, T4, T5> : IRpcHandler where T1 : notnull whe
     {
         CallId = callId;
         OnPerform = onPerform;
-        OnSend = onSend;
+        OnSend = (writer, arg1, arg2, arg3, arg4, arg5) =>
+        {
+            onSend(writer, arg1, arg2, arg3, arg4, arg5);
+            writer.Finish();
+        };
         OnReceive = (r) =>
         {
             var (arg1, arg2, arg3, arg4, arg5) = onReceive(r);
