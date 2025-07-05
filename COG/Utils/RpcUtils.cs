@@ -170,6 +170,8 @@ public class RpcWriter
 
 public interface IRpcHandler
 {
+    public static List<IRpcHandler> Handlers { get; } = new();
+
     public Action<MessageReader> OnReceive { get; }
 }
 

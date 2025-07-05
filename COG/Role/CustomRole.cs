@@ -64,7 +64,6 @@ public class CustomRole
         Id = _order++;
         ShowInOptions = showInOptions;
         AllOptions = new List<CustomOption>();
-        RpcHandlers = new();
 
         KillButtonSetting = new()
         {
@@ -357,7 +356,7 @@ public class CustomRole
         return Name.Color(Color);
     }
 
-    public void RegisterRpcHandler(IRpcHandler handler) => RpcHandlers.Add(handler);
+    public void RegisterRpcHandler(IRpcHandler handler) => IRpcHandler.Handlers.Add(handler);
 
     public static CustomOption.TabType GetTabType(CustomRole role)
     {
