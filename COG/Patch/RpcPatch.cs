@@ -16,7 +16,7 @@ internal class RPCHandlerPatch
         if (Enum.IsDefined((RpcCalls)callId))
             name = ((RpcCalls)callId).ToString();
         else if (Enum.IsDefined((KnownRpc)callId))
-            name = ((RpcCalls)callId).ToString();
+            name = ((KnownRpc)callId).ToString();
         else
             name = callId.ToString();
         Main.Logger.LogDebug($"Rpc {name}({callId}) received, rpc length => {reader.Length}");

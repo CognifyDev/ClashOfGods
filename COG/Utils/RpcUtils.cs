@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using COG.Command.Impl;
 using COG.Rpc;
 using InnerNet;
 using UnityEngine;
@@ -46,12 +47,33 @@ public abstract class RpcUtils
         List<string> parts = new();
 
         var writers = new List<MessageWriter>();
-        targets ??= PlayerUtils.GetAllPlayers().Where(p => p.PlayerId != playerControl.PlayerId).ToArray();
-        foreach (var control in targets)
+
+        if (DebugCommand.EnableRpcTest) // directly uses -1 for targetClientId and able to send rpc in local game, but not tested in online game
         {
-            writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable,
-                control.GetClientID()));
-            parts.Add($"{control.name}({control.PlayerId})");
+            targets ??= PlayerUtils.GetAllPlayers().Where(p => p.PlayerId != playerControl.PlayerId).ToArray();
+            foreach (var control in targets)
+            {
+                writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable,
+                    control.GetClientID()));
+                parts.Add($"{control.name}({control.PlayerId})");
+            }
+        }
+        else // legacy rpc sending, for unable to send rpc by directly using -1 for argument targetClientId
+        {
+            if (targets == null)
+            {
+                writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable));
+                parts.Add("everyone");
+            }
+            else
+            {
+                foreach (var control in targets)
+                {
+                    writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable,
+                        control.GetClientID()));
+                    parts.Add($"{control.name}({control.PlayerId})");
+                }
+            }
         }
 
         Main.Logger.LogDebug($"Rpc {callId} sent to {string.Join(", ", parts)}");

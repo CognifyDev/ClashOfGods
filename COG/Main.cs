@@ -223,7 +223,7 @@ public partial class Main : BasePlugin
         {
             new RpcCommand(),
             new OptionCommand(),
-            new RoleDebugCommand()
+            new DebugCommand()
         });
         
         Harmony.PatchAll();
