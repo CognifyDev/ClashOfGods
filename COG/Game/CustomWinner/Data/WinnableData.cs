@@ -10,8 +10,8 @@ namespace COG.Game.CustomWinner.Data;
 public class WinnableData
 {
     public bool Winnable { get; set; }
-    public string? WinText { get; set; }
-    public Color? WinColor { get; set; }
+    public string WinText { get; set; } = "";
+    public Color WinColor { get; set; } = Color.white;
 
     public GameOverReason GameOverReason { get; set; } = GameOverReason.ImpostorsByKill;
 

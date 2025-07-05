@@ -11,7 +11,6 @@ using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Rpc;
-using COG.States;
 using COG.Utils;
 using TMPro;
 using UnityEngine;
@@ -20,7 +19,7 @@ namespace COG.Listener.Impl;
 
 public class CustomWinnerListener : IListener
 {
-    private bool _ending;
+    private bool _isEnding;
     
     private static readonly int Color1 = Shader.PropertyToID("_Color");
     
@@ -34,18 +33,42 @@ public class CustomWinnerListener : IListener
     [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
     public bool OnCheckGameEnd(GameCheckEndEvent _)
     {
-        if (_ending) return false;
-        if (GlobalCustomOptionConstant.DebugMode.GetBool() || !AmongUsClient.Instance.AmHost) return false;
-        var checkForGameEnd = CustomWinnerManager.GetManager().CheckForGameEnd();
-        if (!checkForGameEnd.Winnable) return false;
-        _ending = true;
-        var data = CustomWinnerManager.GetManager().WinnableData;
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareWinners);
-        writer.WriteBytesAndSize(SerializableWinnableData.Of(data).SerializeToData());
-        writer.Finish();
-        TaskUtils.RunTaskAfter(1.5f, () =>
-            GameManager.Instance.RpcEndGame(checkForGameEnd.GameOverReason, false));
+        if (_isEnding) return false;
+        if (Input.GetKeyDown(KeyCode.F12))
+        {
+            var winnable = new WinnableData()
+            {
+                GameOverReason = (GameOverReason)int.MaxValue,
+            };
+            winnable.WinnablePlayers.AddRange(PlayerUtils.GetAllPlayers().Select(p => p.Data));
+            PrepareForEndGame(winnable);
+
+            return false;
+        }
+        if (GlobalCustomOptionConstant.DebugMode.GetBool() || !AmongUsClient.Instance.AmHost || AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay) return false;
+        
+        var winnableData = CustomWinnerManager.GetManager().CheckForGameEnd();
+        if (!winnableData.Winnable) return false;
+
+        PrepareForEndGame(winnableData);
+        
         return false;
+
+        void PrepareForEndGame(WinnableData data)
+        {
+            _isEnding = true;
+
+            RpcSendWinnableData(CustomWinnerManager.GetManager().WinnableData);
+
+            TaskUtils.RunTaskAfter(1f, () =>
+                GameManager.Instance.RpcEndGame(data.GameOverReason, false)); // Ensure each client has received & processed winnable data
+        }
+
+        void RpcSendWinnableData(WinnableData data)
+        {
+            var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareWinners);
+            writer.WriteBytesAndSize(SerializableWinnableData.Of(data).SerializeToData()).Finish();
+        }
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -85,7 +108,7 @@ public class CustomWinnerListener : IListener
         SetUpRoleSummary(manager);
         
         GameStates.InRealGame = false;
-        _ending = false;
+        _isEnding = false;
     }
 
     private static void SetUpWinnerPlayers(EndGameManager manager)
@@ -141,7 +164,7 @@ public class CustomWinnerListener : IListener
             winnerPoolable.SetNameScale(new Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
 
             Main.Logger.LogDebug(
-                $"Set up winner message for {winner.PlayerName} at {manager.transform.position.ToString()}");
+                $"Set up winner message for {winner.PlayerName} at {manager.transform.position}");
 
             num++;
         }
@@ -179,11 +202,8 @@ public class CustomWinnerListener : IListener
         winText.transform.position = new Vector3(pos.x, pos.y - 0.5f, pos.z);
         winText.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
         winText.text = data.WinText ?? "";
-        if (data.WinColor != null)
-        {
-            winText.color = data.WinColor.Value;
-            manager.BackgroundBar.material.SetColor(Color1, data.WinColor.Value);
-        }
+        winText.color = data.WinColor;
+        manager.BackgroundBar.material.SetColor(Color1, data.WinColor);
     }
 
     private static void SetUpRoleSummary(EndGameManager manager)
