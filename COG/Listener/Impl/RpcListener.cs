@@ -99,10 +99,7 @@ public class RpcListener : IListener
             case KnownRpc.ShareRoles:
             {
                 if (AmongUsClient.Instance.AmHost) return;
-                // 清除原列表，防止干扰
-                GameUtils.PlayerData.Clear();
-                // 开始读入数据
-                Main.Logger.LogDebug("Received role assignment data, applying...");
+                
 
                 var count = reader.ReadPackedInt32();
 
@@ -114,9 +111,7 @@ public class RpcListener : IListener
                     data.Player.SetCustomRole(data.MainRole, data.SubRoles);
                 }
                 
-                foreach (var playerRole in GameUtils.PlayerData)
-                    Main.Logger.LogInfo($"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
-                                        $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}");
+                
 
                 break;
             }

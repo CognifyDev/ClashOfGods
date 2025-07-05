@@ -12,38 +12,51 @@ namespace COG.Listener.Impl;
 
 public class RoleAssignmentListener : IListener
 {
-    public class PlayerGetter : IGetter<PlayerControl>
+    private readonly RpcHandler<int, PlayerData[]> _roleSelectionShareRpcHandler;
+
+    public RoleAssignmentListener()
     {
-        public readonly List<PlayerControl> _players;
+        _roleSelectionShareRpcHandler = new(KnownRpc.ShareRoles,
+            (_, playerData) =>
+            {
+                foreach (var data in playerData)
+                {
+                    GameUtils.PlayerData.Add(data);
+                    data.Player.SetCustomRole(data.MainRole, data.SubRoles);
+                }
 
-        public PlayerGetter(PlayerControl[] targets)
-        {
-            _players = new List<PlayerControl>(targets).Disarrange();
-        }
+                Main.Logger.LogDebug(playerData.Select(playerRole => $"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
+                                    $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}"));
+            },
+            (writer, count, data) =>
+            {
+                writer.WritePacked(count);
 
-        public PlayerControl GetNext()
-        {
-            var target = _players[0];
-            _players.RemoveAt(0);
+                foreach (var playerData in data)
+                    writer.WriteBytesAndSize(SerializablePlayerData.Of(playerData).SerializeToData());
+                
+                writer.Finish();
 
-            return target;
-        }
+                Main.Logger.LogInfo("Successfully sent role assignment data");
+            },
+            reader =>
+            {
+                // 清除原列表，防止干扰
+                GameUtils.PlayerData.Clear();
+                // 开始读入数据
+                Main.Logger.LogDebug("Received role assignment data, applying...");
 
-        public bool HasNext()
-        {
-            return !_players.IsEmpty();
-        }
+                var count = reader.ReadPackedInt32();
+                var list = new List<PlayerData>();
 
-        public int Number()
-        {
-            return _players.Count;
-        }
+                for (int i = 0; i < count; i++)
+                    list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<PlayerData>());
 
-        public void PutBack(PlayerControl value)
-        {
-            _players.Add(value);
-        }
+                return (count, list.ToArray());
+            }
+        );
     }
+
 
     /*
      * 职业分配逻辑：
@@ -241,5 +254,38 @@ public class RoleAssignmentListener : IListener
         roleList.AddRange(GameUtils.PlayerData.SelectMany(pr => pr.SubRoles));
 
         foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
+    }
+
+    public class PlayerGetter : IGetter<PlayerControl>
+    {
+        public readonly List<PlayerControl> _players;
+
+        public PlayerGetter(PlayerControl[] targets)
+        {
+            _players = new List<PlayerControl>(targets).Disarrange();
+        }
+
+        public PlayerControl GetNext()
+        {
+            var target = _players[0];
+            _players.RemoveAt(0);
+
+            return target;
+        }
+
+        public bool HasNext()
+        {
+            return !_players.IsEmpty();
+        }
+
+        public int Number()
+        {
+            return _players.Count;
+        }
+
+        public void PutBack(PlayerControl value)
+        {
+            _players.Add(value);
+        }
     }
 }
