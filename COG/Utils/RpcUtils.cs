@@ -76,7 +76,7 @@ public abstract class RpcUtils
             }
         }
 
-        Main.Logger.LogDebug($"Rpc {callId} sent to {string.Join(", ", parts)}");
+        Main.Logger.LogInfo($"Rpc {callId} sent to {string.Join(", ", parts)}");
 
         return new RpcWriter(writers.ToArray());
     }

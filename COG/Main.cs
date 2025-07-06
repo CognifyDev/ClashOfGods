@@ -77,16 +77,6 @@ public partial class Main : BasePlugin
         Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.OnRpcReceived)));
 #endif
 
-        var diskLogConfig = ConfigFile.CoreConfig.FirstOrDefault(kvp => kvp.Key.Section == "Logging.Disk" && kvp.Key.Key == "LogLevels").Value;
-        var diskLogConsole = ConfigFile.CoreConfig.FirstOrDefault(kvp => kvp.Key.Section == "Logging.Console" && kvp.Key.Key == "LogLevels").Value;
-        if (diskLogConfig != null && (LogLevel)diskLogConfig.BoxedValue != LogLevel.None && (LogLevel)diskLogConsole.BoxedValue != LogLevel.All)
-        {
-            diskLogConfig.BoxedValue = LogLevel.All;
-            ConfigFile.CoreConfig.Save();
-            Logger.LogMessage($"[Logger.Disk]:LogLevels has been set to {nameof(LogLevel.All)} for debugging.");
-        }
-
-
         var longVersionInfo = StringUtils.EncodeToBase64($"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}");
         var storagedInfo = "";
 

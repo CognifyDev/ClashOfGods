@@ -41,7 +41,7 @@ public static class RoleOptionPatch
     {
         if (CampTabs.Count != 0) return;
 
-        Main.Logger.LogDebug("======== Start to initialize custom role options... ========");
+        Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
 
         // Fix button is unselected when open at the first time
         Object.FindObjectOfType<GameSettingMenu>()?.RoleSettingsButton.SelectButton(true);
@@ -57,7 +57,7 @@ public static class RoleOptionPatch
 
         __instance.AllButton.gameObject.SetActive(false);
         
-        Main.Logger.LogDebug("Creating tabs...");
+        Main.Logger.LogInfo("Creating tabs...");
         
         var i = 0;
         foreach (var team in Enum.GetValues<CampType>())
@@ -82,7 +82,7 @@ public static class RoleOptionPatch
     [HarmonyPostfix]
     public static void OnTabChanged(RolesSettingsMenu __instance)
     {
-        Main.Logger.LogDebug($"{nameof(CurrentAdvancedTabFor)}: {CurrentAdvancedTabFor?.GetType().Name ?? "(null)"}");
+        Main.Logger.LogInfo($"{nameof(CurrentAdvancedTabFor)}: {CurrentAdvancedTabFor?.GetType().Name ?? "(null)"}");
         if (CurrentAdvancedTabFor == null) return;
 
         if (CurrentAdvancedTabFor.CampType == CampType.Neutral)

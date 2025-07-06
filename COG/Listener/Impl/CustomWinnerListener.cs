@@ -121,7 +121,7 @@ public class CustomWinnerListener : IListener
 
         var winners = CustomWinnerManager.GetManager().WinnableData.WinnablePlayers.Select(info 
             => new CachedPlayerData(info)).ToList();
-        Main.Logger.LogDebug($"Winners number => {winners.Count}");
+        Main.Logger.LogInfo($"Winners number => {winners.Count}");
 
         foreach (var winner in winners.ToArray().OrderBy(b => b.IsYou ? -1 : 0))
         {

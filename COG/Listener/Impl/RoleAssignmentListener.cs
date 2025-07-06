@@ -42,7 +42,7 @@ public class RoleAssignmentListener : IListener
                 // 清除原列表，防止干扰
                 GameUtils.PlayerData.Clear();
                 // 开始读入数据
-                Main.Logger.LogDebug("Received role assignment data, applying...");
+                Main.Logger.LogInfo("Received role assignment data, applying...");
 
                 var count = reader.ReadPackedInt32();
                 var list = new List<PlayerData>();
@@ -225,7 +225,6 @@ public class RoleAssignmentListener : IListener
                                 $" => {playerRole.MainRole.GetNormalName()}" +
                                 $"{playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}");
     }
-
 
 
     [EventHandler(EventHandlerType.Postfix)]

@@ -19,7 +19,7 @@ internal class RPCHandlerPatch
             name = ((KnownRpc)callId).ToString();
         else
             name = callId.ToString();
-        Main.Logger.LogDebug($"Rpc {name}({callId}) received, rpc length => {reader.Length}");
+        Main.Logger.LogInfo($"Rpc {name}({callId}) received, rpc length => {reader.Length}");
         
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader), EventHandlerType.Postfix);
