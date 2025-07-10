@@ -346,6 +346,8 @@ public class CustomButton
             button.HotkeyText.gameObject.SetActive(true);
             button.HotkeyText.SetText(button.Hotkey.ToString());
 
+            button.UsesRemaining = button.UsesLimit;
+
             button.PassiveButton.OnClick = new();
             button.PassiveButton.OnClick.AddListener((UnityAction)button.CheckClick);
             button.SetActive(GlobalCustomOptionConstant.DebugMode.GetBool());

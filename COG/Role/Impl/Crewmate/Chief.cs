@@ -27,7 +27,7 @@ public class Chief : CustomRole
                 if (!player.AmOwner) return; // local player only
                 if (!player.GetRoles().Any(r => r.CanKill)) // normally speaking, there should be only one role which can kill
                 {
-                    var role = player.GetRoles().FirstOrDefault(r => r.CanKill);
+                    var role = player.GetMainRole();
 
                     role!.CurrentKillButtonSetting = new()
                     {

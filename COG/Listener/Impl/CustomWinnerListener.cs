@@ -35,6 +35,8 @@ public class CustomWinnerListener : IListener
                 UpdateWinners();
             }, 
             (w, r) => w.WriteBytesAndSize(r), r => r.ReadBytesAndSize());
+
+        RpcUtils.RegisterRpcHandler(_winnerDataHandler);
     }
     
     [EventHandler(EventHandlerType.Postfix)]
