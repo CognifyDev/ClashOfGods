@@ -48,7 +48,7 @@ public abstract class RpcUtils
 
         var writers = new List<MessageWriter>();
 
-        if (DebugCommand.EnableRpcTest) // directly uses -1 for targetClientId and able to send rpc in local game, but not tested in online game
+        if (DebugCommand.EnableRpcTest) // directly uses -1 for targetClientId and PROVED TO BE STILL UNABLE TO SEND RPC
         {
             targets ??= PlayerUtils.GetAllPlayers().Where(p => p.PlayerId != playerControl.PlayerId).ToArray();
             foreach (var control in targets)
@@ -98,6 +98,8 @@ public abstract class RpcUtils
 
     public static void StartAndSendRpc(byte rpc, PlayerControl[]? targets = null)
         => StartRpcImmediately(rpc, targets).Finish();
+
+    internal static void RegisterRpcHandler(IRpcHandler roleSelectionShareRpcHandler) => IRpcHandler.Handlers.Add(roleSelectionShareRpcHandler);
 }
 
 public class RpcWriter
@@ -195,7 +197,7 @@ public class RpcWriter
 
 public interface IRpcHandler
 {
-    public static List<IRpcHandler> Handlers { get; } = new();
+    public static HashSet<IRpcHandler> Handlers { get; } = new();
 
     public Action<MessageReader> OnReceive { get; }
 }

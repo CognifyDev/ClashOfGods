@@ -32,8 +32,8 @@ public class SoulHunter : CustomRole, IListener
 
         CanKill = true;
 
-        KillButtonSetting.UsesLimit = 1;
-        KillButtonSetting.CustomCooldown = SoulHunterKillCd.GetFloat;
+        DefaultKillButtonSetting.UsesLimit = 1;
+        DefaultKillButtonSetting.CustomCooldown = SoulHunterKillCd.GetFloat;
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -71,7 +71,7 @@ public class SoulHunter : CustomRole, IListener
             target.RpcSetCustomRole(this);
             target.RpcRevive();
             target.RpcMark(HasRevivedTag);
-            KillButtonSetting.RemainingUses++;
+            DefaultKillButtonSetting.RemainingUses++;
         }
     }
 

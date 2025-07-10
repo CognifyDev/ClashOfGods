@@ -22,8 +22,8 @@ public class Vigilante : CustomRole, IListener
         CanKill = true;
         CanVent = false;
 
-        KillButtonSetting.UsesLimit = int.MaxValue;
-        KillButtonSetting.RemainingUses = 1;
+        DefaultKillButtonSetting.UsesLimit = int.MaxValue;
+        DefaultKillButtonSetting.RemainingUses = 1;
         
         _minCrewmateNumber = CreateOption(() => LanguageConfig.Instance.VigilanteMinCrewmateNumber,
             new FloatOptionValueRule(1F, 1F, 15F, 3F));
@@ -31,7 +31,7 @@ public class Vigilante : CustomRole, IListener
 
     public override void ClearRoleGameData()
     {
-        KillButtonSetting.RemainingUses = 1;
+        DefaultKillButtonSetting.RemainingUses = 1;
         _hasGiven = false;
     }
 
@@ -41,7 +41,7 @@ public class Vigilante : CustomRole, IListener
     {
         if (PlayerUtils.AllCrewmates.Count() > _minCrewmateNumber.GetFloat() || _hasGiven) return;
 
-        KillButtonSetting.RemainingUses++;
+        DefaultKillButtonSetting.RemainingUses++;
         _hasGiven = true;
     }
 

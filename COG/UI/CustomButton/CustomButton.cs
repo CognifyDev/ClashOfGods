@@ -214,6 +214,8 @@ public class CustomButton
         SetActive(hasButton);
         if (!hasButton) return;
 
+        SpriteRenderer!.sprite = Sprite;
+
         ButtonObject!.commsDown.SetActive(false);
         HotkeyRenderer!.gameObject.SetActive(true);
 
@@ -314,7 +316,12 @@ public class CustomButton
             button.ButtonObject = Object.Instantiate(hud.AbilityButton, hud.AbilityButton.transform.parent/*moddedParent.transform*/);
 
             button.SpriteRenderer = button.ButtonObject.graphic;
-            button.SpriteRenderer.sprite = button.Sprite;
+            var sprite = button.Identifier switch
+            {
+                "chief-give-shield" => RoleManager.Instance.GetRole(AmongUs.GameOptions.RoleTypes.GuardianAngel).Ability.Image,
+                _ => button.Sprite
+            };
+            button.ButtonObject.SetSecondImage(new() { SecondImage = sprite });
 
             if (button.UsesLimit > 0)
                 button.ButtonObject.SetUsesRemaining(button.UsesLimit);

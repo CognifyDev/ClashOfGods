@@ -48,11 +48,13 @@ public class RoleAssignmentListener : IListener
                 var list = new List<PlayerData>();
 
                 for (int i = 0; i < count; i++)
-                    list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<PlayerData>());
+                    list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<SerializablePlayerData>().AsPlayerData());
 
                 return (count, list.ToArray());
             }
         );
+
+        RpcUtils.RegisterRpcHandler(_roleSelectionShareRpcHandler);
     }
 
 

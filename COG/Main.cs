@@ -108,18 +108,6 @@ public partial class Main : BasePlugin
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
-        /*
-        // Load plugins
-        try
-        {
-            PluginManager.LoadPlugins();
-        }
-        catch (System.Exception e)
-        {
-            Logger.LogError(e.Message);
-        }
-        */
-
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
@@ -161,6 +149,7 @@ public partial class Main : BasePlugin
             new Technician(),
             new Inspector(),
             new Doorman(),
+            new Chief(),
 
             // Impostor
             new Impostor(),
@@ -238,7 +227,7 @@ public partial class Main : BasePlugin
             
             var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
             var enumerable = files.ToArray();
-            Logger.LogInfo($"{enumerable.Length} plugins to load.");
+            Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
 
             foreach (var file in enumerable)
                 JsPluginManager.GetManager().LoadPlugin(file);

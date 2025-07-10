@@ -20,8 +20,8 @@ public class Sheriff : CustomRole, IListener
         SheriffKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
                 new FloatOptionValueRule(10f, 5f, 60f, 30f, NumberSuffixes.Seconds));
 
-        KillButtonSetting.CustomCooldown = SheriffKillCd.GetFloat;
-        KillButtonSetting.SetBeforeMurder(button =>
+        DefaultKillButtonSetting.CustomCooldown = SheriffKillCd.GetFloat;
+        DefaultKillButtonSetting.SetBeforeMurder(button =>
         {
             var localData = PlayerControl.LocalPlayer.Data;
             var current = button.currentTarget;

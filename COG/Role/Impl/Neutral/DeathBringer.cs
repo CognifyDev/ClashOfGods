@@ -53,8 +53,8 @@ public class DeathBringer : CustomRole, IListener
             _killCooldown.GetFloat,
             -1);
 
-        KillButtonSetting.ForceShow = () => PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat();
-        KillButtonSetting.CustomCooldown = _killCooldown.GetFloat;
+        DefaultKillButtonSetting.ForceShow = () => PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat();
+        DefaultKillButtonSetting.CustomCooldown = _killCooldown.GetFloat;
 
         AddButton(_stareButton);
     }

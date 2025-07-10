@@ -149,7 +149,7 @@ public sealed class CustomOption
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
 
         var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareOptions,
-            target == null ? null : new[] { target });
+            target == null ? null : target.ToSingleElementArray());
         
         writer.WritePacked((uint) Options.Count);
         foreach (var option in Options)

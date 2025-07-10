@@ -46,7 +46,7 @@ public class Assassin : CustomRole
             0
         );
 
-        KillButtonSetting.AddCustomCondition(() => _killedTimes >= MaxUseTime.GetFloat());
+        DefaultKillButtonSetting.AddCustomCondition(() => _killedTimes >= MaxUseTime.GetFloat());
         
         AddButton(DispatchButton);
     }

@@ -26,7 +26,7 @@ public class Reaper : CustomRole, IListener
         TimeToReduce = CreateOption(() => LanguageConfig.Instance.ReaperTimeToReduce,
             new FloatOptionValueRule(1F, 0.5F, 5F, 1.5F, NumberSuffixes.Seconds));
 
-        KillButtonSetting.CustomCooldown = () => _cooldown;
+        DefaultKillButtonSetting.CustomCooldown = () => _cooldown;
     }
 
     [EventHandler(EventHandlerType.Postfix)]

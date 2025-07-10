@@ -75,6 +75,10 @@ role:
       description: "飞船的设施都为我所用"
       long-description: "每轮可以选择一处门进行封锁，封锁后可获得此时其内部的人员组成信息。"
       no-player: "无玩家"
+    chief:
+      name: "参谋长"
+      description: "力量归你，荣耀归我"
+      long-description: "可以分别给予其他玩家一次无代价击杀机会和一次一次性护盾。"
   neutral:
     jester:
       name: "小丑"
@@ -159,6 +163,8 @@ action:
   stare: "凝视"
   examine: "检察"
   block: "封锁"
+  give-kill: "给予击杀机会"
+  give-shield: "给予护盾"
 game:
   end:
     summary-message: "玩家职业:"

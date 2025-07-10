@@ -330,3 +330,13 @@ internal class PlayerControlAwakePatch
             .ExecuteHandlers(new PlayerControlAwakeEvent(__instance), EventHandlerType.Postfix);
     }
 }
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckProtect))]
+static class PlayerCheckProtectPatch
+{
+    public static bool Prefix(PlayerControl __instance, PlayerControl target)
+    {
+        __instance.RpcProtectPlayer(target, __instance.Data.DefaultOutfit.ColorId);
+        return false; // always allow to protect
+    }
+}

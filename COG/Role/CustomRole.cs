@@ -63,15 +63,17 @@ public class CustomRole
         CanSabotage = campType == CampType.Impostor;
         Id = _order++;
         ShowInOptions = showInOptions;
-        AllOptions = new List<CustomOption>();
+        AllOptions = new();
 
-        KillButtonSetting = new()
+        DefaultKillButtonSetting = new()
         {
             ForceShow = () => CanKill,
             TargetOutlineColor = Color
         };
-        KillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this));
-        
+        DefaultKillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this));
+
+        CurrentKillButtonSetting = DefaultKillButtonSetting;
+
         Name = GetContextFromLanguage("name");
         ShortDescription = GetContextFromLanguage("description");
         
@@ -103,7 +105,7 @@ public class CustomRole
             RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 0));
             
             RoleCode = CreateOption(() => LanguageConfig.Instance.RoleCode, 
-                new StringOptionValueRule(0, _ => new[] {Id.ToString()}));
+                new StringOptionValueRule(0, _ => Id.ToString().ToSingleElementArray()));
         }
     }
 
@@ -252,7 +254,9 @@ public class CustomRole
         Role = VanillaRole
     };
 
-    public KillButtonSetting KillButtonSetting { get; }
+    public KillButtonSetting DefaultKillButtonSetting { get; }
+
+    public KillButtonSetting CurrentKillButtonSetting { get; set; }
 
     public List<IRpcHandler> RpcHandlers { get; }
 
@@ -281,7 +285,7 @@ public class CustomRole
         return PlayerControl.LocalPlayer.IsRole(this);
     }
 
-    protected CustomOption CreateOptionWithoutRegister(Func<string> nameGetter, IValueRule rule)
+    protected CustomOption CreateOptionWithoutRegisteration(Func<string> nameGetter, IValueRule rule)
     {
         return CustomOption.Of(GetTabType(this), nameGetter, rule);
     }
@@ -356,7 +360,7 @@ public class CustomRole
         return Name.Color(Color);
     }
 
-    public void RegisterRpcHandler(IRpcHandler handler) => IRpcHandler.Handlers.Add(handler);
+    public void RegisterRpcHandler(IRpcHandler handler) => RpcUtils.RegisterRpcHandler(handler);
 
     public static CustomOption.TabType GetTabType(CustomRole role)
     {
