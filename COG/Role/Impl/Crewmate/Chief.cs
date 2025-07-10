@@ -19,9 +19,9 @@ public class Chief : CustomRole
 
     private PlayerControl? _target;
 
-    public Chief() : base(ColorUtils.FromColor32(75, 86, 107), CampType.Crewmate)
+    public Chief() : base(Color.gray, CampType.Crewmate)
     {
-        _giveKillRpcHandler = new RpcHandler<PlayerControl>(KnownRpc.GiveOneKill,
+        _giveKillRpcHandler = new(KnownRpc.GiveOneKill,
             player =>
             {
                 if (!player.AmOwner) return; // local player only
@@ -33,10 +33,11 @@ public class Chief : CustomRole
                     {
                         ForceShow = () => true,
                         InitialCooldown = 0,
-                        UsesLimit = 1
+                        UsesLimit = 1,
+                        RemainingUses = 1
                     };
 
-                    role!.CurrentKillButtonSetting = role!.DefaultKillButtonSetting; // restore setting after use
+                    role!.CurrentKillButtonSetting.AddAfterClick(() => role!.CurrentKillButtonSetting = role!.DefaultKillButtonSetting); // restore setting after use
                 }
             },
             (writer, player) => writer.WriteNetObject(player),

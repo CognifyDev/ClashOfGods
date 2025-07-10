@@ -626,7 +626,7 @@ public static class PlayerUtils
         if (!player.AmOwner) return null;
 
         var killButton = HudManager.Instance.KillButton;
-        //var setting = KillButtonManager.GetSetting();
+        
         var settings = GetRoles(player).Select(r => r.DefaultKillButtonSetting);
 
         killButton.ToggleVisible(settings.Any(r => r.ForceShow()) && VanillaKillButtonPatch.IsHudActive);

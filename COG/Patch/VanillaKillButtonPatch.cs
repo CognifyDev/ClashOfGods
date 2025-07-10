@@ -80,7 +80,7 @@ static class VanillaKillButtonPatch
             var settings = PlayerControl.LocalPlayer.GetSubRoles().Concat(PlayerControl.LocalPlayer.GetMainRole().ToSingleElementArray()).Select(r => r.DefaultKillButtonSetting);
 
             var activatedSettings = settings.Where(s => s.ForceShow());
-            if (activatedSettings.Count() == 0) return false;
+            if (!activatedSettings.Any()) return false;
             var setting = activatedSettings.First();
 
             if (setting.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())

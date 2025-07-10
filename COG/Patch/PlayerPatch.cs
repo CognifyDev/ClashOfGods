@@ -52,6 +52,7 @@ internal class PlayerKillPatch
         return false; // Always skip vanilla kill check
     }
 
+
     [HarmonyPatch(nameof(PlayerControl.MurderPlayer))]
     [HarmonyPostfix]
     public static void MurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
