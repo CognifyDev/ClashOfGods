@@ -72,7 +72,7 @@ public class CustomRole
         };
         DefaultKillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this));
 
-        CurrentKillButtonSetting = DefaultKillButtonSetting;
+        ResetCurrentKillButtonSetting();
 
         Name = GetContextFromLanguage("name");
         ShortDescription = GetContextFromLanguage("description");
@@ -258,8 +258,6 @@ public class CustomRole
 
     public KillButtonSetting CurrentKillButtonSetting { get; set; }
 
-    public List<IRpcHandler> RpcHandlers { get; }
-
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
         if (!ShowInOptions) return null!;
@@ -361,6 +359,8 @@ public class CustomRole
     }
 
     public void RegisterRpcHandler(IRpcHandler handler) => RpcUtils.RegisterRpcHandler(handler);
+
+    public void ResetCurrentKillButtonSetting() => CurrentKillButtonSetting = DefaultKillButtonSetting;
 
     public static CustomOption.TabType GetTabType(CustomRole role)
     {

@@ -77,7 +77,7 @@ static class VanillaKillButtonPatch
             && !__instance.isCoolingDown
             && PlayerControl.LocalPlayer.CanMove)
         {
-            var settings = PlayerControl.LocalPlayer.GetSubRoles().Concat(PlayerControl.LocalPlayer.GetMainRole().ToSingleElementArray()).Select(r => r.DefaultKillButtonSetting);
+            var settings = PlayerControl.LocalPlayer.GetSubRoles().Concat(PlayerControl.LocalPlayer.GetMainRole().ToSingleElementArray()).Select(r => r.CurrentKillButtonSetting);
 
             var activatedSettings = settings.Where(s => s.ForceShow());
             if (!activatedSettings.Any()) return false;

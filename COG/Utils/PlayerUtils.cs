@@ -627,7 +627,7 @@ public static class PlayerUtils
 
         var killButton = HudManager.Instance.KillButton;
         
-        var settings = GetRoles(player).Select(r => r.DefaultKillButtonSetting);
+        var settings = GetRoles(player).Select(r => r.CurrentKillButtonSetting);
 
         killButton.ToggleVisible(settings.Any(r => r.ForceShow()) && VanillaKillButtonPatch.IsHudActive);
 

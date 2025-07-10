@@ -37,7 +37,7 @@ public class Chief : CustomRole
                         RemainingUses = 1
                     };
 
-                    role!.CurrentKillButtonSetting.AddAfterClick(() => role!.CurrentKillButtonSetting = role!.DefaultKillButtonSetting); // restore setting after use
+                    role!.CurrentKillButtonSetting.AddAfterClick(() => role!.ResetCurrentKillButtonSetting()); // restore setting after use
                 }
             },
             (writer, player) => writer.WriteNetObject(player),
