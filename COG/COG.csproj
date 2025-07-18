@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>preview</LangVersion>
@@ -21,14 +21,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\InDLL\Config\*.*" />
+        <EmbeddedResource Include="Resources\Configs\*.*" />
+		<EmbeddedResource Include="Resources\Libraries\*.*" />
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\InDLL\Images\*.*" />
-        <EmbeddedResource Include="Resources\InDLL\Images\Buttons\*.*" />
-        <EmbeddedResource Include="Resources\InDLL\Images\Settings\*.*" />
-        <EmbeddedResource Include="Resources\InDLL\Images\RolePreviews\*.*" />
+        <EmbeddedResource Include="Resources\Images\*.*" />
+        <EmbeddedResource Include="Resources\Images\Buttons\*.*" />
+        <EmbeddedResource Include="Resources\Images\Settings\*.*" />
+        <EmbeddedResource Include="Resources\Images\RolePreviews\*.*" />
     </ItemGroup>
 
     <ItemGroup>

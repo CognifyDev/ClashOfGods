@@ -8,7 +8,7 @@ public class SettingsConfig : ConfigBase
     
     public SettingsConfig() : base("Settings",
         DataDirectoryName + "/settings.yml",
-        new ResourceFile("COG.Resources.InDLL.Config.settings.yml"))
+        new ResourceFile("COG.Resources.Configs.settings.yml"))
     {
         EnablePluginSystem = YamlReader!.GetBool("plugin.enable")!.Value;
         TimeZone = YamlReader!.GetString("plugin.time-zone")!;

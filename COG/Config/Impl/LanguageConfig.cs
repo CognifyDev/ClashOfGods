@@ -19,8 +19,8 @@ public class LanguageConfig : ConfigBase
     private LanguageConfig() : base(
         "Language",
         DataDirectoryName + "/language.yml",
-        new ResourceFile("COG.Resources.InDLL.Config.language.yml"),
-        true // Still overwrite language file if mod version changes
+        new ResourceFile("COG.Resources.Configs.language.yml"),
+        replace: true // Still overwrite language file if mod version changes
     )
     {
         SetTranslations();
