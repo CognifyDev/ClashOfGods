@@ -94,7 +94,7 @@ public static class RoleOptionPatch
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
         __instance.roleDescriptionText.text = CurrentAdvancedTabFor.GetLongDescription();
         var rolePreview = ResourceUtils.LoadSprite(
-            $"COG.Resources.InDLL.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png", 
+            $"COG.Resources.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png", 
             300);
         __instance.roleScreenshot.sprite = !rolePreview ?
             ResourceUtils.LoadSprite(ResourceConstant.DefaultRolePreview, 185) : rolePreview;
@@ -286,7 +286,7 @@ public static class RoleOptionPatch
         Main.Logger.LogDebug("Button action has registered. Start to set button icon...");
 
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
-        const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
+        const string settingImagePath = "COG.Resources.Images.Settings";
 
         renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 35f);
         CampTabs.TryAdd(camp, (tab, button));

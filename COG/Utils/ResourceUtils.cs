@@ -71,4 +71,9 @@ public static class ResourceUtils
         input.CopyTo(ms);
         return ms.ToArray();
     }
+
+    public static string GetResourcePath(string pathToFile)
+    {
+        return $"COG.Resources.{pathToFile}";
+    }
 }

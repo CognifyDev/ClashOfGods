@@ -15,7 +15,7 @@ public class Guesser : CustomRole, IListener
     public CustomOption MaxGuessTime { get; }
     public CustomOption GuessContinuously { get; }
     public CustomOption EnabledRolesOnly { get; }
-    public CustomOption CanGuessSubRoles { get; }
+    //public CustomOption CanGuessSubRoles { get; }
 
     public int GuessedTime { get; internal set; }
     
@@ -27,8 +27,8 @@ public class Guesser : CustomRole, IListener
             new BoolOptionValueRule(true));
         EnabledRolesOnly = CreateOption(() => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
             new BoolOptionValueRule(false));
-        CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
-            new BoolOptionValueRule(false));
+        /*CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
+            new BoolOptionValueRule(false));*/
     }
     
     [EventHandler(EventHandlerType.Postfix)]

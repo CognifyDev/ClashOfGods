@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 
 namespace COG.Listener.Impl;
 
@@ -222,10 +223,16 @@ public class RoleAssignmentListener : IListener
         }
 
         // 打印职业分配信息
+        var sb = new StringBuilder();
         foreach (var playerRole in GameUtils.PlayerData)
-            Main.Logger.LogInfo($"{playerRole.Player.name}({playerRole.Player.Data.FriendCode})" +
-                                $" => {playerRole.MainRole.GetNormalName()}" +
-                                $"{playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}");
+            sb.AppendLine($"""
+                {playerRole.Player.name}({playerRole.PlayerId}) 
+                    => {playerRole.MainRole.GetNormalName()}  with sub role(s):
+                    {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}
+                """);
+
+        Main.Logger.LogWarning("Message below is for debugging, not for cheating!");
+        Main.Logger.LogInfo(sb.ToString());
     }
 
 

@@ -95,7 +95,7 @@ public static class MainMenuPatch
         CustomBanner = new GameObject("CustomBG");
         CustomBanner.transform.position = new Vector3(1.8f, 0.2f, 0f);
         var bgRenderer = CustomBanner.AddComponent<SpriteRenderer>();
-        bgRenderer.sprite = ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 295f);
+        bgRenderer.sprite = ResourceUtils.LoadSprite("COG.Resources.Images.COG-BG.png", 295f);
     }
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]
@@ -129,7 +129,7 @@ public static class MainMenuPatch
 
     [HarmonyPatch(nameof(MainMenuManager.ResetScreen))]
     [HarmonyPostfix]
-    private static void ShowModBG()
+    private static void ShowModBackground()
     {
         if (CustomBanner != null) CustomBanner.SetActive(true);
         foreach (var btn in Buttons.Where(btn => btn != null && btn.gameObject != null)) btn.gameObject.SetActive(true);

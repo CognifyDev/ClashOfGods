@@ -58,7 +58,7 @@ public class GuessButton : TemplatedCustomGameObject
             MeetingHud.playerStates.ToList().ForEach(x => x.gameObject.SetActive(false));
             
             var enabledRolesOnly = Guesser.EnabledRolesOnly.GetBool();
-            var canGuessSubRoles = Guesser.CanGuessSubRoles.GetBool();
+            var canGuessSubRoles = /*Guesser.CanGuessSubRoles.GetBool()*/false; // How about the SpeedBooster?
             var roles = enabledRolesOnly
                 ? GetCustomRolesFromPlayers()
                 : CustomRoleManager.GetManager().GetRoles().Where(role =>
@@ -157,7 +157,7 @@ public class GuessButton : TemplatedCustomGameObject
 
     private CustomRole[] GetCustomRolesFromPlayers()
     {
-        var canGuessSubRoles = Guesser.CanGuessSubRoles.GetBool();
+        var canGuessSubRoles = /*Guesser.CanGuessSubRoles.GetBool()*/false;
         var players = PlayerUtils.GetAllPlayers();
 
         var customRoles = players.Select(player => player.GetMainRole()).ToList();

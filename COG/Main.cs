@@ -74,10 +74,15 @@ public partial class Main : BasePlugin
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
         Logger.LogInfo($"GitInfo: {GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})");
-#if !DEBUG
-        Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.SelectRoles)));
-        Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.OnRpcReceived)));
-#endif
+
+        ResourceUtils.WriteToFileFromResource(
+                @".\BepInEx\core\Jint.dll",
+            ResourceUtils.GetResourcePath("Libraries.Jint.dll")
+            );
+        ResourceUtils.WriteToFileFromResource(
+                @".\BepInEx\core\YamlDotNet.dll",
+            ResourceUtils.GetResourcePath("Libraries.YamlDotNet.dll")
+            );
 
         var longVersionInfo = StringUtils.EncodeToBase64($"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}");
         var storagedInfo = "";
@@ -103,7 +108,7 @@ public partial class Main : BasePlugin
         _ = ButtonHotkeyConfig.Instance;
 
         File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
-
+        
         /*
         ModUpdater.FetchUpdate();
         Logger.LogInfo(

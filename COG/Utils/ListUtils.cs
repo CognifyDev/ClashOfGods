@@ -31,9 +31,9 @@ public static class ListUtils
         return obj;
     }
 
-    public static string AsString(this List<string> list)
+    public static string AsString(this List<string> list, char start = '{', char end = '}', string separator = ",")
     {
-        var stringBuilder = new StringBuilder("[");
+        var stringBuilder = new StringBuilder(start);
         for (var i = 0; i < list.Count; i++)
         {
             var text = list[i];
@@ -41,11 +41,11 @@ public static class ListUtils
             stringBuilder.Append(text);
             if (i < list.Count - 1)
             {
-                stringBuilder.Append(", ");
+                stringBuilder.Append(separator + " ");
             }
         }
 
-        stringBuilder.Append(']');
+        stringBuilder.Append(end);
         return stringBuilder.ToString();
     }
     
