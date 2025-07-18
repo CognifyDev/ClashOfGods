@@ -210,12 +210,12 @@ public partial class Main : BasePlugin
                     ModOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
                     return false;
                 }, false),
-            new("FixCustomButtonSprite",
+            new(LanguageConfig.Instance.FixButtonSpriteName,
             () => 
                 {
                     if (!GameStates.InRealGame)
                     {
-                        GameUtils.Popup?.Show("NotNow");
+                        GameUtils.Popup?.Show(LanguageConfig.Instance.FixButtonSpriteErrorNotInGameMsg);
                         return false;
                     }
 
