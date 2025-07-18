@@ -35,6 +35,8 @@ using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using COG.Config;
 using BepInEx.Logging;
 using BepInEx.Configuration;
+using UnityEngine;
+using COG.UI.CustomButton;
 
 namespace COG;
 
@@ -178,7 +180,7 @@ public partial class Main : BasePlugin
                         GameUtils.Popup?.Show("You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
                         return false;
                     }
-                    var p = OpenFileDialogue.Display(Mode.Open, "", 
+                    var p = OpenFileDialogue.Display(Mode.Open, "",
                         defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
                     if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 
@@ -207,7 +209,21 @@ public partial class Main : BasePlugin
                     ModOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
                     ModOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
                     return false;
-                }, false)
+                }, false),
+            new("FixCustomButtonSprite",
+            () => 
+                {
+                    if (!GameStates.InRealGame)
+                    {
+                        GameUtils.Popup?.Show("NotNow");
+                        return false;
+                    }
+
+                    var material = new GameObject().AddComponent<SpriteRenderer>().material;
+                    CustomButtonManager.GetManager().GetButtons().ForEach(button => button.Material = material);
+
+                    return false;
+                }, false),
         });
 
         // Register Commands
