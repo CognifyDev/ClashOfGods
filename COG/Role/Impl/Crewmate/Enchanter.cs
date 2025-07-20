@@ -17,7 +17,7 @@ public class Enchanter : CustomRole, IListener
 {
     public CustomButton ContractButton { get; }
     public CustomOption ImmobilizationDuration { get; }
-    public CustomOption CooldownIncreasement { get; }
+    public CustomOption CooldownIncreament { get; }
     public RpcHandler<PlayerControl> KillerPunishmentHandler { get; }
 
     private PlayerControl? _contractedPlayer;
@@ -36,7 +36,6 @@ public class Enchanter : CustomRole, IListener
             },
             () =>
             {
-                ContractButton?.ResetCooldown();
                 _usedThisRound = false;
                 _contractedPlayer = null;
             },
@@ -55,7 +54,7 @@ public class Enchanter : CustomRole, IListener
         ImmobilizationDuration = CreateOption(() => GetContextFromLanguage("immobilization-duration"),
             new FloatOptionValueRule(1, 1, 5,
             3, NumberSuffixes.Seconds));
-        CooldownIncreasement = CreateOption(() => GetContextFromLanguage("cooldown-increasement"),
+        CooldownIncreament = CreateOption(() => GetContextFromLanguage("cooldown-increasement"),
             new FloatOptionValueRule(3, 1, 10,
             5, NumberSuffixes.Seconds));
 
@@ -64,18 +63,24 @@ public class Enchanter : CustomRole, IListener
             {
                 if (!p.AmOwner) return;
 
+                Main.Logger.LogDebug($"Enchanter punishment begun");
+
                 Coroutines.Start(CoImmobilizeAndIncreaseCooldown());
 
                 IEnumerator CoImmobilizeAndIncreaseCooldown()
                 {
+                    Main.Logger.LogDebug($"Setting unmoveable");
                     p.moveable = false;
                     yield return new WaitForSeconds(ImmobilizationDuration.GetFloat());
                     p.moveable = true;
 
+                    Main.Logger.LogDebug($"Increasing cooldown");
                     var role = p.GetRoles().FirstOrDefault(r => r.CanKill);
                     if (role == null) yield break;
+
+                    var originCooldown = role.CurrentKillButtonSetting.CustomCooldown();
                     role.CurrentKillButtonSetting/* this wont be synced, so it is just the setting of local player */.CustomCooldown =
-                        () => role.CurrentKillButtonSetting.CustomCooldown() + CooldownIncreasement.GetFloat();
+                        () => originCooldown + CooldownIncreament.GetFloat();
                 }
             },
             (writer, player) => writer.WriteNetObject(player),

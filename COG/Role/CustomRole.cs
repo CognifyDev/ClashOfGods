@@ -73,7 +73,7 @@ public class CustomRole
         ShowInOptions = showInOptions;
         AllOptions = new();
 
-        DefaultKillButtonSetting = new()
+        _currentKillButtonSetting = DefaultKillButtonSetting = new()
         {
             ForceShow = () => CanKill,
             TargetOutlineColor = Color

@@ -157,6 +157,7 @@ public partial class Main : BasePlugin
             new Inspector(),
             new Doorman(),
             new Chief(),
+            new Enchanter(),
 
             // Impostor
             new Impostor(),
