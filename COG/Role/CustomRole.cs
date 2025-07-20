@@ -24,6 +24,12 @@ namespace COG.Role;
 
 #pragma warning disable CS0659
 
+/*
+ WARNING:
+  Most of the members in CustomRole and PlayerControl won't synchronize automatically,
+  so you probably gotta use RPC to synchronize them.
+ */
+
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
@@ -31,6 +37,8 @@ namespace COG.Role;
 public class CustomRole
 {
     private static int _order = 0;
+    private KillButtonSetting _currentKillButtonSetting;
+    private Stack<KillButtonSetting> _killButtonSettings = new();
 
     /// <summary>
     /// Initializes a sub-role instance.
@@ -76,7 +84,8 @@ public class CustomRole
 
         Name = GetContextFromLanguage("name");
         ShortDescription = GetContextFromLanguage("description");
-        
+        ActionNameContext = LanguageConfig.Instance.GetHandler("action");
+
         var vanillaType = CampType switch
         {
             CampType.Crewmate => RoleTeamTypes.Crewmate,
@@ -211,10 +220,13 @@ public class CustomRole
     {
         get
         {
-            if (RoleNumberOption != null) return RoleNumberOption!.GetInt() > 0;
+            if (RoleNumberOption != null) 
+                return RoleNumberOption!.GetInt() > 0;
             return false;
         }
     }
+
+    public LanguageConfig.TextHandler ActionNameContext { get; } 
 
     public static Action<CustomRole> OnRoleAbilityUsed { get; set; } = (_) => { };
 
@@ -256,7 +268,34 @@ public class CustomRole
 
     public KillButtonSetting DefaultKillButtonSetting { get; }
 
-    public KillButtonSetting CurrentKillButtonSetting { get; set; }
+    /// <summary>
+    /// NOTE: Set to null to use previous setting.<para/>
+    /// PLEASE CAREFULLY CONSIDER WHETHER TO CLONE ONE OR TO JUST MODIFY!
+    /// </summary>
+    public KillButtonSetting CurrentKillButtonSetting
+    {
+        get => _currentKillButtonSetting;
+        set
+        {
+            if (value == null)
+            {
+                if (_killButtonSettings.Count > 0)
+                {
+                    _currentKillButtonSetting = _killButtonSettings.Pop();
+                }
+                else
+                {
+                    _currentKillButtonSetting = DefaultKillButtonSetting;
+                    _killButtonSettings.Push(DefaultKillButtonSetting);
+                }
+            }
+            else
+            {
+                _killButtonSettings.Push(_currentKillButtonSetting);
+                _currentKillButtonSetting = value;
+            }
+        }
+    }
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
@@ -360,7 +399,17 @@ public class CustomRole
 
     public void RegisterRpcHandler(IRpcHandler handler) => RpcUtils.RegisterRpcHandler(handler);
 
-    public void ResetCurrentKillButtonSetting() => CurrentKillButtonSetting = DefaultKillButtonSetting;
+    public void ResetCurrentKillButtonSetting() => CurrentKillButtonSetting = null!;
+
+    public static void ClearKillButtonSettings()
+    {
+        CustomRoleManager.GetManager().GetRoles().
+            ForEach(r =>
+            {
+                r._killButtonSettings.Clear();
+                r.ResetCurrentKillButtonSetting();
+            });
+    }
 
     public static CustomOption.TabType GetTabType(CustomRole role)
     {

@@ -463,6 +463,7 @@ public static class PlayerUtils
             GameUtils.PlayerData.Remove(playerRole);
         }
 
+        CustomRole.ClearKillButtonSettings();
         GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
         VanillaKillButtonPatch.Initialize();

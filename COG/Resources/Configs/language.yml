@@ -79,6 +79,12 @@ role:
       name: "参谋长"
       description: "力量归你，荣耀归我"
       long-description: "可以分别给予其他玩家一次无代价击杀机会和一次一次性护盾。"
+    enchanter:
+      name: "咒术师"
+      description: "将痛楚施加于破坏契约者"
+      long-description: "可以对一名玩家施加契约，若该玩家在当轮内被常规击杀，击杀者将被定身数秒且当轮击杀冷却延长。技能每轮只能使用一次。"
+      immobilization-duration: "定身持续时间"
+      cooldown-increasement: "击杀冷却延长时间"
   neutral:
     jester:
       name: "小丑"

@@ -50,4 +50,21 @@ public class KillButtonSetting
 
     public PlayerControl BeforeMurder() => _beforeMurder(HudManager.Instance.KillButton);
     public void SetBeforeMurder(Func<global::KillButton, PlayerControl> beforeMurder) => _beforeMurder = beforeMurder;
+
+    public KillButtonSetting Clone()
+    {
+        return new KillButtonSetting
+        {
+            OnlyUsableWhenAlive = OnlyUsableWhenAlive,
+            TargetOutlineColor = TargetOutlineColor,
+            UsesLimit = UsesLimit,
+            CustomCooldown = CustomCooldown,
+            ForceShow = ForceShow,
+            InitialCooldown = InitialCooldown,
+            RemainingUses = RemainingUses,
+            _afterClick = _afterClick,
+            _customCondition = _customCondition,
+            _beforeMurder = _beforeMurder
+        };
+    }
 }

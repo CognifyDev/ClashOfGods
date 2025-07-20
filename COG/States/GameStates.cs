@@ -39,6 +39,7 @@ public static class GameStates
 
                 GameUtils.PlayerData.Clear();
                 DeadPlayer.DeadPlayers.Clear();
+                CustomRole.ClearKillButtonSettings();
             }
 
             IsLeavingGame = false;
