@@ -70,6 +70,8 @@ public partial class Main : BasePlugin
             ? VersionInfo.Empty
             : VersionInfo.Parse(PluginVersion);
 
+        System.Console.OutputEncoding = System.Text.Encoding.UTF8;
+
         Logger = new StackTraceLogger($"   {DisplayName}");
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
@@ -138,7 +140,7 @@ public partial class Main : BasePlugin
         {
             new CrewmatesCustomWinner(),
             new ImpostorsCustomWinner(),
-            new LastPlayerCustomWinner(),
+            new LastPlayerCustomWinner()
         });
 
         // Register roles
@@ -199,7 +201,7 @@ public partial class Main : BasePlugin
                 () =>
                 {
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-                    if (GameStates.InRealGame)
+                    if (GameStates.InRealGame || GameStates.InLobby)
                     {
                         GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
                         return false;
@@ -219,14 +221,22 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.FixButtonSpriteName,
             () => 
                 {
-                    if (!GameStates.InRealGame)
+                    if (!GameStates.InRealGame && !GameStates.InLobby)
                     {
                         GameUtils.Popup?.Show(LanguageConfig.Instance.FixButtonSpriteErrorNotInGameMsg);
                         return false;
                     }
 
                     var material = new GameObject().AddComponent<SpriteRenderer>().material;
-                    CustomButtonManager.GetManager().GetButtons().ForEach(button => button.Material = material);
+                    CustomButtonManager.GetManager().GetButtons().ForEach(button =>
+                    {
+                        var size = button.SpriteRenderer.size;
+                        var position = button.SpriteRenderer.transform.position;
+                        button.SpriteRenderer.Destroy();
+                        var a = button.ButtonObject.gameObject.AddComponent<SpriteRenderer>();
+                        a.transform.position = position;
+                        a.sprite = button.Sprite;
+                    });
 
                     return false;
                 }, false),

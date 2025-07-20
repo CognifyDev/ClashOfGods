@@ -1,5 +1,6 @@
 ﻿using COG.Listener;
 using COG.Listener.Event.Impl.Player;
+using COG.Patch;
 using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
@@ -63,15 +64,20 @@ public class Enchanter : CustomRole, IListener
             {
                 if (!p.AmOwner) return;
 
-                Main.Logger.LogDebug($"Enchanter punishment begun");
-
                 Coroutines.Start(CoImmobilizeAndIncreaseCooldown());
 
                 IEnumerator CoImmobilizeAndIncreaseCooldown()
                 {
                     Main.Logger.LogDebug($"Setting unmoveable");
-                    p.moveable = false;
-                    yield return new WaitForSeconds(ImmobilizationDuration.GetFloat());
+
+                    float duration = ImmobilizationDuration.GetFloat();
+                    while (duration > 0f)
+                    {
+                        p.moveable = false; // directly set is useless
+                        duration -= Time.deltaTime;
+                        yield return null;
+                    }
+                    
                     p.moveable = true;
 
                     Main.Logger.LogDebug($"Increasing cooldown");
@@ -81,6 +87,7 @@ public class Enchanter : CustomRole, IListener
                     var originCooldown = role.CurrentKillButtonSetting.CustomCooldown();
                     role.CurrentKillButtonSetting/* this wont be synced, so it is just the setting of local player */.CustomCooldown =
                         () => originCooldown + CooldownIncreament.GetFloat();
+                    PlayerControl.LocalPlayer.ResetKillCooldown();
                 }
             },
             (writer, player) => writer.WriteNetObject(player),
