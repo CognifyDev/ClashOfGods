@@ -11,9 +11,14 @@ public static class ColorUtils
             $"<color=#{ToByte(color.r):X2}{ToByte(color.g):X2}{ToByte(color.b):X2}{ToByte(color.a):X2}>{str}</color>";
     }
 
-    public static string ToColorHaxString(this Color color)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="color"></param>
+    /// <returns>Returns a hex string that starts with "#" and represents <paramref name="color"/> </returns>
+    public static string ToColorHexString(this Color color)
     {
-        return $"{ToByte(color.r):X2}{ToByte(color.g):X2}{ToByte(color.b):X2}{ToByte(color.a):X2}";
+        return $"#{ToByte(color.r):X2}{ToByte(color.g):X2}{ToByte(color.b):X2}{ToByte(color.a):X2}";
     }
 
     public static Color FromColor32(this Color32 color32) 
@@ -28,6 +33,11 @@ public static class ColorUtils
         return (byte)(f * 255);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="color">A string that starts with symbol "#".</param>
+    /// <returns></returns>
     public static Color AsColor(string color)
     {
         var red = Convert.ToByte(color.Substring(1, 2), 16);

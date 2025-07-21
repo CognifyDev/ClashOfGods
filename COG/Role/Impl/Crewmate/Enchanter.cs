@@ -26,7 +26,7 @@ public class Enchanter : CustomRole, IListener
     private bool _usedThisRound = false;
     private PlayerControl? _lastKiller;
 
-    public Enchanter() : base(ColorUtils.FromColor32(112, 48, 160), CampType.Crewmate)
+    public Enchanter() : base(ColorUtils.AsColor("#7030a0"), CampType.Crewmate)
     {
         ContractButton = CustomButton.Of(
             "enchanter-contract",
@@ -73,7 +73,7 @@ public class Enchanter : CustomRole, IListener
                     float duration = ImmobilizationDuration.GetFloat();
                     while (duration > 0f)
                     {
-                        p.moveable = false; // directly set is useless
+                        p.moveable = false; // directly setting moveable is useless
                         duration -= Time.deltaTime;
                         yield return null;
                     }

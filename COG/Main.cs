@@ -217,29 +217,7 @@ public partial class Main : BasePlugin
                     ModOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
                     ModOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
                     return false;
-                }, false),
-            new(LanguageConfig.Instance.FixButtonSpriteName,
-            () => 
-                {
-                    if (!GameStates.InRealGame && !GameStates.InLobby)
-                    {
-                        GameUtils.Popup?.Show(LanguageConfig.Instance.FixButtonSpriteErrorNotInGameMsg);
-                        return false;
-                    }
-
-                    var material = new GameObject().AddComponent<SpriteRenderer>().material;
-                    CustomButtonManager.GetManager().GetButtons().ForEach(button =>
-                    {
-                        var size = button.SpriteRenderer.size;
-                        var position = button.SpriteRenderer.transform.position;
-                        button.SpriteRenderer.Destroy();
-                        var a = button.ButtonObject.gameObject.AddComponent<SpriteRenderer>();
-                        a.transform.position = position;
-                        a.sprite = button.Sprite;
-                    });
-
-                    return false;
-                }, false),
+                }, false)
         });
 
         // Register Commands
