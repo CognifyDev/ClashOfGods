@@ -48,7 +48,6 @@ public class DeathBringer : CustomRole, IListener
             () => true,
             ResourceUtils.LoadSprite(ResourceConstant.StareButton)!,
             3,
-            KeyCode.R,
             LanguageConfig.Instance.StareAction,
             _killCooldown.GetFloat,
             -1);

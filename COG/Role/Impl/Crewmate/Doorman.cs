@@ -47,7 +47,6 @@ public class Doorman : CustomRole
             () => true,
             ResourceUtils.LoadSprite(ResourceConstant.BlockButton)!,
             2,
-            KeyCode.B,
             LanguageConfig.Instance.BlockAction,
             () => 0f,
             -1);

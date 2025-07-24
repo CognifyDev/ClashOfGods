@@ -44,7 +44,6 @@ public class Enchanter : CustomRole, IListener
             () => true,
             null!,
             2,
-            KeyCode.E,
             ActionNameContext.GetString("contract"),
             () => 0f,
             0

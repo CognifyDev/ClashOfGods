@@ -54,7 +54,6 @@ public class Chief : CustomRole
             () => true,
             null!,
             2,
-            KeyCode.K,
             action.GetString("give-kill"),
             () => 0,
             1);
@@ -66,7 +65,6 @@ public class Chief : CustomRole
             () => true,
             null!, // allocated the sprite of guardian angel button, see CustomButton.cs
             2,
-            KeyCode.H,
             action.GetString("give-shield"),
             () => 0,
             1);

@@ -40,7 +40,6 @@ public class Assassin : CustomRole
             () =>  _killedTimes < MaxUseTime.GetFloat(),
             ResourceUtils.LoadSprite(ResourceConstant.DispatchButton)!,
             2,
-            KeyCode.C,
             LanguageConfig.Instance.DispatchAction,
             () => GameUtils.GetGameOptions().KillCooldown,
             0

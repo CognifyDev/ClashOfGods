@@ -2,7 +2,9 @@ using COG.UI.CustomButton;
 using COG.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -12,6 +14,11 @@ public class ButtonHotkeyConfig : ConfigBase
 {
     public static ButtonHotkeyConfig Instance { get; private set; }
 
+    public const int MaxButtonCount = 5;
+    public const string ButtonPrefix = "button";
+
+    private Dictionary<int, KeyCode> _hotkeys = new();
+
     static ButtonHotkeyConfig()
     {
         Instance = new();
@@ -19,50 +26,41 @@ public class ButtonHotkeyConfig : ConfigBase
 
     public ButtonHotkeyConfig() : base("Hotkeys", DataDirectoryName + "/hotkeys.yml")
     {
-        if (Text.IsNullOrEmptyOrWhiteSpace())
-        {
-            SaveConfigs();
-            return;
-        }
-
+        if (Text.IsNullOrEmptyOrWhiteSpace()) return;
         ApplyConfigsFromFile();
     }
 
-    public void SetHotkey(CustomButton button, KeyCode hotkey)
+    public void SetHotkey(int index, KeyCode hotkey)
     {
-        button.Hotkey = hotkey;
+        _hotkeys[index] = hotkey;
         Main.Logger.LogInfo($"Hotkey being set: {hotkey}");
         SaveConfigs();
     }
 
+    public ImmutableDictionary<int, KeyCode> GetHotkeys() => _hotkeys.ToImmutableDictionary();
+
     public void SaveConfigs()
     {
-        List<string> configurations = new();
+        var stringHotkeys = _hotkeys.Select(kvp => $"{ButtonPrefix}{kvp.Key}: {kvp.Value}");
 
-        foreach (var button in CustomButtonManager.GetManager().GetButtons())
-            configurations.Add($"{button.Identifier}: {button.Hotkey}");
-
-        File.WriteAllLines(Path, configurations, Encoding.UTF8);
-        Text = string.Join("\r\n", configurations);
+        File.WriteAllLines(Path, stringHotkeys, Encoding.UTF8);
+        Text = string.Join("\r\n", stringHotkeys);
     }
 
     public void ApplyConfigsFromFile()
     {
-        foreach (var button in CustomButtonManager.GetManager().GetButtons())
+        for (var i = 0; i < MaxButtonCount; i++)
         {
-            var keyName = YamlReader!.GetString(button.Identifier);
-            if (keyName.IsNullOrEmptyOrWhiteSpace()) continue;
+            var value = YamlReader!.GetString($"{ButtonPrefix}{i}");
+            if (value == null) continue;
 
-            if (Enum.TryParse<KeyCode>(keyName, out var keyCode))
+            if (!Enum.TryParse<KeyCode>(value, out var keyCode))
             {
-                var defaultKey = button.Hotkey.HasValue ? button.Hotkey.Value.ToString() : "(null)";
-
-                if (defaultKey != keyName)
-                {
-                    button.Hotkey = keyCode;
-                    Main.Logger.LogInfo($"Hotkey change from default: {defaultKey} => {keyCode}");
-                }
+                Main.Logger.LogWarning($"Invalid hotkey format for button {i}: {value}");
+                continue;
             }
+
+            _hotkeys[i] = keyCode;
         }
     }
 }

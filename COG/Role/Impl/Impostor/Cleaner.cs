@@ -41,7 +41,6 @@ public class Cleaner : CustomRole, IListener
             () => true,
             ResourceUtils.LoadSprite(ResourceConstant.CleanDeadBodyButton)!,
             2,
-            KeyCode.C,
             LanguageConfig.Instance.CleanAction,
             () => CleanBodyCd.GetFloat(),
             0

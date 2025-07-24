@@ -50,7 +50,6 @@ public class Inspector : CustomRole, IListener
             () => true,
             ResourceUtils.LoadSprite(ResourceConstant.ExamineButton)!,
             2,
-            KeyCode.X,
             LanguageConfig.Instance.ExamineAction,
             AbilityCooldownOption.GetFloat,
             -1

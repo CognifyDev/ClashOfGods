@@ -72,6 +72,16 @@ public static class StringUtils
         return result.ToString();
     }
 
+    public static string CustomFormat(this string text, params (string, string)[] args)
+    {
+        foreach (var (key, value) in args)
+        {
+            var toReplace = $"%{key}%";
+            text = text.Replace(toReplace, value);
+        }
+        return text;
+    }
+
     public static bool IsNullOrEmptyOrWhiteSpace(this string? str) => string.IsNullOrWhiteSpace(str);
 
     public static string EncodeToBase64(string origin) => Convert.ToBase64String(Encoding.UTF8.GetBytes(origin));

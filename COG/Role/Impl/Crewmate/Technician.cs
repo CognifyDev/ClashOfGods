@@ -30,7 +30,6 @@ public class Technician : CustomRole, IListener
             () => true,
             ResourceUtils.LoadSprite(ResourceConstant.RepairButton)!,
             2,
-            KeyCode.R,
             LanguageConfig.Instance.RepairAction,
             () => 0f,
             2

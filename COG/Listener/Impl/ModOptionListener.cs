@@ -21,13 +21,12 @@ internal class ModOptionListener : IListener
 
     private static bool _isSettingHotkey = false;
     private static ModOption? _currentBeingSet = null;
-    private static CustomButton? _currentCustomButton = null;
+    private static int _currentIndex = -1;
     private static float _timer = TimerCountdown;
     private static string _namePrefix = "";
 
     public static List<GameObject> HotkeyButtons { get; } = new();
 
-    private string GetHotkeyPrefix(CustomRole role, CustomButton button) => $"{role.Name} - {button.Text}";
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSettingInit(OptionsMenuBehaviourStartEvent @event)
@@ -94,7 +93,7 @@ internal class ModOptionListener : IListener
                 if (Input.GetKeyDown(keyCode) && !keyCode.ToString().StartsWith("Mouse"))
                 {
                     textMesh.text = $"{_namePrefix} : {keyCode}";
-                    ButtonHotkeyConfig.Instance.SetHotkey(_currentCustomButton!, keyCode);
+                    ButtonHotkeyConfig.Instance.SetHotkey(_currentIndex, keyCode);
                     ResetHotkeyState();
                 }
             }
@@ -105,7 +104,7 @@ internal class ModOptionListener : IListener
     {
         _isSettingHotkey = false;
         _currentBeingSet = null;
-        _currentCustomButton = null;
+        _currentIndex = -1;
         _timer = TimerCountdown;
         _namePrefix = "";
     }
@@ -141,30 +140,31 @@ internal class ModOptionListener : IListener
     {
         HotkeyButtons.Clear();
         var a = 0;
-        foreach (var role in CustomRoleManager.GetManager().GetModRoles())
+        var buttons = new List<ModOption>();
+
+        for (var i = 0; i < ButtonHotkeyConfig.MaxButtonCount; i++)
         {
-            foreach (var button in role.AllButtons)
-            {
-                ModOption modOption = default!;
+            ModOption modOption = default!;
 
-                modOption = new ModOption($"{GetHotkeyPrefix(role, button)} : {(button.Hotkey.ToString() == "" ? "null" : button.Hotkey)}",
-                    () =>
+            var buttonString = LanguageConfig.Instance.GetHandler("option.hotkey").GetString("button").CustomFormat(i);
+
+            modOption = new ModOption(buttonString,
+                () =>
+                {
+                    if (!_isSettingHotkey)
                     {
-                        if (!_isSettingHotkey)
-                        {
-                            _currentBeingSet = modOption;
-                            _currentCustomButton = button;
-                            _isSettingHotkey = true;
-                            _timer = TimerCountdown;
-                            _namePrefix = GetHotkeyPrefix(role, button);
-                        }
+                        _currentBeingSet = modOption;
+                        _currentIndex = i;
+                        _isSettingHotkey = true;
+                        _timer = TimerCountdown;
+                        _namePrefix = buttonString;
+                    }
 
-                        return false;
-                    }, false);
+                    return false;
+                }, false);
 
-                CreateButton(menu, a++, modOption);
-                HotkeyButtons.Add(modOption.ToggleButton!.gameObject);
-            }
+            CreateButton(menu, a++, modOption);
+            HotkeyButtons.Add(modOption.ToggleButton!.gameObject);
         }
     }
 

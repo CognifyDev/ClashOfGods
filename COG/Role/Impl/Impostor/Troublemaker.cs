@@ -72,7 +72,6 @@ public class Troublemaker : CustomRole
             () => true,
             null!,
             2,
-            KeyCode.B,
             ActionNameContext.GetString("disturb"),
             () => _disturbCooldown.GetFloat(),
             0);

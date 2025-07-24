@@ -159,6 +159,7 @@ option:
   hotkey:
     name: "热键设置"
     press-key-to-set: "请在%sec%秒内按下新热键"
+    button: "技能按钮 %index%"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 main-menu:
