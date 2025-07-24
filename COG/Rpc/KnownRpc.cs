@@ -18,5 +18,6 @@ public enum KnownRpc : uint
     ShareAbilityOrVentUseForInspector,
     SyncRoleGameData,
     GiveOneKill,
-    EnchanterPunishesKiller
+    EnchanterPunishesKiller,
+    TroubleMakerDisturb
 }

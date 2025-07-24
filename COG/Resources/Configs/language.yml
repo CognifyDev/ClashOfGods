@@ -37,6 +37,12 @@ role:
       description: "通往终局的加速进程"
       long-description: "初始冷却略微延长，场上每死亡一名玩家，冷却时间略微缩短"
       time-to-reduce: "冷却减少时间"
+    troublemaker:
+      name: "扰乱者"
+      description: "制造混乱！"
+      long-description: "可以发动干扰，技能生效期间所有人无法进行任何交互。技能每轮只能使用一次。"
+      disturb-duration: "干扰持续时间"
+      disturb-cooldown: "干扰冷却时间"
   crewmate:
     crewmate:
       name: "船员"
@@ -175,6 +181,7 @@ action:
   give-kill: "给予击杀机会"
   give-shield: "给予护盾"
   contract: "契约"
+  disturb: "干扰"
 game:
   end:
     summary-message: "玩家职业:"

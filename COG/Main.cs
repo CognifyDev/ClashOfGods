@@ -166,6 +166,7 @@ public partial class Main : BasePlugin
             new Cleaner(),
             new Assassin(),
             new Reaper(),
+            new Troublemaker(),
 
             // Neutral
             new Jester(),

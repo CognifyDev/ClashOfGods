@@ -19,7 +19,7 @@ public class Assassin : CustomRole
 
     private PlayerControl? _target;
     
-    public Assassin() : base(Palette.ImpostorRed, CampType.Impostor)
+    public Assassin() : base()
     {
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;

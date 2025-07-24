@@ -16,7 +16,7 @@ public class Reaper : CustomRole, IListener
 
     private float _cooldown;
     
-    public Reaper() : base(Palette.ImpostorRed, CampType.Impostor)
+    public Reaper() : base()
     {
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;

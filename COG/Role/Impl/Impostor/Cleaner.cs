@@ -13,7 +13,7 @@ namespace COG.Role.Impl.Impostor;
 
 public class Cleaner : CustomRole, IListener
 {
-    public Cleaner() : base(Palette.ImpostorRed, CampType.Impostor)
+    public Cleaner() : base()
     {
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;

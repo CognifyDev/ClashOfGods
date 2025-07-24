@@ -59,6 +59,14 @@ public class CustomRole
     {
     }
 
+    /// <summary>
+    /// Initializes an impostor role instance.
+    /// </summary>
+    /// <param name="showInOptions"></param>
+    public CustomRole(bool showInOptions = true) : this(Palette.ImpostorRed, CampType.Impostor, showInOptions)
+    {
+    }
+
     private CustomRole(Color color, CampType campType, bool isSubRole, bool showInOptions)
     {
         IsBaseRole = false;
