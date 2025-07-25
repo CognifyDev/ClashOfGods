@@ -60,8 +60,8 @@ public class Nightmare : CustomRole
         RegisterRpcHandler(_storeHandler);
         RegisterRpcHandler(_cooldownCheckHandler);
 
-        _storeCooldown = CreateOption(() => GetContextFromLanguage("store-cooldown"), new FloatOptionValueRule(10, 5, 60,
-            20, NumberSuffixes.Seconds));
+        _storeCooldown = CreateOption(() => GetContextFromLanguage("store-cooldown"), 
+            new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
 
         _storeButton = CustomButton.Of("nightmare-store",
             () =>

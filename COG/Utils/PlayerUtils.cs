@@ -48,7 +48,7 @@ public static class PlayerUtils
     /// <param name="closestDistance">限制距离</param>
     /// <returns>最近位置的玩家</returns>
     public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true,
-        float closestDistance = float.PositiveInfinity)
+        float closestDistance = float.PositiveInfinity, bool includeImpostor = true)
     {
         var targetLocation = target.GetTruePosition();
         var players = mustAlive ? GetAllAlivePlayers() : GetAllPlayers();
@@ -58,6 +58,7 @@ public static class PlayerUtils
         foreach (var player in players)
         {
             if (player.IsSamePlayer(target)) continue;
+            if (!includeImpostor && player.GetMainRole().CampType == CampType.Impostor) continue;
 
             var playerLocation = player.GetTruePosition();
             var distance = Vector2.Distance(targetLocation, playerLocation);

@@ -21,5 +21,6 @@ public enum KnownRpc : uint
     EnchanterPunishesKiller,
     TroubleMakerDisturb,
     NightmareStore,
-    NightmareCooldownCheck
+    NightmareCooldownCheck,
+    SpyRevealClosestTarget
 }
