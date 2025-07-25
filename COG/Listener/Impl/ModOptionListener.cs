@@ -142,7 +142,7 @@ internal class ModOptionListener : IListener
         var a = 0;
         var buttons = new List<ModOption>();
 
-        for (var i = 0; i < ButtonHotkeyConfig.MaxButtonCount; i++)
+        for (var i = 1; i < ButtonHotkeyConfig.MaxButtonCount + 1; i++)
         {
             ModOption modOption = default!;
 

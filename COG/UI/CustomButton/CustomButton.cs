@@ -214,8 +214,9 @@ public class CustomButton
 
         var assignedHotkey = AutoSetHotkey();
         HotkeyRenderer!.gameObject.SetActive(assignedHotkey);
+        HotkeyText!.gameObject.SetActive(assignedHotkey);
         if (assignedHotkey)
-            HotkeyText!.text = Hotkey.ToString();
+            HotkeyText!.SetText(Hotkey.ToString());
 
         var lp = PlayerControl.LocalPlayer;
         if (isCoolingDown && !lp.inVent && lp.moveable) Timer -= Time.deltaTime;
@@ -267,7 +268,10 @@ public class CustomButton
         var index = 1;
         foreach (var button in sortedActiveButtons)
         {
-            button.Hotkey = hotkeys[index];
+            if (hotkeys.TryGetKey(index, out var hotkey))
+            {
+                button.Hotkey = (KeyCode)hotkey;
+            }
             index++;
         }
 

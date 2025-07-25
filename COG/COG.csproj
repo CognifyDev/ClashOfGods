@@ -4,7 +4,7 @@
         <LangVersion>preview</LangVersion>
         <DebugType>embedded</DebugType>
 
-        <Description>A new-term mod for Among Us with plugin system that allows you to make your own plugin by EASY computer language for Among Us</Description>
+        <Description>A epoch-making Among Us mod with a plugin system that allows you to make your own plugin by EASY computer language JavaScript</Description>
         <Authors>CognifyDev</Authors>
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>

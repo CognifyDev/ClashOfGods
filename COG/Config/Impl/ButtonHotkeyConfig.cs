@@ -49,7 +49,7 @@ public class ButtonHotkeyConfig : ConfigBase
 
     public void ApplyConfigsFromFile()
     {
-        for (var i = 0; i < MaxButtonCount; i++)
+        for (var i = 1; i < MaxButtonCount + 1; i++)
         {
             var value = YamlReader!.GetString($"{ButtonPrefix}{i}");
             if (value == null) continue;
