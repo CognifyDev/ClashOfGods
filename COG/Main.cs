@@ -85,6 +85,10 @@ public partial class Main : BasePlugin
                 @".\BepInEx\core\YamlDotNet.dll",
             ResourceUtils.GetResourcePath("Libraries.YamlDotNet.dll")
             );
+        ResourceUtils.WriteToFileFromResource(
+                @".\BepInEx\core\Acornima.dll",
+            ResourceUtils.GetResourcePath("Libraries.Acornima.dll")
+            );
 
         var longVersionInfo = StringUtils.EncodeToBase64($"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}");
         var storagedInfo = "";
