@@ -19,5 +19,7 @@ public enum KnownRpc : uint
     SyncRoleGameData,
     GiveOneKill,
     EnchanterPunishesKiller,
-    TroubleMakerDisturb
+    TroubleMakerDisturb,
+    NightmareStore,
+    NightmareCooldownCheck
 }
