@@ -250,7 +250,7 @@ public class CustomButton
             GameObject!.transform.localPosition = HudManager.Instance.UseButton.transform.localPosition + Position;
     }
 
-    public void OnMeetingEndSpawn()
+    public void OnMeetingEndsDoSpawn()
     {
         OnMeetingEnds();
     }
@@ -268,9 +268,9 @@ public class CustomButton
         var index = 1;
         foreach (var button in sortedActiveButtons)
         {
-            if (hotkeys.TryGetKey(index, out var hotkey))
+            if (hotkeys.TryGetValue(index, out var hotkey))
             {
-                button.Hotkey = (KeyCode)hotkey;
+                button.Hotkey = hotkey;
             }
             index++;
         }

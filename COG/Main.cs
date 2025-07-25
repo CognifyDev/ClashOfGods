@@ -23,7 +23,7 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
-using COG.UI.ModOption;
+using COG.UI.ClientOption;
 using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
@@ -124,7 +124,7 @@ public partial class Main : BasePlugin
             new DeadPlayerListener(),
             new CustomButtonListener(),
             new GameListener(),
-            new ModOptionListener(),
+            new ClientOptionListener(),
             new RpcListener(),
             new TaskAdderListener(),
             new VersionShowerListener(),
@@ -179,7 +179,7 @@ public partial class Main : BasePlugin
         });
 
         // Register mod options
-        ModOptionManager.GetManager().RegisterModOptions(new ModOption[]
+        ClientOptionManager.GetManager().RegisterClientOptions(new ClientOption[]
         {
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
@@ -215,8 +215,8 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.HotkeySettingName,
                 () =>
                 {
-                    ModOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
-                    ModOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
+                    ClientOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
+                    ClientOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
                     return false;
                 }, false)
         });
@@ -254,7 +254,7 @@ public partial class Main : BasePlugin
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
-        ModOptionManager.GetManager().GetOptions().Clear();
+        ClientOptionManager.GetManager().GetOptions().Clear();
         CustomRoleManager.GetManager().GetRoles().Clear();
         ListenerManager.GetManager().UnregisterHandlers();
         EndGameResult.CachedWinners?.Clear();

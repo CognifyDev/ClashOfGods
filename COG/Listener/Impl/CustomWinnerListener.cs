@@ -76,7 +76,7 @@ public class CustomWinnerListener : IListener
 
             RpcSendWinnableData(CustomWinnerManager.GetManager().WinnableData);
 
-            TaskUtils.RunTaskAfter(1f, () =>
+            TaskUtils.RunTaskAfter(0.5f, () =>
                 GameManager.Instance.RpcEndGame(data.GameOverReason, false)); // Ensure each client has received & processed winnable data
         }
 

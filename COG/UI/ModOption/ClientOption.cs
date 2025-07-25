@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
 
-namespace COG.UI.ModOption;
+namespace COG.UI.ClientOption;
 
-public class ModOption
+public class ClientOption
 {
-    public static readonly List<ModOption> Buttons = new();
+    public static readonly List<ClientOption> Buttons = new();
     public readonly bool DefaultValue;
     public readonly Func<bool> OnClick;
     public readonly string Text;
 
     public ToggleButtonBehaviour? ToggleButton;
 
-    public ModOption(string text, Func<bool> onClick, bool defaultValue)
+    public ClientOption(string text, Func<bool> onClick, bool defaultValue)
     {
         Text = text;
         OnClick = onClick;

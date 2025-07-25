@@ -72,12 +72,12 @@ public static class StringUtils
         return result.ToString();
     }
 
-    public static string CustomFormat(this string text, params (string, string)[] args)
+    public static string CustomFormat(this string text, params (string, object)[] args)
     {
         foreach (var (key, value) in args)
         {
             var toReplace = $"%{key}%";
-            text = text.Replace(toReplace, value);
+            text = text.Replace(toReplace, value.ToString());
         }
         return text;
     }

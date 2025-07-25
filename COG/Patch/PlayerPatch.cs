@@ -142,7 +142,7 @@ internal class ExileControllerWrapUpPatch
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerExileEndEvent(__instance.initData.networkedPlayer?.Object, __instance),
                 EventHandlerType.Postfix);
-        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndsDoSpawn();
     }
 }
 
@@ -163,7 +163,7 @@ internal class AirshipExileControllerPatch
             .ExecuteHandlers(
                 new PlayerExileEndOnAirshipEvent(__instance.initData.networkedPlayer, __instance),
                 EventHandlerType.Postfix);
-        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndsDoSpawn();
     }
 }
 
