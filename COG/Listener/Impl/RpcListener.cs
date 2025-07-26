@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Reflection;
 using COG.Listener.Event.Impl.Player;
 using COG.Patch;
 using COG.Role;
@@ -9,6 +6,10 @@ using COG.States;
 using COG.UI.CustomOption;
 using COG.Utils;
 using InnerNet;
+using System;
+using System.Linq;
+using System.Reflection;
+using static COG.Utils.PlayerUtils;
 
 namespace COG.Listener.Impl;
 
@@ -72,14 +73,14 @@ public class RpcListener : IListener
                 break;    
             }
             
-            case KnownRpc.KillPlayerCompletely:
+            case KnownRpc.KillWithoutDeadBody:
             {
                 var killer = reader.ReadNetObject<PlayerControl>();
                 var target = reader.ReadNetObject<PlayerControl>();
                 var showAnimationToEverybody = reader.ReadBoolean();
                 var anonymousKiller = reader.ReadBoolean();
 
-                killer.KillPlayerCompletely(target, showAnimationToEverybody, anonymousKiller);
+                killer.RpcKillWithoutDeadBody(target, showAnimationToEverybody, anonymousKiller);
                 break;
             }
 
@@ -150,6 +151,13 @@ public class RpcListener : IListener
 
                 Main.Logger.LogMessage($"Syncing game data for {role.Name}...");
                 role.OnRoleGameDataGettingSynchronized(reader);
+                break;
+            }
+
+            case KnownRpc.DieWithoutAnimationAndBody:
+            {
+                var reason = (CustomDeathReason)reader.ReadPackedInt32();
+                @event.Player.DieWithoutAnimationAndBody(reason);
                 break;
             }
         }

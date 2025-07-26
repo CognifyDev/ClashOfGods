@@ -13,7 +13,7 @@ public enum KnownRpc : uint
     ShareOptions,
     ClearSabotages,
     ShareWinners,
-    KillPlayerCompletely,
+    KillWithoutDeadBody,
     MurderAndModifyKillAnimation,
     ShareAbilityOrVentUseForInspector,
     SyncRoleGameData,
@@ -22,5 +22,7 @@ public enum KnownRpc : uint
     TroubleMakerDisturb,
     NightmareStore,
     NightmareCooldownCheck,
-    SpyRevealClosestTarget
+    SpyRevealClosestTarget,
+    WitchUsesAntidote,
+    DieWithoutAnimationAndBody
 }

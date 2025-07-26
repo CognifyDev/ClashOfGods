@@ -122,7 +122,7 @@ public class GuessButton : TemplatedCustomGameObject
                     }
                     else
                     {
-                        PlayerControl.LocalPlayer.RpcKillPlayerCompletely(PlayerControl.LocalPlayer);
+                        PlayerControl.LocalPlayer.RpcKillWithoutDeadBody(PlayerControl.LocalPlayer);
                         Buttons.ForEach(guessButton => guessButton.Destroy());
                         Exit(guesserUI);
                     }
@@ -151,7 +151,7 @@ public class GuessButton : TemplatedCustomGameObject
         }
 
         var target = _target!;
-        PlayerControl.LocalPlayer.RpcKillPlayerCompletely(target);
+        PlayerControl.LocalPlayer.RpcKillWithoutDeadBody(target);
         Guesser.GuessedTime ++;
     }
 

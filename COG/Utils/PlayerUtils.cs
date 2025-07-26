@@ -28,7 +28,7 @@ public enum ColorType
 
 public static class PlayerUtils
 {
-    public static PoolablePlayer PoolablePlayerPrefab 
+    public static PoolablePlayer PoolablePlayerPrefab
             => Resources.FindObjectsOfTypeAll(Il2CppType.Of<PoolablePlayer>()).First().Cast<PoolablePlayer>();
 
     public static IEnumerable<PlayerData> AllImpostors => GetPlayersByCamp(CampType.Impostor);
@@ -36,7 +36,7 @@ public static class PlayerUtils
     public static IEnumerable<PlayerData> AllCrewmates => GetPlayersByCamp(CampType.Crewmate);
 
     public static IEnumerable<PlayerData> AllNeutrals => GetPlayersByCamp(CampType.Neutral);
-    
+
     public static IEnumerable<PlayerData> GetPlayersByCamp(CampType camp)
         => GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == camp);
 
@@ -73,35 +73,17 @@ public static class PlayerUtils
 
     public const MurderResultFlags SucceededFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
 
-    // Whats this method for??
-    //public static void RpcAdvancedMurderPlayer(this PlayerControl killer, PlayerControl target)
-    //{
-    //    if (target == null)
-    //    {
-    //        target = killer;
-    //    }
-
-    //    if (AmongUsClient.Instance.AmClient)
-    //    {
-    //        killer.MurderPlayer(target, SucceededFlags);
-    //    }
-    //    var messageWriter = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.None);
-    //    messageWriter.WriteNetObject(target);
-    //    messageWriter.Write((int)SucceededFlags);
-    //    AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
-    //}
-
     /// <summary>
     /// 杀死一个玩家不留下鸡腿
     /// </summary>
     /// <param name="killer"></param>
     /// <param name="target"></param>
     /// <param name="showAnimationToEverybody"></param>
-    public static void RpcKillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
+    public static void RpcKillWithoutDeadBody(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
-        KillPlayerCompletely(killer, target, showAnimationToEverybody);
+        KillWithoutDeadBody(killer, target, showAnimationToEverybody);
 
-        var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillPlayerCompletely);
+        var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillWithoutDeadBody);
         rpc.WriteNetObject(killer);
         rpc.WriteNetObject(target);
         rpc.Write(showAnimationToEverybody);
@@ -115,7 +97,7 @@ public static class PlayerUtils
     /// <param name="killer"></param>
     /// <param name="target"></param>
     /// <param name="showAnimationToEverybody"></param>
-    public static void KillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
+    public static void KillWithoutDeadBody(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
         _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
         target.Exiled();
@@ -628,7 +610,7 @@ public static class PlayerUtils
         if (!player.AmOwner) return null;
 
         var killButton = HudManager.Instance.KillButton;
-        
+
         var settings = GetRoles(player).Select(r => r.CurrentKillButtonSetting);
 
         killButton.ToggleVisible(settings.Any(r => r.ForceShow()) && VanillaKillButtonPatch.IsHudActive);
@@ -639,7 +621,18 @@ public static class PlayerUtils
     }
 
     public static CustomRole[] GetRoles(this PlayerControl player) => player.GetSubRoles().Concat(player.GetMainRole().ToSingleElementArray()).ToArray();
-    
+
+    public static void RpcDie(this PlayerControl player, CustomDeathReason reason)
+    {
+        player.StartRpcImmediately(KnownRpc.DieWithoutAnimationAndBody).WritePacked((int)reason).Finish();
+        player.DieWithoutAnimationAndBody(reason);
+    }
+
+    public static void DieWithoutAnimationAndBody(this PlayerControl player, CustomDeathReason reason)
+    {
+        new DeadPlayer(DateTime.Now, reason, player.Data, null);
+        player.Exiled();
+    }
 }
 
 public enum CustomDeathReason
@@ -648,7 +641,8 @@ public enum CustomDeathReason
     Disconnected,
     Default,
     Exiled,
-    Misfire
+    Misfire,
+    InteractionAfterRevival
 }
 
 [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
