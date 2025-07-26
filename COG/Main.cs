@@ -171,6 +171,8 @@ public partial class Main : BasePlugin
             new Assassin(),
             new Reaper(),
             new Troublemaker(),
+            new Nightmare(),
+            new Spy(),
 
             // Neutral
             new Jester(),

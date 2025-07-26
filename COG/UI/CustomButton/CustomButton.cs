@@ -76,6 +76,8 @@ public class CustomButton
     public int Row { get; set; }
     public int Order { get; set; }
 
+    public TextMeshPro? InfoText { get; set; }
+
     public static bool Initialized { get; internal set; }
 
     /// <summary>
@@ -255,6 +257,19 @@ public class CustomButton
         OnMeetingEnds();
     }
 
+    public void SetInfoText(string message)
+    {
+        if (!InfoText)
+        {
+            InfoText = Object.Instantiate(HudManager.Instance.TaskPanel.taskText, ButtonObject!.transform);
+            InfoText.alignment = TextAlignmentOptions.Center;
+            InfoText.fontSize = InfoText.fontSizeMax = 3f;
+            InfoText.fontSizeMin = 2f;
+            InfoText.transform.localPosition = new Vector3(0, 1f, 0);
+        }
+
+        InfoText!.text = message;
+    }
 
 #nullable disable
     private bool AutoSetHotkey()

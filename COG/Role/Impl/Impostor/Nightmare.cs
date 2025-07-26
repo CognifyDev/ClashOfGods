@@ -84,17 +84,24 @@ public class Nightmare : CustomRole
                         {
                             if (--_storedKills == 0)
                                 ResetCurrentKillButtonSetting();
+                            SyncInfoText();
                         });
 
                         _storedKills++;
+                        SyncInfoText();
                     }
 
                     _teammateCurrentCooldown = float.MinValue;
                     _receivedCooldownSent = false;
+
+                    void SyncInfoText()
+                    {
+                        _storeButton!.SetInfoText(GetContextFromLanguage("stored-kills-info").CustomFormat(_storedKills));
+                    }
                 }
             },
             () => { },
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) && _storedKills < MaxKillsStored,
+            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) && _storedKills < MaxKillsStored && _target!.GetMainRole().CampType == CampType.Impostor,
             () => true,
             null!,
             2,
