@@ -33,12 +33,7 @@ public class RpcCommand : CommandBase
                     if (int.TryParse(value, out var result))
                     {
                         _current = (byte)result;
-                        if (Enum.IsDefined((RpcCalls)result))
-                            _writer = RpcUtils.StartRpcImmediately(player, (RpcCalls)result);
-                        else if (Enum.IsDefined((KnownRpc)result))
-                            _writer = RpcUtils.StartRpcImmediately(player, (KnownRpc)result);
-                        else
-                            _writer = RpcUtils.StartRpcImmediately(player, (byte)result);
+                        _writer = player.StartRpcImmediately(_current);
                     }
                     else
                     {
@@ -57,11 +52,21 @@ public class RpcCommand : CommandBase
                 case "help":
                 {
                     StringBuilder sb = new();
-                    sb.Append("/rpc add %dataType% %context%\n")
-                        .Append("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player, vector\n")
-                        .Append(
-                            "例：\n /rpc add bool true\n /rpc add vector2 3 -1.2\n /rpc add player 3（玩家Id）\n /rpc add player 玩家名字\n /rpc add vector 1 -3\n")
-                        .Append("/rpc start %callId%\n/rpc send\n/rpc close");
+                    sb.AppendLine("/rpc add %dataType% %context%")
+                        .AppendLine("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player, vector")
+                        .AppendLine("""
+                        例：
+                        /rpc add bool true
+                        /rpc add vector2 3 -1.2
+                        /rpc add player 3（玩家Id）
+                        /rpc add player 玩家名字
+                        /rpc add vector 1 -3
+                        """)
+                        .Append("""
+                        /rpc start %callId%
+                        /rpc send
+                        /rpc close
+                        """);
                     GameUtils.SendSystemMessage(sb.ToString());
                 }
                     break;

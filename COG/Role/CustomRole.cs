@@ -395,7 +395,7 @@ public class CustomRole
 
     public void SyncRoleGameData()
     {
-        var writer = RpcUtils.StartRpcImmediately(KnownRpc.SyncRoleGameData).WritePacked(Id);
+        var writer = RpcWriter.Start(KnownRpc.SyncRoleGameData).WritePacked(Id);
         OnRoleGameDataSynchronizing(writer);
         writer.Finish();
     }
@@ -405,7 +405,7 @@ public class CustomRole
         return Name.Color(Color);
     }
 
-    public void RegisterRpcHandler(IRpcHandler handler) => RpcUtils.RegisterRpcHandler(handler);
+    public void RegisterRpcHandler(IRpcHandler handler) => IRpcHandler.Register(handler);
 
     public void ResetCurrentKillButtonSetting() => CurrentKillButtonSetting = null!;
 

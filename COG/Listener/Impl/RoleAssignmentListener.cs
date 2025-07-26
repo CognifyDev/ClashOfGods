@@ -55,7 +55,7 @@ public class RoleAssignmentListener : IListener
             }
         );
 
-        RpcUtils.RegisterRpcHandler(_roleSelectionShareRpcHandler);
+        IRpcHandler.Register(_roleSelectionShareRpcHandler);
     }
 
 

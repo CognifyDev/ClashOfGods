@@ -69,7 +69,7 @@ public class Inspector : CustomRole, IListener
     public void NotifyInspector()
     {
         if (Players.Any() || IsLocalPlayerRole()) // If there are inspectors, send rpc; otherwise dont waste network traffic
-            RpcUtils.StartAndSendRpc(KnownRpc.ShareAbilityOrVentUseForInspector);
+            RpcWriter.StartAndSend(KnownRpc.ShareAbilityOrVentUseForInspector);
     }
 
     public override void ClearRoleGameData()
