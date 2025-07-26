@@ -261,6 +261,8 @@ public class CustomButton
     {
         if (!InfoText)
         {
+            Main.Logger.LogInfo("Info text creating for CustomButton");
+
             InfoText = Object.Instantiate(HudManager.Instance.TaskPanel.taskText, ButtonObject!.transform);
             InfoText.alignment = TextAlignmentOptions.Center;
             InfoText.fontSize = InfoText.fontSizeMax = 3f;
