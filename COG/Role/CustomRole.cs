@@ -278,7 +278,7 @@ public class CustomRole
 
     /// <summary>
     /// NOTE: Set to null to use previous setting.<para/>
-    /// PLEASE CAREFULLY CONSIDER WHETHER TO CLONE ONE OR TO JUST MODIFY!
+    /// PLEASE CAREFULLY CONSIDER WHETHER TO CLONE ONE OR TO JUST OVERRIDE!
     /// </summary>
     public KillButtonSetting CurrentKillButtonSetting
     {

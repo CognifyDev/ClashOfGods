@@ -9,6 +9,7 @@ using COG.Patch;
 using COG.Role;
 using COG.UI.CustomButton;
 using COG.UI.CustomGameObject.Arrow;
+using COG.UI.CustomGameObject.HudMessage;
 using COG.Utils;
 using System;
 using System.Collections.Generic;
@@ -160,6 +161,8 @@ public class GameListener : IListener
 
         GameStates.InRealGame = true;
         
+        Main.Logger.LogInfo("Registering game listeners...");
+
         if (!_handlers.IsEmpty())
         {
             ListenerManager.GetManager().UnRegisterHandlers(_handlers.ToArray());
@@ -169,10 +172,11 @@ public class GameListener : IListener
         CustomRoleManager.GetManager().GetRoles().Select(role => role.GetListener()).ForEach(
             listener => _handlers.AddRange(ListenerManager.GetManager().AsHandlers(listener)));
 
+        ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
+
+        Main.Logger.LogInfo("Resetting gameplay objects...");
         CustomButton.ResetAllCooldown();
         VanillaKillButtonPatch.Initialize();
-
-        ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
 
         var impText = Object.FindObjectOfType<ImportantTextTask>();
         if (!impText)
@@ -180,6 +184,8 @@ public class GameListener : IListener
 
         impText.name = "RoleHintTask";
         impText.Text = GetRoleHintText();
+
+        new GameObject("HudMessageManager").AddComponent<HudMessage>();
 
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
             foreach (var player in PlayerControl.AllPlayerControls)

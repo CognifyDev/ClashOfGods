@@ -53,6 +53,8 @@ role:
       description: "刺探情报，分析对局"
       long-description: "可以使用洞察，使用洞察或完成击杀后，所有内鬼得知离他们最近的非内鬼阵营玩家位置，持续3秒。"
       observe-cooldown: "洞察冷却时间"
+      get-target-arrow-message-observe: "一位<color=#ff1919ff>密探</color>队友使用了洞察技能，您获得了指向最近非内鬼玩家的箭头！"
+      get-target-arrow-message-kill: "一位<color=#ff1919ff>密探</color>队友击杀了其他玩家，您获得了指向最近非内鬼玩家的箭头！"
   crewmate:
     crewmate:
       name: "船员"

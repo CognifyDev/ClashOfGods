@@ -1,19 +1,22 @@
 ﻿using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomGameObject.Arrow;
+using COG.UI.CustomGameObject.HudMessage;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using COG.Utils.Coding;
 using Reactor.Utilities;
 using System.Collections;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
+[NotTested]
 public class Spy : CustomRole
 {
     private CustomOption _observeCooldown;
-    private RpcHandler _revealClosestTargetHandler;
+    private RpcHandler<bool> _revealClosestTargetHandler;
     private CustomButton _observeButton;
 
     public Spy() : base()
@@ -22,7 +25,7 @@ public class Spy : CustomRole
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
 
         _revealClosestTargetHandler = new(KnownRpc.SpyRevealClosestTarget,
-            () =>
+            isByKill =>
             {
                 if (PlayerControl.LocalPlayer.GetMainRole().CampType != CampType.Impostor) return;
 
@@ -37,6 +40,11 @@ public class Spy : CustomRole
                     const float arrowTime = 3f;
                     var timer = arrowTime;
 
+                    if (!IsLocalPlayerRole())
+                    {
+                        HudMessage.Instance.AddMessage(GetContextFromLanguage(isByKill ? "get-target-arrow-message-kill" : "get-target-arrow-message-observe"), arrowTime);
+                    }
+
                     while (timer > 0)
                     {
                         timer -= Time.deltaTime;
@@ -46,12 +54,14 @@ public class Spy : CustomRole
 
                     arrow.Destroy();
                 }
-            });
+            },
+            (writer, isByKill) => writer.Write(isByKill),
+            reader => reader.ReadBoolean());
 
         RegisterRpcHandler(_revealClosestTargetHandler);
 
         _observeButton = CustomButton.Of("spy-observe",
-            () => _revealClosestTargetHandler.PerformAndSend(),
+            () => _revealClosestTargetHandler.PerformAndSend(false),
             () => { },
             () => true,
             () => true,
@@ -62,5 +72,7 @@ public class Spy : CustomRole
             0);
 
         AddButton(_observeButton);
+
+        CurrentKillButtonSetting.AddAfterClick(() => _revealClosestTargetHandler.PerformAndSend(true));
     }
 }
