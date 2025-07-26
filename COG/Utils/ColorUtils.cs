@@ -22,10 +22,10 @@ public static class ColorUtils
     }
 
     public static Color FromColor32(this Color32 color32) 
-        => new(color32.r / byte.MaxValue, color32.g / byte.MaxValue, color32.b / byte.MaxValue, color32.a / byte.MaxValue);
+        => new(color32.r / (float)byte.MaxValue, color32.g / (float)byte.MaxValue, color32.b / (float)byte.MaxValue, color32.a / (float)byte.MaxValue);
 
-    public static Color FromColor32(byte r, byte g, byte b, byte a = 255)
-        => new(r / byte.MaxValue, g / byte.MaxValue, b / byte.MaxValue, a / byte.MaxValue);
+    public static Color FromColor32(byte r, byte g, byte b, byte a = byte.MaxValue)
+        => new(r / (float)byte.MaxValue, g / (float)byte.MaxValue, b / (float)byte.MaxValue, a / (float)byte.MaxValue);
 
     private static byte ToByte(float f)
     {

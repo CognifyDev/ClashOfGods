@@ -178,9 +178,7 @@ public class GameListener : IListener
         CustomButton.ResetAllCooldown();
         VanillaKillButtonPatch.Initialize();
 
-        var impText = Object.FindObjectOfType<ImportantTextTask>();
-        if (!impText)
-            impText = PlayerTask.GetOrCreateTask<ImportantTextTask>(PlayerControl.LocalPlayer);
+        var impText = PlayerTask.GetOrCreateTask<ImportantTextTask>(PlayerControl.LocalPlayer);
 
         impText.name = "RoleHintTask";
         impText.Text = GetRoleHintText();

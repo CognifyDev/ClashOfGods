@@ -1,18 +1,16 @@
-using AmongUs.GameOptions;
 using COG.Listener.Event.Impl.TAButton;
 using COG.Listener.Event.Impl.TAGame;
 using COG.Role;
 using COG.Role.Impl;
-using COG.Role.Impl.Crewmate;
-using COG.Role.Impl.Impostor;
 using COG.Utils;
+using System.Linq;
 
 namespace COG.Listener.Impl;
 
-public class TaskAdderListener : IListener // Bug
+public class TaskAdderListener : IListener
 {
     public static TaskFolder? RoleFolder;
-    public static TaskAddButton? LastClicked;
+    public const string ModdedTaskName = "ModdedRole";
 
     [EventHandler(EventHandlerType.Prefix)]
     public void OnTaskAdderShowFolder(TaskAdderGameShowFolderEvent @event)
@@ -42,19 +40,17 @@ public class TaskAdderListener : IListener // Bug
 
             foreach (var role in CustomRoleManager.GetManager().GetRoles())
             {
-                if (role is Unknown or Crewmate or Impostor) continue;
+                if (role is Unknown) continue;
                 var button = Object.Instantiate(taskAdderGame.RoleButton);
                 button.Text.text = role.Name;
                 taskAdderGame.AddFileAsChild(RoleFolder, button, ref xCursor, ref yCursor, ref maxHeight);
 
-                RoleBehaviour roleBehaviour = new()
-                {
-                    Role = (RoleTypes)CustomRoleManager.GetManager().GetRoles().IndexOf(role) + 100
-                };
-                button.Role = roleBehaviour;
+                button.Role = role.VanillaRole;
 
                 button.FileImage.color = button.RolloverHandler.OutColor = role.Color;
                 button.RolloverHandler.OverColor = Palette.AcceptedGreen;
+
+                button.name = ModdedTaskName;
             }
         }
     }
@@ -63,21 +59,16 @@ public class TaskAdderListener : IListener // Bug
     public void OnTaskButtonUpdate(TaskAddButtonUpdateEvent @event)
     {
         var button = @event.TaskAddButton;
-        try
+        if (button.Text.text.StartsWith("Be_"))
         {
-            if (button.Text.text.StartsWith("Be_")) return;
-            var role = button.Role;
-            var type = 99;
-            if (!role || !((type = (ushort)role.Role) > 100)) return;
-            if (type > 99)
-                button.Overlay.gameObject.SetActive(LastClicked!.Role.Role == button.Role.Role);
-            else
-                button.Overlay.gameObject.SetActive(false);
+            button.gameObject.SetActive(false);
+            return;
         }
-        catch
-        {
-            // Ignored (There aren't any problems with this)
-        }
+        var role = button.Role;
+        if (button.name != ModdedTaskName) return;
+        var customRole = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(c => c.VanillaRole == role);
+        if (customRole == null) return;
+        button.Overlay.gameObject.SetActive(PlayerControl.LocalPlayer.IsRole(customRole));
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -85,19 +76,11 @@ public class TaskAdderListener : IListener // Bug
     {
         var button = @event.TaskAddButton;
         var role = button.Role;
-        var type = 99;
         if (button.Text.text.StartsWith("Be_")) return true;
-        if (!role || !((type = (ushort)role.Role) > 100)) return true;
-        if (type > 99)
-        {
-            PlayerControl.LocalPlayer.SetCustomRole(CustomRoleManager.GetManager().GetRoles()[type - 100]);
-            LastClicked = button;
-        }
-        else
-        {
-            LastClicked?.Overlay.gameObject.SetActive(false);
-        }
-
+        if (button.name != ModdedTaskName) return true;
+        var customRole = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(c => c.VanillaRole == role);
+        if (customRole == null) return true;
+        PlayerControl.LocalPlayer.SetCustomRole(customRole);
         return false;
     }
 }
