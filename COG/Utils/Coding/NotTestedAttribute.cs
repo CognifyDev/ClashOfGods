@@ -8,4 +8,11 @@ namespace COG.Utils.Coding;
 [AttributeUsage(AttributeTargets.All, Inherited = false)]
 public sealed class NotTestedAttribute : Attribute
 {
+    public NotTestedAttribute()
+    {
+    }
+
+    public NotTestedAttribute(string message)
+    {
+    }
 }

@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
-[NotTested]
+[NotTested("队友的HudMessage")]
 public class Spy : CustomRole
 {
     private CustomOption _observeCooldown;
@@ -52,7 +52,7 @@ public class Spy : CustomRole
                         yield return null;
                     }
 
-                    arrow.Destroy();
+                    arrow.gameObject.Destroy();
                 }
             },
             (writer, isByKill) => writer.Write(isByKill),

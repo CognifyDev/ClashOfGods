@@ -17,6 +17,7 @@ public static class Arrow
         
         arrow.MaxScale = 0.75f;
         arrow.target = target;
+        arrow.image = arrow.GetComponent<SpriteRenderer>();
 
         if (color.HasValue)
             arrow.image.color = color.Value;

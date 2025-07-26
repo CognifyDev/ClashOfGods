@@ -1,5 +1,6 @@
 using COG.Config.Impl;
 using COG.Constant;
+using COG.Role;
 using COG.States;
 using COG.Utils;
 using COG.Utils.Coding;
@@ -372,6 +373,7 @@ public class CustomButton
             button.GameObject.name = ModdedFlag + button.Text;
             button.PassiveButton = button.ButtonObject.GetComponent<PassiveButton>();
             button.TextMesh = button.ButtonObject.buttonLabelText;
+            if (CustomRoleManager.GetManager().GetTypeCampRoles(CampType.Impostor).Any(r=>r.AllButtons.Any(b=>b.Identifier==button.Identifier))) button.TextMesh.material = hud.KillButton.buttonLabelText.material;
             button.TextMesh.text = button.Text;
 
             button.HotkeyRenderer = Object.Instantiate(button.ButtonObject.usesRemainingSprite, button.ButtonObject.transform);

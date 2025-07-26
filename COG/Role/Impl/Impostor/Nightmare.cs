@@ -10,10 +10,7 @@ using System.Collections;
 
 namespace COG.Role.Impl.Impostor;
 
-[NotUsed]
-[NotTested]
-[WorkInProgress]
-[Todo("")]
+[NotTested("rpc")]
 public class Nightmare : CustomRole
 {
     private CustomOption _storeCooldown;
