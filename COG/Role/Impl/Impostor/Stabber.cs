@@ -5,11 +5,10 @@ using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
-public class Assassin : CustomRole
+public class Stabber : CustomRole
 {
     private CustomButton DispatchButton { get; }
     
@@ -19,7 +18,7 @@ public class Assassin : CustomRole
 
     private PlayerControl? _target;
     
-    public Assassin() : base()
+    public Stabber() : base()
     {
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;
@@ -29,7 +28,7 @@ public class Assassin : CustomRole
         MaxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new FloatOptionValueRule(1F, 1F, 15F, 2F));
         
         DispatchButton = CustomButton.Of(
-            "assassin-dispatch",
+            "stabber-dispatch",
             () =>
             {
                 _target!.RpcMurderAndModifyKillAnimation(_target!, PlayerControl.LocalPlayer, true);

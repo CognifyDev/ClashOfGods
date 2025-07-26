@@ -168,7 +168,7 @@ public partial class Main : BasePlugin
             // Impostor
             new Impostor(),
             new Cleaner(),
-            new Assassin(),
+            new Stabber(),
             new Reaper(),
             new Troublemaker(),
             new Nightmare(),
