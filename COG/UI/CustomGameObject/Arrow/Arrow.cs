@@ -1,55 +1,27 @@
 using System.Collections.Generic;
+using System.Linq;
 using COG.Constant;
 using COG.States;
 using COG.Utils;
+using Il2CppInterop.Runtime;
 using UnityEngine;
 
 namespace COG.UI.CustomGameObject.Arrow;
 
-public class Arrow : ICustomGameObject
+public static class Arrow
 {
-#nullable disable
-    public Arrow(Vector3 target, Color? color = null)
+    public static ArrowBehaviour Create(Vector3 target, Color? color = null)
     {
-        if (!GameStates.InRealGame) return;
-        Target = target;
-        Color = color;
-
-        ArrowObject = new GameObject("Arrow") { layer = 5 };
-        Renderer = ArrowObject.AddComponent<SpriteRenderer>();
-        Behaviour = ArrowObject.AddComponent<ArrowBehaviour>();
-
-        if (Color.HasValue)
-            Renderer.color = Color.Value;
-        else
-            Renderer.color = UnityEngine.Color.yellow;
+        var template = (ArrowBehaviour)Resources.FindObjectsOfTypeAll(Il2CppType.Of<ArrowBehaviour>()).First();
+        var arrow = Object.Instantiate(template, Camera.main.transform);
         
-        Renderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.ArrowImage, 200f);
+        arrow.MaxScale = 0.75f;
+        arrow.target = target;
 
-        Behaviour.image = Renderer;
-        Behaviour.target = Target;
-        ArrowObject.SetActive(true);
+        if (color.HasValue)
+            arrow.image.color = color.Value;
 
-        CreatedArrows.Add(this);
-    }
-#nullable restore
-
-    public static List<Arrow> CreatedArrows { get; } = new();
-
-    public ArrowBehaviour Behaviour { get; }
-    public SpriteRenderer Renderer { get; set; }
-    public Vector3 Target { get; set; }
-    public Color? Color { get; set; }
-    public GameObject ArrowObject { get; }
-
-    public void Update()
-    {
-        Behaviour.Update();
-    }
-
-    public void Destroy()
-    {
-        ArrowObject.Destroy();
-        CreatedArrows.Remove(this);
+        arrow.gameObject.SetActive(true);
+        return arrow;
     }
 }

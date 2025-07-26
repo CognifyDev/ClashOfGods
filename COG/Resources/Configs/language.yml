@@ -43,6 +43,16 @@ role:
       long-description: "可以发动干扰，技能生效期间所有人无法进行任何交互。技能每轮只能使用一次。"
       disturb-duration: "干扰持续时间"
       disturb-cooldown: "干扰冷却时间"
+    nightmare:
+      name: "梦魇"
+      description: "将恐慌凝聚，然后于一瞬贯穿"
+      long-description: "在队友附近时可以获取击杀已冷却完毕队友的击杀次数，使队友进入击杀冷却，下次击杀可消耗存储的击杀次数而不进入冷却。最多额外存储2击杀次数。"
+      store-cooldown: "存储冷却时间"
+    spy:
+      name: "密探"
+      description: "刺探情报，分析对局"
+      long-description: "可以使用洞察，使用洞察或完成击杀后，所有内鬼得知离他们最近的非内鬼阵营玩家位置，持续3秒。"
+      observe-cooldown: "洞察冷却时间"
   crewmate:
     crewmate:
       name: "船员"
@@ -183,6 +193,8 @@ action:
   give-shield: "给予护盾"
   contract: "契约"
   disturb: "干扰"
+  store-kill: "存储击杀"
+  observe: "洞察"
 game:
   end:
     summary-message: "玩家职业:"

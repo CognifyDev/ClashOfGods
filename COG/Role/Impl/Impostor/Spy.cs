@@ -1,8 +1,11 @@
 ﻿using COG.Rpc;
 using COG.UI.CustomButton;
+using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using Reactor.Utilities;
+using System.Collections;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
@@ -15,17 +18,34 @@ public class Spy : CustomRole
 
     public Spy() : base()
     {
-        _observeCooldown = CreateOption(()=>GetContextFromLanguage("observe-cooldown"),
+        _observeCooldown = CreateOption(() => GetContextFromLanguage("observe-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
 
         _revealClosestTargetHandler = new(KnownRpc.SpyRevealClosestTarget,
             () =>
             {
                 if (PlayerControl.LocalPlayer.GetMainRole().CampType != CampType.Impostor) return;
+
                 var closest = PlayerControl.LocalPlayer.GetClosestPlayer(includeImpostor: false);
                 if (!closest) return;
-                var distance = Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(), closest!.GetTruePosition());
-                // TODO: TEXT SHOWING DISTANCE
+
+                var arrow = Arrow.Create(closest!.transform.position, Color);
+                Coroutines.Start(UpdateTargetArrow());
+
+                IEnumerator UpdateTargetArrow()
+                {
+                    const float arrowTime = 3f;
+                    var timer = arrowTime;
+
+                    while (timer > 0)
+                    {
+                        timer -= Time.deltaTime;
+                        arrow.target = closest.transform.position;
+                        yield return null;
+                    }
+
+                    arrow.Destroy();
+                }
             });
 
         RegisterRpcHandler(_revealClosestTargetHandler);

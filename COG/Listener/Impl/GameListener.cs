@@ -114,9 +114,6 @@ public class GameListener : IListener
             manager.SabotageButton.ToggleVisible(false);
         }
 
-        Arrow.CreatedArrows.RemoveAll(a => !a.ArrowObject);
-        Arrow.CreatedArrows.ForEach(a => a.Update());
-
         var hint = GameObject.Find("RoleHintTask");
         if (!hint) return;
 

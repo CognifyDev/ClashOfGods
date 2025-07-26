@@ -98,7 +98,7 @@ public class Nightmare : CustomRole
             () => true,
             null!,
             2,
-            ActionNameContext.GetString("store"),
+            ActionNameContext.GetString("store-kill"),
             () => _storeCooldown.GetFloat(),
             0
         );
