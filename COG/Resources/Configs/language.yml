@@ -48,6 +48,7 @@ role:
       description: "将恐慌凝聚，然后于一瞬贯穿"
       long-description: "在队友附近时可以获取击杀已冷却完毕队友的击杀次数，使队友进入击杀冷却，下次击杀可消耗存储的击杀次数而不进入冷却。最多额外存储2击杀次数。"
       store-cooldown: "存储冷却时间"
+      stored-kills-info: "已存储击杀：%stored%/%max%"
     spy:
       name: "密探"
       description: "刺探情报，分析对局"

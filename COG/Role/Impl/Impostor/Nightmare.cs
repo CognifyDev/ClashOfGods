@@ -93,7 +93,7 @@ public class Nightmare : CustomRole
 
                     void SyncInfoText()
                     {
-                        _storeButton!.SetInfoText(GetContextFromLanguage("stored-kills-info").CustomFormat(_storedKills));
+                        _storeButton!.SetInfoText(GetContextFromLanguage("stored-kills-info").CustomFormat(("stored", _storedKills), ("max", MaxKillsStored)));
                     }
                 }
             },
