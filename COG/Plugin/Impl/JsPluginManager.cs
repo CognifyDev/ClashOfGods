@@ -43,28 +43,23 @@ public class JsPluginManager : IPluginManager
     public IPlugin LoadPlugin(string path)
     {
         using var zip = ZipFile.OpenRead(path);
-        var description = GetDescription(zip);
-        if (description == null)
-        {
-            throw new System.Exception($"{path} is not a available plugin!");
-        }
-            
+        var description = GetDescription(zip) ?? throw new System.Exception($"{path} is not a available plugin!");
+
         foreach (var entry in zip.Entries)
         {
+            ResourceType type;
+
             if (entry.FullName.StartsWith("scripts"))
-            {
-                _resources.Add(new ResourceDescription(entry.FullName, description, ResourceType.Script), entry.Open().ToBytes());
-            }  else if (entry.FullName.StartsWith("resources"))
-            {
-                _resources.Add(new ResourceDescription(entry.FullName, description, ResourceType.Resource), entry.Open().ToBytes());
-            }
+                type = ResourceType.Script;
+            else if (entry.FullName == "plugin.yml")
+                type = ResourceType.Config;
+            else
+                type = ResourceType.Resource;
+
+            _resources.Add(new ResourceDescription(entry.FullName, description, type), entry.Open().ToBytes());
         }
 
-        var mainScript = GetEntry(zip, $"scripts/{description.Main}");
-        if (mainScript == null)
-        {
-            throw new System.Exception($"{path} is not a available plugin!");
-        }
+        var mainScript = GetEntry(zip, $"scripts/{description.Main}") ?? throw new System.Exception($"{path} is not a available plugin!");
 
         var modules = new Dictionary<string, ZipArchiveEntry>();
         foreach (var module in description.Modules)

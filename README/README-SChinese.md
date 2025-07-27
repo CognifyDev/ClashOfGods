@@ -1,5 +1,5 @@
 ﻿# ClashOfGods
-#### 一个划时代Among Us模组，带有插件系统，使用简单的计算机语言来制作你专属的模组
+#### 一个划时代的Among Us模组，带有插件系统，使用简单的编程语言JavaScript来制作你专属的模组
 
 > [English](README-English.md) | 简体中文
 
