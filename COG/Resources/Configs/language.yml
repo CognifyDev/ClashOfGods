@@ -102,7 +102,12 @@ role:
       description: "将痛楚施加于破坏契约者"
       long-description: "可以对一名玩家施加契约，若该玩家在当轮内被常规击杀，击杀者将被定身数秒且当轮击杀冷却延长。技能每轮只能使用一次。"
       immobilization-duration: "定身持续时间"
-      cooldown-increasement: "击杀冷却延长时间"
+      cooldown-increament: "击杀冷却延长时间"
+    witch:
+      name: "女巫"
+      description: "从死神手中赎回受害者"
+      long-description: "可以对尸体使用解药将其复活，被复活者进行任何交互后将会在下一轮会议召开时出局。完成所有任务后额外获得一次使用机会。"
+      antidote-cooldown: "解药冷却时间"
   neutral:
     jester:
       name: "小丑"
@@ -197,6 +202,7 @@ action:
   disturb: "干扰"
   store-kill: "存储击杀"
   observe: "洞察"
+  antidote: "解药"
 game:
   end:
     summary-message: "玩家职业:"

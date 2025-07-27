@@ -54,7 +54,7 @@ public class Enchanter : CustomRole, IListener
         ImmobilizationDuration = CreateOption(() => GetContextFromLanguage("immobilization-duration"),
             new FloatOptionValueRule(1, 1, 5,
             3, NumberSuffixes.Seconds));
-        CooldownIncreament = CreateOption(() => GetContextFromLanguage("cooldown-increasement"),
+        CooldownIncreament = CreateOption(() => GetContextFromLanguage("cooldown-increament"),
             new FloatOptionValueRule(3, 1, 10,
             5, NumberSuffixes.Seconds));
 
