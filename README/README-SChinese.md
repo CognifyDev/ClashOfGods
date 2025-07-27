@@ -6,7 +6,7 @@
 Clash Of Gods是一个Among Us模组。<br />
 
 # 声明
-该模组不隶属于我们之中或 Innersloth LLC，其中包含的内容未经 Innersloth LLC 认可或以其他方式赞助 此处包含的部分材料是 Innersloth LLC 的财产 Innersloth LLC。
+该模组不隶属于我们之中或 Innersloth LLC，其中包含的内容未经 Innersloth LLC 认可或以其他方式赞助。此处包含的部分材料是 Innersloth LLC 的财产 Innersloth LLC。
 
 # 介绍
 该模组在原版游戏的基础上添加了许多有趣的职业。
