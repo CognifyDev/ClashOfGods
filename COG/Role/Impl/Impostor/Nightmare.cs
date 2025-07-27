@@ -7,6 +7,7 @@ using COG.Utils.Coding;
 using InnerNet;
 using Reactor.Utilities;
 using System.Collections;
+using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
@@ -20,11 +21,12 @@ public class Nightmare : CustomRole
 
     // GAMEPLAY VARIABLES
     private int _storedKills = 0;
-    private float _teammateCurrentCooldown = float.MinValue;
+    private float _teammateCurrentCooldown = float.MaxValue;
     private bool _receivedCooldownSent = false;
     private PlayerControl? _target;
 
     private const int MaxKillsStored = 2;
+    private const float ResponseTimeout = 5f;
 
     public Nightmare() : base()
     {
@@ -41,7 +43,7 @@ public class Nightmare : CustomRole
             {
                 if (!receiver.AmOwner) return;
 
-                if (cooldown == float.MinValue)
+                if (cooldown == float.MaxValue)
                 {
                     _cooldownCheckHandler!.Send(receiver, sender, PlayerControl.LocalPlayer.killTimer); // Sending current cooldown
                 }
@@ -68,10 +70,20 @@ public class Nightmare : CustomRole
                 IEnumerator Ability()
                 {
                     _storeHandler.Send(_target!);
-                    _cooldownCheckHandler.Send(PlayerControl.LocalPlayer, _target!, float.MinValue);
+                    _cooldownCheckHandler.Send(PlayerControl.LocalPlayer, _target!, float.MaxValue);
 
-                    while (!_receivedCooldownSent)
+                    Main.Logger.LogInfo("Begun checking teammate cooldown, waiting for response...");
+
+                    var timer = 0f;
+                    while (!_receivedCooldownSent || timer <= ResponseTimeout)
+                    {
                         yield return null; // Wait for receiving cooldown
+                        timer += Time.deltaTime;
+                    }
+
+                    if (timer > ResponseTimeout)
+                        Main.Logger.LogWarning("Teammate cooldown check timed out");
+                    
 
                     if (_teammateCurrentCooldown <= 0)
                     {
@@ -88,7 +100,7 @@ public class Nightmare : CustomRole
                         SyncInfoText();
                     }
 
-                    _teammateCurrentCooldown = float.MinValue;
+                    _teammateCurrentCooldown = float.MaxValue;
                     _receivedCooldownSent = false;
 
                     void SyncInfoText()
@@ -113,7 +125,7 @@ public class Nightmare : CustomRole
     public override void ClearRoleGameData()
     {
         _storedKills = 0;
-        _teammateCurrentCooldown = float.MinValue;
+        _teammateCurrentCooldown = float.MaxValue;
         _receivedCooldownSent = false;
     }
 }
