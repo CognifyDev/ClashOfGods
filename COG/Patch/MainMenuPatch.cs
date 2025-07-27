@@ -1,5 +1,6 @@
 using COG.Config.Impl;
 using COG.Utils;
+using COG.Utils.Coding.Debugging;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
 using System;
@@ -58,6 +59,9 @@ public static class MainMenuPatch
         //            ModUpdater.DoUpdate();
         //            Application.Quit();
         //        }, Color.yellow);
+
+        if (!InGameCustomRoleViewer.Instance)
+            new GameObject().AddComponent<InGameCustomRoleViewer>();
     }
 
     /// <summary>

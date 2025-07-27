@@ -37,6 +37,7 @@ using BepInEx.Logging;
 using BepInEx.Configuration;
 using UnityEngine;
 using COG.UI.CustomButton;
+using COG.Utils.Coding.Debugging;
 
 namespace COG;
 
