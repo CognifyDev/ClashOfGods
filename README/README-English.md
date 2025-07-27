@@ -1,5 +1,5 @@
 ﻿# ClashOfGods
-#### An epoch-making Among Us mod with a plugin system that allows you to make your own plugin by EASY computer language JavaScript
+**An epoch-making Among Us mod with a plugin system that allows you to make your own plugin by EASY computer language JavaScript**
 
 > English | [简体中文](README-SChinese.md)
 
