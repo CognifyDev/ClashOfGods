@@ -31,13 +31,13 @@ public static class PlayerUtils
     public static PoolablePlayer PoolablePlayerPrefab
             => Resources.FindObjectsOfTypeAll(Il2CppType.Of<PoolablePlayer>()).First().Cast<PoolablePlayer>();
 
-    public static IEnumerable<PlayerData> AllImpostors => GetPlayersByCamp(CampType.Impostor);
+    public static IEnumerable<CustomPlayerData> AllImpostors => GetPlayersByCamp(CampType.Impostor);
 
-    public static IEnumerable<PlayerData> AllCrewmates => GetPlayersByCamp(CampType.Crewmate);
+    public static IEnumerable<CustomPlayerData> AllCrewmates => GetPlayersByCamp(CampType.Crewmate);
 
-    public static IEnumerable<PlayerData> AllNeutrals => GetPlayersByCamp(CampType.Neutral);
+    public static IEnumerable<CustomPlayerData> AllNeutrals => GetPlayersByCamp(CampType.Neutral);
 
-    public static IEnumerable<PlayerData> GetPlayersByCamp(CampType camp)
+    public static IEnumerable<CustomPlayerData> GetPlayersByCamp(CampType camp)
         => GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == camp);
 
     /// <summary>
@@ -99,7 +99,7 @@ public static class PlayerUtils
     /// <param name="showAnimationToEverybody"></param>
     public static void KillWithoutDeadBody(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
-        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
+        DeadPlayer.Create(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
         target.Exiled();
 
         if (MeetingHud.Instance)
@@ -155,12 +155,16 @@ public static class PlayerUtils
         return DeadBodyUtils.GetDeadBodies().FirstOrDefault(db => db.ParentId == target.PlayerId);
     }
 
-    public static PlayerData? GetPlayerData(this PlayerControl player)
+    [return: NotNullIfNotNull(nameof(player))]
+    public static CustomPlayerData? GetPlayerData(this PlayerControl? player)
     {
-        return player.Data.GetPlayerData();
+        if (!player)
+            return null;
+        return player!.Data.GetPlayerData();
     }
 
-    public static PlayerData? GetPlayerData(this NetworkedPlayerInfo player)
+    [return: NotNullIfNotNull(nameof(player))]
+    public static CustomPlayerData? GetPlayerData(this NetworkedPlayerInfo? player)
     {
         return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.Data.IsSamePlayer(player));
     }
@@ -447,7 +451,7 @@ public static class PlayerUtils
         }
 
         CustomRole.ClearKillButtonSettings();
-        GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
+        GameUtils.PlayerData.Add(new CustomPlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
         VanillaKillButtonPatch.Initialize();
 
@@ -498,7 +502,7 @@ public static class PlayerUtils
     public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, CustomDeathReason reason,
         bool showCorpse = true)
     {
-        _ = new DeadPlayer(DateTime.Now, reason, target.Data, pc.Data);
+        _ = DeadPlayer.Create(DateTime.Now, reason, target.Data, pc.Data);
         if (showCorpse)
             pc.MurderPlayer(target, GameUtils.DefaultFlag);
         else
@@ -513,7 +517,7 @@ public static class PlayerUtils
     public static void RpcMurderAndModifyKillAnimation(this PlayerControl pc, PlayerControl target, PlayerControl toShowAsKiller, bool modifyDeathData)
     {
         if (modifyDeathData)
-            _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, toShowAsKiller.Data);
+            DeadPlayer.Create(DateTime.Now, CustomDeathReason.Default, target.Data, toShowAsKiller.Data);
         pc.MurderPlayer(target, SucceededFlags);
         RpcUtils.StartRpcImmediately(pc, KnownRpc.MurderAndModifyKillAnimation)
             .WriteNetObject(target).WriteNetObject(toShowAsKiller).Write(modifyDeathData).Finish();
@@ -630,7 +634,7 @@ public static class PlayerUtils
 
     public static void DieWithoutAnimationAndBody(this PlayerControl player, CustomDeathReason reason)
     {
-        new DeadPlayer(DateTime.Now, reason, player.Data, null);
+        DeadPlayer.Create(DateTime.Now, reason, player.Data, null);
         player.Exiled();
     }
 }
@@ -656,7 +660,7 @@ public class DeadPlayerListener : IListener
         if (!(target.Data.IsDead && killer && target)) return;
         if (DeadPlayer.IsMarkedAsDead(target)) return;
 
-        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
+        DeadPlayer.Create(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -664,7 +668,7 @@ public class DeadPlayerListener : IListener
     {
         var data = @event.ClientData;
         if (!GameStates.InRealGame) return;
-        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Disconnected, data.Character.Data, null);
+        DeadPlayer.Create(DateTime.Now, CustomDeathReason.Disconnected, data.Character.Data, null);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -672,7 +676,7 @@ public class DeadPlayerListener : IListener
     {
         var exiled = @event.ExileController.initData.networkedPlayer;
         if (exiled == null || DeadPlayer.DeadPlayers.Any(p => p.PlayerId == exiled.PlayerId)) return;
-        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Exiled, exiled, null);
+        DeadPlayer.Create(DateTime.Now, CustomDeathReason.Exiled, exiled, null);
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -682,11 +686,12 @@ public class DeadPlayerListener : IListener
     }
 }
 
+// Use EventRecorder to replace one day
 public class DeadPlayer
 {
     public static List<DeadPlayer> DeadPlayers { get; } = new();
 
-    public DeadPlayer(DateTime deadTime, CustomDeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer)
+    private DeadPlayer(DateTime deadTime, CustomDeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer, bool forceAdd)
     {
         DeadTime = deadTime;
         DeathReason = deathReason;
@@ -696,8 +701,13 @@ public class DeadPlayer
         KillerRole = killer?.GetMainRole();
         PlayerId = playerInfo.PlayerId;
 
-        if (!DeadPlayers.Any(d => d.PlayerId == PlayerId))
+        if (!DeadPlayers.Any(d => d.PlayerId == PlayerId) || forceAdd)
             DeadPlayers.Add(this);
+    }
+
+    public static DeadPlayer Create(DateTime deadTime, CustomDeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer, bool forceAdd = false)
+    {
+        return new(deadTime, deathReason, playerInfo, killer, forceAdd);
     }
 
     public DateTime DeadTime { get; private set; }
@@ -728,23 +738,23 @@ public class SerializablePlayerData
         SubRoleIds = subRoleIds;
     }
 
-    public PlayerData AsPlayerData()
+    public CustomPlayerData AsPlayerData()
     {
-        return new PlayerData(GameData.Instance.GetPlayerById(PlayerId),
+        return new CustomPlayerData(GameData.Instance.GetPlayerById(PlayerId),
             CustomRoleManager.GetManager().GetRoleById(MainRoleId)!,
             SubRoleIds.Select(id => CustomRoleManager.GetManager().GetRoleById(id)).ToArray()!);
     }
 
-    public static SerializablePlayerData Of(PlayerData playerData)
+    public static SerializablePlayerData Of(CustomPlayerData playerData)
     {
         return new SerializablePlayerData(playerData.PlayerId, playerData.MainRole.Id,
             playerData.SubRoles.Select(role => role.Id).ToArray());
     }
 }
 
-public class PlayerData
+public class CustomPlayerData
 {
-    public PlayerData(NetworkedPlayerInfo data, CustomRole role, CustomRole[]? subRoles = null)
+    public CustomPlayerData(NetworkedPlayerInfo data, CustomRole role, CustomRole[]? subRoles = null)
     {
         Player = data.Object;
         Data = data;
@@ -768,4 +778,22 @@ public class PlayerData
     public CustomRole[] SubRoles { get; }
 
     public List<string> Tags { get; }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || obj is not CustomPlayerData data)
+            return false;
+
+        return data.PlayerId == PlayerId;
+    }
+
+    public override int GetHashCode()
+    {
+        return PlayerId;
+    }
+
+    public bool IsRole<T>() where T : CustomRole
+    {
+        return MainRole is T || SubRoles.Any(r => r is T);
+    }
 }

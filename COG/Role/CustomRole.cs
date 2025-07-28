@@ -7,6 +7,8 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
+using COG.Game.Events;
+using COG.Game.Events.Impl;
 using COG.Listener;
 using COG.Rpc;
 using COG.UI.CustomButton;
@@ -86,7 +88,7 @@ public class CustomRole
             ForceShow = () => CanKill,
             TargetOutlineColor = Color
         };
-        DefaultKillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this));
+        DefaultKillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this, null!));
 
         ResetCurrentKillButtonSetting();
 
@@ -236,7 +238,11 @@ public class CustomRole
 
     public LanguageConfig.TextHandler ActionNameContext { get; } 
 
-    public static Action<CustomRole> OnRoleAbilityUsed { get; set; } = (_) => { };
+    public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
+    {
+        if (button == null) return;
+        EventRecorder.Instance.Record(new UseAbilityEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
+    }
 
     public bool IsAvailable()
     {
@@ -347,9 +353,9 @@ public class CustomRole
         hasButton ??= () => PlayerControl.LocalPlayer.IsRole(this);
         button.HasButton += hasButton;
         if (button.HasEffect)
-            button.OnEffect += () => OnRoleAbilityUsed(this);
+            button.OnEffect += () => OnRoleAbilityUsed(this, button);
         else
-            button.OnClick += () => OnRoleAbilityUsed(this);
+            button.OnClick += () => OnRoleAbilityUsed(this, button);
 
         CustomButtonManager.GetManager().RegisterCustomButton(button);
 

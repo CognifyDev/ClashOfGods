@@ -93,7 +93,7 @@ public static class OpenFileDialogue
         public int dwReserved;
         public int FlagsEx;
     }
-#nullable enable
+#nullable restore
 
     public class OpenedFileInfo
     {

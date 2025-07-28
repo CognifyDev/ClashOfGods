@@ -223,18 +223,30 @@ public class CustomWinnerListener : IListener
 
         var summary = new StringBuilder($"{LanguageConfig.Instance.ShowPlayersRolesMessage}\n");
         summary.Append(Environment.NewLine);
-        foreach (var role in GameUtils.PlayerData)
+        foreach (var player in GameUtils.PlayerData)
         {
-            var deadPlayer = DeadPlayer.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
-            summary.Append(role.PlayerName.PadRight(10)).Append(' ')
-                .Append(role.MainRole.Color.ToColorString(role.MainRole.Name));
-            summary.Append(' ').Append((deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed).ToColorString(
-                deadPlayer == null ? LanguageConfig.Instance.Alive :
-                !deadPlayer.DeathReason.HasValue ? LanguageConfig.Instance.UnknownKillReason :
-                deadPlayer.DeathReason.GetLanguageDeathReason()));
+            summary.Append(player.PlayerName.PadRight(10)).Append(' ')
+                .Append(GetPlayerRoleChanges(player));
+
+            summary.Append(' ').Append(GetPlayerAliveStateChanges(player));
             summary.Append(Environment.NewLine);
         }
 
         roleSummary.text = summary.ToString();
+
+        string GetPlayerRoleChanges(CustomPlayerData player)
+        {
+            return player.MainRole.Color.ToColorString(player.MainRole.Name); // For future possible changes
+        }
+
+        string GetPlayerAliveStateChanges(CustomPlayerData player)
+        {
+            var deadPlayer = DeadPlayer.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == player.PlayerId);
+
+            return (deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed).ToColorString(
+                deadPlayer == null ? LanguageConfig.Instance.Alive :
+                (!deadPlayer.DeathReason.HasValue ? LanguageConfig.Instance.UnknownKillReason :
+                deadPlayer.DeathReason.GetLanguageDeathReason()));
+        }
     }
 }

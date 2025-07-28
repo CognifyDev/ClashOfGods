@@ -1,4 +1,5 @@
 global using GameStates = COG.States.GameStates;
+using COG.Game.Events;
 using COG.Patch;
 using COG.Role;
 using COG.UI.Vanilla.KillButton;
@@ -30,6 +31,11 @@ public static class GameStates
             if (!value) IsLeavingGame = true;
 
             CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
+
+            if (value)
+                _ = new EventRecorder();
+            else
+                EventRecorder.ResetAll();
 
             VanillaKillButtonPatch.ActiveLastFrame = false;
 

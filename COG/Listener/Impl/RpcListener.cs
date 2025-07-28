@@ -92,7 +92,7 @@ public class RpcListener : IListener
 
                 KillAnimationPatch.NextKillerToBeReplaced = toModify.Data;
                 if (modifyDeathData)
-                    _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, toModify.Data);
+                    DeadPlayer.Create(DateTime.Now, CustomDeathReason.Default, target.Data, toModify.Data);
                 @event.Player.MurderPlayer(target, PlayerUtils.SucceededFlags);
                 break;
             }

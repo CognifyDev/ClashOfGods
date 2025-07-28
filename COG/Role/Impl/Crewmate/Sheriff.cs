@@ -32,7 +32,7 @@ public class Sheriff : CustomRole, IListener
             }
             else
             {
-                _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Misfire, localData, localData); // Override DeadPlayer instance in advance
+                DeadPlayer.Create(DateTime.Now, CustomDeathReason.Misfire, localData, localData); // Override DeadPlayer instance in advance
                 return PlayerControl.LocalPlayer;
             }
         });

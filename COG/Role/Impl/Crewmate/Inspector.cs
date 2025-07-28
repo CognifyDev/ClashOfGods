@@ -26,7 +26,7 @@ public class Inspector : CustomRole, IListener
 
     public Inspector() : base(ColorUtils.FromColor32(46, 84, 160), CampType.Crewmate)
     {
-        OnRoleAbilityUsed += role => NotifyInspector();
+        OnRoleAbilityUsed += (role, _) => NotifyInspector();
 
         AbilityCooldownOption = CreateOption(() => LanguageConfig.Instance.AbilityCooldown,
             new FloatOptionValueRule(10, 5, 60, 25, NumberSuffixes.Seconds));

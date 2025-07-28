@@ -13,7 +13,7 @@ namespace COG.Listener.Impl;
 
 public class RoleAssignmentListener : IListener
 {
-    private readonly RpcHandler<int, PlayerData[]> _roleSelectionShareRpcHandler;
+    private readonly RpcHandler<int, CustomPlayerData[]> _roleSelectionShareRpcHandler;
 
     public RoleAssignmentListener()
     {
@@ -46,7 +46,7 @@ public class RoleAssignmentListener : IListener
                 Main.Logger.LogInfo("Received role assignment data, applying...");
 
                 var count = reader.ReadPackedInt32();
-                var list = new List<PlayerData>();
+                var list = new List<CustomPlayerData>();
 
                 for (int i = 0; i < count; i++)
                     list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<SerializablePlayerData>().AsPlayerData());

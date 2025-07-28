@@ -145,7 +145,7 @@ public class GameListener : IListener
             LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(("crew", crewCount), ("neutral", neutralCount), ("imp", impCount));
         return;
 
-        int GetCount(IEnumerable<PlayerData> list)
+        int GetCount(IEnumerable<CustomPlayerData> list)
         {
             return list.Select(p => p.Data)
                 .Count(p => !p.IsDead);
