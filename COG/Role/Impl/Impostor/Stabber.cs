@@ -36,7 +36,7 @@ public class Stabber : CustomRole
             },
             () => DispatchButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
-            () =>  _killedTimes < MaxUseTime.GetFloat(),
+            () =>  _killedTimes < MaxUseTime.GetInt(),
             ResourceUtils.LoadSprite(ResourceConstant.DispatchButton)!,
             2,
             LanguageConfig.Instance.DispatchAction,
@@ -44,7 +44,7 @@ public class Stabber : CustomRole
             0
         );
 
-        DefaultKillButtonSetting.AddCustomCondition(() => _killedTimes >= MaxUseTime.GetFloat());
+        DefaultKillButtonSetting.AddCustomCondition(() => _killedTimes >= MaxUseTime.GetInt());
         
         AddButton(DispatchButton);
     }

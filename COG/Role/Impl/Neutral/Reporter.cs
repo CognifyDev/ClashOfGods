@@ -66,7 +66,7 @@ public class Reporter : CustomRole, IListener, IWinnable
         
         foreach (var (target, times) in _reportersWhoReported)
         {
-            if (times < _neededReportTimes.GetFloat()) return;
+            if (times < _neededReportTimes.GetInt()) return;
             
             data.WinnableCampType = CampType; 
             data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(target);

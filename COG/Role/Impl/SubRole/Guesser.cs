@@ -39,7 +39,7 @@ public class Guesser : CustomRole, IListener
         var meetingHud = @event.MeetingHud;
         var debugEnabled = GlobalCustomOptionConstant.DebugMode.GetBool();
         
-        if (GuessedTime >= MaxGuessTime.GetFloat())
+        if (GuessedTime >= MaxGuessTime.GetInt())
         {
             GuessButton.Buttons.ForEach(guessButton => guessButton.Destroy());
             GuessButton.Buttons.Clear();
