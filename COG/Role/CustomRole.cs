@@ -236,13 +236,13 @@ public class CustomRole
         }
     }
 
-    public LanguageConfig.TextHandler ActionNameContext { get; } 
+    public LanguageConfig.TextHandler ActionNameContext { get; }
 
     public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
     {
         if (button == null) return;
         EventRecorder.Instance.Record(new UseAbilityEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
-    }
+    };
 
     public bool IsAvailable()
     {
