@@ -26,7 +26,7 @@ public class Vigilante : CustomRole, IListener
         DefaultKillButtonSetting.RemainingUses = 1;
         
         _minCrewmateNumber = CreateOption(() => LanguageConfig.Instance.VigilanteMinCrewmateNumber,
-            new IntOptionValueRule(1F, 1F, 15F, 3F));
+            new IntOptionValueRule(1, 1, 15, 3));
     }
 
     public override void ClearRoleGameData()
