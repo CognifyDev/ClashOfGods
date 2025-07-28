@@ -10,7 +10,7 @@ public class PlayerKillHandler : TypeEventHandlerBase
 
     public override IGameEvent Handle(CustomPlayerData player, params object[] extraArguments)
     {
-        if (extraArguments.Length < 2 || 
+        if (extraArguments.Length != 1 || 
            extraArguments[0] is not CustomPlayerData victim)
         {
             Main.Logger.LogWarning("Invalid event arguments");

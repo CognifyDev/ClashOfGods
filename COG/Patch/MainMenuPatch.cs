@@ -62,6 +62,10 @@ public static class MainMenuPatch
 
         if (!InGameCustomRoleViewer.Instance)
             new GameObject().AddComponent<InGameCustomRoleViewer>();
+
+        __instance.createGameScreen.modeButtons[0].SelectButton(true);
+        __instance.createGameScreen.modeButtons[1].SelectButton(false);
+        __instance.createGameScreen.modeButtons[1].gameObject.SetActive(false); // Hide HnS button & select classic button
     }
 
     /// <summary>
