@@ -31,7 +31,7 @@ public class Reporter : CustomRole, IListener, IWinnable
     public Reporter() : base(Color.gray, CampType.Neutral)
     {
         _neededReportTimes = CreateOption(() => LanguageConfig.Instance.ReporterNeededReportTimes,
-            new FloatOptionValueRule(1F, 1F, 14F, 3F));
+            new IntOptionValueRule(1, 1, 14, 3));
 
         _instance = this;
     }

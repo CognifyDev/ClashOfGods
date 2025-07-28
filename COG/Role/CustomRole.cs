@@ -121,7 +121,8 @@ public class CustomRole
             // Actually name here is useless for new option
             RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage,
                 new IntOptionValueRule(0, 1, 15, 0));
-            RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 0));
+            RoleChanceOption = CreateOption(() => "Chance", 
+                new IntOptionValueRule(0, 10, 100, 0));
             
             RoleCode = CreateOption(() => LanguageConfig.Instance.RoleCode, 
                 new StringOptionValueRule(0, _ => Id.ToString().ToSingleElementArray()));

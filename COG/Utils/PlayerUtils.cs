@@ -139,15 +139,16 @@ public static class PlayerUtils
         return GetAllPlayers().ToArray().Where(player => player.IsAlive()).ToList();
     }
 
-    public static bool IsSamePlayer(this NetworkedPlayerInfo info, NetworkedPlayerInfo target)
+    public static bool IsSamePlayer(this NetworkedPlayerInfo? info, NetworkedPlayerInfo? target)
     {
-        return IsSamePlayer(info.Object, target.Object);
+        if (!(info && target)) return false;
+        return info == target;
     }
 
     public static bool IsSamePlayer(this PlayerControl? player, PlayerControl? target)
     {
         if (!(player && target)) return false;
-        return player!.GetInstanceID() == target!.GetInstanceID();
+        return player!.Data.IsSamePlayer(target!.Data);
     }
 
     public static DeadBody? GetDeadBody(this PlayerControl target)
@@ -779,7 +780,7 @@ public class CustomPlayerData
 
     public List<string> Tags { get; }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj == null || obj is not CustomPlayerData data)
             return false;

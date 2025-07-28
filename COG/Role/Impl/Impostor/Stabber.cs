@@ -25,7 +25,7 @@ public class Stabber : CustomRole
         CanVent = true;
         CanSabotage = true;
 
-        MaxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new FloatOptionValueRule(1F, 1F, 15F, 2F));
+        MaxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new IntOptionValueRule(1, 1, 1, 2));
         
         DispatchButton = CustomButton.Of(
             "stabber-dispatch",
