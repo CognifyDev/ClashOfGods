@@ -2,6 +2,7 @@
 using COG.Game.Events.Impl.Handlers;
 using COG.Utils;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace COG.Game.Events;
 
@@ -31,6 +32,8 @@ public class EventRecorder
         _events.Add(gameEvent);
         Main.Logger.LogInfo($"Recorded game event: {gameEvent.GetType().Name}");
     }
+
+    public IGameEvent HandleTypeEvent(EventType type, CustomPlayerData player, params object[] extraArguments) => _handlers.FirstOrDefault(h => h.EventType == type)?.Handle(player, extraArguments) ?? null!;
 
     public static void ResetAll()
     {
@@ -70,7 +73,7 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     [HarmonyPostfix]
     static void MurderPlayerPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
-        EventRecorder.Instance.Record(new PlayerKillHandler().Handle(__instance.GetPlayerData(), target.GetPlayerData()));
+        EventRecorder.Instance.Record(EventRecorder.Instance.HandleTypeEvent(EventType.Kill, __instance.GetPlayerData(), target.GetPlayerData()));
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Die))]
