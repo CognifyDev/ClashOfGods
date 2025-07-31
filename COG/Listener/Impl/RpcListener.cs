@@ -1,3 +1,4 @@
+using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
 using COG.Patch;
 using COG.Role;
@@ -9,12 +10,38 @@ using InnerNet;
 using System;
 using System.Linq;
 using System.Reflection;
-using static COG.Utils.PlayerUtils;
 
 namespace COG.Listener.Impl;
 
 public class RpcListener : IListener
 {
+    private string? _murderExtraMessage = null;
+
+    [EventHandler(EventHandlerType.Prefix)]
+    public void BeforeRpcBeingProceeded(PlayerHandleRpcEvent @event)
+    {
+        var reader = MessageReader.Get(@event.Reader);
+        var rpc = @event.CallId;
+        reader.ReadNetObject<PlayerControl>();
+        if (rpc == (byte)RpcCalls.CheckMurder && reader.BytesRemaining > 0) // with extra data
+        {
+            // CheckMurder RPC will be sent to every client, but whether to perform depends if the client is the host
+            // Killer ---Send CheckMurder--> Each client --> Perform
+            // MuderPlayer will be sent even if the kill failed
+            // Kinda complex...
+            _murderExtraMessage = reader.ReadString();
+        }
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerMurder(PlayerMurderEvent @event)
+    {
+        if (@event.MurderResult!.Value.HasFlag(MurderResultFlags.Succeeded) && _murderExtraMessage != null)
+            GameEventPatch.ExtraMessage = _murderExtraMessage;
+        
+        _murderExtraMessage = null;
+    }
+
     [EventHandler(EventHandlerType.Postfix)]
     public void AfterRpcReceived(PlayerHandleRpcEvent @event)
     {

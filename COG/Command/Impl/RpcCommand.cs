@@ -12,6 +12,7 @@ public class RpcCommand : CommandBase
 {
     private RpcWriter? _writer;
     private byte _current;
+    private int _initialSize;
 
     public RpcCommand() : base("rpc")
     {
@@ -44,6 +45,7 @@ public class RpcCommand : CommandBase
                         else
                             throw new NotSupportedException("The RPC you request to send is not supported.");
                     }
+                    _initialSize = _writer.GetWriters().First().Length;
 
                     GameUtils.SendSystemMessage("一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。");
                 }
@@ -102,7 +104,7 @@ public class RpcCommand : CommandBase
                             new[]
                             {
                                 typeof(string),
-                                assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer. */
+                                assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer */
                             });
                         if (method == null)
                             throw new NotSupportedException(
@@ -175,10 +177,14 @@ public class RpcCommand : CommandBase
                 {
                     if (_writer == null) throw new NullReferenceException("Writer is null.");
                     _writer.Finish();
+
+                    var deltaSize = _writer.GetWriters().First().Length - _initialSize;
+                    var reader = MessageReader.GetSized(deltaSize);
+
+                    Array.Copy(_writer.GetWriters().First().Buffer, _initialSize, reader.Buffer, 0, deltaSize);
+
                     _writer = null;
 
-                    var reader = new MessageReader();
-                    _writer!.GetWriters().First().Buffer.CopyTo(reader.Buffer, 0);
                     PlayerControl.LocalPlayer.HandleRpc(_current, reader);
 
                     GameUtils.SendSystemMessage("Rpc已发送！");

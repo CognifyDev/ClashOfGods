@@ -1,6 +1,7 @@
 ﻿using COG.Game.Events.Impl;
 using COG.Game.Events.Impl.Handlers;
 using COG.Utils;
+using COG.Utils.Coding;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,7 +22,7 @@ public class EventRecorder
 
         _handlers.AddRange(new IEventHandler[]
         {
-            new PlayerKillHandler()
+            new PlayerDeathHandler()
         });
     }
 
@@ -29,11 +30,19 @@ public class EventRecorder
 
     public void Record(IGameEvent gameEvent)
     {
-        _events.Add(gameEvent);
-        Main.Logger.LogInfo($"Recorded game event: {gameEvent.GetType().Name}");
+        if (gameEvent != null)
+            _events.Add(gameEvent);
+        
+        Main.Logger.LogInfo($"Recorded game event: {gameEvent?.GetType().Name ?? null}");
     }
 
-    public IGameEvent HandleTypeEvent(EventType type, CustomPlayerData player, params object[] extraArguments) => _handlers.FirstOrDefault(h => h.EventType == type)?.Handle(player, extraArguments) ?? null!;
+    public void RecordTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
+    {
+        var gameEvent = HandleTypeEvent(type, player, extraArguments);
+        Record(gameEvent);
+    }
+
+    public IGameEvent HandleTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments) => _handlers.FirstOrDefault(h => h.EventType == type)?.Handle(player, extraArguments) ?? null!;
 
     public static void ResetAll()
     {
@@ -52,35 +61,42 @@ public static class GameEventPatch // not use listener for flexibility in patchi
         if (!__result) return; // only record if player actually entered the vent
         var vent = __instance._vent_5__2;
         var playerPhysics = __instance.__4__this;
-        EventRecorder.Instance.Record(new EnterVentEvent(playerPhysics.myPlayer.GetPlayerData()!, vent.Id));
+        EventRecorder.Instance.Record(new EnterVentGameEvent(playerPhysics.myPlayer.GetPlayerData()!, vent.Id));
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CompleteTask))]
     [HarmonyPostfix]
     static void CompleteTaskPatch(PlayerControl __instance, [HarmonyArgument(1)] uint idx)
     {
-        EventRecorder.Instance.Record(new FinishTaskEvent(__instance.GetPlayerData()!, idx));
+        EventRecorder.Instance.Record(new FinishTaskGameEvent(__instance.GetPlayerData()!, idx));
     }
 
     [HarmonyPatch(typeof(GameData), nameof(GameData.HandleDisconnect), typeof(PlayerControl), typeof(DisconnectReasons))]
     [HarmonyPrefix] // player might be null if we use postfix
     static void HandleDisconnectPatch(PlayerControl player)
     {
-        EventRecorder.Instance.Record(new PlayerDisconnectEvent(player.GetPlayerData()!));
+        EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()!));
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
     [HarmonyPostfix]
     static void MurderPlayerPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
-        EventRecorder.Instance.Record(EventRecorder.Instance.HandleTypeEvent(EventType.Kill, __instance.GetPlayerData(), target.GetPlayerData()));
+        EventRecorder.Instance.Record(EventRecorder.Instance.HandleTypeEvent(GameEventType.Kill, __instance.GetPlayerData(), target.GetPlayerData()));
     }
+
+    public static string? ExtraMessage { get; set; } = null;
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Die))]
     [HarmonyPostfix]
     static void DiePatch(PlayerControl __instance)
     {
-        EventRecorder.Instance.Record(new PlayerDieEvent(__instance.GetPlayerData()));
+        if (ExtraMessage != null)
+            EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, __instance.GetPlayerData(), ExtraMessage);
+        else
+            EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, __instance.GetPlayerData());
+
+        ExtraMessage = null;
     }
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartGame))]
@@ -103,5 +119,12 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     {
         if (!__result) return;
         EventRecorder.Instance.Record(new StartMeetingEvent(__instance.reporter.GetPlayerData(), __instance.target.GetPlayerData()));
+    }
+
+    [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
+    [HarmonyPostfix]
+    static void ExilePatch([HarmonyArgument(0)] ExileController.InitProperties init)
+    {
+        EventRecorder.Instance.Record(new PlayerExileGameEvent(init.networkedPlayer.GetPlayerData()));
     }
 }

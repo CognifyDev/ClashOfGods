@@ -9,13 +9,19 @@ namespace COG.Listener.Event.Impl.Player;
 /// </summary>
 public class PlayerMurderEvent : PlayerEvent
 {
-    public PlayerMurderEvent(PlayerControl killer, PlayerControl target) : base(killer)
+    public PlayerMurderEvent(PlayerControl killer, PlayerControl target, MurderResultFlags? flags) : base(killer)
     {
         Target = target;
+        MurderResult = flags;
     }
 
     /// <summary>
     ///     被击杀的玩家
     /// </summary>
     public PlayerControl Target { get; }
+
+    /// <summary>
+    ///     击杀结果，如果是 <see cref="EventHandlerType.Prefix"/> 则必定为空，如果是 <see cref="EventHandlerType.Postfix"/> 则必不为空
+    /// </summary>
+    public MurderResultFlags? MurderResult { get; }
 }

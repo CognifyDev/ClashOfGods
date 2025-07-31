@@ -1,5 +1,6 @@
 using AmongUs.Data;
 using COG.Config.Impl;
+using COG.Game.Events;
 using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Player;
@@ -636,6 +637,7 @@ public static class PlayerUtils
     public static void DieWithoutAnimationAndBody(this PlayerControl player, CustomDeathReason reason)
     {
         DeadPlayer.Create(DateTime.Now, reason, player.Data, null);
+        EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, player.GetPlayerData(), reason);
         player.Exiled();
     }
 }

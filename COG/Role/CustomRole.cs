@@ -242,7 +242,7 @@ public class CustomRole
     public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
     {
         if (button == null) return;
-        EventRecorder.Instance.Record(new UseAbilityEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
+        EventRecorder.Instance.Record(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
     };
 
     public bool IsAvailable()

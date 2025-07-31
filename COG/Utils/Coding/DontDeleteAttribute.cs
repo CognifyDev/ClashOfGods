@@ -9,4 +9,11 @@ namespace COG.Utils.Coding;
 [AttributeUsage(AttributeTargets.All, Inherited = false)]
 public sealed class DontDeleteAttribute : Attribute
 {
+    public DontDeleteAttribute()
+    {
+    }
+
+    public DontDeleteAttribute(string msg)
+    {
+    }
 }

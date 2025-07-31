@@ -6,6 +6,6 @@ namespace COG.Game.Events;
 public interface IGameEvent
 {
     DateTime Time { get; }
-    EventType EventType { get; }
+    GameEventType EventType { get; }
     CustomPlayerData Player { get; }
 }

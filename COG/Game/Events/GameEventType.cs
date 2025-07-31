@@ -1,6 +1,6 @@
 ﻿namespace COG.Game.Events;
 
-public enum EventType
+public enum GameEventType
 {
     Die,
     Revive,
@@ -10,5 +10,6 @@ public enum EventType
     UseAblity,
     FinishTask,
     Disconnect,
-    GameStart
+    GameStart,
+    Exile
 }

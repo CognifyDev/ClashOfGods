@@ -4,9 +4,9 @@ namespace COG.Game.Events;
 
 public abstract class TypeEventHandlerBase : IEventHandler
 {
-    public EventType EventType { get; }
+    public GameEventType EventType { get; }
 
-    protected TypeEventHandlerBase(EventType @event)
+    protected TypeEventHandlerBase(GameEventType @event)
     {
         EventType = @event;
     }

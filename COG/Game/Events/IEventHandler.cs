@@ -4,6 +4,6 @@ namespace COG.Game.Events;
 
 public interface IEventHandler
 {
-    public EventType EventType { get; }
+    public GameEventType EventType { get; }
     public IGameEvent Handle(CustomPlayerData player, params object[] extraArguments);
 }

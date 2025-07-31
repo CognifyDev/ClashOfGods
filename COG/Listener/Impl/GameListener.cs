@@ -11,6 +11,7 @@ using COG.UI.CustomButton;
 using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomGameObject.HudMessage;
 using COG.Utils;
+using COG.Utils.Coding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -155,6 +156,7 @@ public class GameListener : IListener
     private readonly List<Handler> _handlers = new();
 
     [EventHandler(EventHandlerType.Postfix)]
+    [FixMe("Once died, always show role info even if revived")]
     public void OnGameStart(GameStartEvent _)
     {
         Main.Logger.LogInfo("========Game Starts!========");

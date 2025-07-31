@@ -38,6 +38,8 @@ public class KillButtonSetting
 
     public int RemainingUses { get; set; }
 
+    public string? ExtraRpcMessage { get; set; } = null;
+
     private Action _afterClick = () => { };
     private Func<bool> _customCondition = () => true;
     private Func<global::KillButton, PlayerControl> _beforeMurder = b => b.currentTarget;
@@ -62,6 +64,7 @@ public class KillButtonSetting
             ForceShow = ForceShow,
             InitialCooldown = InitialCooldown,
             RemainingUses = RemainingUses,
+            ExtraRpcMessage = ExtraRpcMessage,
             _afterClick = _afterClick,
             _customCondition = _customCondition,
             _beforeMurder = _beforeMurder

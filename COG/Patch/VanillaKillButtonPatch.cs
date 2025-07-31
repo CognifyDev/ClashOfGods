@@ -1,11 +1,8 @@
-using COG.Role;
-using COG.States;
-using COG.UI.Vanilla.KillButton;
+using COG.Game.Events;
+using COG.Rpc;
 using COG.Utils;
 using System;
 using System.Linq;
-using UnityEngine;
-using YamlDotNet.Serialization;
 
 namespace COG.Patch;
 
@@ -31,7 +28,7 @@ static class VanillaKillButtonPatch
 
         var aliveUsable = setting.OnlyUsableWhenAlive && __instance.IsAlive();
         var show = setting != null && setting.ForceShow() && IsHudActive && aliveUsable;
-        
+
         killButton.ToggleVisible(show);
 
         ActiveLastFrame = show;
@@ -59,7 +56,7 @@ static class VanillaKillButtonPatch
                 player!.cosmetics.SetOutline(true, new(setting.TargetOutlineColor));
             }
         }
-        
+
     }
 
     public static void Initialize()
@@ -86,18 +83,44 @@ static class VanillaKillButtonPatch
             if (setting.OnlyUsableWhenAlive && !PlayerControl.LocalPlayer.IsAlive())
                 return false;
 
-            PlayerControl.LocalPlayer.CmdCheckMurder(setting.BeforeMurder());
+            var dead = setting.BeforeMurder();
+            var extraMessage = setting.ExtraRpcMessage;
+
+            if (extraMessage == null)
+            {
+                GameEventPatch.ExtraMessage = null;
+                PlayerControl.LocalPlayer.CmdCheckMurder(dead);
+            }
+            else
+            {
+                CmdExtraCheckMurder(PlayerControl.LocalPlayer, dead, extraMessage);
+            }
+
             __instance.SetTarget(null);
 
-            PlayerControl.LocalPlayer.ResetKillCooldown();
+            if (dead)
+            {
+                PlayerControl.LocalPlayer.ResetKillCooldown();
 
-            if (setting.UsesLimit > 0)
-                setting.RemainingUses--;
+                if (setting.UsesLimit > 0)
+                    setting.RemainingUses--;
 
-            setting.AfterClick();
+                setting.AfterClick();
+            }
         }
 
         return false;
+
+        void CmdExtraCheckMurder(PlayerControl killer, PlayerControl target, string msg)
+        {
+            killer.isKilling = true;
+            GameEventPatch.ExtraMessage = msg;
+
+            if (AmongUsClient.Instance.AmLocalHost || AmongUsClient.Instance.AmModdedHost)
+                killer.CheckMurder(target);
+
+            RpcWriter.Start(RpcCalls.CheckMurder).WriteNetObject(target).Write(msg).Finish();
+        }
     }
 
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.SetHudActive), new Type[] { typeof(PlayerControl), typeof(RoleBehaviour), typeof(bool) })]

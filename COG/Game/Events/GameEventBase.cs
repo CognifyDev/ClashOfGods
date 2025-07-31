@@ -6,10 +6,10 @@ namespace COG.Game.Events;
 public abstract class GameEventBase : IGameEvent
 {
     public DateTime Time { get; }
-    public EventType EventType { get; }
+    public GameEventType EventType { get; }
     public CustomPlayerData Player { get; }
 
-    public GameEventBase(EventType eventType, CustomPlayerData player)
+    public GameEventBase(GameEventType eventType, CustomPlayerData player)
     {
         Time = DateTime.Now;
         EventType = eventType;

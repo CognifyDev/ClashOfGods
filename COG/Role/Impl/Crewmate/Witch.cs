@@ -1,20 +1,15 @@
 ﻿using COG.Listener;
 using COG.Listener.Event.Impl.Meeting;
 using COG.Listener.Event.Impl.Player;
-using COG.Patch;
 using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using COG.Utils.Coding;
 
 namespace COG.Role.Impl.Crewmate;
 
 [HarmonyPatch]
-[Todo("多次死亡的检查")]
-[NotUsed]
-[WorkInProgress]
 public class Witch : CustomRole
 {
     private RpcHandler<byte> _antidoteHandler;
@@ -71,7 +66,7 @@ public class Witch : CustomRole
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMeetingStarts(MeetingStartEvent @event)
     {
-        if (_shouldDieWhenMeetingStarts) // Other players should always have this been false
+        if (_shouldDieWhenMeetingStarts) // Other players should always have this being false
             PlayerControl.LocalPlayer.RpcDie(CustomDeathReason.InteractionAfterRevival);
     }
 
