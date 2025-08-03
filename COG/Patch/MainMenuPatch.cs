@@ -60,8 +60,8 @@ public static class MainMenuPatch
         //            Application.Quit();
         //        }, Color.yellow);
 
-        if (!InGameCustomRoleViewer.Instance)
-            new GameObject().AddComponent<InGameCustomRoleViewer>();
+        if (!InGameModDebugger.Instance)
+            new GameObject().AddComponent<InGameModDebugger>();
 
         __instance.createGameScreen.modeButtons[0].SelectButton(true);
         __instance.createGameScreen.modeButtons[1].SelectButton(false);

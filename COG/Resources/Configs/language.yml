@@ -217,6 +217,8 @@ game:
     default: "死亡"
     exiled: "驱逐"
     misfire: "走火"
+    revival: "复活"
+    force-death: "强制死亡"
     unknown: "未知"
   exile:
     default: "%player% 是 %role%。"

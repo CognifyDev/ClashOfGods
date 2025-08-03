@@ -40,10 +40,11 @@ public class EventRecorder
         }
     }
 
-    public void RecordTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
+    public IGameEvent RecordTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
     {
         var gameEvent = HandleTypeEvent(type, player, extraArguments);
         Record(gameEvent);
+        return gameEvent;
     }
 
     public IGameEvent HandleTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments) => _handlers.FirstOrDefault(h => h.EventType == type)?.Handle(player, extraArguments) ?? null!;
@@ -83,10 +84,19 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
-    [HarmonyPostfix]
-    static void MurderPlayerPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
+    [HarmonyPrefix]
+    static void MurderPlayerPrefixPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, ref PlayerKillGameEvent __state)
     {
-        EventRecorder.Instance.Record(EventRecorder.Instance.HandleTypeEvent(GameEventType.Kill, __instance.GetPlayerData(), target.GetPlayerData()));
+        EventRecorder.Instance.Record(__state = new PlayerKillGameEvent(__instance.GetPlayerData(), target.GetPlayerData()));
+    }
+
+    private static IGameEvent? _dieEvent = null;
+
+    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
+    [HarmonyPostfix]
+    static void MurderPlayerPostfixPatch(PlayerKillGameEvent __state) // PlayerControl.Die is called before MurderPlayer is done
+    {
+        __state.RelatedDeathEvent = _dieEvent!;
     }
 
     public static string? ExtraMessage { get; set; } = null;
@@ -96,9 +106,9 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     static void DiePatch(PlayerControl __instance)
     {
         if (ExtraMessage != null)
-            EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, __instance.GetPlayerData(), ExtraMessage);
+            _dieEvent = EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, __instance.GetPlayerData(), ExtraMessage);
         else
-            EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, __instance.GetPlayerData());
+            _dieEvent = EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, __instance.GetPlayerData());
 
         ExtraMessage = null;
     }
@@ -107,14 +117,14 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     [HarmonyPostfix]
     static void StartGamePatch()
     {
-        EventRecorder.Instance.Record(new GameStartEvent());
+        EventRecorder.Instance.Record(new GameStartsEvent());
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Revive))]
     [HarmonyPostfix]
     static void RevivePatch(PlayerControl __instance)
     {
-        EventRecorder.Instance.Record(new PlayerReviveEvent(__instance.GetPlayerData()!));
+        EventRecorder.Instance.Record(new PlayerReviveGameEvent(__instance.GetPlayerData()!));
     }
 
     [HarmonyPatch(typeof(ShipStatus._CoStartMeeting_d__102), nameof(ShipStatus._CoStartMeeting_d__102.MoveNext))]

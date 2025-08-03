@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,8 @@ using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
+using COG.Game.Events;
+using COG.Game.Events.Impl;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Player;
@@ -223,6 +226,9 @@ public class CustomWinnerListener : IListener
 
         var summary = new StringBuilder($"{LanguageConfig.Instance.ShowPlayersRolesMessage}\n");
         summary.Append(Environment.NewLine);
+
+        var handler = LanguageConfig.Instance.GetHandler("game.survival-data");
+
         foreach (var player in GameUtils.PlayerData)
         {
             summary.Append(player.PlayerName.PadRight(10)).Append(' ')
@@ -241,12 +247,47 @@ public class CustomWinnerListener : IListener
 
         string GetPlayerAliveStateChanges(CustomPlayerData player)
         {
-            var deadPlayer = DeadPlayer.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == player.PlayerId);
+            var gameEvents = EventRecorder.Instance.GetEvents().Where(e => e.Player.Equals(player));
+            var sortedEvents = gameEvents.OrderBy(e => e.Time);
+            var states = new List<string>();
 
-            return (deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed).ToColorString(
-                deadPlayer == null ? LanguageConfig.Instance.Alive :
-                (!deadPlayer.DeathReason.HasValue ? LanguageConfig.Instance.UnknownKillReason :
-                deadPlayer.DeathReason.GetLanguageDeathReason()));
+            foreach (var gameEvent in sortedEvents)
+            {
+                if (gameEvent is PlayerDisconnectGameEvent)
+                {
+                    states.Add(handler.GetString("disconnected").Color(Color.gray));
+                }
+                else if (gameEvent is PlayerExileGameEvent)
+                {
+                    states.Add(handler.GetString("exiled").Color(Palette.ImpostorRed));
+                }
+                else if (gameEvent is SheriffMisfireGameEvent)
+                {
+                    states.Add(handler.GetString("misfire").Color(Palette.ImpostorRed));
+                }
+                else if (gameEvent is PlayerReviveGameEvent)
+                {
+                    states.Add(handler.GetString("revival").Color(Palette.AcceptedGreen));
+                }
+                else if (gameEvent is WitchRevivedInteractionDieGameEvent)
+                {
+                    states.Add(handler.GetString("force-death").Color(Palette.ImpostorRed));
+                }
+                else if (gameEvent is PlayerDieGameEvent @event)
+                {
+                    var related = EventRecorder.Instance.GetEvents()
+                        .OfType<PlayerKillGameEvent>()
+                        .FirstOrDefault(e => e.Victim.Equals(player) && e.RelatedDeathEvent == @event);
+                    if (related != null)
+                    {
+                        states.Add(handler.GetString("default").Color(Palette.ImpostorRed));
+                    }
+                }
+            }
+
+            if (!states.Any()) states.Add(handler.GetString("alive").Color(Palette.AcceptedGreen));
+
+            return string.Join(" → ", states);
         }
     }
 }
