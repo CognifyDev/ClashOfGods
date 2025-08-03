@@ -33,11 +33,6 @@ using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using COG.Config;
-using BepInEx.Logging;
-using BepInEx.Configuration;
-using UnityEngine;
-using COG.UI.CustomButton;
-using COG.Utils.Coding.Debugging;
 
 namespace COG;
 
@@ -265,6 +260,7 @@ public partial class Main : BasePlugin
         CustomRoleManager.GetManager().GetRoles().Clear();
         ListenerManager.GetManager().UnregisterHandlers();
         EndGameResult.CachedWinners?.Clear();
+        CustomWinnerManager.GetManager().Reset();
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
         MainMenuPatch.CustomBanner!.Destroy();

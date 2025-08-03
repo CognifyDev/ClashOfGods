@@ -37,6 +37,11 @@ public class Witch : CustomRole
                 if (player.AmOwner)
                 {
                     _shouldDetectInteraction = true;
+                    OnRoleAbilityUsed += (role, _) =>
+                    {
+                        if (!role.IsLocalPlayerRole()) return;
+                        _shouldDieWhenMeetingStarts = true;
+                    };
                 }
             },
             (writer, playerId) => writer.Write(playerId),

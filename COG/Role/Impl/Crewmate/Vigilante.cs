@@ -1,13 +1,10 @@
-﻿using System.Linq;
-using COG.Config.Impl;
-using COG.Constant;
+﻿using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
-using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using UnityEngine;
+using System.Linq;
 
 namespace COG.Role.Impl.Crewmate;
 
@@ -24,7 +21,7 @@ public class Vigilante : CustomRole, IListener
 
         DefaultKillButtonSetting.UsesLimit = int.MaxValue;
         DefaultKillButtonSetting.RemainingUses = 1;
-        
+
         _minCrewmateNumber = CreateOption(() => LanguageConfig.Instance.VigilanteMinCrewmateNumber,
             new IntOptionValueRule(1, 1, 15, 3));
     }

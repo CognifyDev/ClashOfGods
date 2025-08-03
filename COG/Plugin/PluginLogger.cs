@@ -14,33 +14,35 @@ public class PluginLogger
         return $"[{_description.Name}] {msg}";
     }
 
-    public void LogDebug(object? msg)
+#pragma warning disable IDE1006 // Use lower case to match JS name style
+    public void debug(object? msg)
     {
         Main.Logger.NativeLogger.LogDebug(GetFullString(msg));
     }
 
-    public void LogInfo(object? msg)
+    public void info(object? msg)
     {
         Main.Logger.NativeLogger.LogInfo(GetFullString(msg));
     }
 
-    public void LogWarning(object? msg)
+    public void warn(object? msg)
     {
         Main.Logger.NativeLogger.LogWarning(GetFullString(msg));
     }
 
-    public void LogFatal(object? msg)
+    public void fatal(object? msg)
     {
         Main.Logger.NativeLogger.LogFatal(GetFullString(msg));
     }
 
-    public void LogError(object? msg)
+    public void error(object? msg)
     {
         Main.Logger.NativeLogger.LogError(GetFullString(msg));
     }
 
-    public void LogMessage(object? msg)
+    public void message(object? msg)
     {
         Main.Logger.NativeLogger.LogMessage(GetFullString(msg));
     }
+#pragma warning restore IDE1006
 }

@@ -44,7 +44,7 @@ internal class PlayerKillPatch
 
         if (!target)
         {
-            Main.Logger.LogError("Bad kill check with null target");
+            Main.Logger.LogError("Bad kill check with null target (target quitted game?)");
             return false;
         }
 

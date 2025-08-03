@@ -1,7 +1,6 @@
 ﻿using COG.Game.Events.Impl;
 using COG.Game.Events.Impl.Handlers;
 using COG.Utils;
-using COG.Utils.Coding;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,9 +30,14 @@ public class EventRecorder
     public void Record(IGameEvent gameEvent)
     {
         if (gameEvent != null)
+        {
             _events.Add(gameEvent);
-        
-        Main.Logger.LogInfo($"Recorded game event: {gameEvent?.GetType().Name ?? null}");
+            Main.Logger.LogInfo($"Recorded game event: {gameEvent.GetType().Name}");
+        }
+        else
+        {
+            Main.Logger.LogWarning("Attempted to record an illegal game event.");
+        }
     }
 
     public void RecordTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
@@ -47,7 +51,7 @@ public class EventRecorder
     public static void ResetAll()
     {
         Instance = null!;
-        Main.Logger.LogInfo("Event reset");
+        Main.Logger.LogInfo("Event data has been reset.");
     }
 }
 

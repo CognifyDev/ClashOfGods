@@ -46,8 +46,9 @@ version: 1.0.0
 main: main.js
 # 插件的启动文件（插件系统将在 scripts 文件夹下查找该文件）
 
-modules: [ 'modules\myModule.zip' ]
+modules: [ 'modules\myModule.zip|MyModule' ]
 # 插件使用的外部模块（可以包含多项，同样可以使用半角逗号分隔，必须为 .zip 文件，插件系统将在 scripts 文件夹下查找该文件）
+# 每一个模块信息包含两部分：路径与名称，两部分需使用竖杠分隔
 ~~~
 
 注意：若插件系统识别时遇到问题，请自行搜寻学习 Yaml 的基础语法（如字符串）后再检查是否对特殊符号进行处理。

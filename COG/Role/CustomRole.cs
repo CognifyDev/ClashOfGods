@@ -239,6 +239,9 @@ public class CustomRole
 
     public LanguageConfig.TextHandler ActionNameContext { get; }
 
+    /// <summary>
+    ///     WARNING: Only local player performs this.
+    /// </summary>
     public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
     {
         if (button == null) return;
