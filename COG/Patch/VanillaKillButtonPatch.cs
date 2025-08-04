@@ -93,7 +93,7 @@ static class VanillaKillButtonPatch
             }
             else
             {
-                CmdExtraCheckMurder(PlayerControl.LocalPlayer, dead, extraMessage);
+                PlayerControl.LocalPlayer.CmdExtraCheckMurder(dead, extraMessage);
             }
 
             __instance.SetTarget(null);
@@ -110,17 +110,6 @@ static class VanillaKillButtonPatch
         }
 
         return false;
-
-        void CmdExtraCheckMurder(PlayerControl killer, PlayerControl target, string msg)
-        {
-            killer.isKilling = true;
-            GameEventPatch.ExtraMessage = msg;
-
-            if (AmongUsClient.Instance.AmLocalHost || AmongUsClient.Instance.AmModdedHost)
-                killer.CheckMurder(target);
-
-            RpcWriter.Start(RpcCalls.CheckMurder).WriteNetObject(target).Write(msg).Finish();
-        }
     }
 
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.SetHudActive), new Type[] { typeof(PlayerControl), typeof(RoleBehaviour), typeof(bool) })]

@@ -1,4 +1,5 @@
 ﻿using COG.Role.Impl.Crewmate;
+using COG.Role.Impl.Impostor;
 using COG.Utils;
 using System.Linq;
 

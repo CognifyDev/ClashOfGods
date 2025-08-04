@@ -34,7 +34,6 @@ public class Sheriff : CustomRole, IListener
             }
             else
             {
-                DeadPlayer.Create(DateTime.Now, CustomDeathReason.Misfire, localData, localData); // Override DeadPlayer instance in advance
                 DefaultKillButtonSetting.ExtraRpcMessage = $"{MisfireMurderMessage}{current.PlayerId}";
                 return PlayerControl.LocalPlayer;
             }

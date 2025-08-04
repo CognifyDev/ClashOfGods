@@ -7,6 +7,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.Patch;
 using COG.Role;
 using COG.Role.Impl;
+using COG.Role.Impl.Impostor;
 using COG.Rpc;
 using COG.UI.Vanilla.KillButton;
 using Il2CppInterop.Runtime;
@@ -100,7 +101,6 @@ public static class PlayerUtils
     /// <param name="showAnimationToEverybody"></param>
     public static void KillWithoutDeadBody(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
-        DeadPlayer.Create(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
         target.Exiled();
 
         if (MeetingHud.Instance)
@@ -504,7 +504,6 @@ public static class PlayerUtils
     public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, CustomDeathReason reason,
         bool showCorpse = true)
     {
-        _ = DeadPlayer.Create(DateTime.Now, reason, target.Data, pc.Data);
         if (showCorpse)
             pc.MurderPlayer(target, GameUtils.DefaultFlag);
         else
@@ -514,15 +513,6 @@ public static class PlayerUtils
     public static bool CanKill(this PlayerControl pc)
     {
         return pc.GetMainRole().CanKill;
-    }
-
-    public static void RpcMurderAndModifyKillAnimation(this PlayerControl pc, PlayerControl target, PlayerControl toShowAsKiller, bool modifyDeathData)
-    {
-        if (modifyDeathData)
-            DeadPlayer.Create(DateTime.Now, CustomDeathReason.Default, target.Data, toShowAsKiller.Data);
-        pc.MurderPlayer(target, SucceededFlags);
-        RpcUtils.StartRpcImmediately(pc, KnownRpc.MurderAndModifyKillAnimation)
-            .WriteNetObject(target).WriteNetObject(toShowAsKiller).Write(modifyDeathData).Finish();
     }
 
     public static void DisplayPlayerInfoOnName(this PlayerControl player, bool onlyDisplayNameSuffix = false)
@@ -636,9 +626,19 @@ public static class PlayerUtils
 
     public static void DieWithoutAnimationAndBody(this PlayerControl player, CustomDeathReason reason)
     {
-        DeadPlayer.Create(DateTime.Now, reason, player.Data, null);
         EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, player.GetPlayerData(), reason);
         player.Exiled();
+    }
+
+    public static void CmdExtraCheckMurder(this PlayerControl killer, PlayerControl target, string msg)
+    {
+        killer.isKilling = true;
+        GameEventPatch.ExtraMessage = msg;
+
+        if (AmongUsClient.Instance.AmLocalHost || AmongUsClient.Instance.AmModdedHost)
+            killer.CheckMurder(target);
+
+        RpcWriter.Start(RpcCalls.CheckMurder).WriteNetObject(target).Write(msg).Finish();
     }
 }
 
@@ -650,79 +650,6 @@ public enum CustomDeathReason
     Exiled,
     Misfire,
     InteractionAfterRevival
-}
-
-[SuppressMessage("Performance", "CA1822:将成员标记为 static")]
-public class DeadPlayerListener : IListener
-{
-    [EventHandler(EventHandlerType.Postfix)]
-    private void OnMurderPlayer(PlayerMurderEvent @event)
-    {
-        var target = @event.Target;
-        var killer = @event.Player;
-        if (!(target.Data.IsDead && killer && target)) return;
-        if (DeadPlayer.IsMarkedAsDead(target)) return;
-
-        DeadPlayer.Create(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
-    }
-
-    [EventHandler(EventHandlerType.Prefix)]
-    private void OnPlayerLeft(AmongUsClientLeaveEvent @event)
-    {
-        var data = @event.ClientData;
-        if (!GameStates.InRealGame) return;
-        DeadPlayer.Create(DateTime.Now, CustomDeathReason.Disconnected, data.Character.Data, null);
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    private void OnPlayerExile(PlayerExileEndEvent @event)
-    {
-        var exiled = @event.ExileController.initData.networkedPlayer;
-        if (exiled == null || DeadPlayer.DeadPlayers.Any(p => p.PlayerId == exiled.PlayerId)) return;
-        DeadPlayer.Create(DateTime.Now, CustomDeathReason.Exiled, exiled, null);
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    private void OnAirshipPlayerExile(PlayerExileEndOnAirshipEvent @event)
-    {
-        OnPlayerExile(new PlayerExileEndEvent(@event.Player, @event.Controller));
-    }
-}
-
-// Use EventRecorder to replace one day
-public class DeadPlayer
-{
-    public static List<DeadPlayer> DeadPlayers { get; } = new();
-
-    private DeadPlayer(DateTime deadTime, CustomDeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer, bool forceAdd)
-    {
-        DeadTime = deadTime;
-        DeathReason = deathReason;
-        Data = playerInfo;
-        Killer = killer;
-        VictimRole = playerInfo.GetMainRole();
-        KillerRole = killer?.GetMainRole();
-        PlayerId = playerInfo.PlayerId;
-
-        if (!DeadPlayers.Any(d => d.PlayerId == PlayerId) || forceAdd)
-            DeadPlayers.Add(this);
-    }
-
-    public static DeadPlayer Create(DateTime deadTime, CustomDeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer, bool forceAdd = false)
-    {
-        return new(deadTime, deathReason, playerInfo, killer, forceAdd);
-    }
-
-    public DateTime DeadTime { get; private set; }
-    public CustomDeathReason? DeathReason { get; }
-    public NetworkedPlayerInfo Data { get; }
-    public NetworkedPlayerInfo? Killer { get; }
-    public CustomRole? VictimRole { get; private set; }
-    public CustomRole? KillerRole { get; private set; }
-    public byte PlayerId { get; }
-
-    public static bool IsMarkedAsDead(NetworkedPlayerInfo player) => DeadPlayers.Any(p => p.PlayerId == player.PlayerId);
-    public static bool IsMarkedAsDead(PlayerControl player) => IsMarkedAsDead(player.Data);
 }
 
 [Serializable]
@@ -798,5 +725,10 @@ public class CustomPlayerData
     public bool IsRole<T>() where T : CustomRole
     {
         return MainRole is T || SubRoles.Any(r => r is T);
+    }
+
+    public bool IsRole(CustomRole role)
+    {
+        return MainRole.Equals(role) || SubRoles.Any(r => r.Equals(role));
     }
 }

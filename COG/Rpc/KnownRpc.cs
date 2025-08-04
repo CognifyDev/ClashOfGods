@@ -6,7 +6,7 @@ public enum KnownRpc : uint
     HideDeadBody,
     UpdateOption,
     SetRole,
-    Feedback,
+    Feedback, // ?
     Revive,
     NotifySettingChange,
     Mark,
@@ -14,7 +14,6 @@ public enum KnownRpc : uint
     ClearSabotages,
     ShareWinners,
     KillWithoutDeadBody,
-    MurderAndModifyKillAnimation,
     ShareAbilityOrVentUseForInspector,
     SyncRoleGameData,
     GiveOneKill,

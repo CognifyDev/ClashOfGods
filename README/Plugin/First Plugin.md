@@ -57,7 +57,7 @@ modules: [ 'modules\myModule.zip|MyModule' ]
 > 除了项 `modules` `authors` ，其它项为必需。
 
 ### 关于 *main.js*
-一个插件必须包含2个函数，分别名为onEnable和onDisable。
+一个插件必须包含3个函数，分别为 `onLoad`，`onEnable` 与 `onDisable`。
 下面是一个例子：
 ~~~js
 function onLoad() {

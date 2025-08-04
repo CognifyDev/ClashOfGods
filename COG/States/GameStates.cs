@@ -44,7 +44,6 @@ public static class GameStates
                 Main.Logger.LogMessage("Player left game. Clearing in-game data...");
 
                 GameUtils.PlayerData.Clear();
-                DeadPlayer.DeadPlayers.Clear();
                 CustomRole.ClearKillButtonSettings();
             }
 

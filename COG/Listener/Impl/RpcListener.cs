@@ -2,6 +2,7 @@ using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
 using COG.Patch;
 using COG.Role;
+using COG.Role.Impl.Impostor;
 using COG.Rpc;
 using COG.States;
 using COG.UI.CustomOption;
@@ -111,19 +112,6 @@ public class RpcListener : IListener
                 break;
             }
 
-            case KnownRpc.MurderAndModifyKillAnimation:
-            {
-                var target = reader.ReadNetObject<PlayerControl>();
-                var toModify = reader.ReadNetObject<PlayerControl>();
-                var modifyDeathData = reader.ReadBoolean();
-
-                KillAnimationPatch.NextKillerToBeReplaced = toModify.Data;
-                if (modifyDeathData)
-                    DeadPlayer.Create(DateTime.Now, CustomDeathReason.Default, target.Data, toModify.Data);
-                @event.Player.MurderPlayer(target, PlayerUtils.SucceededFlags);
-                break;
-            }
-
             case KnownRpc.Revive:
             {
                 // ¥”Rpc÷–∂¡»ÎPlayerControl
@@ -172,7 +160,7 @@ public class RpcListener : IListener
                 }
                 catch
                 {
-                    Main.Logger.LogError($"Get invalid {nameof(roleId)} while synchronizing role data: {roleId}");
+                    Main.Logger.LogError($"Got invalid {nameof(roleId)} while synchronizing role data: {roleId}");
                     return;
                 }
 

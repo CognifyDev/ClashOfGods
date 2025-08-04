@@ -12,7 +12,6 @@ namespace COG.Utils.Coding.Debugging;
 public class InGameModDebugger : MonoBehaviour
 {
     public List<CustomRole> CustomRoles => CustomRoleManager.GetManager().GetRoles();
-    public List<DeadPlayer> DeadPlayers => DeadPlayer.DeadPlayers;
     public EventRecorder EventRecorder => EventRecorder.Instance;
 
     public static InGameModDebugger Instance { get; private set; }

@@ -1,6 +1,7 @@
 ﻿using COG.Game.Events.Impl;
 using COG.Game.Events.Impl.Handlers;
 using COG.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,7 +22,8 @@ public class EventRecorder
 
         _handlers.AddRange(new IEventHandler[]
         {
-            new PlayerDeathHandler()
+            new PlayerDeathHandler(),
+            new PlayerKillHandler()
         });
     }
 
@@ -85,18 +87,18 @@ public static class GameEventPatch // not use listener for flexibility in patchi
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
     [HarmonyPrefix]
-    static void MurderPlayerPrefixPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, ref PlayerKillGameEvent __state)
+    static void MurderPlayerPrefixPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, ref IGameEvent __state)
     {
-        EventRecorder.Instance.Record(__state = new PlayerKillGameEvent(__instance.GetPlayerData(), target.GetPlayerData()));
+        EventRecorder.Instance.Record(__state = EventRecorder.Instance.HandleTypeEvent(GameEventType.Kill, __instance.GetPlayerData(), target.GetPlayerData(), ExtraMessage!));
     }
 
     private static IGameEvent? _dieEvent = null;
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
     [HarmonyPostfix]
-    static void MurderPlayerPostfixPatch(PlayerKillGameEvent __state) // PlayerControl.Die is called before MurderPlayer is done
+    static void MurderPlayerPostfixPatch(IGameEvent __state) // PlayerControl.Die is called before MurderPlayer is done
     {
-        __state.RelatedDeathEvent = _dieEvent!;
+        ((PlayerKillGameEvent)__state).RelatedDeathEvent = _dieEvent!;
     }
 
     public static string? ExtraMessage { get; set; } = null;

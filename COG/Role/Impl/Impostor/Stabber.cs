@@ -10,9 +10,10 @@ namespace COG.Role.Impl.Impostor;
 
 public class Stabber : CustomRole
 {
-    private CustomButton DispatchButton { get; }
-    
-    private CustomOption MaxUseTime { get; }
+    public const string ModifyKillAnimMessage = "stabber_kill";
+
+    private CustomButton _dispatchButton;
+    private CustomOption _maxUseTime;
 
     private int _killedTimes;
 
@@ -25,18 +26,18 @@ public class Stabber : CustomRole
         CanVent = true;
         CanSabotage = true;
 
-        MaxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new IntOptionValueRule(1, 1, 15, 2));
+        _maxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new IntOptionValueRule(1, 1, 15, 2));
         
-        DispatchButton = CustomButton.Of(
+        _dispatchButton = CustomButton.Of(
             "stabber-dispatch",
             () =>
             {
-                _target!.RpcMurderAndModifyKillAnimation(_target!, PlayerControl.LocalPlayer, true);
-                _killedTimes ++;
+                _target!.CmdExtraCheckMurder(_target!, ModifyKillAnimMessage + PlayerControl.LocalPlayer.PlayerId);
+                _killedTimes++;
             },
-            () => DispatchButton?.ResetCooldown(),
+            () => _dispatchButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
-            () =>  _killedTimes < MaxUseTime.GetInt(),
+            () =>  _killedTimes < _maxUseTime.GetInt(),
             ResourceUtils.LoadSprite(ResourceConstant.DispatchButton)!,
             2,
             LanguageConfig.Instance.DispatchAction,
@@ -44,9 +45,9 @@ public class Stabber : CustomRole
             0
         );
 
-        DefaultKillButtonSetting.AddCustomCondition(() => _killedTimes >= MaxUseTime.GetInt());
+        DefaultKillButtonSetting.AddCustomCondition(() => _killedTimes >= _maxUseTime.GetInt());
         
-        AddButton(DispatchButton);
+        AddButton(_dispatchButton);
     }
 
     public override void ClearRoleGameData()
