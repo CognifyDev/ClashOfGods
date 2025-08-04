@@ -26,14 +26,14 @@ public class Reporter : CustomRole, IListener, IWinnable
 
     private readonly CustomOption _neededReportTimes;
     private static bool _isReporterReported = false;
-    private static Reporter _instance = null!;
+    private static Reporter _roleInstance = null!;
     
     public Reporter() : base(Color.gray, CampType.Neutral)
     {
         _neededReportTimes = CreateOption(() => LanguageConfig.Instance.ReporterNeededReportTimes,
             new IntOptionValueRule(1, 1, 14, 3));
 
-        _instance = this;
+        _roleInstance = this;
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -93,7 +93,7 @@ public class Reporter : CustomRole, IListener, IWinnable
             var icon = pva.PlayerIcon;
             icon.UpdateFromPlayerOutfit(new(), PlayerMaterial.MaskType.ComplexUI, false, false);
             icon.cosmetics.colorBlindText.text = string.Empty;
-            icon.cosmetics.nameText.text = _instance.Name;
+            icon.cosmetics.nameText.text = _roleInstance.Name;
 
             var anonymousColor = ColorUtils.AsColor("#8995a4");
             PlayerMaterial.SetColors(anonymousColor, icon.cosmetics.currentBodySprite.BodySprite);

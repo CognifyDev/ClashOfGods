@@ -19,7 +19,6 @@ using UnityEngine;
 
 namespace COG.Listener.Impl;
 
-[FixMe("Colorblind text is covered by name text")]
 public class GameListener : IListener
 {
     [EventHandler(EventHandlerType.Postfix)]

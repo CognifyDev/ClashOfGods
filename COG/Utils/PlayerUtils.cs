@@ -561,6 +561,9 @@ public static class PlayerUtils
 
         nameTextBuilder.Append(adtnalTextBuilder);
 
+        for (var i = 0; i <= nameTextBuilder.ToString().Count(c => c == '\n'); i++) // Loop 1 more time
+            nameTextBuilder.AppendLine(); // Ensure the colorblind text isnt covered by the name text
+
         nameText.text = nameTextBuilder.ToString();
 
         if (!onlyDisplayNameSuffix)

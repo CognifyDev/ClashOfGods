@@ -164,7 +164,7 @@ public class JsPluginManager : IPluginManager
         var descriptionsByPlugin = ResourceDescription.GetDescriptionsByPlugin(plugin);
         descriptionsByPlugin.ForEach(resourceDescription => _resources.Remove(resourceDescription));
         
-        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been loaded.");
+        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been unloaded.");
     }
 
     public IPlugin[] GetPlugins()
