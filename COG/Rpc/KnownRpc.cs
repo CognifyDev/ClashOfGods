@@ -24,5 +24,6 @@ public enum KnownRpc : uint
     NightmareCooldownCheck,
     SpyRevealClosestTarget,
     WitchUsesAntidote,
-    DieWithoutAnimationAndBody
+    DieWithoutAnimationAndBody,
+    SyncGameEvent
 }

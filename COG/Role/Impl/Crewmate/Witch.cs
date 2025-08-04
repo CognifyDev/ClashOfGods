@@ -10,7 +10,7 @@ using COG.Utils;
 namespace COG.Role.Impl.Crewmate;
 
 [HarmonyPatch]
-public class Witch : CustomRole
+public class Witch : CustomRole, IListener
 {
     private RpcHandler<byte> _antidoteHandler;
     private CustomOption _antidoteCooldown;
@@ -84,6 +84,11 @@ public class Witch : CustomRole
         _remainingUses = 1;
         _shouldDetectInteraction = false;
         _shouldDieWhenMeetingStarts = false;
+    }
+
+    public override IListener GetListener()
+    {
+        return this;
     }
 
 

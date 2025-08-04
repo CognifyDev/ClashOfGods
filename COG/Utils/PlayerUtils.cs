@@ -741,7 +741,7 @@ public class SerializablePlayerData
         SubRoleIds = subRoleIds;
     }
 
-    public CustomPlayerData AsPlayerData()
+    public CustomPlayerData ToPlayerData()
     {
         return new CustomPlayerData(GameData.Instance.GetPlayerById(PlayerId),
             CustomRoleManager.GetManager().GetRoleById(MainRoleId)!,

@@ -49,7 +49,7 @@ public class RoleAssignmentListener : IListener
                 var list = new List<CustomPlayerData>();
 
                 for (int i = 0; i < count; i++)
-                    list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<SerializablePlayerData>().AsPlayerData());
+                    list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<SerializablePlayerData>().ToPlayerData());
 
                 return (count, list.ToArray());
             }

@@ -1,4 +1,6 @@
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace COG.Utils;
@@ -22,5 +24,10 @@ public static class SerializationUtils
 #pragma warning disable
         return (T)formatter.Deserialize(stream);
 #pragma warning restore
+    }
+
+    public static T DeserializeToData<T>(this Il2CppStructArray<byte> data)
+    {
+        return DeserializeToData<T>(data);
     }
 }
