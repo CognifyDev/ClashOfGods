@@ -534,9 +534,6 @@ public static class PlayerUtils
         var mainRole = playerRole.MainRole;
         var nameText = player.cosmetics.nameText;
 
-        if (!onlyDisplayNameSuffix)
-            nameText.color = mainRole.Color;
-
         var nameTextBuilder = new StringBuilder();
         var subRoleNameBuilder = new StringBuilder();
 
@@ -575,6 +572,9 @@ public static class PlayerUtils
         nameTextBuilder.Append(adtnalTextBuilder);
 
         nameText.text = nameTextBuilder.ToString();
+
+        if (!onlyDisplayNameSuffix)
+            nameText.text = nameText.text.Color(mainRole.Color);
     }
 
     /// <summary>

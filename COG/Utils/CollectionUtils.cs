@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Il2CppGenericCollections = Il2CppSystem.Collections.Generic;
 
 namespace COG.Utils;
 
-public static class ListUtils
+public static class CollectionUtils
 {
     /// <summary>
     ///     打乱一个List
@@ -21,10 +22,10 @@ public static class ListUtils
 
     public static bool IsEmpty<T>(this List<T> list)
     {
-        return list is not { Count: > 0 };
+        return !list.Any();
     }
 
-    public static T GetOneAndDelete<T>(this List<T> list)
+    public static T Pop<T>(this List<T> list)
     {
         var obj = list[0];
         list.RemoveAt(0);
@@ -73,5 +74,10 @@ public static class ListUtils
         var toReturn = new Il2CppGenericCollections.List<T>();
         list.ForEach(toReturn.Add);
         return toReturn;
+    }
+
+    public static ReadOnlyCollection<T> AsReadonly<T>(this List<T> list)
+    {
+        return new ReadOnlyCollection<T>(list);
     }
 }

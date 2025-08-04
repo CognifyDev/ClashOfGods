@@ -92,9 +92,6 @@ internal class PlayerShapeShiftPatch
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Update))]
 internal class HostStartPatch
 {
-    public static float Timer = 600;
-    private static bool _update;
-
     public static void Prefix(GameStartManager __instance)
     {
         if (GlobalCustomOptionConstant.DebugMode.GetBool())
@@ -317,9 +314,18 @@ internal class PlayerControlAwakePatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckProtect))]
 static class PlayerCheckProtectPatch
 {
-    public static bool Prefix(PlayerControl __instance, PlayerControl target)
+    static bool Prefix(PlayerControl __instance, PlayerControl target)
     {
         __instance.RpcProtectPlayer(target, __instance.Data.DefaultOutfit.ColorId);
         return false; // always allow to protect
+    }
+}
+
+[HarmonyPatch(typeof(RoleManager), nameof(RoleManager.AssignRoleOnDeath))]
+static class GhostRoleAssignmentPatch
+{
+    static void Prefix(ref bool specialRolesAllowed)
+    {
+        specialRolesAllowed = false;
     }
 }

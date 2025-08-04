@@ -160,6 +160,7 @@ public partial class Main : BasePlugin
             new Doorman(),
             new Chief(),
             new Enchanter(),
+            new Witch(),
 
             // Impostor
             new Impostor(),

@@ -8,7 +8,6 @@ using COG.Listener.Event.Impl.VentImpl;
 using COG.Patch;
 using COG.Role;
 using COG.UI.CustomButton;
-using COG.UI.CustomGameObject.Arrow;
 using COG.UI.CustomGameObject.HudMessage;
 using COG.Utils;
 using COG.Utils.Coding;
@@ -20,6 +19,7 @@ using UnityEngine;
 
 namespace COG.Listener.Impl;
 
+[FixMe("Colorblind text is covered by name text")]
 public class GameListener : IListener
 {
     [EventHandler(EventHandlerType.Postfix)]
@@ -135,13 +135,13 @@ public class GameListener : IListener
         var crewCount = GetCount(PlayerUtils.AllCrewmates);
         var impCount = GetCount(PlayerUtils.AllImpostors);
         var neutralCount = GetCount(PlayerUtils.AllNeutrals);
-        
+
         if (!state.voteTie && exiled && (state.confirmImpostor || PlayerControl.LocalPlayer.Data.IsDead))
         {
             var role = exiled.GetMainRole();
             controller.completeString = role.HandleEjectText(state.networkedPlayer);
         }
-        
+
         controller.ImpostorText.text =
             LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(("crew", crewCount), ("neutral", neutralCount), ("imp", impCount));
         return;
@@ -156,13 +156,12 @@ public class GameListener : IListener
     private readonly List<Handler> _handlers = new();
 
     [EventHandler(EventHandlerType.Postfix)]
-    [FixMe("Once died, always show role info even if revived")]
     public void OnGameStart(GameStartEvent _)
     {
         Main.Logger.LogInfo("========Game Starts!========");
 
         GameStates.InRealGame = true;
-        
+
         Main.Logger.LogInfo("Registering game listeners...");
 
         if (!_handlers.IsEmpty())
@@ -170,7 +169,7 @@ public class GameListener : IListener
             ListenerManager.GetManager().UnRegisterHandlers(_handlers.ToArray());
             _handlers.Clear();
         }
-        
+
         CustomRoleManager.GetManager().GetRoles().Select(role => role.GetListener()).ForEach(
             listener => _handlers.AddRange(ListenerManager.GetManager().AsHandlers(listener)));
 
@@ -204,7 +203,7 @@ public class GameListener : IListener
 
         if (isImpostorRole)
             sb.Append($"<color=#FF1919FF>{TranslationController.Instance.GetString(StringNames.FakeTasks)}</color>\n");
-        
+
         return sb.ToString();
     }
 }
