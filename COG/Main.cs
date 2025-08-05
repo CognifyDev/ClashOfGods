@@ -16,7 +16,6 @@ using COG.Game.CustomWinner.Winnable;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Patch;
-using COG.Plugin.Impl;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
@@ -33,6 +32,7 @@ using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using COG.Config;
+using COG.Plugin.JavaScript;
 
 namespace COG;
 
