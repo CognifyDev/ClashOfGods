@@ -247,7 +247,7 @@ public class CustomWinnerListener : IListener
 
         string GetPlayerAliveStateChanges(CustomPlayerData player)
         {
-            var gameEvents = EventRecorder.Instance.GetEvents().Where(e => e.Player.Equals(player));
+            var gameEvents = EventRecorder.Instance.GetEvents().Where(e => player.Equals(e.Player));
             var sortedEvents = gameEvents.OrderBy(e => e.Time);
             var states = new List<string>();
 
