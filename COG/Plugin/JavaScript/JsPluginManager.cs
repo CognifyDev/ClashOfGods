@@ -18,7 +18,7 @@ public class JsPluginManager : IPluginManager
 
     public static JsPluginManager GetManager() => _manager ??= new JsPluginManager();
 
-    private readonly List<IPlugin> _plugins = new();
+    private readonly List<IPlugin> _plugins = [];
 
     private readonly Dictionary<ResourceDescription, byte[]> _resources = new();
     
