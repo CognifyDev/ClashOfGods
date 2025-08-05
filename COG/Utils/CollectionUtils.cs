@@ -33,24 +33,6 @@ public static class CollectionUtils
         list.RemoveAt(0);
         return obj;
     }
-
-    public static string AsString(this List<string> list, char start = '{', char end = '}', string separator = ",")
-    {
-        var stringBuilder = new StringBuilder(start);
-        for (var i = 0; i < list.Count; i++)
-        {
-            var text = list[i];
-
-            stringBuilder.Append(text);
-            if (i < list.Count - 1)
-            {
-                stringBuilder.Append(separator + " ");
-            }
-        }
-
-        stringBuilder.Append(end);
-        return stringBuilder.ToString();
-    }
     
     public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
     {

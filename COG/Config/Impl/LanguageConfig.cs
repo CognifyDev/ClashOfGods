@@ -126,9 +126,6 @@ public class LanguageConfig : ConfigBase
     public string UnloadModSuccessfulMessage { get; private set; } = null!;
     public string UnloadModInGameErrorMsg { get; private set; } = null!;
 
-    public string FixButtonSpriteName { get; private set; } = null!;
-    public string FixButtonSpriteErrorNotInGameMsg { get; private set; } = null!;
-
     // Update
     public string UpToDate { get; private set; } = null!;
     public string NonCheck { get; private set; } = null!;
@@ -229,9 +226,6 @@ public class LanguageConfig : ConfigBase
         UnloadModButtonName = GetString("option.main.unload-mod.name");
         UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
         UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
-
-        FixButtonSpriteName = GetString("option.main.fix-button-sprite.name");
-        FixButtonSpriteErrorNotInGameMsg = GetString("option.main.fix-button-sprite.error-not-in-game");
 
         UpToDate = GetString("main-menu.update.up-to-date");
         NonCheck = GetString("main-menu.update.check-failed");

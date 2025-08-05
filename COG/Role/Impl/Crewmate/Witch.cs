@@ -22,7 +22,7 @@ public class Witch : CustomRole, IListener
     private static bool _shouldDetectInteraction = false;
     private static bool _shouldDieWhenMeetingStarts = false;
 
-    public Witch() : base()
+    public Witch() : base(ColorUtils.AsColor("#773ba4"), CampType.Crewmate)
     {
         _antidoteHandler = new(KnownRpc.WitchUsesAntidote,
             playerId =>

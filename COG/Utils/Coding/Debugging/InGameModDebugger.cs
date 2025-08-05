@@ -32,5 +32,7 @@ public class InGameModDebugger : MonoBehaviour
     }
 
     public void ForceSetRole(string name) => ForceSetRole(PlayerControl.LocalPlayer.PlayerId, name);
+
+    public PlayerControl GetPlayer(byte id) => PlayerUtils.GetPlayerById(id);
 }
 #nullable restore

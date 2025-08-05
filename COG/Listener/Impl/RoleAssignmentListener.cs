@@ -228,7 +228,7 @@ public class RoleAssignmentListener : IListener
             sb.AppendLine($"""
                 {playerRole.Player.name}({playerRole.PlayerId}) 
                     => {playerRole.MainRole.GetNormalName()}  with sub role(s):
-                    {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).ToList().AsString()}
+                    {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).AsString()}
                 """);
 
         Main.Logger.LogWarning("Message below is for debugging, not for cheating!");
