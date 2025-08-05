@@ -1,31 +1,17 @@
-﻿using System;
+﻿using Reactor.Utilities;
+using System;
 using System.Collections;
-using COG.Rpc;
-using Reactor.Utilities;
 using UnityEngine;
-using Array = Il2CppSystem.Array;
 
 namespace COG.Utils;
 
 public static class TaskUtils
 {
-    public static void RunTask(Action action)
-    {
-        Coroutines.Start(Run());
-        return;
-
-        IEnumerator Run()
-        {
-            yield return new WaitForSeconds(0);
-            action();
-        }
-    }
-
     public static void RunTaskAfter(float seconds, Action action)
     {
         Coroutines.Start(Run());
         return;
-        
+
         IEnumerator Run()
         {
             yield return new WaitForSeconds(seconds);
