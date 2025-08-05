@@ -17,7 +17,7 @@ public static class ServerPatch
         regionInfos.Do(__instance.AddOrUpdateRegion);
     }
 
-    private static IRegionInfo CreateRegionInfo(string name, string ip, ushort port, bool isHttps = false)
+    private static IRegionInfo CreateRegionInfo(string ip, string name, ushort port, bool isHttps = false)
     {
         var serverIp = isHttps ? "https://" : "http://" + ip;
         var serverInfo = new ServerInfo(name, serverIp, port, false);
