@@ -19,7 +19,8 @@ public class LanguageConfig : ConfigBase
     private LanguageConfig() : base(
         "Language",
         DataDirectoryName + "/language.yml",
-        new ResourceFile("COG.Resources.InDLL.Config.language.yml")
+        new ResourceFile("COG.Resources.Configs.language.yml"),
+        replace: true // Still overwrite language file if mod version changes
     )
     {
         SetTranslations();
@@ -50,6 +51,9 @@ public class LanguageConfig : ConfigBase
     public string DebugMode { get; private set; } = null!;
     public string MaxSubRoleNumber { get; private set; } = null!;
     public string MaxNeutralNumber { get; private set; } = null!;
+
+    public string Yes { get; private set; } = null!;
+    public string No { get; private set; } = null!;
 
     // Crewmate
     public string VigilanteMinCrewmateNumber { get; private set; } = null!;
@@ -87,6 +91,7 @@ public class LanguageConfig : ConfigBase
     public string NoMoreDescription { get; private set; } = null!;
     public string RoleCode { get; private set; } = null!;
     public string MaxUseTime { get; private set; } = null!;
+    public string AbilityCooldown { get; private set; } = null!;
 
     public string QQ { get; private set; } = null!;
     public string Discord { get; private set; } = null!;
@@ -95,7 +100,7 @@ public class LanguageConfig : ConfigBase
     public string ImpostorCamp { get; private set; } = null!;
     public string NeutralCamp { get; private set; } = null!;
     public string CrewmateCamp { get; private set; } = null!;
-    public string AddonName { get; private set; } = null!;
+    public string SubRoleName { get; private set; } = null!;
 
     public string UnknownCampDescription { get; private set; } = null!;
     public string ImpostorCampDescription { get; private set; } = null!;
@@ -107,6 +112,8 @@ public class LanguageConfig : ConfigBase
     public string DispatchAction { get; private set; } = null!;
     public string RepairAction { get; private set; } = null!;
     public string StareAction { get; private set; } = null!;
+    public string ExamineAction { get; private set; } = null!;
+    public string BlockAction { get; private set; } = null!;
 
     public string ShowPlayersRolesMessage { get; private set; } = null!;
 
@@ -118,6 +125,9 @@ public class LanguageConfig : ConfigBase
     public string UnloadModButtonName { get; private set; } = null!;
     public string UnloadModSuccessfulMessage { get; private set; } = null!;
     public string UnloadModInGameErrorMsg { get; private set; } = null!;
+
+    public string FixButtonSpriteName { get; private set; } = null!;
+    public string FixButtonSpriteErrorNotInGameMsg { get; private set; } = null!;
 
     // Update
     public string UpToDate { get; private set; } = null!;
@@ -139,13 +149,16 @@ public class LanguageConfig : ConfigBase
     {
         MakePublicMessage = GetString("lobby.make-public-message");
 
+        Yes = GetString("mod-global.yes");
+        No = GetString("mod-global.no");
+
         GeneralHeaderTitle = LoadPreset = GetString("game-setting.general.title");
         LoadPreset = GetString("game-setting.general.load-preset");
         SavePreset = GetString("game-setting.general.save-preset");
         DebugMode = GetString("game-setting.general.debug-mode");
         MaxSubRoleNumber = GetString("game-setting.general.max-sub-role-number");
         MaxNeutralNumber = GetString("game-setting.general.max-neutral-number");
-        
+
         // Crewmate
         VigilanteMinCrewmateNumber = GetString("role.crewmate.vigilante.min-crewmate-number");
 
@@ -185,12 +198,13 @@ public class LanguageConfig : ConfigBase
         NoMoreDescription = GetString("role.global.no-details");
         RoleCode = GetString("role.global.role-code");
         MaxUseTime = GetString("role.global.max-use-time");
+        AbilityCooldown = GetString("role.global.ability-cooldown");
 
         UnknownCamp = GetString("camp.unknown.name");
         ImpostorCamp = GetString("camp.impostor.name");
         NeutralCamp = GetString("camp.neutral.name");
         CrewmateCamp = GetString("camp.crewmate.name");
-        AddonName = GetString("camp.addon");
+        SubRoleName = GetString("camp.sub-role");
 
         UnknownCampDescription = GetString("camp.unknown.description");
         ImpostorCampDescription = GetString("camp.impostor.description");
@@ -202,6 +216,8 @@ public class LanguageConfig : ConfigBase
         DispatchAction = GetString("action.dispatch");
         RepairAction = GetString("action.repair");
         StareAction = GetString("action.stare");
+        ExamineAction = GetString("action.examine");
+        BlockAction = GetString("action.block");
 
         ShowPlayersRolesMessage = GetString("game.end.summary-message");
 
@@ -213,6 +229,9 @@ public class LanguageConfig : ConfigBase
         UnloadModButtonName = GetString("option.main.unload-mod.name");
         UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
         UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
+
+        FixButtonSpriteName = GetString("option.main.fix-button-sprite.name");
+        FixButtonSpriteErrorNotInGameMsg = GetString("option.main.fix-button-sprite.error-not-in-game");
 
         UpToDate = GetString("main-menu.update.up-to-date");
         NonCheck = GetString("main-menu.update.check-failed");

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
@@ -7,6 +8,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using UnityEngine;
 
@@ -17,12 +19,18 @@ public class DeathBringer : CustomRole, IListener
 {
     private const string PlayerStaredAtTag = "staredAt_DeathBringer";
 
-    private readonly CustomButton _killButton, _stareButton;
+    private readonly CustomButton _stareButton;
 
     private readonly CustomOption _killCooldown, _neededPlayerNumber;
+
+    private readonly List<PlayerControl> _staredPlayers = new();
+
+    private PlayerControl? _target;
     
-    public DeathBringer() : base(new Color(112, 48, 160, 100), CampType.Neutral)
+    public DeathBringer() : base(ColorUtils.FromColor32(112, 48, 160, 255), CampType.Neutral)
     {
+        CanKill = true;
+
         _killCooldown = CreateOption(() => LanguageConfig.Instance.KillCooldown,
             new FloatOptionValueRule(1F, 1F, 60F, 30F, NumberSuffixes.Seconds));
         _neededPlayerNumber = CreateOption(() => LanguageConfig.Instance.DeathBringerNeededPlayerNumber,
@@ -32,43 +40,21 @@ public class DeathBringer : CustomRole, IListener
             "death-bringer-stare",
             () =>
             {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return;
-                target.RpcMark(PlayerStaredAtTag);
-                _killButton?.ResetCooldown();
+                _staredPlayers.Add(_target!);
+                PlayerControl.LocalPlayer.ResetKillCooldown();
             },
             () => _stareButton!.ResetCooldown(),
-            () => PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance),
+            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.StareButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.StareButton)!,
             3,
-            KeyCode.R,
             LanguageConfig.Instance.StareAction,
-            () => _killCooldown.GetFloat(),
+            _killCooldown.GetFloat,
             -1);
-        
-        _killButton = CustomButton.Of(
-            "death-bringer-kill",
-            () =>
-            {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return;
-                PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
-                _stareButton.ResetCooldown();
-            },
-            () => _killButton!.ResetCooldown(),
-            () => 
-                PlayerControl.LocalPlayer.GetClosestPlayer(true, GameUtils.GetGameOptions().KillDistance) &&
-            PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat(),
-            () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
-            2,
-            KeyCode.Q,
-            LanguageConfig.Instance.KillAction,
-            () => _killCooldown.GetFloat(),
-            -1);
-        
-        AddButton(_killButton);
+
+        DefaultKillButtonSetting.ForceShow = () => PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat();
+        DefaultKillButtonSetting.CustomCooldown = _killCooldown.GetFloat;
+
         AddButton(_stareButton);
     }
 
@@ -78,15 +64,16 @@ public class DeathBringer : CustomRole, IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerReport(PlayerReportDeadBodyEvent @event)
+    [OnlyLocalPlayerWithThisRoleInvokable]
+    public void OnHostCheckPlayerReport(PlayerReportDeadBodyEvent @event)
     {
-        var playersStaredAt = 
-            PlayerUtils.GetAllAlivePlayers().Where(player => player.HasMarkAs(PlayerStaredAtTag));
-        foreach (var target in playersStaredAt)
-        {
-            target.RpcMurderPlayer(target, true);
-            target.RemoveMark(PlayerStaredAtTag);
-        }
+        foreach (var target in _staredPlayers)
+            target.CmdCheckMurder(target);
+    }
+
+    public override void ClearRoleGameData()
+    {
+        _staredPlayers.Clear();
     }
 
     public override string GetNameInConfig()

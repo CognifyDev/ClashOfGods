@@ -33,7 +33,7 @@ public class GuessButton : TemplatedCustomGameObject
         GameObject.name = GuessButtonName;
         GameObject.transform.localPosition = LocalPosition;
         var renderer = GameObject.GetComponent<SpriteRenderer>();
-        renderer.sprite = ResourceUtils.LoadSprite(ResourcesConstant.GuessButton, 150F);
+        renderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.GuessButton, 150F);
         
         Buttons.Add(this);
     }
@@ -58,7 +58,7 @@ public class GuessButton : TemplatedCustomGameObject
             MeetingHud.playerStates.ToList().ForEach(x => x.gameObject.SetActive(false));
             
             var enabledRolesOnly = Guesser.EnabledRolesOnly.GetBool();
-            var canGuessSubRoles = Guesser.CanGuessSubRoles.GetBool();
+            var canGuessSubRoles = /*Guesser.CanGuessSubRoles.GetBool()*/false; // How about the SpeedBooster?
             var roles = enabledRolesOnly
                 ? GetCustomRolesFromPlayers()
                 : CustomRoleManager.GetManager().GetRoles().Where(role =>
@@ -122,12 +122,12 @@ public class GuessButton : TemplatedCustomGameObject
                     }
                     else
                     {
-                        PlayerControl.LocalPlayer.RpcKillPlayerCompletely(PlayerControl.LocalPlayer);
+                        PlayerControl.LocalPlayer.RpcKillWithoutDeadBody(PlayerControl.LocalPlayer);
                         Buttons.ForEach(guessButton => guessButton.Destroy());
                         Exit(guesserUI);
                     }
                     
-                    if (!Guesser.GuessContinuously.GetBool() || Guesser.GuessedTime >= Guesser.MaxGuessTime.GetFloat())
+                    if (!Guesser.GuessContinuously.GetBool() || Guesser.GuessedTime >= Guesser.MaxGuessTime.GetInt())
                     {
                         Buttons.ForEach(guessButton => guessButton.Destroy());
                         Buttons.Clear();
@@ -151,13 +151,13 @@ public class GuessButton : TemplatedCustomGameObject
         }
 
         var target = _target!;
-        PlayerControl.LocalPlayer.RpcKillPlayerCompletely(target);
+        PlayerControl.LocalPlayer.RpcKillWithoutDeadBody(target);
         Guesser.GuessedTime ++;
     }
 
     private CustomRole[] GetCustomRolesFromPlayers()
     {
-        var canGuessSubRoles = Guesser.CanGuessSubRoles.GetBool();
+        var canGuessSubRoles = /*Guesser.CanGuessSubRoles.GetBool()*/false;
         var players = PlayerUtils.GetAllPlayers();
 
         var customRoles = players.Select(player => player.GetMainRole()).ToList();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,13 @@ using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
+using COG.Game.Events;
+using COG.Game.Events.Impl;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Rpc;
-using COG.States;
 using COG.Utils;
 using TMPro;
 using UnityEngine;
@@ -20,9 +22,25 @@ namespace COG.Listener.Impl;
 
 public class CustomWinnerListener : IListener
 {
-    private bool _ending;
-    
+    private bool _isEnding;
+    private readonly RpcHandler<byte[]> _winnerDataHandler;
+
     private static readonly int Color1 = Shader.PropertyToID("_Color");
+
+    public CustomWinnerListener()
+    {
+        _winnerDataHandler = new(KnownRpc.ShareWinners, 
+            d =>
+            {
+                CustomWinnerManager.GetManager().WinnableData = new WinnableData();
+                CustomWinnerManager.GetManager().WinnableData = d.ToArray().DeserializeToData<SerializableWinnableData>().ToWinnableData();
+
+                UpdateWinners();
+            }, 
+            (w, r) => w.WriteBytesAndSize(r), r => r.ReadBytesAndSize());
+
+        IRpcHandler.Register(_winnerDataHandler);
+    }
     
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent _)
@@ -34,18 +52,41 @@ public class CustomWinnerListener : IListener
     [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
     public bool OnCheckGameEnd(GameCheckEndEvent _)
     {
-        if (_ending) return false;
-        if (GlobalCustomOptionConstant.DebugMode.GetBool() || !AmongUsClient.Instance.AmHost) return false;
-        var checkForGameEnd = CustomWinnerManager.GetManager().CheckForGameEnd();
-        if (!checkForGameEnd.Winnable) return false;
-        _ending = true;
-        var data = CustomWinnerManager.GetManager().WinnableData;
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareWinners);
-        writer.WriteBytesAndSize(SerializableWinnableData.Of(data).SerializeToData());
-        writer.Finish();
-        TaskUtils.RunTaskAfter(1.5f, () =>
-            GameManager.Instance.RpcEndGame(checkForGameEnd.GameOverReason, false));
+        if (_isEnding) return false;
+        if (Input.GetKeyDown(KeyCode.F12))
+        {
+            var winnable = new WinnableData()
+            {
+                GameOverReason = (GameOverReason)int.MaxValue,
+            };
+            winnable.WinnablePlayers.AddRange(PlayerUtils.GetAllPlayers().Select(p => p.Data));
+            PrepareForEndGame(winnable);
+
+            return false;
+        }
+        if (GlobalCustomOptionConstant.DebugMode.GetBool() || !AmongUsClient.Instance.AmHost || AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay) return false;
+        
+        var winnableData = CustomWinnerManager.GetManager().CheckForGameEnd();
+        if (!winnableData.Winnable) return false;
+
+        PrepareForEndGame(winnableData);
+        
         return false;
+
+        void PrepareForEndGame(WinnableData data)
+        {
+            _isEnding = true;
+
+            RpcSendWinnableData(CustomWinnerManager.GetManager().WinnableData);
+
+            TaskUtils.RunTaskAfter(0.5f, () =>
+                GameManager.Instance.RpcEndGame(data.GameOverReason, false)); // Ensure each client has received & processed winnable data
+        }
+
+        void RpcSendWinnableData(WinnableData data)
+        {
+            _winnerDataHandler.Send(SerializableWinnableData.Of(data).SerializeToData()); // Just send, no performing
+        }
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -64,19 +105,6 @@ public class CustomWinnerListener : IListener
     }
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnRpcReceived(PlayerHandleRpcEvent @event)
-    {
-        if (!GameStates.InRealGame) return;
-        if (@event.CallId != (byte)KnownRpc.ShareWinners) return;
-        
-        CustomWinnerManager.GetManager().WinnableData = new WinnableData();
-        CustomWinnerManager.GetManager().WinnableData = @event.Reader.ReadBytesAndSize().ToArray()
-            .DeserializeToData<SerializableWinnableData>().ToWinnableData();
-            
-        UpdateWinners();
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
     public void OnGameEndSetEverythingUp(GameSetEverythingUpEvent @event)
     {
         var manager = @event.Object;
@@ -85,7 +113,7 @@ public class CustomWinnerListener : IListener
         SetUpRoleSummary(manager);
         
         GameStates.InRealGame = false;
-        _ending = false;
+        _isEnding = false;
     }
 
     private static void SetUpWinnerPlayers(EndGameManager manager)
@@ -98,7 +126,7 @@ public class CustomWinnerListener : IListener
 
         var winners = CustomWinnerManager.GetManager().WinnableData.WinnablePlayers.Select(info 
             => new CachedPlayerData(info)).ToList();
-        Main.Logger.LogDebug($"Winners number => {winners.Count}");
+        Main.Logger.LogInfo($"Winners number => {winners.Count}");
 
         foreach (var winner in winners.ToArray().OrderBy(b => b.IsYou ? -1 : 0))
         {
@@ -107,7 +135,7 @@ public class CustomWinnerListener : IListener
             var winnerPoolable = Object.Instantiate(manager.PlayerPrefab, manager.transform);
             if (winner == null!) continue;
             
-            // Variable names optimizing by ChatGPT
+            // Variable names optimization by ChatGPT
             var offsetMultiplier = num % 2 == 0 ? -1 : 1;
             var indexOffset = (num + 1) / 2;
             var lerpFactor = indexOffset / ceiling;
@@ -141,7 +169,7 @@ public class CustomWinnerListener : IListener
             winnerPoolable.SetNameScale(new Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
 
             Main.Logger.LogDebug(
-                $"Set up winner message for {winner.PlayerName} at {manager.transform.position.ToString()}");
+                $"Set up winner message for {winner.PlayerName} at {manager.transform.position}");
 
             num++;
         }
@@ -179,11 +207,8 @@ public class CustomWinnerListener : IListener
         winText.transform.position = new Vector3(pos.x, pos.y - 0.5f, pos.z);
         winText.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
         winText.text = data.WinText ?? "";
-        if (data.WinColor != null)
-        {
-            winText.color = data.WinColor.Value;
-            manager.BackgroundBar.material.SetColor(Color1, data.WinColor.Value);
-        }
+        winText.color = data.WinColor;
+        manager.BackgroundBar.material.SetColor(Color1, data.WinColor);
     }
 
     private static void SetUpRoleSummary(EndGameManager manager)
@@ -201,18 +226,68 @@ public class CustomWinnerListener : IListener
 
         var summary = new StringBuilder($"{LanguageConfig.Instance.ShowPlayersRolesMessage}\n");
         summary.Append(Environment.NewLine);
-        foreach (var role in GameUtils.PlayerData)
+
+        var handler = LanguageConfig.Instance.GetHandler("game.survival-data");
+
+        foreach (var player in GameUtils.PlayerData)
         {
-            var deadPlayer = DeadPlayer.DeadPlayers.FirstOrDefault(dp => dp.PlayerId == role.PlayerId);
-            summary.Append(role.PlayerName.PadRight(10)).Append(' ')
-                .Append(role.MainRole.Color.ToColorString(role.MainRole.Name));
-            summary.Append(' ').Append((deadPlayer == null ? Palette.AcceptedGreen : Palette.ImpostorRed).ToColorString(
-                deadPlayer == null ? LanguageConfig.Instance.Alive :
-                deadPlayer.DeathReason == null ? LanguageConfig.Instance.UnknownKillReason :
-                deadPlayer.DeathReason.GetLanguageDeathReason()));
+            summary.Append(player.PlayerName.PadRight(10)).Append(' ')
+                .Append(GetPlayerRoleChanges(player));
+
+            summary.Append(' ').Append(GetPlayerAliveStateChanges(player));
             summary.Append(Environment.NewLine);
         }
 
         roleSummary.text = summary.ToString();
+
+        string GetPlayerRoleChanges(CustomPlayerData player)
+        {
+            return player.MainRole.Color.ToColorString(player.MainRole.Name); // For future possible changes
+        }
+
+        string GetPlayerAliveStateChanges(CustomPlayerData player)
+        {
+            var gameEvents = EventRecorder.Instance.GetEvents().Where(e => e.Player.Equals(player));
+            var sortedEvents = gameEvents.OrderBy(e => e.Time);
+            var states = new List<string>();
+
+            foreach (var gameEvent in sortedEvents)
+            {
+                if (gameEvent is PlayerDisconnectGameEvent)
+                {
+                    states.Add(handler.GetString("disconnected").Color(Color.gray));
+                }
+                else if (gameEvent is PlayerExileGameEvent)
+                {
+                    states.Add(handler.GetString("exiled").Color(Palette.ImpostorRed));
+                }
+                else if (gameEvent is SheriffMisfireGameEvent)
+                {
+                    states.Add(handler.GetString("misfire").Color(Palette.ImpostorRed));
+                }
+                else if (gameEvent is PlayerReviveGameEvent)
+                {
+                    states.Add(handler.GetString("revival").Color(Palette.AcceptedGreen));
+                }
+                else if (gameEvent is WitchRevivedInteractionDieGameEvent)
+                {
+                    states.Add(handler.GetString("force-death").Color(Palette.ImpostorRed));
+                }
+                else if (gameEvent is PlayerDieGameEvent @event)
+                {
+                    var related = EventRecorder.Instance.GetEvents()
+                        .OfType<PlayerKillGameEvent>()
+                        .FirstOrDefault(e => e.Victim.Equals(player) && e.RelatedDeathEvent == @event);
+                    if (related != null)
+                    {
+                        states.Add(handler.GetString("default").Color(Palette.ImpostorRed));
+                    }
+                }
+            }
+
+            if (!states.Any()) states.Add(handler.GetString("alive").Color(Palette.AcceptedGreen));
+
+            return string.Join(" → ", states);
+        }
     }
 }

@@ -11,8 +11,6 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-// FIX: Ability button sprite still cant be displayed
-// The sprite has loaded correctly, but it cant be displayed
 public class Technician : CustomRole, IListener
 {
     public Technician() : base(Palette.Orange, CampType.Crewmate)
@@ -21,19 +19,17 @@ public class Technician : CustomRole, IListener
         CanKill = false;
         CanSabotage = false;
 
+        var repairRpcHandler = new RpcHandler(KnownRpc.ClearSabotages, RepairSabotages);
+        RegisterRpcHandler(repairRpcHandler);
+
         RepairButton = CustomButton.Of(
             "technician-repair",
-            () =>
-            {
-                RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ClearSabotages).Finish();
-                RepairSabotages();
-            },
+            repairRpcHandler.PerformAndSend,
             () => RepairButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency),
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.RepairButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.RepairButton)!,
             2,
-            KeyCode.R,
             LanguageConfig.Instance.RepairAction,
             () => 0f,
             2
@@ -45,12 +41,13 @@ public class Technician : CustomRole, IListener
     private CustomButton RepairButton { get; }
 
     [EventHandler(EventHandlerType.Postfix)]
+    [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnVentCheck(VentCheckEvent @event)
     {
         var data = @event.PlayerInfo;
         var player = data.Object;
         var vent = @event.Vent;
-        if (!IsLocalPlayerRole(player)) return;
+
         if (PlayerControl.LocalPlayer.AllTasksCompleted())
         {
             HudManager.Instance.ImpostorVentButton.Show();
@@ -84,13 +81,6 @@ public class Technician : CustomRole, IListener
             @event.SetCouldUse(false);
             @event.SetResult(float.MaxValue);
         }
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnRpcReceived(PlayerHandleRpcEvent @event)
-    {
-        if ((KnownRpc)@event.CallId == KnownRpc.ClearSabotages)
-            RepairSabotages();
     }
 
     private static void RepairSabotages()

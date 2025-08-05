@@ -7,17 +7,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using COG.UI.CustomButton;
+using COG.Config.Impl;
+using COG.UI.CustomOption;
+using COG.UI.CustomOption.ValueRules.Impl;
+using COG.Constant;
 
 namespace COG.Role.Impl.Crewmate;
 
-[NotTested]
-[NotUsed]
-[Todo("""
-    1. Optimize repeated target searching button
-    2. Add language strings
-    3. Add cooldown option
-    4. Add button sprite
-    """)]
 public class Inspector : CustomRole, IListener
 {
     private bool _abilityUsedThisRound = false;
@@ -25,14 +21,15 @@ public class Inspector : CustomRole, IListener
     private PlayerControl? _buttonTarget;
     private PlayerControl? _examinedTarget;
 
-    public string YesString { get; }
-    public string NoString { get; }
+    public CustomOption AbilityCooldownOption { get; }
     public CustomButton ExamineButton { get; }
 
-    public Inspector() : base(Color.gray, CampType.Crewmate)
+    public Inspector() : base(ColorUtils.FromColor32(46, 84, 160), CampType.Crewmate)
     {
-        OnRoleAbilityUsed += role => NotifyInspector();
+        OnRoleAbilityUsed += (role, _) => NotifyInspector();
 
+        AbilityCooldownOption = CreateOption(() => LanguageConfig.Instance.AbilityCooldown,
+            new FloatOptionValueRule(10, 5, 60, 25, NumberSuffixes.Seconds));
         ExamineButton = CustomButton.Of("inspector-examine",
             () =>
             {
@@ -46,41 +43,33 @@ public class Inspector : CustomRole, IListener
             },
             () =>
             {
-                if (_abilityUsedThisRound) return false;
-
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return false;
-
-                var localPlayer = PlayerControl.LocalPlayer;
-                var localLocation = localPlayer.GetTruePosition();
-                var targetLocation = target.GetTruePosition();
-                var distance = Vector2.Distance(localLocation, targetLocation);
-
-                return GameUtils.GetGameOptions().KillDistance >= distance;
+                if (_abilityUsedThisRound) 
+                    return false;
+                return PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _buttonTarget);
             },
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.ExamineButton)!,
             2,
-            KeyCode.X,
-            "EXAMINE",
-            () => 0,
+            LanguageConfig.Instance.ExamineAction,
+            AbilityCooldownOption.GetFloat,
             -1
-       );
+        );
+
+        AddButton(ExamineButton);
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerInvokable]
-    public void OnRpcReceived(PlayerHandleRpcEvent @event)
+    [OnlyLocalPlayerWithThisRoleInvokable]
+    public override void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
     {
-        if (@event.CallId is (byte)KnownRpc.ShareAbilityOrVentUseForInspector or (byte)RpcCalls.EnterVent)
-            _abilityUsedPlayers.Add(@event.Player);
+        if (callId is (byte)KnownRpc.ShareAbilityOrVentUseForInspector or (byte)RpcCalls.EnterVent)
+            _abilityUsedPlayers.Add(sender);
     }
 
     // The player of the role that vented/killed/used his ability performs this, so we gotta send RPC to notify
     public void NotifyInspector()
     {
         if (Players.Any() || IsLocalPlayerRole()) // If there are inspectors, send rpc; otherwise dont waste network traffic
-            RpcUtils.StartAndSendRpc(KnownRpc.ShareAbilityOrVentUseForInspector);
+            RpcWriter.StartAndSend(KnownRpc.ShareAbilityOrVentUseForInspector);
     }
 
     public override void ClearRoleGameData()
@@ -92,7 +81,7 @@ public class Inspector : CustomRole, IListener
     public override string HandleAdditionalPlayerName(PlayerControl player)
     {
         if (player.IsSamePlayer(_examinedTarget))
-            return $"({(_abilityUsedPlayers.Contains(player) ? YesString.Color(Palette.ImpostorRed) : NoString.Color(Palette.ImpostorRed))})";
+            return $"({(_abilityUsedPlayers.Contains(player) ? LanguageConfig.Instance.Yes.Color(Palette.ImpostorRed) : LanguageConfig.Instance.No.Color(Palette.AcceptedGreen))})";
         return base.HandleAdditionalPlayerName(player);
     }
 

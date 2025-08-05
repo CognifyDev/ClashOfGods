@@ -10,8 +10,8 @@ namespace COG.Game.CustomWinner.Data;
 public class WinnableData
 {
     public bool Winnable { get; set; }
-    public string? WinText { get; set; }
-    public Color? WinColor { get; set; }
+    public string WinText { get; set; } = "";
+    public Color WinColor { get; set; } = Color.white;
 
     public GameOverReason GameOverReason { get; set; } = GameOverReason.ImpostorsByKill;
 
@@ -33,7 +33,7 @@ public class WinnableData
 [Serializable]
 public class SerializableWinnableData
 {
-    private SerializableWinnableData(bool winnable, string? winText, float[] color,
+    private SerializableWinnableData(bool winnable, string winText, float[] color,
         int gameOverReason, byte[] winnablePlayers, int winnableCampType)
     {
         Winnable = winnable;
@@ -45,7 +45,7 @@ public class SerializableWinnableData
     }
 
     public bool Winnable { get; }
-    public string? WinText { get; }
+    public string WinText { get; }
     public float[] Color { get; }
     public int GameOverReason { get; }
     public byte[] WinnablePlayers { get; }
@@ -55,7 +55,7 @@ public class SerializableWinnableData
     {
         var color = data.WinColor;
         return new SerializableWinnableData(data.Winnable, data.WinText,
-            color == null ? Array.Empty<float>() : ColorToFloats((Color)color), (int)data.GameOverReason,
+            ColorToFloats(color), (int)data.GameOverReason,
             data.WinnablePlayers.Select(p => p.PlayerId).ToArray(), (int)data.WinnableCampType);
     }
 

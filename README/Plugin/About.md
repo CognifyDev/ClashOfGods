@@ -3,4 +3,4 @@
 
 #### 目录
 1. [第一个插件](First%20Plugin.md)
-2. [原生函数](Functions.md)
+2. [原生函数](Builtins.md)

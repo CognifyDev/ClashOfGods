@@ -1,8 +1,6 @@
 using AmongUs.GameOptions;
 using COG.Config.Impl;
-using COG.Constant;
 using COG.Listener;
-using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
@@ -13,54 +11,36 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Sheriff : CustomRole, IListener
 {
+    public const string MisfireMurderMessage = "sheriff_misfire";
+
     public Sheriff() : base(Color.yellow, CampType.Crewmate)
     {
+        CanKill = true;
+
         BaseRoleType = RoleTypes.Crewmate; 
         
         SheriffKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
                 new FloatOptionValueRule(10f, 5f, 60f, 30f, NumberSuffixes.Seconds));
 
-        SheriffKillButton = CustomButton.Of(
-            "sheriff-kill",
-            () =>
-            {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (!target) return;
+        DefaultKillButtonSetting.CustomCooldown = SheriffKillCd.GetFloat;
+        DefaultKillButtonSetting.SetBeforeMurder(button =>
+        {
+            var localData = PlayerControl.LocalPlayer.Data;
+            var current = button.currentTarget;
 
-                var localData = PlayerControl.LocalPlayer.Data;
-                if (target!.GetMainRole().CampType != CampType.Crewmate)
-                {
-                    PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
-                }
-                else
-                {
-                    _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Misfire, localData, localData);
-                    PlayerControl.LocalPlayer.RpcMurderPlayer(PlayerControl.LocalPlayer, true);
-                }
-            },
-            () => SheriffKillButton?.ResetCooldown(),
-            () =>
+            if (current!.GetMainRole().CampType != CampType.Crewmate)
             {
-                var target = PlayerControl.LocalPlayer.GetClosestPlayer();
-                if (target == null) return false;
-                var localPlayer = PlayerControl.LocalPlayer;
-                var localLocation = localPlayer.GetTruePosition();
-                var targetLocation = target.GetTruePosition();
-                var distance = Vector2.Distance(localLocation, targetLocation);
-                return GameUtils.GetGameOptions().KillDistance >= distance;
-            },
-            () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.GeneralKillButton)!,
-            2,
-            KeyCode.Q,
-            LanguageConfig.Instance.KillAction,
-            () => SheriffKillCd!.GetFloat(),
-            -1
-        );
+                return current;
+            }
+            else
+            {
+                DefaultKillButtonSetting.ExtraRpcMessage = $"{MisfireMurderMessage}{current.PlayerId}";
+                return PlayerControl.LocalPlayer;
+            }
+        });
 
-        AddButton(SheriffKillButton);
+        DefaultKillButtonSetting.AddAfterClick(() => DefaultKillButtonSetting.ExtraRpcMessage = null);
     }
 
     private CustomOption SheriffKillCd { get; }
-    private CustomButton SheriffKillButton { get; }
 }

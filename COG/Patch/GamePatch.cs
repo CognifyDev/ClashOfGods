@@ -76,8 +76,6 @@ internal class GameStartManagerStartPatch
 
     public static void Postfix(GameStartManager __instance)
     {
-        HostStartPatch.Timer = 600f;
-
         ListenerManager.GetManager()
             .ExecuteHandlers(new GameStartManagerStartEvent(__instance), EventHandlerType.Postfix);
     }

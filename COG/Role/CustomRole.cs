@@ -7,11 +7,15 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
+using COG.Game.Events;
+using COG.Game.Events.Impl;
 using COG.Listener;
+using COG.Rpc;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using UnityEngine;
 using Random = System.Random;
@@ -22,15 +26,50 @@ namespace COG.Role;
 
 #pragma warning disable CS0659
 
+/*
+ WARNING:
+  Most of the members in CustomRole and PlayerControl won't synchronize automatically,
+  so you probably gotta use RPC to synchronize them.
+ */
+
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class CustomRole
 {
-    private static int _order;
-    
-    public CustomRole(Color color, CampType campType, bool isSubRole = false, bool showInOptions = true)
+    private static int _order = 0;
+    private KillButtonSetting _currentKillButtonSetting;
+    private Stack<KillButtonSetting> _killButtonSettings = new();
+
+    /// <summary>
+    /// Initializes a sub-role instance.
+    /// </summary>
+    /// <param name="color"></param>
+    /// <param name="showInOptions"></param>
+    public CustomRole(Color color, bool showInOptions = true) : this(color, CampType.Unknown, true, showInOptions)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a main role instance.
+    /// </summary>
+    /// <param name="color"></param>
+    /// <param name="campType"></param>
+    /// <param name="showInOptions"></param>
+    public CustomRole(Color color, CampType campType, bool showInOptions = true) : this(color, campType, false, showInOptions)
+    {
+    }
+
+    /// <summary>
+    /// Initializes an impostor role instance.
+    /// </summary>
+    /// <param name="showInOptions"></param>
+    public CustomRole(bool showInOptions = true) : this(Palette.ImpostorRed, CampType.Impostor, showInOptions)
+    {
+    }
+
+    private CustomRole(Color color, CampType campType, bool isSubRole, bool showInOptions)
     {
         IsBaseRole = false;
         Color = color;
@@ -40,14 +79,23 @@ public class CustomRole
         CanVent = campType == CampType.Impostor;
         CanKill = campType == CampType.Impostor;
         CanSabotage = campType == CampType.Impostor;
-        Id = _order;
-        _order++;
+        Id = _order++;
         ShowInOptions = showInOptions;
-        AllOptions = new List<CustomOption>();
-        
+        AllOptions = new();
+
+        _currentKillButtonSetting = DefaultKillButtonSetting = new()
+        {
+            ForceShow = () => CanKill,
+            TargetOutlineColor = Color
+        };
+        DefaultKillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this, null!));
+
+        ResetCurrentKillButtonSetting();
+
         Name = GetContextFromLanguage("name");
         ShortDescription = GetContextFromLanguage("description");
-        
+        ActionNameContext = LanguageConfig.Instance.GetHandler("action");
+
         var vanillaType = CampType switch
         {
             CampType.Crewmate => RoleTeamTypes.Crewmate,
@@ -73,10 +121,11 @@ public class CustomRole
             // Actually name here is useless for new option
             RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage,
                 new IntOptionValueRule(0, 1, 15, 0));
-            RoleChanceOption = CreateOption(() => "Chance", new IntOptionValueRule(0, 10, 100, 0));
+            RoleChanceOption = CreateOption(() => "Chance", 
+                new IntOptionValueRule(0, 10, 100, 0));
             
             RoleCode = CreateOption(() => LanguageConfig.Instance.RoleCode, 
-                new StringOptionValueRule(0, _ => new[] {Id.ToString()}));
+                new StringOptionValueRule(0, _ => Id.ToString().ToSingleElementArray()));
         }
     }
 
@@ -97,7 +146,7 @@ public class CustomRole
     public Color Color { get; }
     
     /// <summary>
-    /// 角色的名称
+    ///     角色的名称
     /// </summary>
     public string Name { get; }
     
@@ -105,8 +154,7 @@ public class CustomRole
     {
         var campName = IsSubRole ? "sub-roles" : CampType.ToString().ToLower();
         var location = $"role.{campName}.{GetNameInConfig()}.{context}";
-        var toReturn = LanguageConfig.Instance.YamlReader!
-            .GetString(location);
+        var toReturn = LanguageConfig.Instance.YamlReader!.GetString(location);
         return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
     }
 
@@ -183,12 +231,22 @@ public class CustomRole
     {
         get
         {
-            if (RoleNumberOption != null) return RoleNumberOption!.GetInt() > 0;
+            if (RoleNumberOption != null) 
+                return RoleNumberOption!.GetInt() > 0;
             return false;
         }
     }
 
-    public static Action<CustomRole> OnRoleAbilityUsed { get; set; } = (_) => { };
+    public LanguageConfig.TextHandler ActionNameContext { get; }
+
+    /// <summary>
+    ///     WARNING: Only local player performs this.
+    /// </summary>
+    public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
+    {
+        if (button == null) return;
+        EventRecorder.Instance.Record(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
+    };
 
     public bool IsAvailable()
     {
@@ -226,10 +284,44 @@ public class CustomRole
         Role = VanillaRole
     };
 
+    public KillButtonSetting DefaultKillButtonSetting { get; }
+
+    /// <summary>
+    /// NOTE: Set to null to use previous setting.<para/>
+    /// PLEASE CAREFULLY CONSIDER WHETHER TO CLONE ONE OR TO JUST OVERRIDE!
+    /// </summary>
+    public KillButtonSetting CurrentKillButtonSetting
+    {
+        get => _currentKillButtonSetting;
+        set
+        {
+            if (value == null)
+            {
+                if (_killButtonSettings.Count > 0)
+                {
+                    _currentKillButtonSetting = _killButtonSettings.Pop();
+                }
+                else
+                {
+                    _currentKillButtonSetting = DefaultKillButtonSetting;
+                    _killButtonSettings.Push(DefaultKillButtonSetting);
+                }
+            }
+            else
+            {
+                _killButtonSettings.Push(_currentKillButtonSetting);
+                _currentKillButtonSetting = value;
+            }
+        }
+    }
+
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
     {
+        if (!ShowInOptions) return null!;
+
         var option = CustomOption.Of(GetTabType(this), nameGetter, rule).Register();
         AllOptions.Add(option);
+
         return option;
     }
 
@@ -248,7 +340,7 @@ public class CustomRole
         return PlayerControl.LocalPlayer.IsRole(this);
     }
 
-    protected CustomOption CreateOptionWithoutRegister(Func<string> nameGetter, IValueRule rule)
+    protected CustomOption CreateOptionWithoutRegisteration(Func<string> nameGetter, IValueRule rule)
     {
         return CustomOption.Of(GetTabType(this), nameGetter, rule);
     }
@@ -265,9 +357,9 @@ public class CustomRole
         hasButton ??= () => PlayerControl.LocalPlayer.IsRole(this);
         button.HasButton += hasButton;
         if (button.HasEffect)
-            button.OnEffect += () => OnRoleAbilityUsed(this);
+            button.OnEffect += () => OnRoleAbilityUsed(this, button);
         else
-            button.OnClick += () => OnRoleAbilityUsed(this);
+            button.OnClick += () => OnRoleAbilityUsed(this, button);
 
         CustomButtonManager.GetManager().RegisterCustomButton(button);
 
@@ -299,9 +391,42 @@ public class CustomRole
     {
     }
 
+    public virtual void OnRoleGameDataGettingSynchronized(MessageReader reader)
+    {
+    }
+
+    public virtual void OnRoleGameDataSynchronizing(RpcWriter writer)
+    {
+    }
+
+    public virtual void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
+    {
+    }
+
+    public void SyncRoleGameData()
+    {
+        var writer = RpcWriter.Start(KnownRpc.SyncRoleGameData).WritePacked(Id);
+        OnRoleGameDataSynchronizing(writer);
+        writer.Finish();
+    }
+
     public string GetColorName()
     {
         return Name.Color(Color);
+    }
+
+    public void RegisterRpcHandler(IRpcHandler handler) => IRpcHandler.Register(handler);
+
+    public void ResetCurrentKillButtonSetting() => CurrentKillButtonSetting = null!;
+
+    public static void ClearKillButtonSettings()
+    {
+        CustomRoleManager.GetManager().GetRoles().
+            ForEach(r =>
+            {
+                r._killButtonSettings.Clear();
+                r.ResetCurrentKillButtonSetting();
+            });
     }
 
     public static CustomOption.TabType GetTabType(CustomRole role)
@@ -328,7 +453,7 @@ public class CustomRole
 }
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-public sealed class OnlyLocalPlayerInvokableAttribute : Attribute
+public sealed class OnlyLocalPlayerWithThisRoleInvokableAttribute : Attribute
 {
 }
 

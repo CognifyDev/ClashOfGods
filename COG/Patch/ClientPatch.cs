@@ -38,15 +38,11 @@ public static class HideUselessButtons
     }
 }
 
-[HarmonyPatch(typeof(GameOptionsManager), nameof(GameOptionsManager.SwitchGameMode))]
-public static class NormalModeOnly
+[HarmonyPatch(typeof(MMOnlineManager), nameof(MMOnlineManager.Start))]
+static class LocalGamePatch
 {
-    public static void Postfix(GameOptionsManager __instance)
+    static void Postfix()
     {
-        if (AmongUsClient.Instance && AmongUsClient.Instance.AmHost && 
-            __instance.currentGameMode != GameModes.Normal)
-        {
-            __instance.SwitchGameMode(GameModes.Normal);
-        }
+        GameObject.Find("CreateHnSGameButton").SetActive(false);
     }
 }

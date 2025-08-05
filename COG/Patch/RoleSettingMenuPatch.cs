@@ -41,7 +41,7 @@ public static class RoleOptionPatch
     {
         if (CampTabs.Count != 0) return;
 
-        Main.Logger.LogDebug("======== Start to initialize custom role options... ========");
+        Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
 
         // Fix button is unselected when open at the first time
         Object.FindObjectOfType<GameSettingMenu>()?.RoleSettingsButton.SelectButton(true);
@@ -57,7 +57,7 @@ public static class RoleOptionPatch
 
         __instance.AllButton.gameObject.SetActive(false);
         
-        Main.Logger.LogDebug("Creating tabs...");
+        Main.Logger.LogInfo("Creating tabs...");
         
         var i = 0;
         foreach (var team in Enum.GetValues<CampType>())
@@ -82,7 +82,7 @@ public static class RoleOptionPatch
     [HarmonyPostfix]
     public static void OnTabChanged(RolesSettingsMenu __instance)
     {
-        Main.Logger.LogDebug($"{nameof(CurrentAdvancedTabFor)}: {CurrentAdvancedTabFor?.GetType().Name ?? "(null)"}");
+        Main.Logger.LogInfo($"{nameof(CurrentAdvancedTabFor)}: {CurrentAdvancedTabFor?.GetType().Name ?? "(null)"}");
         if (CurrentAdvancedTabFor == null) return;
 
         if (CurrentAdvancedTabFor.CampType == CampType.Neutral)
@@ -94,10 +94,10 @@ public static class RoleOptionPatch
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
         __instance.roleDescriptionText.text = CurrentAdvancedTabFor.GetLongDescription();
         var rolePreview = ResourceUtils.LoadSprite(
-            $"COG.Resources.InDLL.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png", 
+            $"COG.Resources.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png", 
             300);
-        __instance.roleScreenshot.sprite = rolePreview == null ?
-            ResourceUtils.LoadSprite(ResourcesConstant.DefaultRolePreview, 185) : rolePreview;
+        __instance.roleScreenshot.sprite = !rolePreview ?
+            ResourceUtils.LoadSprite(ResourceConstant.DefaultRolePreview, 185) : rolePreview;
         __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground").GetComponent<SpriteRenderer>().color =
             new Color(1, 1, 1, 1);
 
@@ -159,7 +159,7 @@ public static class RoleOptionPatch
             CampType.Crewmate => LanguageConfig.Instance.CrewmateCamp,
             CampType.Impostor => LanguageConfig.Instance.ImpostorCamp,
             CampType.Neutral => LanguageConfig.Instance.NeutralCamp,
-            _ => LanguageConfig.Instance.AddonName
+            _ => LanguageConfig.Instance.SubRoleName
         };
         header.Background.color = camp switch
         {
@@ -183,7 +183,7 @@ public static class RoleOptionPatch
         if (camp is CampType.Unknown or CampType.Neutral)
             header.Title.color = Color.white;
 
-        Main.Logger.LogDebug("Role header has created. Now set up role buttons...");
+        Main.Logger.LogDebug("Role header has been created. Now set up role buttons...");
 
         var initialX = RolesSettingsMenu.X_START_CHANCE;
         const float initialY = 0.14f;
@@ -221,7 +221,6 @@ public static class RoleOptionPatch
             passive.OnMouseOver = new UnityEvent();
             passive.OnClick = new Button.ButtonClickedEvent();
             
-
             if (role.RoleOptions.Count != 0)
             {
                 passive.OnMouseOut.AddListener((UnityAction)new Action(() => label.color = color));
@@ -287,7 +286,7 @@ public static class RoleOptionPatch
         Main.Logger.LogDebug("Button action has registered. Start to set button icon...");
 
         var renderer = button.transform.FindChild("RoleIcon").GetComponent<SpriteRenderer>();
-        const string settingImagePath = "COG.Resources.InDLL.Images.Settings";
+        const string settingImagePath = "COG.Resources.Images.Settings";
 
         renderer.sprite = ResourceUtils.LoadSprite(settingImagePath + "." + imageName + ".png", 35f);
         CampTabs.TryAdd(camp, (tab, button));
@@ -337,7 +336,7 @@ public static class RoleOptionPatch
         CurrentButton = button;
         CurrentTab = tabToOpen;
         SetButtonActive(button, true);
-        if (tabToOpen != null) 
+        if (tabToOpen) 
             tabToOpen.SetActive(true);
     }
 

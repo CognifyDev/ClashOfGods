@@ -10,8 +10,9 @@ namespace COG.Command.Impl;
 
 public class RpcCommand : CommandBase
 {
-    private RpcUtils.RpcWriter? _writer;
+    private RpcWriter? _writer;
     private byte _current;
+    private int _initialSize;
 
     public RpcCommand() : base("rpc")
     {
@@ -33,12 +34,7 @@ public class RpcCommand : CommandBase
                     if (int.TryParse(value, out var result))
                     {
                         _current = (byte)result;
-                        if (Enum.IsDefined((RpcCalls)result))
-                            _writer = RpcUtils.StartRpcImmediately(player, (RpcCalls)result);
-                        else if (Enum.IsDefined((KnownRpc)result))
-                            _writer = RpcUtils.StartRpcImmediately(player, (KnownRpc)result);
-                        else
-                            _writer = RpcUtils.StartRpcImmediately(player, (byte)result);
+                        _writer = player.StartRpcImmediately(_current);
                     }
                     else
                     {
@@ -49,6 +45,7 @@ public class RpcCommand : CommandBase
                         else
                             throw new NotSupportedException("The RPC you request to send is not supported.");
                     }
+                    _initialSize = _writer.GetWriters().First().Length;
 
                     GameUtils.SendSystemMessage("一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。");
                 }
@@ -57,11 +54,21 @@ public class RpcCommand : CommandBase
                 case "help":
                 {
                     StringBuilder sb = new();
-                    sb.Append("/rpc add %dataType% %context%\n")
-                        .Append("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player, vector\n")
-                        .Append(
-                            "例：\n /rpc add bool true\n /rpc add vector2 3 -1.2\n /rpc add player 3（玩家Id）\n /rpc add player 玩家名字\n /rpc add vector 1 -3\n")
-                        .Append("/rpc start %callId%\n/rpc send\n/rpc close");
+                    sb.AppendLine("/rpc add %dataType% %context%")
+                        .AppendLine("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player, vector")
+                        .AppendLine("""
+                        例：
+                        /rpc add bool true
+                        /rpc add vector2 3 -1.2
+                        /rpc add player 3（玩家Id）
+                        /rpc add player 玩家名字
+                        /rpc add vector 1 -3
+                        """)
+                        .Append("""
+                        /rpc start %callId%
+                        /rpc send
+                        /rpc close
+                        """);
                     GameUtils.SendSystemMessage(sb.ToString());
                 }
                     break;
@@ -97,7 +104,7 @@ public class RpcCommand : CommandBase
                             new[]
                             {
                                 typeof(string),
-                                assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer. */
+                                assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer */
                             });
                         if (method == null)
                             throw new NotSupportedException(
@@ -170,10 +177,14 @@ public class RpcCommand : CommandBase
                 {
                     if (_writer == null) throw new NullReferenceException("Writer is null.");
                     _writer.Finish();
+
+                    var deltaSize = _writer.GetWriters().First().Length - _initialSize;
+                    var reader = MessageReader.GetSized(deltaSize);
+
+                    Array.Copy(_writer.GetWriters().First().Buffer, _initialSize, reader.Buffer, 0, deltaSize);
+
                     _writer = null;
 
-                    var reader = new MessageReader();
-                    _writer!.GetWriters().First().Buffer.CopyTo(reader.Buffer, 0);
                     PlayerControl.LocalPlayer.HandleRpc(_current, reader);
 
                     GameUtils.SendSystemMessage("Rpc已发送！");

@@ -11,34 +11,34 @@ public class ConfigBase
 
     public static bool AutoReplace { get; set; } = false;
 
-    public ConfigBase(string name, string path, string text)
+    public ConfigBase(string name, string path, string text, bool replace = false)
     {
         Name = name;
         Path = path;
         Text = text;
         Configs.Add(this);
 
-        LoadConfigs();
+        LoadConfigs(replace);
     }
 
-    protected ConfigBase(string name, string path, ResourceFile resourceFile)
+    protected ConfigBase(string name, string path, ResourceFile resourceFile, bool replace = false)
     {
         Name = name;
         Path = path;
         Text = resourceFile.GetResourcesText();
         Configs.Add(this);
 
-        LoadConfigs();
+        LoadConfigs(replace);
     }
 
-    public ConfigBase(string name, string path)
+    public ConfigBase(string name, string path, bool replace = false)
     {
         Name = name;
         Path = path;
         Text = "";
         Configs.Add(this);
 
-        LoadConfigs();
+        LoadConfigs(replace);
     }
 
     public static List<ConfigBase> Configs { get; } = new();
@@ -51,10 +51,13 @@ public class ConfigBase
     {
         if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
 
+        if (File.Exists(Path) && (replace || AutoReplace))
+            File.Copy(Path, Path + ".old", true); // Backup
+
         if (!File.Exists(Path) || replace || AutoReplace)
             File.WriteAllText(Path, Text, Encoding.UTF8); // Auto overwrite
         else
-            Text = File.ReadAllText(Path, Encoding.UTF8); // Replace from disk
+            Text = File.ReadAllText(Path, Encoding.UTF8); // Replace variable from disk
 
         YamlReader = Yaml.LoadFromString(Text);
         AutoReplace = false;

@@ -25,14 +25,26 @@ public class PlayerListener : IListener
             yield return new WaitForSeconds(0.8f);
             if (!target.IsSamePlayer(PlayerControl.LocalPlayer))
             {
-                try
+                const int maxAttempts = 3;
+                for (var i = 0; i < maxAttempts; i++)
                 {
-                    CustomOption.ShareConfigs(target);
-                }
-                // DANGER: some exceptions may be ignored
-                catch (NullReferenceException)
-                {
-                    // ignore
+                    var failed = false;
+                    try
+                    {
+                        CustomOption.ShareConfigs(target);
+                        break;
+                    }
+                    catch (SystemException ex)
+                    {
+                        Main.Logger.LogWarning($"Error while sending options: \n{ex.ToString()}\nWill retry after 0.5s... ({i + 1}/{maxAttempts})");
+                        failed = true;
+
+                        if (i >= maxAttempts - 1)
+                            Main.Logger.LogError("Failed to share options!");
+                    }
+
+                    if (failed && i < maxAttempts - 1)
+                        yield return new WaitForSeconds(0.5f);
                 }
             }
         }

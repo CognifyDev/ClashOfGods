@@ -15,20 +15,20 @@ public class Guesser : CustomRole, IListener
     public CustomOption MaxGuessTime { get; }
     public CustomOption GuessContinuously { get; }
     public CustomOption EnabledRolesOnly { get; }
-    public CustomOption CanGuessSubRoles { get; }
+    //public CustomOption CanGuessSubRoles { get; }
 
     public int GuessedTime { get; internal set; }
     
-    public Guesser() : base(new Color(192, 0, 0, 100), CampType.Unknown, true)
+    public Guesser() : base(ColorUtils.FromColor32(192, 0, 0, 100))
     {
         MaxGuessTime = CreateOption(() => LanguageConfig.Instance.GuesserMaxGuessTime,
-            new FloatOptionValueRule(1F, 1F, 15F, 3F));
+            new IntOptionValueRule(1, 1, 15, 3));
         GuessContinuously = CreateOption(() => LanguageConfig.Instance.GuesserGuessContinuously, 
             new BoolOptionValueRule(true));
         EnabledRolesOnly = CreateOption(() => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
             new BoolOptionValueRule(false));
-        CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
-            new BoolOptionValueRule(false));
+        /*CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
+            new BoolOptionValueRule(false));*/
     }
     
     [EventHandler(EventHandlerType.Postfix)]
@@ -39,7 +39,7 @@ public class Guesser : CustomRole, IListener
         var meetingHud = @event.MeetingHud;
         var debugEnabled = GlobalCustomOptionConstant.DebugMode.GetBool();
         
-        if (GuessedTime >= MaxGuessTime.GetFloat())
+        if (GuessedTime >= MaxGuessTime.GetInt())
         {
             GuessButton.Buttons.ForEach(guessButton => guessButton.Destroy());
             GuessButton.Buttons.Clear();

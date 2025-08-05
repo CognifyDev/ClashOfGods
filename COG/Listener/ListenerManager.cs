@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using COG.Listener.Event;
 using COG.Role;
+using COG.States;
 using COG.Utils;
 
 namespace COG.Listener;
@@ -61,7 +62,8 @@ public class ListenerManager
     /// <param name="listener">the listener</param>
     public void RegisterListenerIfNotExists(IListener listener)
     {
-        if (GetHandlers(listener).ToList().IsEmpty()) RegisterListener(listener);
+        if (GetHandlers(listener).ToList().IsEmpty()) 
+            RegisterListener(listener);
     }
 
     /// <summary>
@@ -125,10 +127,14 @@ public class ListenerManager
             if (!type.Equals(handler.EventHandlerType) ||
                 !handler.EventType.IsInstanceOfType(@event)) continue;
 
-            var attr = handler.Method.GetCustomAttribute<OnlyLocalPlayerInvokableAttribute>();
-            if (attr != null && handler.Listener is CustomRole role)
+            var onlyLocal = handler.Method.GetCustomAttribute<OnlyLocalPlayerWithThisRoleInvokableAttribute>();
+            if (onlyLocal != null && handler.Listener is CustomRole role)
                 if (!role.IsLocalPlayerRole())
                     continue;
+
+            var onlyInRealGame = handler.Method.GetCustomAttribute<OnlyInRealGameAttribute>();
+            if (onlyInRealGame != null && !GameStates.InRealGame)
+                continue;
 
             var returnType = handler.Method.ReturnType;
             var result = handler.Method.Invoke(handler.Listener, new object?[] { @event });

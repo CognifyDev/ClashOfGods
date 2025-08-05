@@ -5,6 +5,7 @@ using COG.Listener;
 using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace COG.Role.Impl.Impostor;
 
 public class Cleaner : CustomRole, IListener
 {
-    public Cleaner() : base(Palette.ImpostorRed, CampType.Impostor)
+    public Cleaner() : base()
     {
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;
@@ -26,17 +27,20 @@ public class Cleaner : CustomRole, IListener
             "cleaner-clean",
             () =>
             {
-                var body = PlayerUtils.GetClosestBody();
-                if (!body) return;
-                body!.RpcCleanDeadBody();
-                ButtonConstant.KillButton.ResetCooldown();
+                _body!.RpcHideDeadBody();
+                PlayerControl.LocalPlayer.ResetKillCooldown();
             },
             () => CleanBodyButton?.ResetCooldown(),
-            () => PlayerUtils.GetClosestBody() != null,
+            () =>
+            {
+                if (_body) _body!.ClearOutline(); // Clear outline of previous target
+                _body = PlayerUtils.GetClosestBody();
+                if (_body) _body!.SetOutline(Color);
+                return _body;
+            },
             () => true,
-            ResourceUtils.LoadSprite(ResourcesConstant.CleanDeadBodyButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.CleanDeadBodyButton)!,
             2,
-            KeyCode.C,
             LanguageConfig.Instance.CleanAction,
             () => CleanBodyCd.GetFloat(),
             0
@@ -47,6 +51,8 @@ public class Cleaner : CustomRole, IListener
 
     private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
+
+    private DeadBody? _body;
 
     public override IListener GetListener()
     {

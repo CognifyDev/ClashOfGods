@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
@@ -8,11 +9,11 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
-using GameStates = COG.States.GameStates;
 using Random = System.Random;
 
 namespace COG.Role.Impl.Neutral;
 
+[HarmonyPatch]
 public class Reporter : CustomRole, IListener, IWinnable
 {
     private readonly Dictionary<PlayerControl, uint> _reportersWhoReported = new();
@@ -20,38 +21,38 @@ public class Reporter : CustomRole, IListener, IWinnable
     public override void ClearRoleGameData()
     {
         _reportersWhoReported.Clear();
+        _isReporterReported = false;
     }
 
     private readonly CustomOption _neededReportTimes;
+    private static bool _isReporterReported = false;
+    private static Reporter _roleInstance = null!;
     
     public Reporter() : base(Color.gray, CampType.Neutral)
     {
         _neededReportTimes = CreateOption(() => LanguageConfig.Instance.ReporterNeededReportTimes,
-            new FloatOptionValueRule(1F, 1F, 14F, 3F));
+            new IntOptionValueRule(1, 1, 14, 3));
+
+        _roleInstance = this;
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnPlayerReport(PlayerReportDeadBodyEvent @event)
+    public bool OnHostCheckPlayerReport(PlayerReportDeadBodyEvent @event)
     {
         var player = @event.Player;
         var target = @event.Target;
         if (!player.IsRole(this)) return true;
 
-        if (target == null) return false;
-        
-        var allAlivePlayers = PlayerUtils.GetAllAlivePlayers();
-        var randomPlayer = allAlivePlayers[new Random().Next(0, allAlivePlayers.Count - 1)];
-        randomPlayer.ReportDeadBody(target);
+        if (target == null) return true;
+
+        _isReporterReported = true;
         
         if (_reportersWhoReported.TryGetValue(player, out var times))
-        {
             _reportersWhoReported[player] = ++times;
-        }
         else
-        {
             _reportersWhoReported.Add(player, 1);
-        }
-        return false;
+        
+        return true;
     }
 
     public override IListener GetListener()
@@ -65,7 +66,7 @@ public class Reporter : CustomRole, IListener, IWinnable
         
         foreach (var (target, times) in _reportersWhoReported)
         {
-            if (times < _neededReportTimes.GetFloat()) return;
+            if (times < _neededReportTimes.GetInt()) return;
             
             data.WinnableCampType = CampType; 
             data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(target);
@@ -78,5 +79,32 @@ public class Reporter : CustomRole, IListener, IWinnable
     public uint GetWeight()
     {
         return IWinnable.GetOrder(6);
+    }
+
+    [HarmonyPatch(typeof(MeetingIntroAnimation._CoRun_d__17), nameof(MeetingIntroAnimation._CoRun_d__17.MoveNext))]
+    [HarmonyPostfix]
+    static void MeetingIntroPatch(MeetingIntroAnimation._CoRun_d__17 __instance)
+    {
+        if (_isReporterReported)
+        {
+            var pva = __instance.__4__this.transform.FindChild("PlayerVoteArea(Clone)").GetComponent<PlayerVoteArea>();
+            pva.Background.sprite = ShipStatus.Instance.CosmeticsCache.GetNameplate("nameplate_NoPlate").Image;
+
+            var icon = pva.PlayerIcon;
+            icon.UpdateFromPlayerOutfit(new(), PlayerMaterial.MaskType.ComplexUI, false, false);
+            icon.cosmetics.colorBlindText.text = string.Empty;
+            icon.cosmetics.nameText.text = _roleInstance.Name;
+
+            var anonymousColor = ColorUtils.AsColor("#8995a4");
+            PlayerMaterial.SetColors(anonymousColor, icon.cosmetics.currentBodySprite.BodySprite);
+        }
+    }
+
+    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
+    [HarmonyPostfix]
+    static void MeetingUpdatePatch(MeetingHud __instance)
+    {
+        if (_isReporterReported)
+            __instance.playerStates.Do(pva => pva.Megaphone.gameObject.SetActive(false));
     }
 }

@@ -1,11 +1,16 @@
 using AmongUs.Data;
 using COG.Config.Impl;
+using COG.Game.Events;
 using COG.Listener;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Player;
+using COG.Patch;
 using COG.Role;
 using COG.Role.Impl;
+using COG.Role.Impl.Impostor;
 using COG.Rpc;
+using COG.UI.Vanilla.KillButton;
+using Il2CppInterop.Runtime;
 using InnerNet;
 using System;
 using System.Collections.Generic;
@@ -13,7 +18,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using GameStates = COG.States.GameStates;
 
 namespace COG.Utils;
 
@@ -26,18 +30,17 @@ public enum ColorType
 
 public static class PlayerUtils
 {
-    public static readonly int Outline = Shader.PropertyToID("_Outline");
-    public static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
-    public static PoolablePlayer? PoolablePlayerPrefab { get; set; }
+    public static PoolablePlayer PoolablePlayerPrefab
+            => Resources.FindObjectsOfTypeAll(Il2CppType.Of<PoolablePlayer>()).First().Cast<PoolablePlayer>();
 
-    public static IEnumerable<PlayerData> AllImpostors =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Impostor);
+    public static IEnumerable<CustomPlayerData> AllImpostors => GetPlayersByCamp(CampType.Impostor);
 
-    public static IEnumerable<PlayerData> AllCrewmates =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Crewmate);
+    public static IEnumerable<CustomPlayerData> AllCrewmates => GetPlayersByCamp(CampType.Crewmate);
 
-    public static IEnumerable<PlayerData> AllNeutrals =>
-        GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == CampType.Neutral);
+    public static IEnumerable<CustomPlayerData> AllNeutrals => GetPlayersByCamp(CampType.Neutral);
+
+    public static IEnumerable<CustomPlayerData> GetPlayersByCamp(CampType camp)
+        => GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == camp);
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家
@@ -47,7 +50,7 @@ public static class PlayerUtils
     /// <param name="closestDistance">限制距离</param>
     /// <returns>最近位置的玩家</returns>
     public static PlayerControl? GetClosestPlayer(this PlayerControl target, bool mustAlive = true,
-        float closestDistance = float.MaxValue)
+        float closestDistance = float.PositiveInfinity, bool includeImpostor = true)
     {
         var targetLocation = target.GetTruePosition();
         var players = mustAlive ? GetAllAlivePlayers() : GetAllPlayers();
@@ -56,7 +59,8 @@ public static class PlayerUtils
 
         foreach (var player in players)
         {
-            if (player == target) continue;
+            if (player.IsSamePlayer(target)) continue;
+            if (!includeImpostor && player.GetMainRole().CampType == CampType.Impostor) continue;
 
             var playerLocation = player.GetTruePosition();
             var distance = Vector2.Distance(targetLocation, playerLocation);
@@ -71,34 +75,17 @@ public static class PlayerUtils
 
     public const MurderResultFlags SucceededFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
 
-    public static void RpcAdvancedMurderPlayer(this PlayerControl killer, PlayerControl target)
-    {
-        if (target == null)
-        {
-            target = killer;
-        }
-
-        if (AmongUsClient.Instance.AmClient)
-        {
-            killer.MurderPlayer(target, SucceededFlags);
-        }
-        var messageWriter = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.None);
-        messageWriter.WriteNetObject(target);
-        messageWriter.Write((int)SucceededFlags);
-        AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
-    }
-
     /// <summary>
     /// 杀死一个玩家不留下鸡腿
     /// </summary>
     /// <param name="killer"></param>
     /// <param name="target"></param>
     /// <param name="showAnimationToEverybody"></param>
-    public static void RpcKillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
+    public static void RpcKillWithoutDeadBody(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
-        KillPlayerCompletely(killer, target, showAnimationToEverybody);
+        KillWithoutDeadBody(killer, target, showAnimationToEverybody);
 
-        var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillPlayerCompletely);
+        var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillWithoutDeadBody);
         rpc.WriteNetObject(killer);
         rpc.WriteNetObject(target);
         rpc.Write(showAnimationToEverybody);
@@ -112,9 +99,8 @@ public static class PlayerUtils
     /// <param name="killer"></param>
     /// <param name="target"></param>
     /// <param name="showAnimationToEverybody"></param>
-    public static void KillPlayerCompletely(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
+    public static void KillWithoutDeadBody(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
-        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
         target.Exiled();
 
         if (MeetingHud.Instance)
@@ -154,30 +140,33 @@ public static class PlayerUtils
         return GetAllPlayers().ToArray().Where(player => player.IsAlive()).ToList();
     }
 
-    public static bool IsSamePlayer(this NetworkedPlayerInfo info, NetworkedPlayerInfo target)
+    public static bool IsSamePlayer(this NetworkedPlayerInfo? info, NetworkedPlayerInfo? target)
     {
-        return IsSamePlayer(info.Object, target.Object);
+        if (!(info && target)) return false;
+        return info == target;
     }
 
     public static bool IsSamePlayer(this PlayerControl? player, PlayerControl? target)
     {
-        if (player == null || target == null) return false;
-        return player.PlayerId == target.PlayerId;
+        if (!(player && target)) return false;
+        return player!.Data.IsSamePlayer(target!.Data);
     }
 
     public static DeadBody? GetDeadBody(this PlayerControl target)
     {
-        var deadBodies = DeadBodyUtils.GetDeadBodies().Where(body =>
-            body.GetPlayer().IsSamePlayer(target)).ToList();
-        return deadBodies.Count > 0 ? deadBodies[0] : null;
+        return DeadBodyUtils.GetDeadBodies().FirstOrDefault(db => db.ParentId == target.PlayerId);
     }
 
-    public static PlayerData? GetPlayerData(this PlayerControl player)
+    [return: NotNullIfNotNull(nameof(player))]
+    public static CustomPlayerData? GetPlayerData(this PlayerControl? player)
     {
-        return player.Data.GetPlayerData();
+        if (!player)
+            return null;
+        return player!.Data.GetPlayerData();
     }
 
-    public static PlayerData? GetPlayerData(this NetworkedPlayerInfo player)
+    [return: NotNullIfNotNull(nameof(player))]
+    public static CustomPlayerData? GetPlayerData(this NetworkedPlayerInfo? player)
     {
         return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.Data.IsSamePlayer(player));
     }
@@ -297,7 +286,6 @@ public static class PlayerUtils
     /// <returns></returns>
     public static bool IsAlive(this PlayerControl player)
     {
-        if (GameStates.InLobby) return true;
         if (player == null) return false;
         return !player.Data.IsDead;
     }
@@ -312,7 +300,9 @@ public static class PlayerUtils
         if (!player) return false; // 在对局内只要是游戏正式开始时在游戏内的玩家，玩家的NetworkedPlayerInfo绝对不为空
 
         var targetRole = player.GetPlayerData();
-        return targetRole?.MainRole != null && (targetRole.MainRole.Id == role.Id || targetRole.SubRoles.Select(customRole => customRole.Id).Contains(role.Id));
+        if (targetRole == null) return false;
+
+        return targetRole.SubRoles.Concat(targetRole.MainRole.ToSingleElementArray()).Contains(role);
     }
 
     public static DeadBody? GetClosestBody(List<DeadBody>? unTargetAble = null)
@@ -324,7 +314,7 @@ public static class PlayerUtils
         var position = PlayerControl.LocalPlayer.GetTruePosition();
 
         foreach (var body in Object.FindObjectsOfType<DeadBody>()
-                     .Where(b => unTargetAble?.Contains(b) ?? true))
+                     .Where(b => b.gameObject.active && (unTargetAble?.Contains(b) ?? true)))
         {
             var vector = body.TruePosition - position;
             var magnitude = vector.magnitude;
@@ -411,13 +401,12 @@ public static class PlayerUtils
     /// <param name="color">颜色</param>
     public static void SetOutline(this PlayerControl pc, Color color)
     {
-        pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 1f);
-        pc.cosmetics.currentBodySprite.BodySprite.material.SetColor(OutlineColor, color);
+        pc.cosmetics.SetOutline(true, new(color));
     }
 
     public static void ClearOutline(this PlayerControl pc)
     {
-        pc.cosmetics.currentBodySprite.BodySprite.material.SetFloat(Outline, 0);
+        pc.cosmetics.SetOutline(false, new());
     }
 
     public static bool IsRole<T>(this PlayerControl pc) where T : CustomRole
@@ -451,15 +440,22 @@ public static class PlayerUtils
         if (!pc) return;
         if (role == null)
         {
-            Main.Logger.LogError("It shouldn't be possible but the role to set is null. Try check if you're using a generic SetCustomRole<T> method and setting a role which is not registered yet.");
+            Main.Logger.LogError("It shouldn't be possible but the role to set is null. Try checking if you're using a generic SetCustomRole<T> method and setting a role which is not registered yet.");
             return;
         }
 
         var playerRole = GameUtils.PlayerData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
-        if (playerRole is not null) GameUtils.PlayerData.Remove(playerRole);
+        if (playerRole is not null)
+        {
+            playerRole.MainRole.ClearRoleGameData();
+            playerRole.SubRoles.Do(r => r.ClearRoleGameData());
+            GameUtils.PlayerData.Remove(playerRole);
+        }
 
-        GameUtils.PlayerData.Add(new PlayerData(pc.Data, role, subRoles));
+        CustomRole.ClearKillButtonSettings();
+        GameUtils.PlayerData.Add(new CustomPlayerData(pc.Data, role, subRoles));
         RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+        VanillaKillButtonPatch.Initialize();
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
     }
@@ -508,7 +504,6 @@ public static class PlayerUtils
     public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, CustomDeathReason reason,
         bool showCorpse = true)
     {
-        _ = new DeadPlayer(DateTime.Now, reason, target.Data, pc.Data);
         if (showCorpse)
             pc.MurderPlayer(target, GameUtils.DefaultFlag);
         else
@@ -520,14 +515,7 @@ public static class PlayerUtils
         return pc.GetMainRole().CanKill;
     }
 
-    public static void RpcMurderAndModifyKillAnimation(this PlayerControl pc, PlayerControl target, PlayerControl toShowAsKiller)
-    {
-        pc.MurderPlayer(target, SucceededFlags);
-        RpcUtils.StartRpcImmediately(pc, KnownRpc.MurderAndModifyKillAnimation)
-            .WriteNetObject(target).WriteNetObject(toShowAsKiller).Finish();
-    }
-
-    public static void DisplayPlayerInfoOnName(this PlayerControl player)
+    public static void DisplayPlayerInfoOnName(this PlayerControl player, bool onlyDisplayNameSuffix = false)
     {
         var playerRole = player.GetPlayerData();
         if (playerRole is null || playerRole.MainRole is null) return;
@@ -535,30 +523,125 @@ public static class PlayerUtils
         var subRoles = playerRole.SubRoles;
         var mainRole = playerRole.MainRole;
         var nameText = player.cosmetics.nameText;
-        nameText.color = mainRole.Color;
 
         var nameTextBuilder = new StringBuilder();
         var subRoleNameBuilder = new StringBuilder();
 
-        if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
-            foreach (var role in subRoles)
-                subRoleNameBuilder.Append(' ').Append(role.GetColorName());
+        if (!onlyDisplayNameSuffix)
+        {
+            if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
+                foreach (var role in subRoles)
+                    subRoleNameBuilder.Append(' ').Append(role.GetColorName());
 
-        nameTextBuilder.Append(mainRole.Name)
-            .Append(subRoleNameBuilder)
-            .Append('\n').Append(player.Data.PlayerName);
+            nameTextBuilder.Append(mainRole.Name)
+                .Append(subRoleNameBuilder)
+                .Append('\n').Append(player.Data.PlayerName);
+        }
+        else
+        {
+            nameTextBuilder.Append(player.Data.PlayerName);
+        }
 
         var adtnalTextBuilder = new StringBuilder();
-        foreach (var (color, text) in subRoles.ToList()
+        if (!onlyDisplayNameSuffix)
+        {
+            foreach (var (color, text) in subRoles.ToList()
                      .Select(r => (
                          r.Color,
                          r.HandleAdditionalPlayerName(player)
                      )))
-            adtnalTextBuilder.Append(' ').Append(text.Color(color));
+                adtnalTextBuilder.Append(' ').Append(text.Color(color));
+        }
+        else
+        {
+            var data = PlayerControl.LocalPlayer.GetPlayerData()!;
+            foreach (var role in CustomRoleManager.GetManager().GetRoles())
+                adtnalTextBuilder.Append(role.HandleAdditionalPlayerName(player));
+        }
 
         nameTextBuilder.Append(adtnalTextBuilder);
 
-        nameText.text = nameTextBuilder + adtnalTextBuilder.ToString();
+        for (var i = 0; i <= nameTextBuilder.ToString().Count(c => c == '\n'); i++) // Loop 1 more time
+            nameTextBuilder.AppendLine(); // Ensure the colorblind text isnt covered by the name text
+
+        nameText.text = nameTextBuilder.ToString();
+
+        if (!onlyDisplayNameSuffix)
+            nameText.text = nameText.text.Color(mainRole.Color);
+    }
+
+    /// <summary>
+    /// 检查 <see cref="GetClosestPlayer(PlayerControl, bool, float)"/> 返回的玩家是否在游戏设置击杀距离内
+    /// </summary>
+    /// <param name="closestValidPlayer"></param>
+    /// <param name="mustAlive"></param>
+    /// <param name="closestDistance"></param>
+    /// <returns></returns>
+    public static bool CheckClosestTargetInKillDistance(this PlayerControl player, out PlayerControl? closestValidPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
+    {
+        if ((closestValidPlayer = player.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
+
+        var localLocation = player.GetTruePosition();
+        var targetLocation = closestValidPlayer.GetTruePosition();
+        var distance = Vector2.Distance(localLocation, targetLocation);
+        var valid = GameUtils.GetGameOptions().KillDistance >= distance;
+
+        if (!valid)
+            closestValidPlayer = null;
+
+        return valid;
+    }
+
+    public static void RpcSuicide(this PlayerControl player) => player.CmdCheckMurder(player);
+
+    public static void ResetKillCooldown(this PlayerControl player)
+    {
+        if (!player.AmOwner) return;
+
+        var cooldown = player.GetKillButtonSetting()?.CustomCooldown() ?? -1;
+        player.SetKillTimer(cooldown < 0
+                            ? GameManager.Instance.LogicOptions.GetKillCooldown()
+                            : cooldown);
+    }
+
+    public static KillButtonSetting? GetKillButtonSetting(this PlayerControl player)
+    {
+        if (!player.AmOwner) return null;
+
+        var killButton = HudManager.Instance.KillButton;
+
+        var settings = GetRoles(player).Select(r => r.CurrentKillButtonSetting);
+
+        killButton.ToggleVisible(settings.Any(r => r.ForceShow()) && VanillaKillButtonPatch.IsHudActive);
+
+        var activatedSettings = settings.Where(s => s.ForceShow());
+        if (activatedSettings.Count() == 0) return null;
+        return activatedSettings.First(); // there should be one settings active
+    }
+
+    public static CustomRole[] GetRoles(this PlayerControl player) => player.GetSubRoles().Concat(player.GetMainRole().ToSingleElementArray()).ToArray();
+
+    public static void RpcDie(this PlayerControl player, CustomDeathReason reason)
+    {
+        player.StartRpcImmediately(KnownRpc.DieWithoutAnimationAndBody).WritePacked((int)reason).Finish();
+        player.DieWithoutAnimationAndBody(reason);
+    }
+
+    public static void DieWithoutAnimationAndBody(this PlayerControl player, CustomDeathReason reason)
+    {
+        EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, player.GetPlayerData(), reason);
+        player.Exiled();
+    }
+
+    public static void CmdExtraCheckMurder(this PlayerControl killer, PlayerControl target, string msg)
+    {
+        killer.isKilling = true;
+        GameEventPatch.ExtraMessage = msg;
+
+        if (AmongUsClient.Instance.AmLocalHost || AmongUsClient.Instance.AmModdedHost)
+            killer.CheckMurder(target);
+
+        RpcWriter.Start(RpcCalls.CheckMurder).WriteNetObject(target).Write(msg).Finish();
     }
 }
 
@@ -568,74 +651,8 @@ public enum CustomDeathReason
     Disconnected,
     Default,
     Exiled,
-    Misfire
-}
-
-[SuppressMessage("Performance", "CA1822:将成员标记为 static")]
-public class DeadPlayerListener : IListener
-{
-    [EventHandler(EventHandlerType.Postfix)]
-    private void OnMurderPlayer(PlayerMurderEvent @event)
-    {
-        var target = @event.Target;
-        var killer = @event.Player;
-        if (!(target.Data.IsDead && killer && target)) return;
-        if (DeadPlayer.IsMarkedAsDead(target)) return;
-
-        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Default, target.Data, killer.Data);
-    }
-
-    [EventHandler(EventHandlerType.Prefix)]
-    private void OnPlayerLeft(AmongUsClientLeaveEvent @event)
-    {
-        var data = @event.ClientData;
-        if (!GameStates.InRealGame) return;
-        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Disconnected, data.Character.Data, null);
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    private void OnPlayerExile(PlayerExileEndEvent @event)
-    {
-        var exiled = @event.ExileController.initData.networkedPlayer;
-        if (exiled == null || DeadPlayer.DeadPlayers.Any(p => p.PlayerId == exiled.PlayerId)) return;
-        _ = new DeadPlayer(DateTime.Now, CustomDeathReason.Exiled, exiled, null);
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    private void OnAirshipPlayerExile(PlayerExileEndOnAirshipEvent @event)
-    {
-        OnPlayerExile(new PlayerExileEndEvent(@event.Player, @event.Controller));
-    }
-}
-
-public class DeadPlayer
-{
-    public static List<DeadPlayer> DeadPlayers { get; } = new();
-
-    public DeadPlayer(DateTime deadTime, CustomDeathReason? deathReason, NetworkedPlayerInfo playerInfo, NetworkedPlayerInfo? killer)
-    {
-        DeadTime = deadTime;
-        DeathReason = deathReason;
-        Data = playerInfo;
-        Killer = killer;
-        VictimRole = playerInfo.GetMainRole();
-        KillerRole = killer?.GetMainRole();
-        PlayerId = playerInfo.PlayerId;
-
-        if (!DeadPlayers.Any(d => d.PlayerId == PlayerId))
-            DeadPlayers.Add(this);
-    }
-
-    public DateTime DeadTime { get; private set; }
-    public CustomDeathReason? DeathReason { get; }
-    public NetworkedPlayerInfo Data { get; }
-    public NetworkedPlayerInfo? Killer { get; }
-    public CustomRole? VictimRole { get; private set; }
-    public CustomRole? KillerRole { get; private set; }
-    public byte PlayerId { get; }
-
-    public static bool IsMarkedAsDead(NetworkedPlayerInfo player) => DeadPlayers.Any(p => p.PlayerId == player.PlayerId);
-    public static bool IsMarkedAsDead(PlayerControl player) => IsMarkedAsDead(player.Data);
+    Misfire,
+    InteractionAfterRevival
 }
 
 [Serializable]
@@ -654,23 +671,23 @@ public class SerializablePlayerData
         SubRoleIds = subRoleIds;
     }
 
-    public PlayerData AsPlayerData()
+    public CustomPlayerData ToPlayerData()
     {
-        return new PlayerData(GameData.Instance.GetPlayerById(PlayerId),
+        return new CustomPlayerData(GameData.Instance.GetPlayerById(PlayerId),
             CustomRoleManager.GetManager().GetRoleById(MainRoleId)!,
             SubRoleIds.Select(id => CustomRoleManager.GetManager().GetRoleById(id)).ToArray()!);
     }
 
-    public static SerializablePlayerData Of(PlayerData playerData)
+    public static SerializablePlayerData Of(CustomPlayerData playerData)
     {
         return new SerializablePlayerData(playerData.PlayerId, playerData.MainRole.Id,
             playerData.SubRoles.Select(role => role.Id).ToArray());
     }
 }
 
-public class PlayerData
+public class CustomPlayerData
 {
-    public PlayerData(NetworkedPlayerInfo data, CustomRole role, CustomRole[]? subRoles = null)
+    public CustomPlayerData(NetworkedPlayerInfo data, CustomRole role, CustomRole[]? subRoles = null)
     {
         Player = data.Object;
         Data = data;
@@ -694,4 +711,27 @@ public class PlayerData
     public CustomRole[] SubRoles { get; }
 
     public List<string> Tags { get; }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || obj is not CustomPlayerData data)
+            return false;
+
+        return data.PlayerId == PlayerId;
+    }
+
+    public override int GetHashCode()
+    {
+        return PlayerId;
+    }
+
+    public bool IsRole<T>() where T : CustomRole
+    {
+        return MainRole is T || SubRoles.Any(r => r is T);
+    }
+
+    public bool IsRole(CustomRole role)
+    {
+        return MainRole.Equals(role) || SubRoles.Any(r => r.Equals(role));
+    }
 }

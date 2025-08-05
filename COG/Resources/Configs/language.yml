@@ -1,0 +1,230 @@
+lobby:
+  make-public-message: "禁止设置为公开"
+mod-global:
+  yes: "是"
+  no: "否"
+role:
+  unknown:
+    unknown:
+      name: "未知"
+      description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
+      long-description: "当你未被分配职业或者其他特殊情况，你会是这个职业"
+  global:
+    max-num: "最大职业数量"
+    allow-start-meeting: "允许启动会议"
+    allow-report-body: "允许报告尸体"
+    kill-cooldown: "击杀冷却时间"
+    ability-cooldown: "技能冷却时间"
+    no-details: "没有详细信息"
+    role-code: "职业特征码"
+    max-use-time: "最大使用次数"
+  impostor:
+    impostor:
+      name: "伪装者"
+      description: "击杀船员，造成破坏"
+      long-description: "只是内鬼而已"
+    cleaner:
+      name: "清洁工"
+      description: "清除作案痕迹"
+      long-description: "清洁工可以清理船员的尸体。清洁工可以击杀，但是击杀和清理共用冷却"
+      clean-cd: "清理尸体冷却"
+    stabber:
+      name: "暗刃杀手"
+      description: "不留破绽地行刺"
+      long-description: "拥有两次击杀不发生位移的机会"
+    reaper:
+      name: "收割者"
+      description: "通往终局的加速进程"
+      long-description: "初始冷却略微延长，场上每死亡一名玩家，冷却时间略微缩短"
+      time-to-reduce: "冷却减少时间"
+    troublemaker:
+      name: "扰乱者"
+      description: "制造混乱！"
+      long-description: "可以发动干扰，技能生效期间所有人无法进行任何交互。技能每轮只能使用一次。"
+      disturb-duration: "干扰持续时间"
+      disturb-cooldown: "干扰冷却时间"
+    nightmare:
+      name: "梦魇"
+      description: "将恐慌凝聚，然后于一瞬贯穿"
+      long-description: "在队友附近时可以获取击杀已冷却完毕队友的击杀次数，使队友进入击杀冷却，下次击杀可消耗存储的击杀次数而不进入冷却。最多额外存储2击杀次数。"
+      store-cooldown: "存储冷却时间"
+      stored-kills-info: "已存储击杀：%stored%/%max%"
+    spy:
+      name: "密探"
+      description: "刺探情报，分析对局"
+      long-description: "可以使用洞察，使用洞察或完成击杀后，所有内鬼得知离他们最近的非内鬼阵营玩家位置，持续3秒。"
+      observe-cooldown: "洞察冷却时间"
+      get-target-arrow-message-observe: "一位<color=#ff1919ff>密探</color>队友使用了洞察技能，您获得了指向最近非内鬼玩家的箭头！"
+      get-target-arrow-message-kill: "一位<color=#ff1919ff>密探</color>队友击杀了其他玩家，您获得了指向最近非内鬼玩家的箭头！"
+  crewmate:
+    crewmate:
+      name: "船员"
+      description: "找出伪装者，投出内鬼"
+      long-description: "只是船员罢了"
+    bait:
+      name: "诱饵"
+      description: "愿者上钩"
+      long-description: "被击杀时，凶手自动报告鸡腿"
+      killer-report-delay: "凶手自报延迟"
+      warn-killer: "闪光警告凶手"
+    sheriff:
+      name: "警长"
+      description: "任何邪恶，终将绳之以法"
+      long-description: "可执法淘汰内鬼阵营，中立第三方或中立杀手玩家，尝试执法船员阵营玩家会直接出局。"
+    vigilante:
+      name: "侠客"
+      description: "行侠仗义！"
+      long-description: "你拥有一次击杀机会，当船员数量小于等于设定值时你会额外获得一次击杀机会"
+      min-crewmate-number: "给予额外击杀机会的最小船员数量"
+    soul-hunter:
+      name: "灵魂猎手"
+      description: "从地狱归来，将邪恶一同带去"
+      long-description: "拥有一次无代价击杀。被击杀后指定秒在鸡腿处复活(如果鸡腿还存在的话)并获得一次执法机会，下轮会议召开时将立刻出局。"
+      revive-after: "复活秒数"
+    technician:
+      name: "技术员"
+      description: "解决飞船的一切疑难杂症"
+      long-description: "可以进行2次修复，立刻结束破坏或封锁。完成所有任务后可以使用通风口。"
+    inspector:
+      name: "巡查员"
+      description: "检查可疑人员！"
+      long-description: "可以检察一名玩家本轮是否使用过击杀/通风口/主动技能，如有其中任意一项则结果为“是”，否则为“否”，结果会标记在其名称右方。技能每轮只能对同一玩家使用一次。"
+    doorman:
+      name: "守门人"
+      description: "飞船的设施都为我所用"
+      long-description: "每轮可以选择一处门进行封锁，封锁后可获得此时其内部的人员组成信息。"
+      no-player: "无玩家"
+    chief:
+      name: "参谋长"
+      description: "力量归你，荣耀归我"
+      long-description: "可以分别给予其他玩家一次无代价击杀机会和一次一次性护盾。"
+    enchanter:
+      name: "咒术师"
+      description: "将痛楚施加于破坏契约者"
+      long-description: "可以对一名玩家施加契约，若该玩家在当轮内被常规击杀，击杀者将被定身数秒且当轮击杀冷却延长。技能每轮只能使用一次。"
+      immobilization-duration: "定身持续时间"
+      cooldown-increament: "击杀冷却延长时间"
+    witch:
+      name: "女巫"
+      description: "从死神手中赎回受害者"
+      long-description: "可以对尸体使用解药将其复活，被复活者进行任何交互后将会在下一轮会议召开时出局。完成所有任务后额外获得一次使用机会。"
+      antidote-cooldown: "解药冷却时间"
+  neutral:
+    jester:
+      name: "小丑"
+      description: "承受一切诋毁，然后放声大笑"
+      long-description: "被投票放逐直接获胜"
+    reporter:
+      name: "记者"
+      description: "抓住太空中的头牌新闻"
+      long-description: "记者不能启动会议，只能报告鸡腿，且不会向其他人显示报告者是自己，只提示会议是记者召开的。报告一定次数鸡腿后召开紧急会议且当轮会议上不被击杀或放逐则直接获胜。"
+      neededReportTimes: "需要报告次数"
+    death-bringer:
+      name: "死亡使者"
+      description: "悄无声息地带走时间已尽的人"
+      long-description: "无法进行常规击杀。每轮可以凝视一名玩家，该玩家将在下轮会议开始前出局。当场上人数少于等于指定人数时可以进行常规击杀。"
+      neededPlayerNumber: "所需的玩家数目"
+  sub-roles:
+    guesser:
+      name: "赌怪"
+      description: "生命就是豪赌"
+      long-description: "你可以在会议上猜测他人的职业，但如果猜测失败你将会自杀"
+      max-guess-time: "最大猜测次数"
+      guess-continuously: "连续赌注"
+      guess-enabled-roles-only: "仅能赌注启用职业"
+      can-guess-sub-roles: "启用赌注副职业"
+    speed-booster:
+      name: "敏捷"
+      description: "我是闪电侠！"
+      long-description: "移动速度提升"
+      increasing-speed: "增加速度"
+camp:
+  unknown:
+    name: "未知阵营"
+    description: "未知的阵营"
+  impostor:
+    name: "伪装者阵营"
+    description: "杀死船员"
+  neutral:
+    name: "中立阵营"
+    description: "掌握好权重"
+  crewmate:
+    name: "船员阵营"
+    description: "完成任务，找出内鬼"
+  sub-role: "附加职业"
+game-setting:
+  view-description:
+    general: "预览游戏大厅的常规设置。"
+    role: "预览游戏大厅的职业设置。"
+  general:
+    title: "COG设置"
+    load-preset: "加载预设"
+    save-preset: "保存预设"
+    debug-mode: "<color=#9AFF00>调试模式</color>"
+    max-sub-role-number: "最大副职业数量"
+    max-neutral-number: "最大中立数目"
+option:
+  main:
+    cog-options: "COG选项"
+    load-custom-lang: "加载自定义语言文件"
+    unload-mod:
+      name: "临时禁用模组"
+      success: "模组已成功被临时禁用！\n如果您仍想要继续游玩模组，请重启游戏"
+      error-in-game: "请先离开本局游戏再进行操作"
+    fix-button-sprite: 
+      name: "修复按钮图标"
+      error-not-in-game: "仅可在局内进行此操作"
+  hotkey:
+    name: "热键设置"
+    press-key-to-set: "请在%sec%秒内按下新热键"
+    button: "技能按钮 %index%"
+  enable: "<color=#5DB927>开启</color>"
+  disable: "<color=#F20D0D>关闭</color>"
+main-menu:
+  github: "Github"
+  qq: "QQ"
+  discord: "Discord"
+  update-button-string: "检查更新"
+  update:
+    up-to-date: "你已经更新到最新版本"
+    check-failed: "未能找到最新版本"
+    fetched: "搜索到最新版：%version%\r\n%description%\r\n是否安装？"
+action:
+  kill: "击杀"
+  clean: "清理"
+  dispatch: "处决"
+  repair: "修复"
+  stare: "凝视"
+  examine: "检察"
+  block: "封锁"
+  give-kill: "给予击杀机会"
+  give-shield: "给予护盾"
+  contract: "契约"
+  disturb: "干扰"
+  store-kill: "存储击杀"
+  observe: "洞察"
+  antidote: "解药"
+game:
+  end:
+    summary-message: "玩家职业:"
+    winners:
+      impostor: "伪装者胜利"
+      crewmate: "船员胜利"
+      neutral: "%player% 胜利"
+  survival-data:
+    alive: "存活"
+    disconnected: "断连"
+    default: "死亡"
+    exiled: "驱逐"
+    misfire: "走火"
+    revival: "复活"
+    force-death: "强制死亡"
+    unknown: "未知"
+  exile:
+    default: "%player% 是 %role%。"
+    # %crew% - 船员数目
+    # %neutral% - 中立数目
+    # %imp% - 内鬼数目
+    alive-player-info: "剩余 %imp% 个内鬼"
+  chat:
+    system-message: "<b>【系统消息】</b>\0"

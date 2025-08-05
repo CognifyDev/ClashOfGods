@@ -1,5 +1,6 @@
 using COG.Config.Impl;
 using COG.Utils;
+using COG.Utils.Coding.Debugging;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
 using System;
@@ -14,7 +15,7 @@ namespace COG.Patch;
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuPatch
 {
-    public static GameObject? CustomBG;
+    public static GameObject? CustomBanner;
     public static readonly List<PassiveButton> Buttons = new();
     public static bool PopupCreated;
 
@@ -58,6 +59,13 @@ public static class MainMenuPatch
         //            ModUpdater.DoUpdate();
         //            Application.Quit();
         //        }, Color.yellow);
+
+        if (!InGameModDebugger.Instance)
+            new GameObject().AddComponent<InGameModDebugger>();
+
+        __instance.createGameScreen.modeButtons[0].SelectButton(true);
+        __instance.createGameScreen.modeButtons[1].SelectButton(false);
+        __instance.createGameScreen.modeButtons[1].gameObject.SetActive(false); // Hide HnS button & select classic button
     }
 
     /// <summary>
@@ -92,10 +100,10 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     private static void LoadImage()
     {
-        CustomBG = new GameObject("CustomBG");
-        CustomBG.transform.position = new Vector3(1.8f, 0.2f, 0f);
-        var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
-        bgRenderer.sprite = ResourceUtils.LoadSprite("COG.Resources.InDLL.Images.COG-BG.png", 295f);
+        CustomBanner = new GameObject("CustomBG");
+        CustomBanner.transform.position = new Vector3(1.8f, 0.2f, 0f);
+        var bgRenderer = CustomBanner.AddComponent<SpriteRenderer>();
+        bgRenderer.sprite = ResourceUtils.LoadSprite("COG.Resources.Images.COG-BG.png", 295f);
     }
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]
@@ -119,18 +127,19 @@ public static class MainMenuPatch
     [HarmonyPatch(nameof(MainMenuManager.OpenAccountMenu))]
     [HarmonyPatch(nameof(MainMenuManager.OpenCredits))]
     [HarmonyPatch(nameof(MainMenuManager.OpenGameModeMenu))]
+    [HarmonyPatch(nameof(MainMenuManager.OpenOnlineMenu))]
     [HarmonyPostfix]
-    private static void HideModBG()
+    private static void HideModBannerPatch()
     {
-        if (CustomBG != null) CustomBG.SetActive(false);
+        if (CustomBanner != null) CustomBanner.SetActive(false);
         foreach (var btn in Buttons) btn.gameObject.SetActive(false);
     }
 
     [HarmonyPatch(nameof(MainMenuManager.ResetScreen))]
     [HarmonyPostfix]
-    private static void ShowModBG()
+    private static void ShowModBackground()
     {
-        if (CustomBG != null) CustomBG.SetActive(true);
+        if (CustomBanner != null) CustomBanner.SetActive(true);
         foreach (var btn in Buttons.Where(btn => btn != null && btn.gameObject != null)) btn.gameObject.SetActive(true);
     }
 }

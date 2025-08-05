@@ -1,16 +1,48 @@
-using System.Linq;
+using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
 using COG.Patch;
 using COG.Role;
+using COG.Role.Impl.Impostor;
 using COG.Rpc;
+using COG.States;
 using COG.UI.CustomOption;
 using COG.Utils;
 using InnerNet;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace COG.Listener.Impl;
 
 public class RpcListener : IListener
 {
+    private string? _murderExtraMessage = null;
+
+    [EventHandler(EventHandlerType.Prefix)]
+    public void BeforeRpcBeingProceeded(PlayerHandleRpcEvent @event)
+    {
+        var reader = MessageReader.Get(@event.Reader);
+        var rpc = @event.CallId;
+        reader.ReadNetObject<PlayerControl>();
+        if (rpc == (byte)RpcCalls.CheckMurder && reader.BytesRemaining > 0) // with extra data
+        {
+            // CheckMurder RPC will be sent to every client, but whether to perform depends if the client is the host
+            // Killer ---Send CheckMurder--> Each client --> Perform
+            // MuderPlayer will be sent even if the kill failed
+            // Kinda complex...
+            _murderExtraMessage = reader.ReadString();
+        }
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnPlayerMurder(PlayerMurderEvent @event)
+    {
+        if (@event.MurderResult!.Value.HasFlag(MurderResultFlags.Succeeded) && _murderExtraMessage != null)
+            GameEventPatch.ExtraMessage = _murderExtraMessage;
+        
+        _murderExtraMessage = null;
+    }
+
     [EventHandler(EventHandlerType.Postfix)]
     public void AfterRpcReceived(PlayerHandleRpcEvent @event)
     {
@@ -69,26 +101,111 @@ public class RpcListener : IListener
                 break;    
             }
             
-            case KnownRpc.KillPlayerCompletely:
+            case KnownRpc.KillWithoutDeadBody:
             {
                 var killer = reader.ReadNetObject<PlayerControl>();
                 var target = reader.ReadNetObject<PlayerControl>();
                 var showAnimationToEverybody = reader.ReadBoolean();
                 var anonymousKiller = reader.ReadBoolean();
 
-                killer.KillPlayerCompletely(target, showAnimationToEverybody, anonymousKiller);
+                killer.RpcKillWithoutDeadBody(target, showAnimationToEverybody, anonymousKiller);
                 break;
             }
 
-            case KnownRpc.MurderAndModifyKillAnimation:
+            case KnownRpc.Revive:
+            {
+                // 从Rpc中读入PlayerControl
+                var target = reader.ReadNetObject<PlayerControl>();
+                
+                // 复活目标玩家
+                target.Revive();
+                break;
+            }
+
+            case KnownRpc.HideDeadBody:
+            {
+                if (!GameStates.InRealGame) return;
+                var pid = reader.ReadByte();
+                var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
+                if (!body) return;
+                body!.gameObject.SetActive(false);
+                break;
+            }
+
+            case KnownRpc.Mark:
             {
                 var target = reader.ReadNetObject<PlayerControl>();
-                var toModify = reader.ReadNetObject<PlayerControl>();
+                var tag = reader.ReadString();
+                var playerData = target.GetPlayerData();
 
-                KillAnimationPatch.NextKillerToBeReplaced = toModify.Data;
-                @event.Player.MurderPlayer(target, PlayerUtils.SucceededFlags);
+                if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
+                {
+                    playerData?.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
+                    break;
+                }
+                
+                playerData?.Tags.Add(tag);
+                break;
+            }
+
+            case KnownRpc.SyncRoleGameData:
+            {
+                int roleId = -1;
+                CustomRole role = null!;
+
+                try
+                {
+                    roleId = reader.ReadPackedInt32();
+                    role = CustomRoleManager.GetManager().GetRoleById(roleId) ?? throw new();
+                }
+                catch
+                {
+                    Main.Logger.LogError($"Got invalid {nameof(roleId)} while synchronizing role data: {roleId}");
+                    return;
+                }
+
+                Main.Logger.LogMessage($"Syncing game data for {role.Name}...");
+                role.OnRoleGameDataGettingSynchronized(reader);
+                break;
+            }
+
+            case KnownRpc.DieWithoutAnimationAndBody:
+            {
+                var reason = (CustomDeathReason)reader.ReadPackedInt32();
+                @event.Player.DieWithoutAnimationAndBody(reason);
+                break;
+            }
+
+            case KnownRpc.SyncGameEvent:
+            {
+                var eventName = reader.ReadString();
+                var undeserializedPlayerData = reader.ReadBytesAndSize();
+                var serializedPlayerData = undeserializedPlayerData.DeserializeToData<SerializablePlayerData>();
+
+                var matchedEventType = typeof(Main).Assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(NetworkedGameEventBase)) && !t.IsAbstract && t.Name == eventName);
+                
+                if (matchedEventType == null)
+                {
+                    Main.Logger.LogError($"Unknown event type: {eventName}");
+                    return;
+                }
+
+                dynamic instance = Activator.CreateInstance(matchedEventType, serializedPlayerData)!;
+                instance.Deserialize(reader);
+
+                Main.Logger.LogInfo("Deserialized networked game event: " + eventName);
+
                 break;
             }
         }
+
+        IRpcHandler.Handlers.ForEach(h =>
+        {
+            dynamic handler = h;
+            if (handler.CallId != callId) return;
+            h.OnReceive(reader);
+        });
+
+        CustomRoleManager.GetManager().GetRoles().ForEach(cr => cr.OnRpcReceived(@event.Player, callId, reader));
     }
 }

@@ -1,5 +1,10 @@
+global using GameStates = COG.States.GameStates;
+using COG.Game.Events;
+using COG.Patch;
 using COG.Role;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
+using System;
 
 namespace COG.States;
 
@@ -21,19 +26,32 @@ public static class GameStates
         {
             Main.Logger.LogMessage($"{nameof(GameStates)}::{nameof(_inRealGame)} being set to {value}. Clearing role data...");
 
-            CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
-            
             _inRealGame = value;
+
+            if (!value) IsLeavingGame = true;
+
+            CustomRoleManager.GetManager().GetRoles().ForEach(r => r.ClearRoleGameData());
+
+            if (value)
+                _ = new EventRecorder();
+            else
+                EventRecorder.ResetAll();
+
+            VanillaKillButtonPatch.ActiveLastFrame = false;
 
             if (!value)
             {
                 Main.Logger.LogMessage("Player left game. Clearing in-game data...");
 
                 GameUtils.PlayerData.Clear();
-                DeadPlayer.DeadPlayers.Clear();
+                CustomRole.ClearKillButtonSettings();
             }
+
+            IsLeavingGame = false;
         }
     }
+
+    public static bool IsLeavingGame { get; private set; }
 
     /// <summary>
     ///     是否在大厅中
@@ -53,4 +71,9 @@ public static class GameStates
     public static bool IsVoting => IsMeeting &&
                                    MeetingHud.Instance.state is MeetingHud.VoteStates.Voted
                                        or MeetingHud.VoteStates.NotVoted;
+}
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+public sealed class OnlyInRealGameAttribute : System.Attribute
+{
 }

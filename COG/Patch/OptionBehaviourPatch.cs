@@ -25,6 +25,8 @@ public static class RoleOptionSettingPatch
         __instance.roleChance = chance.GetInt();
         __instance.countText.text = __instance.roleMaxCount.ToString();
         __instance.chanceText.text = __instance.roleChance.ToString();
+        __instance.AdjustChanceButtonsActiveState();
+        __instance.AdjustCountButtonsActiveState();
         return false;
     }
 }

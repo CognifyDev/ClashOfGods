@@ -6,7 +6,9 @@ using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.PPhysics;
 using COG.UI.CustomButton;
 using COG.Utils;
+using COG.Utils.Coding;
 using InnerNet;
+using System;
 
 namespace COG.Patch;
 
@@ -35,18 +37,30 @@ internal class PlayerKillPatch
 {
     [HarmonyPatch(nameof(PlayerControl.CheckMurder))]
     [HarmonyPrefix]
-    public static bool CheckMurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
+    public static bool CheckMurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
-        return ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Prefix);
+        var executeOrigin =  ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerMurderEvent(__instance, target, null), EventHandlerType.Prefix);
+
+        if (!target)
+        {
+            Main.Logger.LogError("Bad kill check with null target (target quitted game?)");
+            return false;
+        }
+
+        if (executeOrigin)
+            __instance.RpcMurderPlayer(target, true);
+
+        return false; // Always skip vanilla kill check
     }
+
 
     [HarmonyPatch(nameof(PlayerControl.MurderPlayer))]
     [HarmonyPostfix]
-    public static void MurderPath(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
+    public static void MurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] MurderResultFlags resultFlags)
     {
         ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerMurderEvent(__instance, target), EventHandlerType.Postfix);
+            .ExecuteHandlers(new PlayerMurderEvent(__instance, target, resultFlags), EventHandlerType.Postfix);
     }
 }
 
@@ -78,9 +92,6 @@ internal class PlayerShapeShiftPatch
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.Update))]
 internal class HostStartPatch
 {
-    public static float Timer = 600;
-    private static bool _update;
-
     public static void Prefix(GameStartManager __instance)
     {
         if (GlobalCustomOptionConstant.DebugMode.GetBool())
@@ -90,28 +101,6 @@ internal class HostStartPatch
             __instance.StartButton.SetButtonEnableState(true);
             __instance.StartButton.ChangeButtonText(TranslationController.Instance.GetString(StringNames.StartLabel));
         }
-            
-
-        {
-            // showtime
-            if (!AmongUsClient.Instance.AmHost || !GameData.Instance ||
-                AmongUsClient.Instance.AmLocalHost) return;
-            _update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
-        }
-    }
-
-    public static void Postfix(GameStartManager __instance)
-    {
-        // showtime
-        //if (_update) _currentText = __instance.PlayerCounter.text;
-        //if (!AmongUsClient.Instance.AmHost) return;
-        //Timer = Mathf.Max(0f, Timer -= Time.deltaTime);
-        //var minutes = (int)Timer / 60;
-        //var seconds = (int)Timer % 60;
-
-        //var suffix = $"({minutes:00}:{seconds:00})";
-        //__instance.PlayerCounter.text = _currentText + suffix;
-        //__instance.PlayerCounter.autoSizeTextContainer = true;
     }
 }
 
@@ -130,7 +119,7 @@ internal class ExileControllerWrapUpPatch
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerExileEndEvent(__instance.initData.networkedPlayer?.Object, __instance),
                 EventHandlerType.Postfix);
-        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndsDoSpawn();
     }
 }
 
@@ -151,7 +140,7 @@ internal class AirshipExileControllerPatch
             .ExecuteHandlers(
                 new PlayerExileEndOnAirshipEvent(__instance.initData.networkedPlayer, __instance),
                 EventHandlerType.Postfix);
-        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndSpawn();
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons()) btn.OnMeetingEndsDoSpawn();
     }
 }
 
@@ -222,6 +211,8 @@ internal class CreatePlayerPatch
 }
 
 [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoSpawnPlayer))]
+[Obsolete("Inlined")]
+[DontDelete("Rewrite soon")]
 internal class OnSpawnPlayerPatch
 {
     public static bool Prefix(PlayerPhysics __instance, [HarmonyArgument(0)] LobbyBehaviour lobbyBehaviour)
@@ -317,5 +308,24 @@ internal class PlayerControlAwakePatch
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerControlAwakeEvent(__instance), EventHandlerType.Postfix);
+    }
+}
+
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckProtect))]
+static class PlayerCheckProtectPatch
+{
+    static bool Prefix(PlayerControl __instance, PlayerControl target)
+    {
+        __instance.RpcProtectPlayer(target, __instance.Data.DefaultOutfit.ColorId);
+        return false; // always allow to protect
+    }
+}
+
+[HarmonyPatch(typeof(RoleManager), nameof(RoleManager.AssignRoleOnDeath))]
+static class GhostRoleAssignmentPatch
+{
+    static void Prefix(ref bool specialRolesAllowed)
+    {
+        specialRolesAllowed = false;
     }
 }

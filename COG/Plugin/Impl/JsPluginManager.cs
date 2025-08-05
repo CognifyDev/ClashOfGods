@@ -43,28 +43,25 @@ public class JsPluginManager : IPluginManager
     public IPlugin LoadPlugin(string path)
     {
         using var zip = ZipFile.OpenRead(path);
-        var description = GetDescription(zip);
-        if (description == null)
-        {
-            throw new System.Exception($"{path} is not a available plugin!");
-        }
-            
+        var description = GetDescription(zip) ?? throw new System.Exception($"{path} is not a available plugin!");
+
         foreach (var entry in zip.Entries)
         {
-            if (entry.FullName.StartsWith("scripts"))
-            {
-                _resources.Add(new ResourceDescription(entry.FullName, description, ResourceType.Script), entry.Open().ToBytes());
-            }  else if (entry.FullName.StartsWith("resources"))
-            {
-                _resources.Add(new ResourceDescription(entry.FullName, description, ResourceType.Resource), entry.Open().ToBytes());
-            }
+            ResourceType type;
+
+            if (entry.FullName.StartsWith("scripts/"))
+                type = ResourceType.Script;
+            else if (entry.FullName == "plugin.yml")
+                type = ResourceType.Config;
+            else
+                type = ResourceType.Resource;
+
+            using var stream = entry.Open();
+            _resources.Add(new ResourceDescription(entry.FullName, description, type), stream.ToBytes());
         }
 
-        var mainScript = GetEntry(zip, $"scripts/{description.Main}");
-        if (mainScript == null)
-        {
-            throw new System.Exception($"{path} is not a available plugin!");
-        }
+        var mainScriptPath = $"scripts/{description.Main}";
+        var mainScript = GetEntry(zip, mainScriptPath) ?? throw new System.Exception($"{path} is not a available plugin!");
 
         var modules = new Dictionary<string, ZipArchiveEntry>();
         foreach (var module in description.Modules)
@@ -82,7 +79,8 @@ public class JsPluginManager : IPluginManager
 
         var engine = new Engine(options =>
         {
-            options.AllowClr();
+            options.AllowClr(AppDomain.CurrentDomain.GetAssemblies()); // Also includes COG assembly
+            options.CatchClrExceptions();
 
             if (!SettingsConfig.Instance.TimeZone.ToLower().Equals("default"))
             {
@@ -101,21 +99,26 @@ public class JsPluginManager : IPluginManager
             
         modules.ForEach(module =>
         {
-            engine.Modules.Add(module.Key, Encoding.UTF8.GetString(module.Value.Open().ToBytes()));
+            using var moduleStream = module.Value.Open();
+            engine.Modules.Add(module.Key, Encoding.UTF8.GetString(moduleStream.ToBytes()));
+            engine.Modules.Import(module.Key);
         });
 
-        engine.Execute(Encoding.UTF8.GetString(mainScript.Open().ToBytes()));
-            
-        // setup for engine
+        // set up for engine
         engine.SetValue("getResource", new Func<string, byte[]>(s =>
         {
             var descriptionByPath = ResourceDescription.GetDescriptionByPath(s);
             if (descriptionByPath == null) return Array.Empty<byte>();
-                
+
             return _resources.TryGetValue(descriptionByPath, out var value) ? value : Array.Empty<byte>();
         }));
 
         engine.SetValue("logger", new PluginLogger(description));
+
+        using var mainScriptStream = mainScript.Open();
+        var scripts = _resources.Where(kvp => kvp.Key.ResourceType == ResourceType.Script).Select(kvp => (kvp.Key, Encoding.UTF8.GetString(kvp.Value))).ToList();
+        scripts.Add(new(_resources.Select(kvp => kvp.Key).First(d => d.Path == mainScriptPath), Encoding.UTF8.GetString(mainScriptStream.ToBytes())));
+        scripts.ForEach(s => engine.Execute(s.Item2, s.Key.Path));
         
         var plugin = new JsPlugin(description, engine);
         _plugins.Add(plugin);
@@ -161,7 +164,7 @@ public class JsPluginManager : IPluginManager
         var descriptionsByPlugin = ResourceDescription.GetDescriptionsByPlugin(plugin);
         descriptionsByPlugin.ForEach(resourceDescription => _resources.Remove(resourceDescription));
         
-        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been loaded.");
+        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been unloaded.");
     }
 
     public IPlugin[] GetPlugins()

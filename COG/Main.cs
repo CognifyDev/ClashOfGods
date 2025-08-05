@@ -23,8 +23,7 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
-using COG.UI.CustomButton;
-using COG.UI.ModOption;
+using COG.UI.ClientOption;
 using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
@@ -33,7 +32,6 @@ using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using GameStates = COG.States.GameStates;
 using COG.Config;
 
 namespace COG;
@@ -62,22 +60,33 @@ public partial class Main : BasePlugin
     public override void Load()
     {
         Instance = this;
-        
+
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
         VersionInfo = PluginVersion.Equals("Unknown")
             ? VersionInfo.Empty
             : VersionInfo.Parse(PluginVersion);
 
+        System.Console.OutputEncoding = System.Text.Encoding.UTF8;
+
         Logger = new StackTraceLogger($"   {DisplayName}");
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
         Logger.LogInfo($"GitInfo: {GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})");
-#if !DEBUG
-        Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.SelectRoles)));
-        Logger.DisableMethod(typeof(GameListener).GetMethod(nameof(GameListener.OnRpcReceived)));
-#endif
 
-        var longVersionInfo = $"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}";
+        ResourceUtils.WriteToFileFromResource(
+                @".\BepInEx\core\Jint.dll",
+            ResourceUtils.GetResourcePath("Libraries.Jint.dll")
+            );
+        ResourceUtils.WriteToFileFromResource(
+                @".\BepInEx\core\YamlDotNet.dll",
+            ResourceUtils.GetResourcePath("Libraries.YamlDotNet.dll")
+            );
+        ResourceUtils.WriteToFileFromResource(
+                @".\BepInEx\core\Acornima.dll",
+            ResourceUtils.GetResourcePath("Libraries.Acornima.dll")
+            );
+
+        var longVersionInfo = StringUtils.EncodeToBase64($"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}");
         var storagedInfo = "";
 
         try
@@ -91,7 +100,7 @@ public partial class Main : BasePlugin
         if (!storagedInfo.IsNullOrEmptyOrWhiteSpace())
         {
             if (storagedInfo != longVersionInfo)
-                Logger.LogInfo("Current mod version doesnt equal to version of last mod running on this machine. Schedule to replace config files...");
+                Logger.LogWarning("Current mod version doesnt equal to version of last mod running on this machine. Schedule to replace config files...");
             else
                 ConfigBase.AutoReplace = false;
         }
@@ -101,37 +110,28 @@ public partial class Main : BasePlugin
         _ = ButtonHotkeyConfig.Instance;
 
         File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
-
+        
         /*
-                ModUpdater.FetchUpdate();
-                Logger.LogInfo(
-                    $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
+        ModUpdater.FetchUpdate();
+        Logger.LogInfo(
+            $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
-        /*
-                // Load plugins
-                try
-                {
-                    PluginManager.LoadPlugins();
-                }
-                catch (System.Exception e)
-                {
-                    Logger.LogError(e.Message);
-                }
-        */
         ListenerManager.GetManager().RegisterListeners(new IListener[]
         {
             new CommandListener(),
             new PlayerListener(),
-            new DeadPlayerListener(),
             new CustomButtonListener(),
             new GameListener(),
-            new ModOptionListener(),
+            new ClientOptionListener(),
             new RpcListener(),
             new TaskAdderListener(),
             new VersionShowerListener(),
             new VanillaBugFixListener(),
-            new CustomWinnerListener()
+            new CustomWinnerListener(),
+            new LobbyListener(),
+            new RoleAssignmentListener(),
+            new IntroListener()
         });
         
         // Register CustomWinners
@@ -139,7 +139,7 @@ public partial class Main : BasePlugin
         {
             new CrewmatesCustomWinner(),
             new ImpostorsCustomWinner(),
-            new LastPlayerCustomWinner(),
+            new LastPlayerCustomWinner()
         });
 
         // Register roles
@@ -155,12 +155,20 @@ public partial class Main : BasePlugin
             new Vigilante(),
             new SoulHunter(),
             new Technician(),
+            new Inspector(),
+            new Doorman(),
+            new Chief(),
+            new Enchanter(),
+            new Witch(),
 
             // Impostor
             new Impostor(),
             new Cleaner(),
-            new Assassin(),
+            new Stabber(),
             new Reaper(),
+            new Troublemaker(),
+            new Nightmare(),
+            new Spy(),
 
             // Neutral
             new Jester(),
@@ -173,7 +181,7 @@ public partial class Main : BasePlugin
         });
 
         // Register mod options
-        ModOptionManager.GetManager().RegisterModOptions(new ModOption[]
+        ClientOptionManager.GetManager().RegisterClientOptions(new ClientOption[]
         {
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
@@ -183,20 +191,20 @@ public partial class Main : BasePlugin
                         GameUtils.Popup?.Show("You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
                         return false;
                     }
-                    var p = OpenFileDialogue.Display(Mode.Open, "", 
+                    var p = OpenFileDialogue.Display(Mode.Open, "",
                         defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
                     if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 
                     LanguageConfig.LoadLanguageConfig(p.FilePath!);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-                    SceneManager.LoadScene("MainMenu");
+                    SceneManager.LoadScene(Constants.MAIN_MENU_SCENE);
                     return false;
                 }, false),
             new(LanguageConfig.Instance.UnloadModButtonName,
                 () =>
                 {
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-                    if (GameStates.InRealGame)
+                    if (GameStates.InRealGame || GameStates.InLobby)
                     {
                         GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
                         return false;
@@ -209,8 +217,8 @@ public partial class Main : BasePlugin
             new(LanguageConfig.Instance.HotkeySettingName,
                 () =>
                 {
-                    ModOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
-                    ModOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
+                    ClientOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
+                    ClientOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
                     return false;
                 }, false)
         });
@@ -219,11 +227,9 @@ public partial class Main : BasePlugin
         CommandManager.GetManager().RegisterCommands(new CommandBase[]
         {
             new RpcCommand(),
-            new OptionCommand()
+            new OptionCommand(),
+            new DebugCommand()
         });
-        
-        // Register custom buttons
-        CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
         
         Harmony.PatchAll();
         
@@ -234,7 +240,7 @@ public partial class Main : BasePlugin
             
             var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
             var enumerable = files.ToArray();
-            Logger.LogInfo($"{enumerable.Length} plugins to load.");
+            Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
 
             foreach (var file in enumerable)
                 JsPluginManager.GetManager().LoadPlugin(file);
@@ -250,13 +256,14 @@ public partial class Main : BasePlugin
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
-        ModOptionManager.GetManager().GetOptions().Clear();
+        ClientOptionManager.GetManager().GetOptions().Clear();
         CustomRoleManager.GetManager().GetRoles().Clear();
         ListenerManager.GetManager().UnregisterHandlers();
         EndGameResult.CachedWinners?.Clear();
+        CustomWinnerManager.GetManager().Reset();
         Harmony.UnpatchAll();
         MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
-        MainMenuPatch.CustomBG!.Destroy();
+        MainMenuPatch.CustomBanner!.Destroy();
         return false;
     }
 }

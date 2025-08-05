@@ -1,12 +1,12 @@
 ﻿# ClashOfGods
-#### 一个划时代Among Us模组，带有插件系统，使用简单的计算机语言来制作你专属的模组
+**一个划时代的Among Us模组，带有插件系统，使用简单的编程语言JavaScript来制作你专属的模组**
 
 > [English](README-English.md) | 简体中文
 
 Clash Of Gods是一个Among Us模组。<br />
 
 # 声明
-该模组不隶属于我们之中或 Innersloth LLC，其中包含的内容未经 Innersloth LLC 认可或以其他方式赞助 此处包含的部分材料是 Innersloth LLC 的财产 Innersloth LLC。
+该模组不隶属于我们之中或 Innersloth LLC，其中包含的内容未经 Innersloth LLC 认可或以其他方式赞助。此处包含的部分材料是 Innersloth LLC 的财产 Innersloth LLC。
 
 # 介绍
 该模组在原版游戏的基础上添加了许多有趣的职业。

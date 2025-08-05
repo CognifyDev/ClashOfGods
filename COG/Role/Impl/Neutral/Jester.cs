@@ -2,6 +2,8 @@ using System.Linq;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
+using COG.Game.Events;
+using COG.Game.Events.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
@@ -27,16 +29,17 @@ public class Jester : CustomRole, IListener, IWinnable
 
     public void CheckWin(WinnableData data)
     {
-        var jesters = DeadPlayer.DeadPlayers.Where(dp =>
-            dp.Data.IsRole(this) && dp.DeathReason == CustomDeathReason.Exiled); // Only one jester can win so only one will die due to kill
+        var ejectionEvents = EventRecorder.Instance.GetEvents().Where(e => e is PlayerExileGameEvent);
+        var matchedEvent = ejectionEvents.FirstOrDefault(e => e.Player.IsRole(this)); // select last exiled jester as winner
 
-        var deadPlayers = jesters.ToArray();
-        if (!deadPlayers.Any()) return;
+        if (matchedEvent == null) return;
+
+        var winner = matchedEvent.Player;
 
         data.WinnableCampType = CampType; 
-        data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(deadPlayers[0].Data.PlayerName);
+        data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(winner.PlayerName);
         data.WinColor = Color;
-        data.WinnablePlayers.Add(deadPlayers[0].Data);
+        data.WinnablePlayers.Add(winner.Data);
         data.Winnable = true;
     }
 
@@ -46,7 +49,7 @@ public class Jester : CustomRole, IListener, IWinnable
     }
 
     [EventHandler(EventHandlerType.Prefix)]
-    public bool OnCheckStartMeeting(PlayerReportDeadBodyEvent @event)
+    public bool OnHostCheckStartMeeting(PlayerReportDeadBodyEvent @event)
     {
         if (!GameStates.InRealGame || GameStates.InLobby) return true;
         var victim = @event.Target;

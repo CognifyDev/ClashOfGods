@@ -84,4 +84,10 @@ public class CustomWinnerManager
     
         return WinnableData;
     }
+
+    public void Reset()
+    {
+        _winnable.Clear();
+        WinnableData = WinnableData.Of();
+    }
 }

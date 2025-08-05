@@ -3,17 +3,26 @@ namespace COG.Rpc;
 public enum KnownRpc : uint
 {
     ShareRoles = 100,
-    CleanDeadBody,
+    HideDeadBody,
     UpdateOption,
     SetRole,
-    Feedback,
+    Feedback, // ?
     Revive,
     NotifySettingChange,
     Mark,
     ShareOptions,
     ClearSabotages,
     ShareWinners,
-    KillPlayerCompletely,
-    MurderAndModifyKillAnimation,
-    ShareAbilityOrVentUseForInspector
+    KillWithoutDeadBody,
+    ShareAbilityOrVentUseForInspector,
+    SyncRoleGameData,
+    GiveOneKill,
+    EnchanterPunishesKiller,
+    TroubleMakerDisturb,
+    NightmareStore,
+    NightmareCooldownCheck,
+    SpyRevealClosestTarget,
+    WitchUsesAntidote,
+    DieWithoutAnimationAndBody,
+    SyncGameEvent
 }
