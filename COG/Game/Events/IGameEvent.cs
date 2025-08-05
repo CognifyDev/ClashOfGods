@@ -7,5 +7,5 @@ public interface IGameEvent
 {
     DateTime Time { get; }
     GameEventType EventType { get; }
-    CustomPlayerData Player { get; }
+    CustomPlayerData? Player { get; }
 }

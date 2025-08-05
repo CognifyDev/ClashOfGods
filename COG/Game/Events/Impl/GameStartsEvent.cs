@@ -2,7 +2,7 @@
 
 public class GameStartsEvent : GameEventBase
 {
-    public GameStartsEvent() : base(GameEventType.GameStart, null!)
+    public GameStartsEvent() : base(GameEventType.GameStart, null)
     {
     }
 }

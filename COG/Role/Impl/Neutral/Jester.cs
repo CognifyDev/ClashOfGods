@@ -30,14 +30,14 @@ public class Jester : CustomRole, IListener, IWinnable
     public void CheckWin(WinnableData data)
     {
         var ejectionEvents = EventRecorder.Instance.GetEvents().Where(e => e is PlayerExileGameEvent);
-        var matchedEvent = ejectionEvents.FirstOrDefault(e => e.Player.IsRole(this)); // select last exiled jester as winner
+        var matchedEvent = ejectionEvents.FirstOrDefault(e => e.Player!.IsRole(this)); // select last exiled jester as winner
 
         if (matchedEvent == null) return;
 
         var winner = matchedEvent.Player;
 
         data.WinnableCampType = CampType; 
-        data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(winner.PlayerName);
+        data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(winner!.PlayerName);
         data.WinColor = Color;
         data.WinnablePlayers.Add(winner.Data);
         data.Winnable = true;

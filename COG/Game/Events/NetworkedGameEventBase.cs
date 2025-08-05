@@ -24,7 +24,7 @@ public abstract class NetworkedGameEventBase : GameEventBase
     {
         var writer = RpcWriter.Start(KnownRpc.SyncGameEvent);
         writer.Write(GetType().Name);
-        writer.WriteBytesAndSize(SerializablePlayerData.Of(Player).SerializeToData());
+        writer.WriteBytesAndSize(SerializablePlayerData.Of(Player!).SerializeToData());
         Serialize(writer);
         writer.Finish();
     }
