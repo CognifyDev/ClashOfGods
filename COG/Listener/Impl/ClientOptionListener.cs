@@ -13,6 +13,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using COG.UI.ClientOption.Impl;
 
 namespace COG.Listener.Impl;
 
@@ -21,7 +22,7 @@ internal class ClientOptionListener : IListener
     private const float TimerCountdown = 5f;
 
     private static bool _isSettingHotkey = false;
-    private static ClientOption? _currentBeingSet = null;
+    private static ToggleClientOption? _currentBeingSet = null;
     private static int _currentIndex = -1;
     private static float _timer = TimerCountdown;
     private static TabGroup? _modTabButton;
@@ -60,15 +61,13 @@ internal class ClientOptionListener : IListener
             {
                 for (var i = 0; i < menu.Tabs.Length; i++)
                 {
-                    if (menu.Tabs[i].GetInstanceID() == _modTabButton!.GetInstanceID()) return i;
+                    if (menu.Tabs[i] == _modTabButton) return i;
                 }
                 Main.Logger.LogWarning("Modded tab button not found!");
                 return -1;
             }
 
-            foreach (var btn in ClientOption.Buttons)
-                if (btn.ToggleButton)
-                    btn.ToggleButton!.gameObject.SetActive(true);
+            ClientOptionManager.GetManager().GetOptions().DoIf(option => option.Component, option => option.Component!.gameObject.SetActive(true));
         }));
 
         LoadNormalButtons(menu);
@@ -106,18 +105,33 @@ internal class ClientOptionListener : IListener
     {
         _modTabButton!.GetComponentInChildren<TextMeshPro>().text = LanguageConfig.Instance.CogOptions;
 
+        var optionHandler = LanguageConfig.Instance.GetHandler("option");
+        foreach (var option in ClientOptionManager.GetManager().GetOptions())
+        {
+            if (option is SliderClientOption sliderOption)
+            {
+                var trueValue = sliderOption.MinValue + (sliderOption.MaxValue - sliderOption.MinValue) * sliderOption.OptionObject!.Value;
+                if (sliderOption.OnUpdateTextChange != null)
+                    sliderOption.OptionObject.GetComponentInChildren<TextMeshPro>().text = sliderOption.OnUpdateTextChange(trueValue, optionHandler.GetString(sliderOption.Translatable));
+            }
+            else if (option is ToggleClientOption toggleOption)
+            {
+                if (toggleOption.OnUpdateTextChange != null)
+                    toggleOption.OptionObject!.GetComponentInChildren<TextMeshPro>().text = toggleOption.OnUpdateTextChange(toggleOption.OptionObject!.onState, optionHandler.GetString(toggleOption.Translatable));
+            }
+        }
+
         if (_isSettingHotkey)
         {
-            var textMesh = _currentBeingSet!.ToggleButton!.Text;
-
             _timer -= Time.deltaTime;
+
             if (_timer <= 0)
             {
                 ResetHotkeyState();
                 return;
             }
 
-            textMesh.text = LanguageConfig.Instance.PressKeyToSet.CustomFormat(Mathf.CeilToInt(_timer));
+            _currentBeingSet!.OnChange(false);
 
             foreach (var keyCode in Enum.GetValues<KeyCode>())
             {
@@ -126,16 +140,6 @@ internal class ClientOptionListener : IListener
                     ButtonHotkeyConfig.Instance.SetHotkey(_currentIndex, keyCode);
                     ResetHotkeyState();
                 }
-            }
-        }
-        else
-        {
-            var index = 1;
-            foreach (var button in HotkeyButtons)
-            {
-                bool succeeded = ButtonHotkeyConfig.Instance.GetHotkeys().TryGetValue(index, out var keyCode);
-                button.GetComponent<ToggleButtonBehaviour>().Text.text = $"{LanguageConfig.Instance.GetHandler("option.hotkey").GetString("button").CustomFormat(index)}{(succeeded ? $": {keyCode}" : "")}";
-                index++;
             }
         }
     }
@@ -152,28 +156,26 @@ internal class ClientOptionListener : IListener
     {
         Main.Logger.LogInfo("Initting normal buttons");
 
-        ClientOption.Buttons.Clear();
-        foreach (var clientOption in ClientOptionManager.GetManager().GetOptions()) clientOption.Register();
         var a = 0;
-        foreach (var btn in ClientOption.Buttons)
-            CreateButton(menu, a++, btn);
+        foreach (var btn in ClientOptionManager.GetManager().GetOptions())
+            CreateButton(menu, ref a, btn);
     }
 
     private void LoadHotkeyButtons(OptionsMenuBehaviour menu)
     {
         HotkeyButtons.Clear();
         var a = 0;
-        var buttons = new List<ClientOption>();
+        var buttons = new List<ToggleClientOption>();
 
         for (var i = 1; i < ButtonHotkeyConfig.MaxButtonCount + 1; i++)
         {
-            ClientOption clientOption = default!;
+            ToggleClientOption clientOption = default!;
 
-            var buttonString = LanguageConfig.Instance.GetHandler("option.hotkey").GetString("button").CustomFormat(i);
             var capturedIndex = i; // Capture the current index for the lambda 
 
-            clientOption = new ClientOption(buttonString,
-                () =>
+            clientOption = new ToggleClientOption("hotkey.button",
+                false,
+                _ =>
                 {
                     if (!_isSettingHotkey)
                     {
@@ -184,10 +186,17 @@ internal class ClientOptionListener : IListener
                     }
 
                     return false;
-                }, false);
+                },
+                (newValue, origin) =>
+                {
+                    if (_isSettingHotkey)
+                        return LanguageConfig.Instance.PressKeyToSet.CustomFormat(Mathf.CeilToInt(_timer));
+                    else
+                        return LanguageConfig.Instance.GetHandler("option.hotkey").GetString("button") + capturedIndex + (ButtonHotkeyConfig.Instance.GetHotkeys().TryGetValue(capturedIndex, out var keyCode) ? $": {keyCode}" : "");
+                });
 
-            CreateButton(menu, a++, clientOption);
-            HotkeyButtons.Add(clientOption.ToggleButton!.gameObject);
+            CreateButton(menu, ref a, clientOption);
+            HotkeyButtons.Add(clientOption.OptionObject!.gameObject);
         }
     }
 
@@ -197,39 +206,76 @@ internal class ClientOptionListener : IListener
     /// <param name="menu">OptionMenuBehaviour 的实例</param>
     /// <param name="idx">（从0开始）加入按钮的序号</param>
     /// <param name="option">对应的客户端选项</param>
-    private void CreateButton(OptionsMenuBehaviour menu, int idx, ClientOption option)
+    private void CreateButton(OptionsMenuBehaviour menu, ref int idx, IClientOption option)
     {
-        var template = menu.CensorChatButton;
-        var button = Object.Instantiate(template, ModTabContainer!.transform);
-        Vector3 pos = new(idx % 2 == 0 ? -1.3f : 1.3f, 1.7f - idx / 2 * 0.5f, -0.5f);
-
-        button.transform.localPosition = pos;
-        button.transform.localScale = Vector3.one;
-        button.onState = option.DefaultValue;
-        button.Background.color = button.onState ? Palette.AcceptedGreen : Palette.EnabledColor;
-        button.Text.text = option.Text;
-        button.name = option.Text.Replace(" ", "");
-        button.gameObject.SetActive(true);
-
-        var passive = button.GetComponent<PassiveButton>();
-        passive.OnClick = new Button.ButtonClickedEvent();
-        passive.OnMouseOut = new UnityEvent();
-        passive.OnMouseOver = new UnityEvent();
-
-        passive.OnMouseOut.AddListener((Action)(() =>
-            button.Background.color = button.onState ? Palette.AcceptedGreen : Palette.EnabledColor));
-        passive.OnMouseOver.AddListener((Action)(() =>
+        var handler = LanguageConfig.Instance.GetHandler("option");
+        if (option is ToggleClientOption toggleOption)
         {
-            if (!button.onState) button.Background.color = Palette.AcceptedGreen;
-        }));
-        passive.OnClick.AddListener((Action)(() =>
-        {
-            button.onState = option.OnClick();
+            var template = menu.CensorChatButton;
+            var button = Object.Instantiate(template, ModTabContainer!.transform);
+            Vector3 pos = new(idx % 2 == 0 ? -1.3f : 1.3f, 1.7f - idx / 2 * 0.5f, -0.5f);
+
+            button.transform.localPosition = pos;
+            button.transform.localScale = Vector3.one;
+            button.onState = toggleOption.DefaultValue;
             button.Background.color = button.onState ? Palette.AcceptedGreen : Palette.EnabledColor;
-        }));
+            button.name = button.Text.text = handler.GetString(toggleOption.Translatable);
+            button.gameObject.SetActive(true);
 
-        option.ToggleButton = button;
+            var passive = button.GetComponent<PassiveButton>();
+            passive.OnClick = new Button.ButtonClickedEvent();
+            passive.OnMouseOut = new UnityEvent();
+            passive.OnMouseOver = new UnityEvent();
 
-        button.gameObject.SetActive(false);
+            passive.OnMouseOut.AddListener((Action)(() =>
+                button.Background.color = button.onState ? Palette.AcceptedGreen : Palette.EnabledColor));
+            passive.OnMouseOver.AddListener((Action)(() =>
+            {
+                if (!button.onState) button.Background.color = Palette.AcceptedGreen;
+            }));
+            passive.OnClick.AddListener((Action)(() =>
+            {
+                button.onState = toggleOption.OnChange(button.onState);
+                button.Background.color = button.onState ? Palette.AcceptedGreen : Palette.EnabledColor;
+            }));
+
+            toggleOption.OptionObject = button;
+
+            button.gameObject.SetActive(false);
+
+            idx++;
+        }
+        else if (option is SliderClientOption sliderOption)
+        {
+            if (idx % 2 == 1) idx++;
+
+            var template = menu.MusicSlider;
+            var slider = Object.Instantiate(template, ModTabContainer!.transform);
+            Vector3 pos = new(-2, 1.7f - idx / 2 * 0.5f, -0.5f);
+
+            var valueRange = sliderOption.MaxValue - sliderOption.MinValue;
+
+            slider.transform.localPosition = pos;
+            slider.transform.localScale = Vector3.one;
+            var text = slider.GetComponentInChildren<TextMeshPro>();
+            text.DestroyComponent<TextTranslatorTMP>();
+            slider.name = text.text = handler.GetString(sliderOption.Translatable);
+            slider.OnValueChange = new();
+            slider.OnValueChange.AddListener(new Action(() =>
+            {
+                var trueValue = ComputeActualValue(slider.Value);
+                slider.SetValue(ComputePercent(sliderOption.OnChange(trueValue)));
+                sliderOption.CurrentValue = trueValue;
+            }));
+            slider.SetValue(ComputePercent(sliderOption.DefaultValue));
+
+            slider.gameObject.SetActive(false);
+            sliderOption.OptionObject = slider;
+
+            idx += 2; // Next line
+
+            float ComputePercent(float actual) => (actual - sliderOption.MinValue) / valueRange;
+            float ComputeActualValue(float percent) => sliderOption.MinValue + valueRange * percent;
+        }
     }
 }

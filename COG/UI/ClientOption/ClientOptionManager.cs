@@ -1,3 +1,4 @@
+using COG.UI.ClientOption.Impl;
 using System.Collections.Generic;
 
 namespace COG.UI.ClientOption;
@@ -5,24 +6,24 @@ namespace COG.UI.ClientOption;
 public class ClientOptionManager
 {
     private static readonly ClientOptionManager Manager = new();
-    private readonly List<ClientOption> _options = new();
+    private readonly List<IClientOption> _options = new();
 
     public static ClientOptionManager GetManager()
     {
         return Manager;
     }
 
-    public void RegisterClientOption(ClientOption option)
+    public void RegisterClientOption(IClientOption option)
     {
         _options.Add(option);
     }
 
-    public void RegisterClientOptions(ClientOption[] options)
+    public void RegisterClientOptions(IEnumerable<IClientOption> options)
     {
         _options.AddRange(options);
     }
 
-    public List<ClientOption> GetOptions()
+    public List<IClientOption> GetOptions()
     {
         return _options;
     }

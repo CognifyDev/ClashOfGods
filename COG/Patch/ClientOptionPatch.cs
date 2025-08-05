@@ -64,7 +64,7 @@ internal class OnTabGroupOpen
     private static void Postfix()
     {
         ClientOptionListener.ResetHotkeyState();
-        ClientOptionListener.HotkeyButtons.ForEach(o => o.SetActive(false));
+        ClientOptionListener.HotkeyButtons.DoIf(o => o, o => o.SetActive(false));
     }
 }
 

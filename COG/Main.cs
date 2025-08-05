@@ -31,8 +31,9 @@ using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
-using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
+using OpenFileMode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
 using COG.Config;
+using COG.UI.ClientOption.Impl;
 
 namespace COG;
 
@@ -110,7 +111,7 @@ public partial class Main : BasePlugin
         _ = ButtonHotkeyConfig.Instance;
 
         File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
-        
+
         /*
         ModUpdater.FetchUpdate();
         Logger.LogInfo(
@@ -133,7 +134,7 @@ public partial class Main : BasePlugin
             new RoleAssignmentListener(),
             new IntroListener()
         });
-        
+
         // Register CustomWinners
         CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
         {
@@ -181,17 +182,18 @@ public partial class Main : BasePlugin
         });
 
         // Register mod options
-        ClientOptionManager.GetManager().RegisterClientOptions(new ClientOption[]
+        ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
         {
-            new(LanguageConfig.Instance.LoadCustomLanguage,
-                () =>
+            new ToggleClientOption("main.load-custom-lang",
+                false,
+                _ =>
                 {
                     if (GameStates.InRealGame || GameStates.InLobby)
                     {
                         GameUtils.Popup?.Show("You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
                         return false;
                     }
-                    var p = OpenFileDialogue.Display(Mode.Open, "",
+                    var p = OpenFileDialogue.Display(OpenFileMode.Open, "",
                         defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
                     if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 
@@ -199,9 +201,10 @@ public partial class Main : BasePlugin
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     SceneManager.LoadScene(Constants.MAIN_MENU_SCENE);
                     return false;
-                }, false),
-            new(LanguageConfig.Instance.UnloadModButtonName,
-                () =>
+                }),
+            new ToggleClientOption("main.unload-mod.name",
+                false,
+                _ =>
                 {
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     if (GameStates.InRealGame || GameStates.InLobby)
@@ -213,14 +216,35 @@ public partial class Main : BasePlugin
                     Unload();
                     GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
-                }, false),
-            new(LanguageConfig.Instance.HotkeySettingName,
-                () =>
+                }),
+            new ToggleClientOption("hotkey.name",
+                false,
+                _ =>
                 {
-                    ClientOption.Buttons.ForEach(o => o.ToggleButton!.gameObject.SetActive(false));
+                    ClientOptionManager.GetManager().GetOptions().ForEach(o => o.Component!.gameObject.SetActive(false));
                     ClientOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
                     return false;
-                }, false)
+                }),
+            new SliderClientOption("main.max-chat-bubble-adjustment", 
+                20,
+                20,
+                100,
+                newValue =>
+                {
+                    var value = ChatBubblePoolPatch.MaxBubbleCount = (int)newValue;
+                    ChatController? controller = null;
+                    if (controller = Object.FindObjectOfType<ChatController>())
+                    {
+                        var pool = controller.chatBubblePool;
+                        var current = pool.activeChildren.Count + pool.inactiveChildren.Count;
+                        var toClone = value - current;
+
+                        for (var i = 0; i < toClone; i++)
+                            pool.CreateOneInactive(pool.Prefab);
+                    }
+                    return value;
+                },
+                (value, origin) => origin + $": {(int)value}")
         });
 
         // Register Commands

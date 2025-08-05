@@ -171,13 +171,11 @@ option:
       name: "临时禁用模组"
       success: "模组已成功被临时禁用！\n如果您仍想要继续游玩模组，请重启游戏"
       error-in-game: "请先离开本局游戏再进行操作"
-    fix-button-sprite: 
-      name: "修复按钮图标"
-      error-not-in-game: "仅可在局内进行此操作"
+    max-chat-bubble-adjustment: "最大保留聊天记录数"
   hotkey:
     name: "热键设置"
     press-key-to-set: "请在%sec%秒内按下新热键"
-    button: "技能按钮 %index%"
+    button: "技能按钮"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 main-menu:
