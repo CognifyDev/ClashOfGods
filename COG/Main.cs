@@ -117,8 +117,7 @@ public partial class Main : BasePlugin
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
-        ListenerManager.GetManager().RegisterListeners(new IListener[]
-        {
+        ListenerManager.GetManager().RegisterListeners([
             new CommandListener(),
             new PlayerListener(),
             new CustomButtonListener(),
@@ -132,19 +131,17 @@ public partial class Main : BasePlugin
             new LobbyListener(),
             new RoleAssignmentListener(),
             new IntroListener()
-        });
+        ]);
         
         // Register CustomWinners
-        CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
-        {
+        CustomWinnerManager.GetManager().RegisterCustomWinnables([
             new CrewmatesCustomWinner(),
             new ImpostorsCustomWinner(),
             new LastPlayerCustomWinner()
-        });
+        ]);
 
         // Register roles
-        CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
-        {
+        CustomRoleManager.GetManager().RegisterRoles([
             // Unknown
             new Unknown(),
 
@@ -178,11 +175,10 @@ public partial class Main : BasePlugin
             // Sub-roles
             new Guesser(),
             new SpeedBooster()
-        });
+        ]);
 
         // Register mod options
-        ClientOptionManager.GetManager().RegisterClientOptions(new ClientOption[]
-        {
+        ClientOptionManager.GetManager().RegisterClientOptions([
             new(LanguageConfig.Instance.LoadCustomLanguage,
                 () =>
                 {
@@ -221,15 +217,14 @@ public partial class Main : BasePlugin
                     ClientOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
                     return false;
                 }, false)
-        });
+        ]);
 
         // Register Commands
-        CommandManager.GetManager().RegisterCommands(new CommandBase[]
-        {
+        CommandManager.GetManager().RegisterCommands([
             new RpcCommand(),
             new OptionCommand(),
             new DebugCommand()
-        });
+        ]);
         
         Harmony.PatchAll();
         
