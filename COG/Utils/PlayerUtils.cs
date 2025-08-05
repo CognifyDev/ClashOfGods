@@ -501,15 +501,6 @@ public static class PlayerUtils
         return data.SubRoles;
     }
 
-    public static void LocalDieWithReason(this PlayerControl pc, PlayerControl target, CustomDeathReason reason,
-        bool showCorpse = true)
-    {
-        if (showCorpse)
-            pc.MurderPlayer(target, GameUtils.DefaultFlag);
-        else
-            pc.Exiled();
-    }
-
     public static bool CanKill(this PlayerControl pc)
     {
         return pc.GetMainRole().CanKill;
@@ -542,7 +533,7 @@ public static class PlayerUtils
             nameTextBuilder.Append(player.Data.PlayerName);
         }
 
-        var adtnalTextBuilder = new StringBuilder();
+        var additionalTextBuilder = new StringBuilder();
         if (!onlyDisplayNameSuffix)
         {
             foreach (var (color, text) in subRoles.ToList()
@@ -550,16 +541,16 @@ public static class PlayerUtils
                          r.Color,
                          r.HandleAdditionalPlayerName(player)
                      )))
-                adtnalTextBuilder.Append(' ').Append(text.Color(color));
+                additionalTextBuilder.Append(' ').Append(text.Color(color));
         }
         else
         {
             var data = PlayerControl.LocalPlayer.GetPlayerData()!;
             foreach (var role in CustomRoleManager.GetManager().GetRoles())
-                adtnalTextBuilder.Append(role.HandleAdditionalPlayerName(player));
+                additionalTextBuilder.Append(role.HandleAdditionalPlayerName(player));
         }
 
-        nameTextBuilder.Append(adtnalTextBuilder);
+        nameTextBuilder.Append(additionalTextBuilder);
 
         for (var i = 0; i <= nameTextBuilder.ToString().Count(c => c == '\n'); i++) // Loop 1 more time
             nameTextBuilder.AppendLine(); // Ensure the colorblind text isnt covered by the name text

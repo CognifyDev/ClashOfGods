@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using COG.Config;
 using COG.Config.Impl;
 using COG.Utils;
 using Jint;
@@ -14,7 +15,7 @@ public class JsPluginManager : IPluginManager
 {
     private static JsPluginManager? _manager;
     
-    public const string PluginDirectoryPath = Config.ConfigBase.DataDirectoryName + "\\plugins";
+    public const string PluginDirectoryPath = ConfigBase.DataDirectoryName + "\\plugins";
 
     public static JsPluginManager GetManager() => _manager ??= new JsPluginManager();
 
