@@ -61,15 +61,15 @@ modules: [ 'modules\myModule.zip|MyModule' ]
 下面是一个例子：
 ~~~js
 function onLoad() {
-    logger.LogInfo("1")
+    logger.info("1")
 }
 
 function onEnable() {
-    logger.LogInfo("2")
+    logger.info("2")
 }
 
 function onDisable() {
-    logger.LogInfo("3")
+    logger.info("3")
 }
 ~~~
 `onLoad` 将会在插件加载的时候调用；
