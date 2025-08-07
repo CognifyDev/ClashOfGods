@@ -1,25 +1,25 @@
+using System.Collections;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using Reactor.Utilities;
-using System.Collections;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
 public class Bait : CustomRole, IListener
 {
-    public CustomOption KillerSelfReportDelay { get; }
-    public CustomOption WarnKiller { get; }
-
     public Bait() : base(ColorUtils.AsColor("#00F7FF"), CampType.Crewmate)
     {
-        KillerSelfReportDelay = CreateOption(() => GetContextFromLanguage("killer-report-delay"), 
+        KillerSelfReportDelay = CreateOption(() => GetContextFromLanguage("killer-report-delay"),
             new FloatOptionValueRule(0, 1, 5, 1, NumberSuffixes.Seconds));
         WarnKiller = CreateOption(() => GetContextFromLanguage("warn-killer"), new BoolOptionValueRule(true));
     }
+
+    public CustomOption KillerSelfReportDelay { get; }
+    public CustomOption WarnKiller { get; }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnMurderPlayer(PlayerMurderEvent @event)

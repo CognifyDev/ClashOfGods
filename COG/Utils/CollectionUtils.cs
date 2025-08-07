@@ -1,10 +1,9 @@
-using Il2CppInterop.Runtime.InteropTypes;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
+using Il2CppInterop.Runtime.InteropTypes;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppGenericCollections = Il2CppSystem.Collections.Generic;
 
 namespace COG.Utils;
@@ -33,7 +32,7 @@ public static class CollectionUtils
         list.RemoveAt(0);
         return obj;
     }
-    
+
     public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
     {
         collection.ToList().ForEach(action);

@@ -17,13 +17,13 @@ public class WinnableData
 
     public List<NetworkedPlayerInfo> WinnablePlayers { get; } = new();
 
+    public CampType WinnableCampType { get; set; } = CampType.Unknown;
+
     public List<CachedPlayerData> GetWinnablePlayersAsCachedPlayerData()
     {
         return new List<CachedPlayerData>(WinnablePlayers.Select(info => new CachedPlayerData(info)).ToList());
     }
 
-    public CampType WinnableCampType { get; set; } = CampType.Unknown;
-    
     public static WinnableData Of()
     {
         return new WinnableData();
@@ -66,8 +66,8 @@ public class SerializableWinnableData
             Winnable = Winnable,
             WinText = WinText,
             WinColor = FloatsToColor(Color),
-            GameOverReason = (GameOverReason) GameOverReason,
-            WinnableCampType = (CampType) WinnableCampType
+            GameOverReason = (GameOverReason)GameOverReason,
+            WinnableCampType = (CampType)WinnableCampType
         };
         toReturn.WinnablePlayers.Clear();
         toReturn.WinnablePlayers.AddRange(WinnablePlayers.Select(p => PlayerUtils.GetPlayerById(p)!.Data));
@@ -84,7 +84,7 @@ public class SerializableWinnableData
 
         return array;
     }
-    
+
     private static Color FloatsToColor(float[] floats)
     {
         return new Color(floats[0], floats[1], floats[2], floats[3]);

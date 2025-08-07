@@ -1,4 +1,7 @@
-﻿using COG.Listener;
+﻿using System.Collections;
+using System.Linq;
+using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
 using COG.UI.CustomOption;
@@ -7,23 +10,16 @@ using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using InnerNet;
 using Reactor.Utilities;
-using System.Collections;
-using System.Linq;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
 public class Enchanter : CustomRole, IListener
 {
-    public CustomButton ContractButton { get; }
-    public CustomOption ImmobilizationDuration { get; }
-    public CustomOption CooldownIncreament { get; }
-    public RpcHandler<PlayerControl> KillerPunishmentHandler { get; }
-
     private PlayerControl? _contractedPlayer;
-    private PlayerControl? _target;
-    private bool _usedThisRound = false;
     private PlayerControl? _lastKiller;
+    private PlayerControl? _target;
+    private bool _usedThisRound;
 
     public Enchanter() : base(ColorUtils.AsColor("#7030a0"), CampType.Crewmate)
     {
@@ -52,12 +48,12 @@ public class Enchanter : CustomRole, IListener
 
         ImmobilizationDuration = CreateOption(() => GetContextFromLanguage("immobilization-duration"),
             new FloatOptionValueRule(1, 1, 5,
-            3, NumberSuffixes.Seconds));
+                3, NumberSuffixes.Seconds));
         CooldownIncreament = CreateOption(() => GetContextFromLanguage("cooldown-increament"),
             new FloatOptionValueRule(3, 1, 10,
-            5, NumberSuffixes.Seconds));
+                5, NumberSuffixes.Seconds));
 
-        KillerPunishmentHandler = new(KnownRpc.EnchanterPunishesKiller,
+        KillerPunishmentHandler = new RpcHandler<PlayerControl>(KnownRpc.EnchanterPunishesKiller,
             p => // p must be local player
             {
                 if (!p.AmOwner) return;
@@ -66,9 +62,9 @@ public class Enchanter : CustomRole, IListener
 
                 IEnumerator CoImmobilizeAndIncreaseCooldown()
                 {
-                    Main.Logger.LogDebug($"Setting unmoveable");
+                    Main.Logger.LogDebug("Setting unmoveable");
 
-                    float duration = ImmobilizationDuration.GetFloat();
+                    var duration = ImmobilizationDuration.GetFloat();
                     while (duration > 0f)
                     {
                         p.moveable = false; // directly setting moveable is useless
@@ -78,12 +74,13 @@ public class Enchanter : CustomRole, IListener
 
                     p.moveable = true;
 
-                    Main.Logger.LogDebug($"Increasing cooldown");
+                    Main.Logger.LogDebug("Increasing cooldown");
                     var role = p.GetRoles().FirstOrDefault(r => r.CanKill);
                     if (role == null) yield break;
 
                     var originCooldown = role.CurrentKillButtonSetting.CustomCooldown();
-                    role.CurrentKillButtonSetting/* this wont be synced, so it is just the setting of local player */.CustomCooldown =
+                    role.CurrentKillButtonSetting /* this wont be synced, so it is just the setting of local player */
+                            .CustomCooldown =
                         () => originCooldown + CooldownIncreament.GetFloat();
                     PlayerControl.LocalPlayer.ResetKillCooldown();
                 }
@@ -93,6 +90,11 @@ public class Enchanter : CustomRole, IListener
 
         RegisterRpcHandler(KillerPunishmentHandler);
     }
+
+    public CustomButton ContractButton { get; }
+    public CustomOption ImmobilizationDuration { get; }
+    public CustomOption CooldownIncreament { get; }
+    public RpcHandler<PlayerControl> KillerPunishmentHandler { get; }
 
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
@@ -116,5 +118,8 @@ public class Enchanter : CustomRole, IListener
         _lastKiller = null;
     }
 
-    public override IListener GetListener() => this;
+    public override IListener GetListener()
+    {
+        return this;
+    }
 }

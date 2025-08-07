@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using BepInEx.Unity.IL2CPP.Utils.Collections;
-using COG.Listener.Event.Impl.HManager;
+﻿using COG.Listener.Event.Impl.HManager;
 using COG.UI.Hud.CustomButton;
 using COG.Utils;
 

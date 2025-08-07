@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.UI.CustomOption;
@@ -21,7 +20,8 @@ internal static class GameOptionMenuPatch
         var space = GameOptionsMenu.SPACING_Y;
         var mapPickerHeight = GameOptionsMenu.MAP_PICKER_HEIGHT;
 
-        var settingMap = CustomOption.Options.Where(o => o is { Page: CustomOption.TabType.General }).ToDictionary(o => o, o => o.ToVanillaOptionData());
+        var settingMap = CustomOption.Options.Where(o => o is { Page: CustomOption.TabType.General })
+            .ToDictionary(o => o, o => o.ToVanillaOptionData());
 
         var num = -(__instance.scrollBar.ContentYBounds.max + mapPickerHeight);
         var header = Object.Instantiate(__instance.categoryHeaderOrigin, __instance.settingsContainer);
@@ -39,21 +39,21 @@ internal static class GameOptionMenuPatch
             switch (vanillaSetting.Type)
             {
                 case OptionTypes.Checkbox:
-                    {
-                        behaviour = Object.Instantiate(__instance.checkboxOrigin, __instance.settingsContainer);
-                        break;
-                    }
+                {
+                    behaviour = Object.Instantiate(__instance.checkboxOrigin, __instance.settingsContainer);
+                    break;
+                }
                 case OptionTypes.String:
-                    {
-                        behaviour = Object.Instantiate(__instance.stringOptionOrigin, __instance.settingsContainer);
-                        break;
-                    }
+                {
+                    behaviour = Object.Instantiate(__instance.stringOptionOrigin, __instance.settingsContainer);
+                    break;
+                }
                 case OptionTypes.Float:
                 case OptionTypes.Int:
-                    {
-                        behaviour = Object.Instantiate(__instance.numberOptionOrigin, __instance.settingsContainer);
-                        break;
-                    }
+                {
+                    behaviour = Object.Instantiate(__instance.numberOptionOrigin, __instance.settingsContainer);
+                    break;
+                }
             }
 
             if (!behaviour) continue;
@@ -74,7 +74,8 @@ internal static class GameOptionMenuPatch
     [HarmonyPostfix]
     public static void OnMenuUpdate(GameOptionsMenu __instance)
     {
-        List<CustomOption> options = CustomOption.Options.Where(o => o is { OptionBehaviour: not null, Page: CustomOption.TabType.General }).ToList();
+        var options = CustomOption.Options
+            .Where(o => o is { OptionBehaviour: not null, Page: CustomOption.TabType.General }).ToList();
         var num = GameOptionsMenu.START_POS_Y;
         var headerHeight = GameOptionsMenu.HEADER_HEIGHT;
         var space = GameOptionsMenu.SPACING_Y;
@@ -87,10 +88,11 @@ internal static class GameOptionMenuPatch
             foreach (var setting in category.AllGameSettings)
                 num -= space;
         }
+
         num -= headerHeight;
         options.ForEach(o =>
         {
-            float x = xStart;
+            var x = xStart;
 
             if (o.Parent is { ValueRule: BoolOptionValueRule })
             {
@@ -118,5 +120,5 @@ internal static class GameOptionMenuPatch
     public static bool OnValueChangedVanilla(OptionBehaviour option)
     {
         return !CustomOption.TryGetOption(option, out _);
-    } 
+    }
 }

@@ -1,4 +1,5 @@
-﻿using COG.Rpc;
+﻿using System.Collections;
+using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.Arrow;
@@ -7,7 +8,6 @@ using COG.UI.Hud.CustomMessage;
 using COG.Utils;
 using COG.Utils.Coding;
 using Reactor.Utilities;
-using System.Collections;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
@@ -15,16 +15,16 @@ namespace COG.Role.Impl.Impostor;
 [NotTested("队友的HudMessage")]
 public class Spy : CustomRole
 {
-    private CustomOption _observeCooldown;
-    private RpcHandler<bool> _revealClosestTargetHandler;
-    private CustomButton _observeButton;
+    private readonly CustomButton _observeButton;
+    private readonly CustomOption _observeCooldown;
+    private readonly RpcHandler<bool> _revealClosestTargetHandler;
 
-    public Spy() : base()
+    public Spy()
     {
         _observeCooldown = CreateOption(() => GetContextFromLanguage("observe-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
 
-        _revealClosestTargetHandler = new(KnownRpc.SpyRevealClosestTarget,
+        _revealClosestTargetHandler = new RpcHandler<bool>(KnownRpc.SpyRevealClosestTarget,
             isByKill =>
             {
                 if (PlayerControl.LocalPlayer.GetMainRole().CampType != CampType.Impostor) return;
@@ -41,9 +41,10 @@ public class Spy : CustomRole
                     var timer = arrowTime;
 
                     if (!IsLocalPlayerRole())
-                    {
-                        CustomHudMessage.Instance.AddMessage(GetContextFromLanguage(isByKill ? "get-target-arrow-message-kill" : "get-target-arrow-message-observe"), arrowTime);
-                    }
+                        CustomHudMessage.Instance.AddMessage(
+                            GetContextFromLanguage(isByKill
+                                ? "get-target-arrow-message-kill"
+                                : "get-target-arrow-message-observe"), arrowTime);
 
                     while (timer > 0)
                     {

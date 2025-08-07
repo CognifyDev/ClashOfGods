@@ -1,16 +1,16 @@
+using System.Linq;
 using COG.Listener.Event.Impl.TAButton;
 using COG.Listener.Event.Impl.TAGame;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Utils;
-using System.Linq;
 
 namespace COG.Listener.Impl;
 
 public class TaskAdderListener : IListener
 {
-    public static TaskFolder? RoleFolder;
     public const string ModdedTaskName = "ModdedRole";
+    public static TaskFolder? RoleFolder;
 
     [EventHandler(EventHandlerType.Prefix)]
     public void OnTaskAdderShowFolder(TaskAdderGameShowFolderEvent @event)
@@ -64,6 +64,7 @@ public class TaskAdderListener : IListener
             button.gameObject.SetActive(false);
             return;
         }
+
         var role = button.Role;
         if (button.name != ModdedTaskName) return;
         var customRole = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(c => c.VanillaRole == role);

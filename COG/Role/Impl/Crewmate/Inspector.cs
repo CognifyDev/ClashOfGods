@@ -1,28 +1,23 @@
-using COG.Utils.Coding;
-using COG.Listener;
-using COG.Listener.Event.Impl.Player;
-using COG.Rpc;
-using COG.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using COG.Config.Impl;
+using COG.Constant;
+using COG.Listener;
+using COG.Listener.Attribute;
+using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
-using COG.Constant;
 using COG.UI.Hud.CustomButton;
+using COG.Utils;
 
 namespace COG.Role.Impl.Crewmate;
 
 public class Inspector : CustomRole, IListener
 {
-    private bool _abilityUsedThisRound = false;
-    private List<PlayerControl> _abilityUsedPlayers = new();
+    private readonly List<PlayerControl> _abilityUsedPlayers = new();
+    private bool _abilityUsedThisRound;
     private PlayerControl? _buttonTarget;
     private PlayerControl? _examinedTarget;
-
-    public CustomOption AbilityCooldownOption { get; }
-    public CustomButton ExamineButton { get; }
 
     public Inspector() : base(ColorUtils.FromColor32(46, 84, 160), CampType.Crewmate)
     {
@@ -43,7 +38,7 @@ public class Inspector : CustomRole, IListener
             },
             () =>
             {
-                if (_abilityUsedThisRound) 
+                if (_abilityUsedThisRound)
                     return false;
                 return PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _buttonTarget);
             },
@@ -58,6 +53,9 @@ public class Inspector : CustomRole, IListener
         AddButton(ExamineButton);
     }
 
+    public CustomOption AbilityCooldownOption { get; }
+    public CustomButton ExamineButton { get; }
+
     [OnlyLocalPlayerWithThisRoleInvokable]
     public override void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
     {
@@ -68,7 +66,8 @@ public class Inspector : CustomRole, IListener
     // The player of the role that vented/killed/used his ability performs this, so we gotta send RPC to notify
     public void NotifyInspector()
     {
-        if (Players.Any() || IsLocalPlayerRole()) // If there are inspectors, send rpc; otherwise dont waste network traffic
+        if (Players.Any() ||
+            IsLocalPlayerRole()) // If there are inspectors, send rpc; otherwise dont waste network traffic
             RpcWriter.StartAndSend(KnownRpc.ShareAbilityOrVentUseForInspector);
     }
 
@@ -81,9 +80,13 @@ public class Inspector : CustomRole, IListener
     public override string HandleAdditionalPlayerName(PlayerControl player)
     {
         if (player.IsSamePlayer(_examinedTarget))
-            return $"({(_abilityUsedPlayers.Contains(player) ? LanguageConfig.Instance.Yes.Color(Palette.ImpostorRed) : LanguageConfig.Instance.No.Color(Palette.AcceptedGreen))})";
+            return
+                $"({(_abilityUsedPlayers.Contains(player) ? LanguageConfig.Instance.Yes.Color(Palette.ImpostorRed) : LanguageConfig.Instance.No.Color(Palette.AcceptedGreen))})";
         return base.HandleAdditionalPlayerName(player);
     }
 
-    public override IListener GetListener() => this;
+    public override IListener GetListener()
+    {
+        return this;
+    }
 }

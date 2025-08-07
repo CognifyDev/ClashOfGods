@@ -1,6 +1,4 @@
-﻿using AmongUs.GameOptions;
-using COG.States;
-using UnityEngine;
+﻿using UnityEngine;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantAssignment
@@ -39,9 +37,9 @@ public static class HideUselessButtons
 }
 
 [HarmonyPatch(typeof(MMOnlineManager), nameof(MMOnlineManager.Start))]
-static class LocalGamePatch
+internal static class LocalGamePatch
 {
-    static void Postfix()
+    private static void Postfix()
     {
         GameObject.Find("CreateHnSGameButton").SetActive(false);
     }

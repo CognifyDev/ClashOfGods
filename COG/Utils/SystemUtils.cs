@@ -60,7 +60,10 @@ public static class SystemUtils
         try
         {
             using (var key = Registry.LocalMachine.CreateSubKey(keyPath))
+            {
                 key.SetValue(valueName, value, RegistryValueKind.String);
+            }
+
             return true;
         }
         catch (System.Exception e)

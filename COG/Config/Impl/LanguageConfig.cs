@@ -39,8 +39,8 @@ public class LanguageConfig : ConfigBase
             Instance = new LanguageConfig();
         }
     }
-    
-    public static Action OnLanguageLoaded { get; set;  } = new(() => { });
+
+    public static Action OnLanguageLoaded { get; set; } = new(() => { });
 
     public static LanguageConfig Instance { get; private set; }
     public string MakePublicMessage { get; private set; } = null!;
@@ -74,7 +74,7 @@ public class LanguageConfig : ConfigBase
     // Neutral
     public string ReporterNeededReportTimes { get; private set; } = null!;
     public string DeathBringerNeededPlayerNumber { get; private set; } = null!;
-    
+
     // Sub-roles
     public string GuesserMaxGuessTime { get; private set; } = null!;
     public string GuesserGuessContinuously { get; private set; } = null!;
@@ -143,7 +143,7 @@ public class LanguageConfig : ConfigBase
 
     public string DefaultEjectText { get; private set; } = null!;
     public string AlivePlayerInfo { get; private set; } = null!;
-    
+
     public string SystemMessage { get; private set; } = null!;
     public string HotkeySettingName { get; private set; } = null!;
     public string PressKeyToSet { get; internal set; } = null!;
@@ -180,7 +180,7 @@ public class LanguageConfig : ConfigBase
         // Neutral
         ReporterNeededReportTimes = GetString("role.neutral.reporter.neededReportTimes");
         DeathBringerNeededPlayerNumber = GetString("role.neutral.death-bringer.neededPlayerNumber");
-        
+
         // Sub-Roles
         GuesserMaxGuessTime = GetString("role.sub-roles.guesser.max-guess-time");
         GuesserGuessContinuously = GetString("role.sub-roles.guesser.guess-continuously");
@@ -269,11 +269,11 @@ public class LanguageConfig : ConfigBase
 
     private static void LoadLanguageConfig() => Instance = new();
     internal static void LoadLanguageConfig(string path) => Instance = new(path);
-    
+
     public class TextHandler
     {
         internal TextHandler(string location) => Location = location;
-        
+
         public string Location { get; }
 
         public string GetString(string target) => Instance.GetString($"{Location}.{target}");

@@ -17,16 +17,16 @@ public class ImpostorsCustomWinner : IWinnable
         var aliveCrewmates = PlayerUtils.AllCrewmates.Select(pair => pair.Player).Where
             (p => p.IsAlive()).ToList();
 
-        if (aliveImpostors.Count >= aliveCrewmates.Count && 
+        if (aliveImpostors.Count >= aliveCrewmates.Count &&
             aliveNeutrals.Where(p => p.GetMainRole().CanKill).ToList().Count <= 0)
-        {
             EndGame(data, true);
-        }
 
-        if (CheckGameEndBySabotage())
-        {
-            EndGame(data, false);
-        }
+        if (CheckGameEndBySabotage()) EndGame(data, false);
+    }
+
+    public uint GetWeight()
+    {
+        return IWinnable.GetOrder(1);
     }
 
     private static void EndGame(WinnableData data, bool kill)
@@ -38,7 +38,7 @@ public class ImpostorsCustomWinner : IWinnable
         data.WinColor = Palette.ImpostorRed;
         data.Winnable = true;
     }
-    
+
     private static bool CheckGameEndBySabotage()
     {
         if (ShipStatus.Instance.Systems == null) return false;
@@ -64,10 +64,5 @@ public class ImpostorsCustomWinner : IWinnable
             !(critical.Countdown < 0f)) return false;
         critical.ClearSabotage();
         return true;
-    }
-
-    public uint GetWeight()
-    {
-        return IWinnable.GetOrder(1);
     }
 }

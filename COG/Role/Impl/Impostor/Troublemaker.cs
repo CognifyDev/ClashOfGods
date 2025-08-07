@@ -1,33 +1,33 @@
-﻿using COG.Rpc;
+﻿using System.Collections;
+using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
-using COG.Utils;
-using COG.Utils.Coding;
 using Reactor.Utilities;
-using System.Collections;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
 public class Troublemaker : CustomRole
 {
-    private CustomOption _disturbDuration;
-    private CustomOption _disturbCooldown;
-    private CustomButton _disturbButton;
-    private RpcHandler _disturbRpcHandler;
     private GameObject? _commsDown;
+    private readonly CustomButton _disturbButton;
+    private readonly CustomOption _disturbCooldown;
+    private readonly CustomOption _disturbDuration;
+    private readonly RpcHandler _disturbRpcHandler;
 
-    private bool _usedThisRound = false;
+    private bool _usedThisRound;
 
-    public Troublemaker() : base()
+    public Troublemaker()
     {
-        _disturbDuration = CreateOption(() => GetContextFromLanguage("disturb-duration"), new FloatOptionValueRule(5f, 5f, 15f,
+        _disturbDuration = CreateOption(() => GetContextFromLanguage("disturb-duration"), new FloatOptionValueRule(5f,
+            5f, 15f,
             10f, NumberSuffixes.Seconds));
-        _disturbCooldown = CreateOption(() => GetContextFromLanguage("disturb-cooldown"), new FloatOptionValueRule(10f, 5f, 60f,
+        _disturbCooldown = CreateOption(() => GetContextFromLanguage("disturb-cooldown"), new FloatOptionValueRule(10f,
+            5f, 60f,
             30f, NumberSuffixes.Seconds));
 
-        _disturbRpcHandler = new(KnownRpc.TroubleMakerDisturb, () =>
+        _disturbRpcHandler = new RpcHandler(KnownRpc.TroubleMakerDisturb, () =>
         {
             var useButton = HudManager.Instance.UseButton;
 
@@ -35,9 +35,10 @@ public class Troublemaker : CustomRole
             {
                 _commsDown = Object.Instantiate(HudManager.Instance.AbilityButton.commsDown, useButton.transform);
                 _commsDown.name = "CommsDown";
-                _commsDown.transform.localPosition = HudManager.Instance.AbilityButton.commsDown.transform.localPosition;
+                _commsDown.transform.localPosition =
+                    HudManager.Instance.AbilityButton.commsDown.transform.localPosition;
             }
-            
+
             Coroutines.Start(CoDisturb());
 
             IEnumerator CoDisturb()

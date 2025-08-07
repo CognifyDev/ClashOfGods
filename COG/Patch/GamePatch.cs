@@ -7,7 +7,6 @@ using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
 using COG.Listener.Event.Impl.VentImpl;
-using COG.States;
 using COG.Utils;
 using Il2CppSystem.Collections.Generic;
 using UnityEngine;

@@ -17,7 +17,7 @@ public static class RoleOptionSettingPatch
         var role = CustomRoleManager.GetManager().GetRoles()
             .FirstOrDefault(r => r.AllOptions.Any(o => o.OptionBehaviour == __instance));
         if (role == null) return true;
-        
+
         var playerCount = role.RoleNumberOption!;
         var chance = role.RoleChanceOption!;
 

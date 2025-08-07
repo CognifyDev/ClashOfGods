@@ -24,7 +24,7 @@ public static class ResourceUtils
             {
                 var texture = new Texture2D(2, 2, TextureFormat.ARGB32, true);
                 var byteTexture = Il2CppSystem.IO.File.ReadAllBytes(path);
-                ImageConversion.LoadImage(texture, byteTexture, false);
+                texture.LoadImage(byteTexture, false);
                 return texture;
             }
         }
@@ -60,7 +60,7 @@ public static class ResourceUtils
         var texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
         using MemoryStream ms = new();
         stream?.CopyTo(ms);
-        bool succeed = ImageConversion.LoadImage(texture, ms.ToArray(), false);
+        var succeed = texture.LoadImage(ms.ToArray(), false);
         if (!succeed) Main.Logger.LogError("Failed to load texture: " + path);
         return texture;
     }

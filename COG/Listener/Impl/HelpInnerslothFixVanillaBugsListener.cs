@@ -19,7 +19,7 @@ public class VanillaBugFixListener : IListener
         }
     }
 
-    public void OnEjectionEnd(ExileController controller)
+    private static void OnEjectionEnd(ExileController controller)
     {
         controller.ReEnableGameplay();
     }

@@ -1,35 +1,35 @@
+using System.Linq;
 using COG.Config.Impl;
 using COG.Rpc;
 using COG.UI.Hud.CustomButton;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
-using COG.Utils.Coding;
 using InnerNet;
-using System.Linq;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
 public class Chief : CustomRole
 {
-    private CustomButton _giveKillButton;
-    private CustomButton _giveShieldButton;
+    private readonly CustomButton _giveKillButton;
 
-    private RpcHandler<PlayerControl> _giveKillRpcHandler;
+    private readonly RpcHandler<PlayerControl> _giveKillRpcHandler;
+    private readonly CustomButton _giveShieldButton;
 
     private PlayerControl? _target;
 
     public Chief() : base(Color.gray, CampType.Crewmate)
     {
-        _giveKillRpcHandler = new(KnownRpc.GiveOneKill,
+        _giveKillRpcHandler = new RpcHandler<PlayerControl>(KnownRpc.GiveOneKill,
             player =>
             {
                 if (!player.AmOwner) return; // local player only
-                if (!player.GetRoles().Any(r => r.CanKill)) // normally speaking, there should be only one role which can kill
+                if (!player.GetRoles()
+                        .Any(r => r.CanKill)) // normally speaking, there should be only one role which can kill
                 {
                     var role = player.GetMainRole();
 
-                    role!.CurrentKillButtonSetting = new()
+                    role!.CurrentKillButtonSetting = new KillButtonSetting
                     {
                         ForceShow = () => true,
                         InitialCooldown = 0,
@@ -37,7 +37,8 @@ public class Chief : CustomRole
                         RemainingUses = 1
                     };
 
-                    role!.CurrentKillButtonSetting.AddAfterClick(() => role!.ResetCurrentKillButtonSetting()); // restore setting after use
+                    role!.CurrentKillButtonSetting.AddAfterClick(() =>
+                        role!.ResetCurrentKillButtonSetting()); // restore setting after use
                 }
             },
             (writer, player) => writer.WriteNetObject(player),

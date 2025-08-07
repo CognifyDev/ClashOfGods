@@ -12,16 +12,20 @@ namespace COG.Game.CustomWinner;
 public class CustomWinnerManager
 {
     private static CustomWinnerManager? _manager;
-    public static CustomWinnerManager GetManager() => _manager ??= new CustomWinnerManager();
 
     private readonly List<IWinnable> _winnable = new();
-    
+
     private CustomWinnerManager()
     {
         WinnableData = WinnableData.Of();
     }
 
     public WinnableData WinnableData { get; internal set; }
+
+    public static CustomWinnerManager GetManager()
+    {
+        return _manager ??= new CustomWinnerManager();
+    }
 
     public void RegisterCustomWinnable(IWinnable winnable)
     {
@@ -49,14 +53,14 @@ public class CustomWinnerManager
 
         foreach (var group in winnerGroups)
         {
-            bool isWin = false;
+            var isWin = false;
             var winTexts = new List<string>();
-        
+
             foreach (var winnable in group)
             {
                 winnable.CheckWin(WinnableData);
-                bool currentWin = WinnableData.Winnable;
-            
+                var currentWin = WinnableData.Winnable;
+
                 // 记录胜利状态及文本
                 if (currentWin)
                 {
@@ -64,6 +68,7 @@ public class CustomWinnerManager
                     if (!string.IsNullOrEmpty(WinnableData.WinText))
                         winTexts.Add(WinnableData.WinText);
                 }
+
                 WinnableData.Winnable = false; // 重置状态避免污染后续检查
             }
 
@@ -79,9 +84,10 @@ public class CustomWinnerManager
                 WinnableData.GameOverReason = GameOverReason.CrewmatesByTask;
                 WinnableData.WinText = string.Join(" ", winTexts);
             }
+
             return WinnableData; // 高优先级胜利直接返回
         }
-    
+
         return WinnableData;
     }
 

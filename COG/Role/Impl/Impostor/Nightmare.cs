@@ -1,12 +1,13 @@
-﻿using COG.Rpc;
+﻿using System.Collections;
+using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
+using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using COG.Utils.Coding;
 using InnerNet;
 using Reactor.Utilities;
-using System.Collections;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
@@ -14,23 +15,22 @@ namespace COG.Role.Impl.Impostor;
 [NotTested("rpc")]
 public class Nightmare : CustomRole
 {
-    private CustomOption _storeCooldown;
-    private CustomButton _storeButton;
-    private RpcHandler<PlayerControl> _storeHandler;
-    private RpcHandler<PlayerControl, PlayerControl, float> _cooldownCheckHandler;
-
-    // GAMEPLAY VARIABLES
-    private int _storedKills = 0;
-    private float _teammateCurrentCooldown = float.MaxValue;
-    private bool _receivedCooldownSent = false;
-    private PlayerControl? _target;
-
     private const int MaxKillsStored = 2;
     private const float ResponseTimeout = 5f;
+    private readonly RpcHandler<PlayerControl, PlayerControl, float> _cooldownCheckHandler;
+    private bool _receivedCooldownSent;
+    private readonly CustomButton _storeButton;
+    private readonly CustomOption _storeCooldown;
 
-    public Nightmare() : base()
+    // GAMEPLAY VARIABLES
+    private int _storedKills;
+    private readonly RpcHandler<PlayerControl> _storeHandler;
+    private PlayerControl? _target;
+    private float _teammateCurrentCooldown = float.MaxValue;
+
+    public Nightmare()
     {
-        _storeHandler = new(KnownRpc.NightmareStore,
+        _storeHandler = new RpcHandler<PlayerControl>(KnownRpc.NightmareStore,
             player =>
             {
                 if (player.AmOwner) // local player only
@@ -38,14 +38,15 @@ public class Nightmare : CustomRole
             },
             (writer, player) => writer.WriteNetObject(player),
             reader => reader.ReadNetObject<PlayerControl>());
-        _cooldownCheckHandler = new(KnownRpc.NightmareCooldownCheck,
+        _cooldownCheckHandler = new RpcHandler<PlayerControl, PlayerControl, float>(KnownRpc.NightmareCooldownCheck,
             (sender, receiver, cooldown) =>
             {
                 if (!receiver.AmOwner) return;
 
                 if (cooldown == float.MaxValue)
                 {
-                    _cooldownCheckHandler!.Send(receiver, sender, PlayerControl.LocalPlayer.killTimer); // Sending current cooldown
+                    _cooldownCheckHandler!.Send(receiver, sender,
+                        PlayerControl.LocalPlayer.killTimer); // Sending current cooldown
                 }
                 else
                 {
@@ -54,12 +55,13 @@ public class Nightmare : CustomRole
                 }
             },
             (writer, player, receiver, cooldown) => writer.WriteNetObject(player).Write(cooldown),
-            reader => (reader.ReadNetObject<PlayerControl>(), reader.ReadNetObject<PlayerControl>(), reader.ReadSingle()));
+            reader => (reader.ReadNetObject<PlayerControl>(), reader.ReadNetObject<PlayerControl>(),
+                reader.ReadSingle()));
 
         RegisterRpcHandler(_storeHandler);
         RegisterRpcHandler(_cooldownCheckHandler);
 
-        _storeCooldown = CreateOption(() => GetContextFromLanguage("store-cooldown"), 
+        _storeCooldown = CreateOption(() => GetContextFromLanguage("store-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
 
         _storeButton = CustomButton.Of("nightmare-store",
@@ -83,11 +85,11 @@ public class Nightmare : CustomRole
 
                     if (timer > ResponseTimeout)
                         Main.Logger.LogWarning("Teammate cooldown check timed out");
-                    
+
 
                     if (_teammateCurrentCooldown <= 0)
                     {
-                        CurrentKillButtonSetting = new();
+                        CurrentKillButtonSetting = new KillButtonSetting();
                         CurrentKillButtonSetting.CustomCooldown = () => 0f;
                         CurrentKillButtonSetting.AddAfterClick(() =>
                         {
@@ -105,12 +107,14 @@ public class Nightmare : CustomRole
 
                     void SyncInfoText()
                     {
-                        _storeButton!.SetInfoText(GetContextFromLanguage("stored-kills-info").CustomFormat(("stored", _storedKills), ("max", MaxKillsStored)));
+                        _storeButton!.SetInfoText(GetContextFromLanguage("stored-kills-info")
+                            .CustomFormat(("stored", _storedKills), ("max", MaxKillsStored)));
                     }
                 }
             },
             () => { },
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) && _storedKills < MaxKillsStored && _target!.GetMainRole().CampType == CampType.Impostor,
+            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) &&
+                  _storedKills < MaxKillsStored && _target!.GetMainRole().CampType == CampType.Impostor,
             () => true,
             null!,
             2,

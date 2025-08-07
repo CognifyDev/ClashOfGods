@@ -1,24 +1,24 @@
+using System.Linq;
 using COG.Constant;
 using COG.Role;
 using COG.Utils;
-using System.Linq;
 
 namespace COG.Command.Impl;
 
 /// <summary>
-///     ½öÓÃÓÚµ÷ÊÔ
+///     ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½
 /// </summary>
 public class DebugCommand : CommandBase
 {
-    public static bool EnableRpcTest { get; private set; } = false;
-
     public DebugCommand() : base("debug")
     {
     }
 
+    public static bool EnableRpcTest { get; private set; }
+
     public override bool OnExecute(PlayerControl player, string[] args)
     {
-        if (!GlobalCustomOptionConstant.DebugMode.GetBool() || args.Length == 0) 
+        if (!GlobalCustomOptionConstant.DebugMode.GetBool() || args.Length == 0)
             return false;
 
         switch (args.First())
@@ -36,7 +36,7 @@ public class DebugCommand : CommandBase
                 break;
             }
         }
-        
+
         return false;
     }
 }

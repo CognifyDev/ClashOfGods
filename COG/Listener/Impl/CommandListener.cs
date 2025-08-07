@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using COG.Command;
 using COG.Listener.Event.Impl.Player;

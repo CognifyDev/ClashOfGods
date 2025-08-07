@@ -6,52 +6,73 @@ namespace COG.UI.Vanilla.KillButton;
 
 public class KillButtonSetting
 {
+    private Action _afterClick = () => { };
+    private Func<global::KillButton, PlayerControl> _beforeMurder = b => b.currentTarget;
+    private Func<bool> _customCondition = () => true;
+
     /// <summary>
-    /// ÊÇ·ñ»î×ÅÊ±·½¿É»÷É±
+    ///     ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½É»ï¿½É±
     /// </summary>
     public bool OnlyUsableWhenAlive { get; set; } = true;
 
     /// <summary>
-    /// »÷É±Ä¿±êµÄÂÖÀªÏßÑÕÉ«
+    ///     ï¿½ï¿½É±Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«
     /// </summary>
     public Color TargetOutlineColor { get; set; } = Palette.ImpostorRed;
 
     /// <summary>
-    /// Ê¹ÓÃÏÞÖÆ£¨¡Ü0ÎªÎÞÏÞ£©
+    ///     Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½ï¿½ï¿½0Îªï¿½ï¿½ï¿½Þ£ï¿½
     /// </summary>
-    public int UsesLimit { get; set; } = 0;
+    public int UsesLimit { get; set; }
 
     /// <summary>
-    /// ×Ô¶¨ÒåÀäÈ´£¨£¼0ÎªÊ¹ÓÃÓÎÏ·Ä¬ÈÏÖµ£©
+    ///     ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½È´ï¿½ï¿½ï¿½ï¿½0ÎªÊ¹ï¿½ï¿½ï¿½ï¿½Ï·Ä¬ï¿½ï¿½Öµï¿½ï¿½
     /// </summary>
     public Func<float> CustomCooldown { get; set; } = () => float.NegativeInfinity;
 
     /// <summary>
-    /// ÊÇ·ñÇ¿ÖÆÏÔÊ¾
+    ///     ï¿½Ç·ï¿½Ç¿ï¿½ï¿½ï¿½ï¿½Ê¾
     /// </summary>
     public Func<bool> ForceShow { get; set; } = () => false;
 
     /// <summary>
-    /// ³õÊ¼ÀäÈ´£¨£¼0ÎªÊ¹ÓÃ×Ô¶¨Òå»òÓÎÏ·»÷É±ÀäÈ´£©
+    ///     ï¿½ï¿½Ê¼ï¿½ï¿½È´ï¿½ï¿½ï¿½ï¿½0ÎªÊ¹ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½É±ï¿½ï¿½È´ï¿½ï¿½
     /// </summary>
     public float InitialCooldown { get; set; } = float.NegativeInfinity;
 
     public int RemainingUses { get; set; }
 
-    public string? ExtraRpcMessage { get; set; } = null;
+    public string? ExtraRpcMessage { get; set; }
 
-    private Action _afterClick = () => { };
-    private Func<bool> _customCondition = () => true;
-    private Func<global::KillButton, PlayerControl> _beforeMurder = b => b.currentTarget;
+    public void AfterClick()
+    {
+        _afterClick.GetInvocationList().Do(dg => dg.DynamicInvoke());
+    }
 
-    public void AfterClick() => _afterClick.GetInvocationList().Do(dg => dg.DynamicInvoke());
-    public void AddAfterClick(Action action) => _afterClick += action;
+    public void AddAfterClick(Action action)
+    {
+        _afterClick += action;
+    }
 
-    public bool CustomCondition() => _customCondition.GetInvocationList().All(dg => (bool)dg.DynamicInvoke()!);
-    public void AddCustomCondition(Func<bool> cond) => _customCondition += cond;
+    public bool CustomCondition()
+    {
+        return _customCondition.GetInvocationList().All(dg => (bool)dg.DynamicInvoke()!);
+    }
 
-    public PlayerControl BeforeMurder() => _beforeMurder(HudManager.Instance.KillButton);
-    public void SetBeforeMurder(Func<global::KillButton, PlayerControl> beforeMurder) => _beforeMurder = beforeMurder;
+    public void AddCustomCondition(Func<bool> cond)
+    {
+        _customCondition += cond;
+    }
+
+    public PlayerControl BeforeMurder()
+    {
+        return _beforeMurder(HudManager.Instance.KillButton);
+    }
+
+    public void SetBeforeMurder(Func<global::KillButton, PlayerControl> beforeMurder)
+    {
+        _beforeMurder = beforeMurder;
+    }
 
     public KillButtonSetting Clone()
     {

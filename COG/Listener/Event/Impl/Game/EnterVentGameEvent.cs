@@ -1,13 +1,14 @@
-﻿using COG.Utils;
+﻿using COG.Game.Events;
+using COG.Utils;
 
-namespace COG.Game.Events.Impl;
+namespace COG.Listener.Event.Impl.Game;
 
 public class EnterVentGameEvent : GameEventBase
 {
-    public int VentId { get; }
-
     public EnterVentGameEvent(CustomPlayerData player, int ventId) : base(GameEventType.EnterVent, player)
     {
         VentId = ventId;
     }
+
+    public int VentId { get; }
 }

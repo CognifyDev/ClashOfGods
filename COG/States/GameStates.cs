@@ -2,9 +2,7 @@ global using GameStates = COG.States.GameStates;
 using COG.Game.Events;
 using COG.Patch;
 using COG.Role;
-using COG.UI.Vanilla.KillButton;
 using COG.Utils;
-using System;
 
 namespace COG.States;
 
@@ -13,7 +11,7 @@ namespace COG.States;
 /// </summary>
 public static class GameStates
 {
-    private static bool _inRealGame = false;
+    private static bool _inRealGame;
 
     /// <summary>
     ///     是否处于正式游戏中
@@ -24,7 +22,8 @@ public static class GameStates
 
         set
         {
-            Main.Logger.LogMessage($"{nameof(GameStates)}::{nameof(_inRealGame)} being set to {value}. Clearing role data...");
+            Main.Logger.LogMessage(
+                $"{nameof(GameStates)}::{nameof(_inRealGame)} being set to {value}. Clearing role data...");
 
             _inRealGame = value;
 
@@ -71,9 +70,4 @@ public static class GameStates
     public static bool IsVoting => IsMeeting &&
                                    MeetingHud.Instance.state is MeetingHud.VoteStates.Voted
                                        or MeetingHud.VoteStates.NotVoted;
-}
-
-[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-public sealed class OnlyInRealGameAttribute : System.Attribute
-{
 }

@@ -5,10 +5,12 @@ global using GitInfo = ThisAssembly.Git;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Command;
 using COG.Command.Impl;
+using COG.Config;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
@@ -24,6 +26,7 @@ using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
 using COG.UI.ClientOption;
+using COG.UI.ClientOption.Impl;
 using COG.Utils;
 using COG.Utils.Version;
 using COG.Utils.WinAPI;
@@ -32,8 +35,6 @@ using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using OpenFileMode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
-using COG.Config;
-using COG.UI.ClientOption.Impl;
 
 namespace COG;
 
@@ -67,7 +68,7 @@ public partial class Main : BasePlugin
             ? VersionInfo.Empty
             : VersionInfo.Parse(PluginVersion);
 
-        System.Console.OutputEncoding = System.Text.Encoding.UTF8;
+        System.Console.OutputEncoding = Encoding.UTF8;
 
         Logger = new StackTraceLogger($"   {DisplayName}");
         Logger.LogInfo("Loading...");
@@ -75,17 +76,17 @@ public partial class Main : BasePlugin
         Logger.LogInfo($"GitInfo: {GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})");
 
         ResourceUtils.WriteToFileFromResource(
-                @".\BepInEx\core\Jint.dll",
+            @".\BepInEx\core\Jint.dll",
             ResourceUtils.GetResourcePath("Libraries.Jint.dll")
-            );
+        );
         ResourceUtils.WriteToFileFromResource(
-                @".\BepInEx\core\YamlDotNet.dll",
+            @".\BepInEx\core\YamlDotNet.dll",
             ResourceUtils.GetResourcePath("Libraries.YamlDotNet.dll")
-            );
+        );
         ResourceUtils.WriteToFileFromResource(
-                @".\BepInEx\core\Acornima.dll",
+            @".\BepInEx\core\Acornima.dll",
             ResourceUtils.GetResourcePath("Libraries.Acornima.dll")
-            );
+        );
 
         var longVersionInfo = StringUtils.EncodeToBase64($"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}");
         var storagedInfo = "";
@@ -94,14 +95,18 @@ public partial class Main : BasePlugin
         {
             storagedInfo = File.ReadAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat");
         }
-        catch { }
+        catch
+        {
+            // ignored
+        }
 
         ConfigBase.AutoReplace = true;
 
         if (!storagedInfo.IsNullOrEmptyOrWhiteSpace())
         {
             if (storagedInfo != longVersionInfo)
-                Logger.LogWarning("Current mod version doesnt equal to version of last mod running on this machine. Schedule to replace config files...");
+                Logger.LogWarning(
+                    "Current mod version doesnt equal to version of last mod running on this machine. Schedule to replace config files...");
             else
                 ConfigBase.AutoReplace = false;
         }
@@ -190,10 +195,12 @@ public partial class Main : BasePlugin
                 {
                     if (GameStates.InRealGame || GameStates.InLobby)
                     {
-                        GameUtils.Popup?.Show("You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
+                        GameUtils.Popup?.Show(
+                            "You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
                         return false;
                     }
-                    var p = OpenFileDialogue.Display(OpenFileMode.Open, "",
+
+                    var p = OpenFileDialogue.Display(OpenFileMode.Open,
                         defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
                     if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
 
@@ -221,11 +228,12 @@ public partial class Main : BasePlugin
                 false,
                 _ =>
                 {
-                    ClientOptionManager.GetManager().GetOptions().ForEach(o => o.Component!.gameObject.SetActive(false));
+                    ClientOptionManager.GetManager().GetOptions()
+                        .ForEach(o => o.Component!.gameObject.SetActive(false));
                     ClientOptionListener.HotkeyButtons.ForEach(o => o.SetActive(true));
                     return false;
                 }),
-            new SliderClientOption("main.max-chat-bubble-adjustment", 
+            new SliderClientOption("main.max-chat-bubble-adjustment",
                 20,
                 20,
                 100,
@@ -233,7 +241,7 @@ public partial class Main : BasePlugin
                 {
                     var value = ChatBubblePoolPatch.MaxBubbleCount = (int)newValue;
                     ChatController? controller = null;
-                    if (controller = Object.FindObjectOfType<ChatController>())
+                    if (controller == Object.FindObjectOfType<ChatController>())
                     {
                         var pool = controller.chatBubblePool;
                         var current = pool.activeChildren.Count + pool.inactiveChildren.Count;
@@ -242,6 +250,7 @@ public partial class Main : BasePlugin
                         for (var i = 0; i < toClone; i++)
                             pool.CreateOneInactive(pool.Prefab);
                     }
+
                     return value;
                 },
                 (value, origin) => origin + $": {(int)value}")
@@ -254,22 +263,24 @@ public partial class Main : BasePlugin
             new OptionCommand(),
             new DebugCommand()
         });
-        
+
         Harmony.PatchAll();
-        
+
         // Start to load plugins
         if (SettingsConfig.Instance.EnablePluginSystem)
         {
-            if (!Directory.Exists(JsPluginManager.PluginDirectoryPath)) Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
-            
-            var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath).Where(name => name.ToLower().EndsWith(".cog"));
+            if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
+                Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
+
+            var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
+                .Where(name => name.ToLower().EndsWith(".cog"));
             var enumerable = files.ToArray();
             Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
 
             foreach (var file in enumerable)
                 JsPluginManager.GetManager().LoadPlugin(file);
         }
-        
+
         _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
     }
 

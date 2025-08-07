@@ -5,15 +5,15 @@ using COG.Listener;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
-using COG.UI.Vanilla.KillButton;
 using COG.Utils;
-using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
 public class Cleaner : CustomRole, IListener
 {
-    public Cleaner() : base()
+    private DeadBody? _body;
+
+    public Cleaner()
     {
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;
@@ -51,8 +51,6 @@ public class Cleaner : CustomRole, IListener
 
     private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
-
-    private DeadBody? _body;
 
     public override IListener GetListener()
     {

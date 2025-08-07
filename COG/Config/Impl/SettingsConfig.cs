@@ -4,8 +4,11 @@ namespace COG.Config.Impl;
 
 public class SettingsConfig : ConfigBase
 {
-    public static SettingsConfig Instance { get; }
-    
+    static SettingsConfig()
+    {
+        Instance = new SettingsConfig();
+    }
+
     public SettingsConfig() : base("Settings",
         DataDirectoryName + "/settings.yml",
         new ResourceFile("COG.Resources.Configs.settings.yml"))
@@ -16,13 +19,10 @@ public class SettingsConfig : ConfigBase
         Strict = YamlReader!.GetBool("plugin.strict")!.Value;
     }
 
-    public bool EnablePluginSystem { get; } 
+    public static SettingsConfig Instance { get; }
+
+    public bool EnablePluginSystem { get; }
     public string TimeZone { get; }
     public string Culture { get; }
     public bool Strict { get; }
-
-    static SettingsConfig()
-    {
-        Instance = new();
-    }
 }

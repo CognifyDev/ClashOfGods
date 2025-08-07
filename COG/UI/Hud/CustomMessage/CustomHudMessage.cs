@@ -1,7 +1,7 @@
-﻿using Reactor.Utilities.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Reactor.Utilities.Attributes;
 using TMPro;
 using UnityEngine;
 
@@ -11,23 +11,24 @@ namespace COG.UI.Hud.CustomMessage;
 [RegisterInIl2Cpp]
 public class CustomHudMessage : MonoBehaviour
 {
+    private TextMeshPro _messageObject;
+
+    private Dictionary<string, float> _messageTimers = new();
+
     public CustomHudMessage(IntPtr ptr) : base(ptr)
     {
     }
 
     public static CustomHudMessage Instance { get; private set; }
 
-    private Dictionary<string, float> _messageTimers = new();
-    private TextMeshPro _messageObject;
-
-    void Start()
+    private void Start()
     {
         Instance = this;
 
         var template = HudManager.Instance.TaskPanel.taskText;
         _messageObject = Instantiate(template, HudManager.Instance.transform);
         _messageObject.name = nameof(CustomHudMessage);
-        _messageObject.transform.localPosition = new(0, -2, 0);
+        _messageObject.transform.localPosition = new Vector3(0, -2, 0);
 
         _messageObject.fontSize = _messageObject.fontSizeMin = _messageObject.fontSizeMax = 3;
         _messageObject.alignment = TextAlignmentOptions.Center;
@@ -35,9 +36,9 @@ public class CustomHudMessage : MonoBehaviour
         _messageObject.text = "";
     }
 
-    void Update()
+    private void Update()
     {
-        if(_messageTimers.Count == 0)
+        if (_messageTimers.Count == 0)
         {
             _messageObject.text = "";
             return;
@@ -66,13 +67,8 @@ public class CustomHudMessage : MonoBehaviour
     {
         if (string.IsNullOrEmpty(message)) return;
         if (_messageTimers.ContainsKey(message))
-        {
             _messageTimers[message] = Mathf.Max(_messageTimers[message], duration);
-        }
         else
-        {
             _messageTimers.Add(message, duration);
-        }
     }
 }
-#nullable restore

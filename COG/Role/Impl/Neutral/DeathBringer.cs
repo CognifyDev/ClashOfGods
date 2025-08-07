@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
-using COG.UI.Vanilla.KillButton;
 using COG.Utils;
-using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
@@ -19,15 +17,15 @@ public class DeathBringer : CustomRole, IListener
 {
     private const string PlayerStaredAtTag = "staredAt_DeathBringer";
 
-    private readonly CustomButton _stareButton;
-
     private readonly CustomOption _killCooldown, _neededPlayerNumber;
+
+    private readonly CustomButton _stareButton;
 
     private readonly List<PlayerControl> _staredPlayers = new();
 
     private PlayerControl? _target;
-    
-    public DeathBringer() : base(ColorUtils.FromColor32(112, 48, 160, 255), CampType.Neutral)
+
+    public DeathBringer() : base(ColorUtils.FromColor32(112, 48, 160), CampType.Neutral)
     {
         CanKill = true;
 
@@ -35,7 +33,7 @@ public class DeathBringer : CustomRole, IListener
             new FloatOptionValueRule(1F, 1F, 60F, 30F, NumberSuffixes.Seconds));
         _neededPlayerNumber = CreateOption(() => LanguageConfig.Instance.DeathBringerNeededPlayerNumber,
             new FloatOptionValueRule(1F, 1F, 15F, 5F));
-        
+
         _stareButton = CustomButton.Of(
             "death-bringer-stare",
             () =>
@@ -52,7 +50,8 @@ public class DeathBringer : CustomRole, IListener
             _killCooldown.GetFloat,
             -1);
 
-        DefaultKillButtonSetting.ForceShow = () => PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat();
+        DefaultKillButtonSetting.ForceShow =
+            () => PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat();
         DefaultKillButtonSetting.CustomCooldown = _killCooldown.GetFloat;
 
         AddButton(_stareButton);

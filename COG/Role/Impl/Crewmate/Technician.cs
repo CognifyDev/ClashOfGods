@@ -1,12 +1,12 @@
+using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
-using COG.Listener.Event.Impl.Player;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Rpc;
 using COG.UI.Hud.CustomButton;
 using COG.Utils;
-using System.Linq;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -54,13 +54,14 @@ public class Technician : CustomRole, IListener
 
             var dist = float.MaxValue;
             var couldUse = (!player.MustCleanVent(vent.Id) || (player.inVent && Vent.currentVent == vent))
-                && !data.IsDead && (player.CanMove || player.inVent);
+                           && !data.IsDead && (player.CanMove || player.inVent);
             if (ShipStatus.Instance.Systems.TryGetValueSafeIl2Cpp(SystemTypes.Ventilation, out var systemType))
             {
                 var ventilationSystem = systemType.Cast<VentilationSystem>();
                 if (ventilationSystem != null && ventilationSystem.IsVentCurrentlyBeingCleaned(vent.Id))
                     couldUse = false;
             }
+
             var canUse = couldUse;
             if (canUse)
             {
@@ -68,7 +69,8 @@ public class Technician : CustomRole, IListener
                 var position = vent.transform.position;
                 dist = Vector2.Distance(center, position);
                 canUse &= dist <= vent.UsableDistance
-                    && !PhysicsHelpers.AnythingBetween(player.Collider, center, position, Constants.ShipOnlyMask, false);
+                          && !PhysicsHelpers.AnythingBetween(player.Collider, center, position, Constants.ShipOnlyMask,
+                              false);
             }
 
             @event.SetCanUse(canUse);
@@ -86,9 +88,9 @@ public class Technician : CustomRole, IListener
     private static void RepairSabotages()
     {
         var ship = ShipStatus.Instance;
-        var mapId = (MapNames)(AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay ?
-        AmongUsClient.Instance.TutorialMapId :
-        GameUtils.GetGameOptions().MapId);
+        var mapId = (MapNames)(AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay
+            ? AmongUsClient.Instance.TutorialMapId
+            : GameUtils.GetGameOptions().MapId);
 
         ship.RepairCriticalSabotages();
         if (ship.Systems.TryGetValueSafeIl2Cpp(SystemTypes.Electrical, out var system))

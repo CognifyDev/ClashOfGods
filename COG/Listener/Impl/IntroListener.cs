@@ -1,8 +1,9 @@
+using System.Text;
 using AmongUs.GameOptions;
 using COG.Listener.Event.Impl.ICutscene;
 using COG.Role;
 using COG.Utils;
-using System.Text;
+using Il2CppSystem.Collections.Generic;
 using UnityEngine;
 
 namespace COG.Listener.Impl;
@@ -62,7 +63,7 @@ public class IntroListener : IListener
 
         var camp = role.CampType;
         if (camp is not (CampType.Neutral or CampType.Unknown)) return;
-        var soloTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
+        var soloTeam = new List<PlayerControl>();
         soloTeam.Add(player);
         @event.SetTeamToDisplay(soloTeam);
     }

@@ -53,13 +53,11 @@ public static class StringUtils
                     result.Append(args[argIndex++]?.ToString() ?? string.Empty);
                     isInPlaceholder = false;
                 }
+
                 continue;
             }
 
-            if (!isInPlaceholder)
-            {
-                result.Append(t);
-            }
+            if (!isInPlaceholder) result.Append(t);
         }
 
         // 最终状态检查
@@ -79,12 +77,22 @@ public static class StringUtils
             var toReplace = $"%{key}%";
             text = text.Replace(toReplace, value.ToString());
         }
+
         return text;
     }
 
-    public static bool IsNullOrEmptyOrWhiteSpace(this string? str) => string.IsNullOrWhiteSpace(str);
+    public static bool IsNullOrEmptyOrWhiteSpace(this string? str)
+    {
+        return string.IsNullOrWhiteSpace(str);
+    }
 
-    public static string EncodeToBase64(string origin) => Convert.ToBase64String(Encoding.UTF8.GetBytes(origin));
+    public static string EncodeToBase64(string origin)
+    {
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(origin));
+    }
 
-    public static string DecodeAsBase64(string encoded) => Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
+    public static string DecodeAsBase64(string encoded)
+    {
+        return Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
+    }
 }

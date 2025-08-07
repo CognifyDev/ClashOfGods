@@ -6,6 +6,6 @@ public class PassiveButtonEvent : Event
     {
         Button = button;
     }
-    
+
     public PassiveButton Button { get; }
 }

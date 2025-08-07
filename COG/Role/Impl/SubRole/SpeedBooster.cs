@@ -10,19 +10,28 @@ namespace COG.Role.Impl.SubRole;
 
 public class SpeedBooster : CustomRole, IListener
 {
-    private CustomOption IncreasingSpeed { get; }
-    
     public SpeedBooster() : base(Color.cyan)
     {
         IncreasingSpeed = CreateOption(() => LanguageConfig.Instance.SpeedBoosterIncreasingSpeed,
             new FloatOptionValueRule(0.5F, 0.5F, 10F, 1F, NumberSuffixes.Multiplier));
     }
 
+    private CustomOption IncreasingSpeed { get; }
+
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnGameStart(GameStartEvent _)
     {
         PlayerControl.LocalPlayer.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
+        }
+
+        player.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
+        }
+
+        player.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
+        }
+
+        player.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
     }
 
     public override IListener GetListener()

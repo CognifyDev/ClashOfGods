@@ -1,9 +1,9 @@
-﻿using COG.Role.Impl.Crewmate;
-using COG.Role.Impl.Impostor;
+﻿using System.Linq;
+using COG.Game.Events;
+using COG.Role.Impl.Crewmate;
 using COG.Utils;
-using System.Linq;
 
-namespace COG.Game.Events.Impl.Handlers;
+namespace COG.Listener.Event.Impl.Game.Handlers;
 
 public class PlayerDeathHandler : TypeEventHandlerBase
 {
@@ -11,15 +11,15 @@ public class PlayerDeathHandler : TypeEventHandlerBase
     {
     }
 
-    public override IGameEvent Handle(CustomPlayerData player, params object[] extraArguments)
+    public override IGameEvent? Handle(CustomPlayerData player, params object[] extraArguments)
     {
         if (extraArguments.Length == 1)
         {
             if (extraArguments[0] is CustomDeathReason reason)
-            {
                 switch (reason)
                 {
-                    case CustomDeathReason.InteractionAfterRevival: // This only calls Die method, not MurderPlayer, so write here
+                    case CustomDeathReason.InteractionAfterRevival
+                        : // This only calls Die method, not MurderPlayer, so write here
                     {
                         var revived = (CustomPlayerData)extraArguments[1];
                         return new WitchRevivedInteractionDieGameEvent(player, revived);
@@ -27,8 +27,8 @@ public class PlayerDeathHandler : TypeEventHandlerBase
                     default:
                         return null!;
                 }
-            }
-            else if (extraArguments[0] is string extraMessage)
+
+            if (extraArguments[0] is string extraMessage)
             {
                 if (extraMessage.StartsWith(Sheriff.MisfireMurderMessage))
                 {
@@ -37,25 +37,19 @@ public class PlayerDeathHandler : TypeEventHandlerBase
                         var playerData = GameUtils.PlayerData.First(p => p.PlayerId == result);
                         return new SheriffMisfireGameEvent(player, playerData);
                     }
-                    else
-                    {
-                        Main.Logger.LogWarning($"Invalid message argument: " + extraMessage);
-                        return null!;
-                    }
+
+                    Main.Logger.LogWarning("Invalid message argument: " + extraMessage);
+                    return null!;
                 }
 
                 Main.Logger.LogWarning($"Unexpected {nameof(extraMessage)}: {extraMessage}");
                 return null!;
             }
-            else
-            {
-                Main.Logger.LogWarning($"Unexpected extra argument type: {extraArguments[0].GetType()}");
-                return null!;
-            }
+
+            Main.Logger.LogWarning($"Unexpected extra argument type: {extraArguments[0].GetType()}");
+            return null!;
         }
-        else
-        {
-            return new PlayerDieGameEvent(player);
-        }
+
+        return new PlayerDieGameEvent(player);
     }
 }

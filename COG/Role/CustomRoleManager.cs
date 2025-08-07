@@ -39,7 +39,10 @@ public class CustomRoleManager
         return customRoles;
     }
 
-    public List<CustomRole> GetModRoles() => GetRoles().Where(r => !r.IsBaseRole).ToList();
+    public List<CustomRole> GetModRoles()
+    {
+        return GetRoles().Where(r => !r.IsBaseRole).ToList();
+    }
 
     public CustomRole? GetRoleByClassName(string name, bool ignoreCase = false)
     {
@@ -56,7 +59,7 @@ public class CustomRoleManager
     }
 
     /// <summary>
-    ///     获取一个新的获取器
+    ///     获取一个获取器
     /// </summary>
     /// <returns>获取器实例</returns>
     public IGetter<CustomRole> NewGetter(Func<CustomRole, bool> predicate, CustomRole? defaultRole = null)
@@ -71,10 +74,8 @@ public class CustomRoleManager
 
     private class RoleGetter : IGetter<CustomRole>
     {
-        private List<CustomRole> CustomRoles { get; } = new();
-
         private readonly CustomRole? _defaultRole;
-        
+
         public RoleGetter(Func<CustomRole, bool> predicate, CustomRole? defaultRole = null)
         {
             _defaultRole = defaultRole;
@@ -82,24 +83,20 @@ public class CustomRoleManager
             {
                 if (!predicate(role)) continue;
                 if (role.RoleNumberOption == null) continue;
-                
+
                 var length = role.RoleNumberOption.GetInt();
 
-                for (var i = 0; i < length; i++)
-                {
-                    CustomRoles.Add(role);
-                }
+                for (var i = 0; i < length; i++) CustomRoles.Add(role);
             }
 
             CustomRoles = CustomRoles.Disarrange();
         }
-        
+
+        private List<CustomRole> CustomRoles { get; } = new();
+
         public CustomRole GetNext()
         {
-            if (!HasNext() && _defaultRole != null)
-            {
-                return _defaultRole;
-            }
+            if (!HasNext() && _defaultRole != null) return _defaultRole;
             var role = CustomRoles[0];
             CustomRoles.Remove(role);
             return role;

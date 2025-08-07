@@ -1,12 +1,14 @@
-﻿using COG.Utils;
+﻿using COG.Game.Events;
+using COG.Utils;
 
-namespace COG.Game.Events.Impl;
+namespace COG.Listener.Event.Impl.Game;
 
 public class SheriffMisfireGameEvent : GameEventBase
 {
-    public CustomPlayerData AttemptedTarget { get; }
     public SheriffMisfireGameEvent(CustomPlayerData sheriff, CustomPlayerData target) : base(GameEventType.Die, sheriff)
     {
         AttemptedTarget = target;
     }
+
+    public CustomPlayerData AttemptedTarget { get; }
 }

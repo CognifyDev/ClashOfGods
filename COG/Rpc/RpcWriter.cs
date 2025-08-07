@@ -1,8 +1,8 @@
-﻿using COG.Command.Impl;
+﻿using System.Collections.Generic;
+using System.Linq;
+using COG.Command.Impl;
 using COG.Utils;
 using InnerNet;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace COG.Rpc;
@@ -10,7 +10,7 @@ namespace COG.Rpc;
 public class RpcWriter
 {
     private readonly MessageWriter[] _writers;
-    private bool _finished = false;
+    private bool _finished;
 
     internal RpcWriter(MessageWriter[] writers)
     {
@@ -96,7 +96,10 @@ public class RpcWriter
         _finished = true;
     }
 
-    public MessageWriter[] GetWriters() => _writers;
+    public MessageWriter[] GetWriters()
+    {
+        return _writers;
+    }
 
     public static RpcWriter Start(PlayerControl playerControl, RpcCalls callId,
         PlayerControl[]? targets = null)
@@ -149,14 +152,16 @@ public class RpcWriter
         {
             if (targets == null)
             {
-                writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable));
+                writers.Add(
+                    AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable));
                 parts.Add("everyone");
             }
             else
             {
                 foreach (var control in targets)
                 {
-                    writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable,
+                    writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId,
+                        SendOption.Reliable,
                         control.GetClientID()));
                     parts.Add($"{control.name}({control.PlayerId})");
                 }
@@ -169,20 +174,32 @@ public class RpcWriter
     }
 
     public static void StartAndSend(PlayerControl player, KnownRpc rpc, PlayerControl[]? targets = null)
-        => Start(player, rpc, targets).Finish();
+    {
+        Start(player, rpc, targets).Finish();
+    }
 
     public static void StartAndSend(PlayerControl player, RpcCalls rpc, PlayerControl[]? targets = null)
-        => Start(player, rpc, targets).Finish();
+    {
+        Start(player, rpc, targets).Finish();
+    }
 
     public static void StartAndSend(PlayerControl player, byte rpc, PlayerControl[]? targets = null)
-        => Start(player, rpc, targets).Finish();
+    {
+        Start(player, rpc, targets).Finish();
+    }
 
     public static void StartAndSend(KnownRpc rpc, PlayerControl[]? targets = null)
-        => Start(rpc, targets).Finish();
+    {
+        Start(rpc, targets).Finish();
+    }
 
     public static void StartAndSend(RpcCalls rpc, PlayerControl[]? targets = null)
-        => Start(rpc, targets).Finish();
+    {
+        Start(rpc, targets).Finish();
+    }
 
     public static void StartAndSend(byte rpc, PlayerControl[]? targets = null)
-        => Start(rpc, targets).Finish();
+    {
+        Start(rpc, targets).Finish();
+    }
 }

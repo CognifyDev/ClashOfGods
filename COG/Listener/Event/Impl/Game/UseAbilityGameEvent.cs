@@ -1,26 +1,27 @@
-﻿using COG.Rpc;
+﻿using COG.Game.Events;
+using COG.Rpc;
 using COG.UI.Hud.CustomButton;
 using COG.Utils;
 
-namespace COG.Game.Events.Impl;
+namespace COG.Listener.Event.Impl.Game;
 
 public class UseAbilityGameEvent : NetworkedGameEventBase
 {
-    public string AbilityButtonIdentifier { get; private set; } = null!;
-
-    public UseAbilityGameEvent(CustomPlayerData player, CustomButton button) : base(GameEventType.UseAblity, player)
+    public UseAbilityGameEvent(CustomPlayerData player, CustomButton button) : base(GameEventType.UseAbility, player)
     {
         AbilityButtonIdentifier = button.Identifier;
 
         DoSend();
     }
 
-    public UseAbilityGameEvent(SerializablePlayerData player) : base(GameEventType.UseAblity, player.ToPlayerData())
+    public UseAbilityGameEvent(SerializablePlayerData player) : base(GameEventType.UseAbility, player.ToPlayerData())
     {
         // This constructor is used for deserialization, so we don't call DoSend here.
     }
 
-    public override void Serialize(RpcWriter writer)
+    public string AbilityButtonIdentifier { get; private set; } = null!;
+
+    protected override void Serialize(RpcWriter writer)
     {
         writer.Write(AbilityButtonIdentifier);
     }
