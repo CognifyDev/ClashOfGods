@@ -18,13 +18,14 @@ public static class GameObjectUtils
 
     public static void TryDestroyComponent<T>(this Component? comp) where T : Component
     {
-        comp.TryDestroyComponent<T>();
+        if (!comp) return;
+        comp!.GetComponent<T>().TryDestroy();
     }
 
     public static void TryDestroyComponent<T>(this GameObject? obj) where T : Component
     {
         if (!obj) return;
-        obj!.GetComponent<T>().TryDestroy();
+        obj!.TryDestroyComponent<T>();
     }
 
     public static void TryDestroyGameObject(this Component? comp)
