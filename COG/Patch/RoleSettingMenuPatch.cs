@@ -31,7 +31,7 @@ public static class RoleOptionPatch
     {
         __instance.advancedSettingChildren ??= new();
         foreach (var behaviour in __instance.advancedSettingChildren)
-            behaviour.gameObject.Destroy();
+            behaviour.gameObject.TryDestroy();
         __instance.advancedSettingChildren.Clear(); // Fix advanced tab couldn't be opened
     }
 
@@ -53,7 +53,7 @@ public static class RoleOptionPatch
             .ForEach(t => t.gameObject.SetActive(false));
 
         var headers = __instance.tabParent;
-        headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.Destroy());
+        headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.TryDestroy());
 
         __instance.AllButton.gameObject.SetActive(false);
         
@@ -63,7 +63,7 @@ public static class RoleOptionPatch
         foreach (var team in Enum.GetValues<CampType>())
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
         
-        chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.Destroy();
+        chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.TryDestroy();
     }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.Update))]
@@ -141,7 +141,7 @@ public static class RoleOptionPatch
         var initialHeaderPos = new Vector3(headerXStart, yStart, -2f);
         var sliderInner = chanceTabTemplate.parent;
         var tab = Object.Instantiate(chanceTabTemplate, sliderInner);
-        tab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(o => o.gameObject.Destroy());
+        tab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked").ForEach(o => o.gameObject.TryDestroy());
 
         tab.gameObject.SetActive(false);
         tab.localPosition = chanceTabTemplate.localPosition;
@@ -268,7 +268,7 @@ public static class RoleOptionPatch
         var button = Object.Instantiate(menu.roleSettingsTabButtonOrigin, headerParent).GetComponent<PassiveButton>();
 
         button.transform.localPosition = new Vector3(xStart + index * offset, yStart, -2);
-        button.DestroyComponent<RoleSettingsTabButton>();
+        button.TryDestroyComponent<RoleSettingsTabButton>();
         button.OnClick = new Button.ButtonClickedEvent();
         button.OnClick.AddListener((UnityAction)new Action(() =>
         {

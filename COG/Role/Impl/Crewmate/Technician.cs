@@ -4,7 +4,7 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Rpc;
-using COG.UI.CustomButton;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using System.Linq;
 using UnityEngine;

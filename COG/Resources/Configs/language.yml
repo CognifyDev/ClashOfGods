@@ -3,6 +3,10 @@ lobby:
 mod-global:
   yes: "是"
   no: "否"
+  cancel: "取消"
+  confirm: "确认"
+  previous-page: "上一页"
+  next-page: "下一页"
 role:
   unknown:
     unknown:
@@ -133,6 +137,9 @@ role:
       guess-continuously: "连续赌注"
       guess-enabled-roles-only: "仅能赌注启用职业"
       can-guess-sub-roles: "启用赌注副职业"
+      in-game:
+        ui-title: "猜测职业"
+        remaining-guesses: "剩余猜测次数：%guess%"
     speed-booster:
       name: "敏捷"
       description: "我是闪电侠！"

@@ -1,7 +1,7 @@
 ﻿using COG.Rpc;
-using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using COG.Utils.Coding;
 using InnerNet;

@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using COG.Config.Impl;
+﻿using COG.Config.Impl;
 using COG.Listener.Event.Impl.Game;
-using COG.Role;
-using COG.UI.CustomButton;
 using COG.UI.ClientOption;
+using COG.UI.ClientOption.Impl;
 using COG.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using COG.UI.ClientOption.Impl;
 
 namespace COG.Listener.Impl;
 
@@ -43,7 +39,7 @@ internal class ClientOptionListener : IListener
 
         ModTabContainer = new(ModTabName);
         ModTabContainer.transform.SetParent(Camera.main.transform);
-        ModTabContainer.transform.localPosition = new(0,0, -910);
+        ModTabContainer.transform.localPosition = new(0, 0, -910);
         ModTabContainer.layer = LayerMask.NameToLayer("UI");
 
         _modTabButton.name = "ClientOptionButton";
@@ -53,8 +49,8 @@ internal class ClientOptionListener : IListener
         _modTabButton.Content = ModTabContainer;
 
         _modTabButton.GetComponent<PassiveButton>().OnClick = new();
-        _modTabButton.GetComponent<PassiveButton>().OnClick.AddListener(new Action(() => 
-        { 
+        _modTabButton.GetComponent<PassiveButton>().OnClick.AddListener(new Action(() =>
+        {
             menu.OpenTabGroup(GetModTabIndex());
 
             int GetModTabIndex()
@@ -258,7 +254,7 @@ internal class ClientOptionListener : IListener
             slider.transform.localPosition = pos;
             slider.transform.localScale = Vector3.one;
             var text = slider.GetComponentInChildren<TextMeshPro>();
-            text.DestroyComponent<TextTranslatorTMP>();
+            text.TryDestroyComponent<TextTranslatorTMP>();
             slider.name = text.text = handler.GetString(sliderOption.Translatable);
             slider.OnValueChange = new();
             slider.OnValueChange.AddListener(new Action(() =>

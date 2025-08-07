@@ -55,6 +55,12 @@ public class LanguageConfig : ConfigBase
     public string Yes { get; private set; } = null!;
     public string No { get; private set; } = null!;
 
+    public string Cancel { get; private set; } = null!;
+    public string Confirm { get; private set; } = null!;
+
+    public string PreviousPage { get; private set; } = null!;
+    public string NextPage { get; private set; } = null!;
+
     // Crewmate
     public string VigilanteMinCrewmateNumber { get; private set; } = null!;
 
@@ -149,7 +155,13 @@ public class LanguageConfig : ConfigBase
         Yes = GetString("mod-global.yes");
         No = GetString("mod-global.no");
 
-        GeneralHeaderTitle = LoadPreset = GetString("game-setting.general.title");
+        Cancel = GetString("mod-global.cancel");
+        Confirm = GetString("mod-global.confirm");
+
+        PreviousPage = GetString("mod-global.previous-page");
+        PreviousPage = GetString("mod-global.next-page");
+
+        GeneralHeaderTitle = GetString("game-setting.general.title");
         LoadPreset = GetString("game-setting.general.load-preset");
         SavePreset = GetString("game-setting.general.save-preset");
         DebugMode = GetString("game-setting.general.debug-mode");

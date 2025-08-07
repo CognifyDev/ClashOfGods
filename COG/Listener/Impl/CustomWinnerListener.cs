@@ -119,7 +119,7 @@ public class CustomWinnerListener : IListener
     private static void SetUpWinnerPlayers(EndGameManager manager)
     {
         manager.transform.GetComponentsInChildren<PoolablePlayer>().ToList()
-            .ForEach(pb => pb.gameObject.Destroy());
+            .ForEach(pb => pb.gameObject.TryDestroy());
 
         var num = 0;
         var ceiling = Mathf.CeilToInt(7.5f);

@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Listener.Event.Impl.HManager;
-using COG.UI.CustomButton;
-using UnityEngine;
+using COG.UI.Hud.CustomButton;
+using COG.Utils;
 
 namespace COG.Listener.Impl;
 
@@ -12,13 +12,7 @@ internal class CustomButtonListener : IListener
     public void OnHudStart(HudManagerStartEvent @event)
     {
         CustomButton.Initialized = false;
-        IEnumerator CoInitCustomButton()
-        {
-            yield return new WaitForSeconds(1f);
-            CustomButton.Init(@event.Manager);
-        }
-        
-        @event.Manager.StartCoroutine(CoInitCustomButton().WrapToIl2Cpp());
+        TaskUtils.RunTaskAfter(1, () => CustomButton.Init(@event.Manager));
     }
 
     [EventHandler(EventHandlerType.Postfix)]

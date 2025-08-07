@@ -4,7 +4,7 @@ using COG.Listener.Event.Impl;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.PPhysics;
-using COG.UI.CustomButton;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using COG.Utils.Coding;
 using InnerNet;

@@ -1,9 +1,9 @@
 ﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
-using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 
 namespace COG.Role.Impl.Impostor;

@@ -1,15 +1,13 @@
-﻿using System.Collections;
-using System.Linq;
-using COG.Config.Impl;
-using COG.Constant;
+﻿using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
-using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using Reactor.Utilities;
+using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -19,10 +17,10 @@ public class SoulHunter : CustomRole, IListener
     private const string HasRevivedTag = "hasRevived_SoulHunter";
 
     private Vector2? _position;
-    
+
     private CustomOption ReviveAfter { get; }
     private CustomOption SoulHunterKillCd { get; }
-    
+
     public SoulHunter() : base(Color.green, CampType.Crewmate)
     {
         ReviveAfter = CreateOption(() => LanguageConfig.Instance.SoulHunterReviveAfter,
@@ -59,7 +57,7 @@ public class SoulHunter : CustomRole, IListener
                 deadBody.RpcHideDeadBody();
             else
                 yield break;
-            
+
             if (GameStates.IsMeeting)
                 yield break;
 
@@ -67,7 +65,7 @@ public class SoulHunter : CustomRole, IListener
                 target.NetTransform.RpcSnapTo(_position.Value);
             else
                 Main.Logger.LogError($"{nameof(_position)} is null while reviving!");
-            
+
             target.RpcSetCustomRole(this);
             target.RpcRevive();
             target.RpcMark(HasRevivedTag);

@@ -1,4 +1,3 @@
-using COG.UI.CustomButton;
 using COG.Utils;
 using System;
 using System.Collections.Generic;
