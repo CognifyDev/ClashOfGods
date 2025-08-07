@@ -121,7 +121,8 @@ public partial class Main : BasePlugin
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
-        ListenerManager.GetManager().RegisterListeners([
+        ListenerManager.GetManager().RegisterListeners(new IListener[]
+        {
             new CommandListener(),
             new PlayerListener(),
             new CustomButtonListener(),
@@ -135,7 +136,7 @@ public partial class Main : BasePlugin
             new LobbyListener(),
             new RoleAssignmentListener(),
             new IntroListener()
-        ]);
+        });
 
         // Register CustomWinners
         CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
