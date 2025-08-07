@@ -177,7 +177,7 @@ public class GuesserButton
     {
         if (previousPage)
         {
-            CreateBottomButton("", new(-2.5f, -2.2f, 0f), () =>
+            CreateBottomButton(LanguageConfig.Instance.PreviousPage, new(-2.5f, -2.2f, 0f), () =>
             {
                 _roleButtonContainer.TryDestroy();
                 SetUpRolePage(_page - 1);
@@ -185,7 +185,7 @@ public class GuesserButton
         }
         if (nextPage)
         {
-            CreateBottomButton("", new(2.5f, -2.2f, 0f), () =>
+            CreateBottomButton(LanguageConfig.Instance.NextPage, new(2.5f, -2.2f, 0f), () =>
             {
                 _roleButtonContainer.TryDestroy();
                 SetUpRolePage(_page + 1);

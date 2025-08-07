@@ -59,7 +59,7 @@ public class Guesser : CustomRole, IListener
             // 如果死了或者是当前玩家则不要布置
             if (playerVoteArea == null || playerVoteArea.AmDead ||
                 playerVoteArea.TargetPlayerId == player.PlayerId) continue;
-            var guessButton = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
+            _ = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
                 playerVoteArea, this);
         }
     }
