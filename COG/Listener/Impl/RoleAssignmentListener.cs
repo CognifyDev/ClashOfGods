@@ -17,7 +17,7 @@ public class RoleAssignmentListener : IListener
 
     public RoleAssignmentListener()
     {
-        _roleSelectionShareRpcHandler = new(KnownRpc.ShareRoles,
+        _roleSelectionShareRpcHandler = new RpcHandler<int, CustomPlayerData[]>(KnownRpc.ShareRoles,
             (_, playerData) =>
             {
                 foreach (var data in playerData)
@@ -40,9 +40,9 @@ public class RoleAssignmentListener : IListener
             },
             reader =>
             {
-                // Çå³ıÔ­ÁĞ±í£¬·ÀÖ¹¸ÉÈÅ
+                // æ¸…é™¤åŸåˆ—è¡¨ï¼Œé˜²æ­¢å¹²æ‰°
                 GameUtils.PlayerData.Clear();
-                // ¿ªÊ¼¶ÁÈëÊı¾İ
+                // å¼€å§‹è¯»å…¥æ•°æ®
                 Main.Logger.LogInfo("Received role assignment data, applying...");
 
                 var count = reader.ReadPackedInt32();
@@ -60,118 +60,117 @@ public class RoleAssignmentListener : IListener
 
 
     /*
-     * Ö°Òµ·ÖÅäÂß¼­£º
+     * èŒä¸šåˆ†é…é€»è¾‘ï¼š
      *
-     * Ö°Òµ·ÖÅä»ù±¾Ìõ¼ş
-     * 1.Ê×ÏÈÒª±£Ö¤ËùÓĞ¿ÉÓÃµÄÖ°Òµ¶¼±»·ÖÅäÍê³É£¬È»ºóÔÙÈ¥·ÖÅä»ùÖ°Òµ
-     * 2.Ó¦µ±±£Ö¤ÄÚ¹íÏÈ±»·ÖÅäÍêÈ«£¬Æä´ÎÊÇ´¬Ô±ºÍÖĞÁ¢ÕóÓª
-     * 3.¸±Ö°Òµ·ÖÅäÒªĞ¡ĞÄ£¬ÎªÁËËã·¨µÄ¿ìËÙÓ¦µ±ÔÚ·ÖÅäÉÏÊöÖ°ÒµµÄÇé¿öÏÂÒ»Í¬·ÖÅä¸±Ö°Òµ
-     *
+     * èŒä¸šåˆ†é…åŸºæœ¬æ¡ä»¶
+     * 1.é¦–å…ˆè¦ä¿è¯æ‰€æœ‰å¯ç”¨çš„èŒä¸šéƒ½è¢«åˆ†é…å®Œæˆï¼Œç„¶åå†å»åˆ†é…åŸºèŒä¸š
+     * 2.åº”å½“ä¿è¯å†…é¬¼å…ˆè¢«åˆ†é…å®Œå…¨ï¼Œå…¶æ¬¡æ˜¯èˆ¹å‘˜å’Œä¸­ç«‹é˜µè¥
+     * 3.å‰¯èŒä¸šåˆ†é…è¦å°å¿ƒï¼Œä¸ºäº†ç®—æ³•çš„å¿«é€Ÿåº”å½“åœ¨åˆ†é…ä¸Šè¿°èŒä¸šçš„æƒ…å†µä¸‹ä¸€åŒåˆ†é…å‰¯èŒä¸š
      */
     private static void SelectRoles()
     {
-        // Ê×ÏÈÇå³ı ·ÀÖ¹¸ÉÈÅ
+        // é¦–å…ˆæ¸…é™¤ é˜²æ­¢å¹²æ‰°
         GameUtils.PlayerData.Clear();
 
-        // ²»ÊÇ·¿Ö÷Í£Ö¹·ÖÅä
+        // ä¸æ˜¯æˆ¿ä¸»åœæ­¢åˆ†é…
         if (!AmongUsClient.Instance.AmHost) return;
 
-        // »ñÈ¡ËùÓĞµÄÍæ¼Ò¼¯ºÏ
+        // è·å–æ‰€æœ‰çš„ç©å®¶é›†åˆ
         var playerGetter = new PlayerGetter(PlayerUtils.GetAllPlayers().ToArray());
 
-        // Ìí¼Óµ½×Öµä
+        // æ·»åŠ åˆ°å­—å…¸
         var mainRoleData = new Dictionary<PlayerControl, CustomRole>();
         var subRoleData = new Dictionary<PlayerControl, CustomRole[]>();
 
-        // »ñÈ¡×î¶à¿ÉÒÔ±»¸³ÓèµÄ¸±Ö°ÒµÊıÁ¿
+        // è·å–æœ€å¤šå¯ä»¥è¢«èµ‹äºˆçš„å‰¯èŒä¸šæ•°é‡
         var maxSubRoleNumber = GlobalCustomOptionConstant.MaxSubRoleNumber.GetInt();
 
-        // »ñÈ¡±¾¾ÖÓÎÏ·Òª·ÖÅäµÄÄÚ¹íÊıÁ¿
+        // è·å–æœ¬å±€æ¸¸æˆè¦åˆ†é…çš„å†…é¬¼æ•°é‡
         var impostorNumber = GameUtils.GetImpostorsNumber();
 
-        // »ñÈ¡±¾¾ÖÓÎÏ·Òª·ÖÅäµÄÖĞÁ¢ÊıÁ¿
+        // è·å–æœ¬å±€æ¸¸æˆè¦åˆ†é…çš„ä¸­ç«‹æ•°é‡
         var neutralNumber = GameUtils.GetNeutralNumber();
 
-        // »ñÈ¡Ò»¸ö¸±Ö°Òµ»ñÈ¡Æ÷
+        // è·å–ä¸€ä¸ªå‰¯èŒä¸šè·å–å™¨
         var subRoleGetter = CustomRoleManager.GetManager().NewGetter(role => role.IsSubRole);
 
-        // »ñÈ¡Ò»¸öÄÚ¹í»ñÈ¡Æ÷
+        // è·å–ä¸€ä¸ªå†…é¬¼è·å–å™¨
         var impostorGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Impostor,
             CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>());
 
-        // ´´½¨Ò»¸öÖĞÁ¢Ö°Òµ»ñÈ¡Æ÷
-        // Êµ¼ÊÉÏ CustomRoleManager.GetManager().GetTypeRoleInstance<Jester>() ÊÇ¶àÓàµÄ
-        // ÒòÎªÔÚ GameUtils#GetNeutralNumber ÖĞÎÒÃÇÒÑ¾­ÖÆ¶¨ÁË³¡ÉÏ´æÔÚµÄÖĞÁ¢ÊıÁ¿ÊÇÉèÖÃÀïÃæÉèÖÃµÄÖĞÁ¢ÊıÁ¿
+        // åˆ›å»ºä¸€ä¸ªä¸­ç«‹èŒä¸šè·å–å™¨
+        // å®é™…ä¸Š CustomRoleManager.GetManager().GetTypeRoleInstance<Jester>() æ˜¯å¤šä½™çš„
+        // å› ä¸ºåœ¨ GameUtils#GetNeutralNumber ä¸­æˆ‘ä»¬å·²ç»åˆ¶å®šäº†åœºä¸Šå­˜åœ¨çš„ä¸­ç«‹æ•°é‡æ˜¯è®¾ç½®é‡Œé¢è®¾ç½®çš„ä¸­ç«‹æ•°é‡
         var neutralGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Neutral);
 
         var crewmateGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Crewmate,
             CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>());
 
-        // Ê×ÏÈ·ÖÅäÄÚ¹íÖ°Òµ
+        // é¦–å…ˆåˆ†é…å†…é¬¼èŒä¸š
         for (var i = 0; i < impostorNumber; i++)
         {
             if (!playerGetter.HasNext()) break;
 
-            // ÒòÎªGetterÉèÖÃÁËÄ¬ÈÏÖµ£¬Òò´ËÎŞĞè¼ì²âÊÇ·ñº¬ÓĞÏÂÒ»¸ö
+            // å› ä¸ºGetterè®¾ç½®äº†é»˜è®¤å€¼ï¼Œå› æ­¤æ— éœ€æ£€æµ‹æ˜¯å¦å«æœ‰ä¸‹ä¸€ä¸ª
             var impostorRole = impostorGetter.GetNext();
 
-            // Íæ¼ÒÊÇÒ»¶¨¿ÉÒÔ»ñÈ¡µ½µÄ£¬ÒòÎªÈç¹ûÍæ¼ÒµÄÊıÄ¿²»×ãÒÔ»ñÈ¡µ½£¬ÄÇÃ´ÄÚ¹íµÄÊıÄ¿Ò²²»»á´óÓÚ1£¬Òò´Ë£¬³ı·ÇÒ»¸öÍæ¼ÒÒ²Ã»ÓĞ£¬²»È»ÊÇÒ»¶¨¿ÉÒÔ»ñÈ¡µ½µÄ
-            // ¶øÍæ¼Ò²»¿ÉÄÜÒ»¸öÒ²Ã»ÓĞ£¬Òò´ËÒ»¶¨¿ÉÒÔ»ñÈ¡µ½
+            // ç©å®¶æ˜¯ä¸€å®šå¯ä»¥è·å–åˆ°çš„ï¼Œå› ä¸ºå¦‚æœç©å®¶çš„æ•°ç›®ä¸è¶³ä»¥è·å–åˆ°ï¼Œé‚£ä¹ˆå†…é¬¼çš„æ•°ç›®ä¹Ÿä¸ä¼šå¤§äº1ï¼Œå› æ­¤ï¼Œé™¤éä¸€ä¸ªç©å®¶ä¹Ÿæ²¡æœ‰ï¼Œä¸ç„¶æ˜¯ä¸€å®šå¯ä»¥è·å–åˆ°çš„
+            // è€Œç©å®¶ä¸å¯èƒ½ä¸€ä¸ªä¹Ÿæ²¡æœ‰ï¼Œå› æ­¤ä¸€å®šå¯ä»¥è·å–åˆ°
             var target = playerGetter.GetNext();
 
-            // Ìí¼ÓÊı¾İ
+            // æ·»åŠ æ•°æ®
             mainRoleData.Add(target, impostorRole);
         }
 
-        // ½ÓÏÂÀ´·ÖÅäÖĞÁ¢Ö°Òµ
+        // æ¥ä¸‹æ¥åˆ†é…ä¸­ç«‹èŒä¸š
         for (var i = 0; i < neutralNumber; i++)
         {
             if (!neutralGetter.HasNext()) break;
 
             if (!playerGetter.HasNext()) break;
 
-            // Í¬Àí£¬ÒÑ¾­ÉèÖÃÁËÄ¬ÈÏÖµ£¬ÎŞĞè¼ì²â
+            // åŒç†ï¼Œå·²ç»è®¾ç½®äº†é»˜è®¤å€¼ï¼Œæ— éœ€æ£€æµ‹
             var neutralRole = neutralGetter.GetNext();
 
-            // »ñÈ¡Íæ¼ÒÊµÀı
+            // è·å–ç©å®¶å®ä¾‹
             var target = playerGetter.GetNext();
 
-            // Ìí¼ÓÊı¾İ
+            // æ·»åŠ æ•°æ®
             mainRoleData.Add(target, neutralRole);
         }
 
-        // ½ô½Ó×Å·ÖÅä´¬Ô±Ö°Òµ
+        // ç´§æ¥ç€åˆ†é…èˆ¹å‘˜èŒä¸š
         while (playerGetter.HasNext())
         {
-            // »ñÈ¡ÊµÀı
+            // è·å–å®ä¾‹
             var cremateRole = crewmateGetter.GetNext();
 
-            // »ñÈ¡Íæ¼ÒÊµÀı
+            // è·å–ç©å®¶å®ä¾‹
             var target = playerGetter.GetNext();
 
-            // Ã»±ØÒªÒÆ³ıÍæ¼ÒÔÚÁĞ±íÖĞ£¬ÒòÎªºóÃæÎÒÃÇÓÃ²»µ½players¼¯ºÏÁË
+            // æ²¡å¿…è¦ç§»é™¤ç©å®¶åœ¨åˆ—è¡¨ä¸­ï¼Œå› ä¸ºåé¢æˆ‘ä»¬ç”¨ä¸åˆ°playersé›†åˆäº†
             // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
 
-            // Ìí¼ÓÊı¾İ
+            // æ·»åŠ æ•°æ®
             mainRoleData.Add(target, cremateRole);
         }
 
-        // ×îºó·ÖÅäÒ»ÏÂ¸±Ö°Òµ
+        // æœ€ååˆ†é…ä¸€ä¸‹å‰¯èŒä¸š
         /*
-         * ¸±Ö°Òµ·ÖÅäËã·¨ÈçÏÂ£º
-         * Ëæ»ú»ñÈ¡Íæ¼Ò±Ä¼«Ê½µØ·¢·Å¸±Ö°Òµ
+         * å‰¯èŒä¸šåˆ†é…ç®—æ³•å¦‚ä¸‹ï¼š
+         * éšæœºè·å–ç©å®¶è¹¦æå¼åœ°å‘æ”¾å‰¯èŒä¸š
          */
         var allPlayers = PlayerUtils.GetAllPlayers().Disarrange();
 
         /*
-         * ¸±Ö°ÒµµÄ·ÖÅäÓĞµãÌØÊâ
-         * ¸±Ö°ÒµÓĞ×î´ó·ÖÅäÊıÄ¿ÒÔ¼°¸±Ö°ÒµÊıÄ¿ÏŞÖÆ
-         * Òò´ËËüµÄ·ÖÅä±È½ÏÂé·³
+         * å‰¯èŒä¸šçš„åˆ†é…æœ‰ç‚¹ç‰¹æ®Š
+         * å‰¯èŒä¸šæœ‰æœ€å¤§åˆ†é…æ•°ç›®ä»¥åŠå‰¯èŒä¸šæ•°ç›®é™åˆ¶
+         * å› æ­¤å®ƒçš„åˆ†é…æ¯”è¾ƒéº»çƒ¦
          *
-         * Ê×ÏÈÒªÃ÷È··ÖÅäÍæ¼ÒµÄÅĞ¶¨Ìõ¼ş£¬Ìõ¼şÈçÏÂ£º
-         * ×î´ó·ÖÅäÊıÄ¿ = ×î´ó·ÖÅäÊıÄ¿ * Íæ¼ÒÊıÄ¿
-         * µ±ÇÒ½öµ± ¸±Ö°ÒµÒÑ·ÖÅäÊıÄ¿ µÈÓÚ ¸±Ö°ÒµÓ¦µ±·ÖÅäÊıÄ¿(=¸±Ö°ÒµÆôÓÃÊıÄ¿ > ×î´ó·ÖÅäÊıÄ¿ ? ×î´ó·ÖÅäÊıÄ¿ : ¸±Ö°ÒµÆôÓÃÊıÄ¿)
-         * ·ÖÅäÍê³É
+         * é¦–å…ˆè¦æ˜ç¡®åˆ†é…ç©å®¶çš„åˆ¤å®šæ¡ä»¶ï¼Œæ¡ä»¶å¦‚ä¸‹ï¼š
+         * æœ€å¤§åˆ†é…æ•°ç›® = æœ€å¤§åˆ†é…æ•°ç›® * ç©å®¶æ•°ç›®
+         * å½“ä¸”ä»…å½“ å‰¯èŒä¸šå·²åˆ†é…æ•°ç›® ç­‰äº å‰¯èŒä¸šåº”å½“åˆ†é…æ•°ç›®(=å‰¯èŒä¸šå¯ç”¨æ•°ç›® > æœ€å¤§åˆ†é…æ•°ç›® ? æœ€å¤§åˆ†é…æ•°ç›® : å‰¯èŒä¸šå¯ç”¨æ•°ç›®)
+         * åˆ†é…å®Œæˆ
          */
         var subRoleEnabledNumber = subRoleGetter.Number();
         var subRoleMaxCanBeArrange = maxSubRoleNumber * allPlayers.Count;
@@ -208,21 +207,21 @@ public class RoleAssignmentListener : IListener
         }
 
 
-        // È«²¿¶¼·ÖÅäÍê³É£¬½ÓÏÂÀ´Ó¦ÓÃÒ»ÏÂ
+        // å…¨éƒ¨éƒ½åˆ†é…å®Œæˆï¼Œæ¥ä¸‹æ¥åº”ç”¨ä¸€ä¸‹
         for (var i = 0; i < mainRoleData.Count; i++)
         {
             var target = mainRoleData.Keys.ToArray()[i];
 
-            // ¸è¼§Ê÷ÀÁ²¢Ã»ÓĞÖØĞ´Equals·½·¨£¬Òò´ËÖ»ÄÜÕâÑù
+            // æ­Œå§¬æ ‘æ‡’å¹¶æ²¡æœ‰é‡å†™Equalsæ–¹æ³•ï¼Œå› æ­¤åªèƒ½è¿™æ ·
             var subRolesList = subRoleData.Where(pair =>
                 pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList();
 
             var subRoles = subRolesList.Any() ? subRolesList[0] : Array.Empty<CustomRole>();
 
-            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles); // ÏÈ±¾µØÉèÖÃÖ°Òµ£¬ºóÃæShareRole»á°ÑÖ°Òµ·¢³öÈ¥µÄ
+            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles); // å…ˆæœ¬åœ°è®¾ç½®èŒä¸šï¼Œåé¢ShareRoleä¼šæŠŠèŒä¸šå‘å‡ºå»çš„
         }
 
-        // ´òÓ¡Ö°Òµ·ÖÅäĞÅÏ¢
+        // æ‰“å°èŒä¸šåˆ†é…ä¿¡æ¯
         var sb = new StringBuilder();
         foreach (var playerRole in GameUtils.PlayerData)
             sb.AppendLine($"""
@@ -237,7 +236,7 @@ public class RoleAssignmentListener : IListener
 
 
     [EventHandler(EventHandlerType.Postfix)]
-    public void OnSelectRoles(RoleManagerSelectRolesEvent @event)
+    public void OnSelectRoles(RoleManagerSelectRolesEvent _)
     {
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
@@ -252,9 +251,9 @@ public class RoleAssignmentListener : IListener
         foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
     }
 
-    public class PlayerGetter : IGetter<PlayerControl>
+    private class PlayerGetter : IGetter<PlayerControl>
     {
-        public readonly List<PlayerControl> _players;
+        private readonly List<PlayerControl> _players;
 
         public PlayerGetter(PlayerControl[] targets)
         {

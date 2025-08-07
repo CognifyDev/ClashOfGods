@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace COG.Patch;
 
-[HarmonyPatch] 
+[HarmonyPatch]
 // ChatBubble methods order: (Init) => SetRight/SetLeft => SetCosmetics => SetChatBubbleName (called SetName) => SetText => AlignChildren => (Done)
 internal static class ChatPlayerInfoPatch
 {

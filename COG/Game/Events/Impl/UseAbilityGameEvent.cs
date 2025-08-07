@@ -6,8 +6,6 @@ namespace COG.Game.Events.Impl;
 
 public class UseAbilityGameEvent : NetworkedGameEventBase
 {
-    public string AbilityButtonIdentifier { get; private set; } = null!;
-
     public UseAbilityGameEvent(CustomPlayerData player, CustomButton button) : base(GameEventType.UseAblity, player)
     {
         AbilityButtonIdentifier = button.Identifier;
@@ -19,6 +17,8 @@ public class UseAbilityGameEvent : NetworkedGameEventBase
     {
         // This constructor is used for deserialization, so we don't call DoSend here.
     }
+
+    public string AbilityButtonIdentifier { get; private set; } = null!;
 
     public override void Serialize(RpcWriter writer)
     {

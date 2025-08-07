@@ -1,7 +1,7 @@
+using System;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
-using System;
 
 namespace COG.Patch;
 
@@ -12,7 +12,7 @@ internal class RPCHandlerPatch
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] byte callId,
         [HarmonyArgument(1)] MessageReader reader)
     {
-        string name = "";
+        var name = "";
         if (Enum.IsDefined((RpcCalls)callId))
             name = ((RpcCalls)callId).ToString();
         else if (Enum.IsDefined((KnownRpc)callId))
@@ -20,7 +20,7 @@ internal class RPCHandlerPatch
         else
             name = callId.ToString();
         Main.Logger.LogInfo($"Rpc {name}({callId}) received, rpc length => {reader.Length}");
-        
+
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader), EventHandlerType.Postfix);
     }

@@ -1,5 +1,5 @@
-﻿using COG.Utils;
-using System.Linq;
+﻿using System.Linq;
+using COG.Utils;
 
 namespace COG.Patch;
 
@@ -8,11 +8,10 @@ internal static class HauntMenuMinigamePatch
 {
     [HarmonyPatch(nameof(HauntMenuMinigame.FixedUpdate))]
     [HarmonyPostfix]
-    static void FixedUpdatePatch(HauntMenuMinigame __instance)
+    private static void FixedUpdatePatch(HauntMenuMinigame __instance)
     {
         if (__instance.HauntTarget)
-        {
-            __instance.FilterText.text = string.Join(' ', __instance.HauntTarget.GetRoles().Select(r => r.GetColorName()));
-        }
+            __instance.FilterText.text =
+                string.Join(' ', __instance.HauntTarget.GetRoles().Select(r => r.GetColorName()));
     }
 }

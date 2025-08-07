@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using COG.Patch;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
@@ -14,6 +13,7 @@ using COG.Utils.WinAPI;
 using Reactor.Utilities;
 using UnityEngine;
 using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
+
 // ReSharper disable InconsistentNaming
 
 namespace COG.UI.CustomOption;
@@ -148,16 +148,16 @@ public sealed class CustomOption
     {
         if (PlayerUtils.GetAllPlayers().Count <= 0 || !AmongUsClient.Instance.AmHost) return;
 
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.ShareOptions,
+        var writer = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.ShareOptions,
             target == null ? null : target.ToSingleElementArray());
-        
-        writer.WritePacked((uint) Options.Count);
+
+        writer.WritePacked((uint)Options.Count);
         foreach (var option in Options)
         {
             writer.WritePacked((uint)option.Id);
-            writer.WritePacked((uint) option.Selection);
+            writer.WritePacked((uint)option.Selection);
         }
-        
+
         writer.Finish();
     }
 
@@ -240,18 +240,23 @@ public sealed class CustomOption
             Main.Logger.LogWarning($"Trying to get float value from int option: {Name()}({Id})");
             return intRule.Selections[Selection];
         }
+
         throw new NotSupportedException();
     }
 
     public int GetInt()
     {
         if (ValueRule is IntOptionValueRule rule)
+        {
             return rule.Selections[Selection];
-        else if (ValueRule is FloatOptionValueRule floatRule)
+        }
+
+        if (ValueRule is FloatOptionValueRule floatRule)
         {
             Main.Logger.LogWarning($"Trying to get int value from float option: {Name()}({Id})");
             return (int)floatRule.Selections[Selection];
         }
+
         throw new NotSupportedException();
     }
 
@@ -277,7 +282,7 @@ public sealed class CustomOption
 
     private void ShareOptionChange(int newSelection)
     {
-        RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.UpdateOption)
+        PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.UpdateOption)
             .WritePacked(Id)
             .WritePacked(newSelection)
             .Finish();
@@ -287,14 +292,14 @@ public sealed class CustomOption
     {
         if (!AmongUsClient.Instance.AmHost) return;
         if (!OptionBehaviour) return;
-        
+
         var role = CustomRoleManager.GetManager().GetRoles().FirstOrDefault(r => r.AllOptions.Contains(this));
-        
+
         if (role == null)
         {
-            string valueText = "";
+            var valueText = "";
 
-            if (OptionBehaviour!.GetComponent<StringOption>()) 
+            if (OptionBehaviour!.GetComponent<StringOption>())
                 valueText = GetString();
             else if (OptionBehaviour!.GetComponent<ToggleOption>())
                 valueText = TranslationController.Instance.GetString(GetBool()
@@ -334,9 +339,11 @@ public sealed class CustomOption
                 _ => role.Name.Color(Color.grey)
             };
 
-            string valueText = "";
+            var valueText = "";
 
-            if (OptionBehaviour!.GetComponent<StringOption>()) // It's strange that using (OptionBehaviour is TargetType) expression is useless
+            if (OptionBehaviour!
+                .GetComponent<
+                    StringOption>()) // It's strange that using (OptionBehaviour is TargetType) expression is useless
                 valueText = GetString();
             else if (OptionBehaviour!.GetComponent<ToggleOption>())
                 valueText = TranslationController.Instance.GetString(GetBool()

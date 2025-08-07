@@ -7,15 +7,17 @@ namespace COG.Utils;
 
 public static class DeadBodyUtils
 {
-    public static List<DeadBody> GetDeadBodies() => 
-        Object.FindObjectsOfType<DeadBody>().ToList();
-    
+    public static List<DeadBody> GetDeadBodies()
+    {
+        return Object.FindObjectsOfType<DeadBody>().ToList();
+    }
+
     public static void RpcHideDeadBody(this DeadBody body)
     {
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.HideDeadBody);
+        var writer = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.HideDeadBody);
         writer.Write(body.ParentId);
         writer.Finish();
-        
+
         body.gameObject.SetActive(false);
     }
 

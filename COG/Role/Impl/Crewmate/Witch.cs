@@ -12,19 +12,18 @@ namespace COG.Role.Impl.Crewmate;
 [HarmonyPatch]
 public class Witch : CustomRole, IListener
 {
-    private RpcHandler<byte> _antidoteHandler;
-    private CustomOption _antidoteCooldown;
-    private CustomButton _antidoteButton;
+    private static bool _shouldDetectInteraction;
+    private static bool _shouldDieWhenMeetingStarts;
+    private readonly CustomButton _antidoteButton;
+    private readonly CustomOption _antidoteCooldown;
+    private readonly RpcHandler<byte> _antidoteHandler;
 
     private DeadBody? _current;
     private int _remainingUses = 1;
 
-    private static bool _shouldDetectInteraction = false;
-    private static bool _shouldDieWhenMeetingStarts = false;
-
     public Witch() : base(ColorUtils.AsColor("#773ba4"), CampType.Crewmate)
     {
-        _antidoteHandler = new(KnownRpc.WitchUsesAntidote,
+        _antidoteHandler = new RpcHandler<byte>(KnownRpc.WitchUsesAntidote,
             playerId =>
             {
                 var player = PlayerUtils.GetPlayerById(playerId);
@@ -33,6 +32,7 @@ public class Witch : CustomRole, IListener
                     Main.Logger.LogWarning("Unknown player when witch reviving: " + playerId);
                     return;
                 }
+
                 player!.Revive();
                 if (player.AmOwner)
                 {
@@ -94,7 +94,7 @@ public class Witch : CustomRole, IListener
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.UseClosest))]
     [HarmonyPostfix]
-    static void OnPlayerInteracts(PlayerControl __instance)
+    private static void OnPlayerInteracts(PlayerControl __instance)
     {
         if (__instance.AmOwner && _shouldDetectInteraction)
             _shouldDieWhenMeetingStarts = true;

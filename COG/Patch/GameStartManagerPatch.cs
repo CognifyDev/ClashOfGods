@@ -31,6 +31,7 @@ internal static class GameStartManagerPatch
             __instance.LobbyInfoPane.DeactivatePane();
             Opened = true;
         }
+
         return false;
     }
 
@@ -41,8 +42,8 @@ internal static class GameStartManagerPatch
         if (!AmongUsClient.Instance.AmHost) return;
         __instance.HostViewButton.gameObject.SetActive(false);
         var button = __instance.EditButton;
-        button.transform.localPosition = new(-1, -0.1f, 0);
-        button.inactiveSprites.transform.localScale = button.activeSprites.transform.localScale = new(2, 1, 1);
+        button.transform.localPosition = new Vector3(-1, -0.1f, 0);
+        button.inactiveSprites.transform.localScale = button.activeSprites.transform.localScale = new Vector3(2, 1, 1);
         var collider = button.Colliders.First().Cast<BoxCollider2D>();
         var size = button.inactiveSprites.GetComponent<SpriteRenderer>().size;
         size.x *= 2;

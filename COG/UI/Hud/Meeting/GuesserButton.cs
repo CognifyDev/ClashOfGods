@@ -9,27 +9,26 @@ using COG.Utils;
 using COG.Utils.Coding;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace COG.UI.Hud.Meeting;
 
 public class GuesserButton
 {
-    public static List<GuesserButton> Buttons { get; } = new();
-    public GameObject GameObject { get; private set; }
-
     private const string GuessButtonName = "GuessButton";
-
-    private readonly PlayerControl? _target;
     private readonly PlayerVoteArea _area;
 
-    private GameObject? _container = null;
+    private readonly PlayerControl? _target;
+    private PassiveButton? _confirmButton;
+
+    private GameObject? _container;
+    private readonly Guesser _guesser;
+    private int _page = 1;
+    private GameObject? _roleButtonContainer;
+    private readonly IEnumerable<CustomRole> _roles;
     private SpriteRenderer? _selectedButton;
     private CustomRole? _selectedRole;
-    private IEnumerable<CustomRole> _roles;
-    private PassiveButton? _confirmButton;
-    private GameObject? _roleButtonContainer;
-    private Guesser _guesser;
-    private int _page = 1;
 
     /// <summary>
     ///     赌怪按钮
@@ -41,7 +40,7 @@ public class GuesserButton
         _target = PlayerUtils.GetPlayerById(playerVoteArea.TargetPlayerId);
         _area = playerVoteArea;
         GameObject.name = GuessButtonName;
-        GameObject.transform.localPosition = new(-0.95f, 0.03f, -1.3f);
+        GameObject.transform.localPosition = new Vector3(-0.95f, 0.03f, -1.3f);
         var renderer = GameObject.GetComponent<SpriteRenderer>();
         renderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.GuessButton, 150F);
         var passive = GameObject.GetComponent<PassiveButton>();
@@ -50,22 +49,27 @@ public class GuesserButton
 
         Buttons.Add(this);
 
-        _roles = _guesser.EnabledRolesOnly.GetBool() ? GetCustomRolesFromPlayers() : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole);
+        _roles = _guesser.EnabledRolesOnly.GetBool()
+            ? GetCustomRolesFromPlayers()
+            : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole);
     }
+
+    public static List<GuesserButton> Buttons { get; } = new();
+    public GameObject GameObject { get; }
 
     public void SetUp()
     {
         Reset();
         MeetingHud.Instance.ButtonParent.gameObject.SetActive(false);
 
-        _container = new("GuesserButtons");
+        _container = new GameObject("GuesserButtons");
         _container.transform.SetParent(MeetingHud.Instance.ButtonParent.transform.parent);
         _container.transform.localPosition = Vector3.zero;
         _container.transform.localScale = Vector3.one;
 
         var titleTemplate = MeetingHud.Instance.TitleText;
         var title = Object.Instantiate(titleTemplate, _container.transform);
-        title.transform.localPosition = new(0, 2.2f, -1);
+        title.transform.localPosition = new Vector3(0, 2.2f, -1);
         title.TryDestroyComponent<TextTranslatorTMP>();
         title.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game").GetString("ui-title");
 
@@ -78,7 +82,7 @@ public class GuesserButton
     {
         var newArea = Object.Instantiate(_area, _container!.transform);
         newArea.transform.localScale = Vector3.one;
-        newArea.transform.localPosition = new(0, 1.5f, 0);
+        newArea.transform.localPosition = new Vector3(0, 1.5f, 0);
         newArea.transform.FindChild(GuessButtonName).gameObject.TryDestroy();
     }
 
@@ -113,7 +117,7 @@ public class GuesserButton
         for (var i = 0; i < maxRow; i++)
         {
             var x = initialX + i * deltaX;
-            
+
             for (var j = 0; j < maxLine; j++)
             {
                 var y = initialY + j * deltaY;
@@ -130,10 +134,13 @@ public class GuesserButton
                 nameText.text = currentRole.GetColorName();
 
                 nameText.transform.localPosition = Vector3.zero;
-                nameText.transform.localScale = new(1.5f, 1.5f, 1f);
-                roleButton.transform.FindChild("votePlayerBase").FindChild("ControllerHighlight").GetComponentInChildren<SpriteRenderer>().enabled = false;
-                roleButton.transform.localScale = new(0.7f, 0.7f, 1f);
-                roleButton.transform.GetAllChildren().DoIf(c => !new[] { "MaskArea", "votePlayerBase", "NameText" }.Contains(c.name), c => c.gameObject.TryDestroy());
+                nameText.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+                roleButton.transform.FindChild("votePlayerBase").FindChild("ControllerHighlight")
+                    .GetComponentInChildren<SpriteRenderer>().enabled = false;
+                roleButton.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
+                roleButton.transform.GetAllChildren()
+                    .DoIf(c => !new[] { "MaskArea", "votePlayerBase", "NameText" }.Contains(c.name),
+                        c => c.gameObject.TryDestroy());
 
                 roleButton.SetActive(false);
                 roleButton.TryDestroyComponent<PlayerVoteArea>();
@@ -143,7 +150,7 @@ public class GuesserButton
                 var highlight = votePlayerBase.FindChild("ControllerHighlight").GetComponent<SpriteRenderer>();
                 highlight.enabled = false;
                 var passive = votePlayerBase.GetComponent<PassiveButton>();
-                passive.OnClick = new();
+                passive.OnClick = new Button.ButtonClickedEvent();
                 passive.OnClick.AddListener(new Action(() =>
                 {
                     if (_selectedButton)
@@ -158,8 +165,8 @@ public class GuesserButton
                     if (!_confirmButton)
                         SetUpConfirmButton();
                 }));
-                passive.OnMouseOut = new();
-                passive.OnMouseOver = new();
+                passive.OnMouseOut = new UnityEvent();
+                passive.OnMouseOver = new UnityEvent();
                 passive.OnMouseOut.AddListener(new Action(() =>
                     highlight.enabled = _selectedButton == highlight));
                 passive.OnMouseOver.AddListener(new Action(() =>
@@ -175,26 +182,22 @@ public class GuesserButton
     public void SetUpPageButton(bool previousPage, bool nextPage)
     {
         if (previousPage)
-        {
-            CreateBottomButton("", new(-2.5f, -2.2f, 0f), () =>
+            CreateBottomButton("", new Vector3(-2.5f, -2.2f, 0f), () =>
             {
                 _roleButtonContainer.TryDestroy();
                 SetUpRolePage(_page - 1);
             });
-        }
         if (nextPage)
-        {
-            CreateBottomButton("", new(2.5f, -2.2f, 0f), () =>
+            CreateBottomButton("", new Vector3(2.5f, -2.2f, 0f), () =>
             {
                 _roleButtonContainer.TryDestroy();
                 SetUpRolePage(_page + 1);
             });
-        }
     }
 
     public void SetUpCancelButton()
     {
-        CreateBottomButton(LanguageConfig.Instance.Cancel, new(-3.6f, -2.2f, 0f), () =>
+        CreateBottomButton(LanguageConfig.Instance.Cancel, new Vector3(-3.6f, -2.2f, 0f), () =>
         {
             _container.TryDestroy();
             MeetingHud.Instance.ButtonParent.gameObject.SetActive(true);
@@ -204,7 +207,7 @@ public class GuesserButton
 
     public void SetUpConfirmButton()
     {
-        _confirmButton = CreateBottomButton(LanguageConfig.Instance.Confirm, new(3.6f, -2.2f, 0f), Shoot);
+        _confirmButton = CreateBottomButton(LanguageConfig.Instance.Confirm, new Vector3(3.6f, -2.2f, 0f), Shoot);
     }
 
     public PassiveButton CreateBottomButton(string text, Vector3 localPosition, Action onClick)
@@ -219,13 +222,13 @@ public class GuesserButton
         var highlight = passive.transform.FindChild("ControllerHighlight").GetComponent<SpriteRenderer>();
         highlight.enabled = false;
 
-        passive.OnClick = new();
+        passive.OnClick = new Button.ButtonClickedEvent();
         passive.OnClick.AddListener(onClick);
-        passive.OnMouseOut = new();
-        passive.OnMouseOver = new();
+        passive.OnMouseOut = new UnityEvent();
+        passive.OnMouseOver = new UnityEvent();
         passive.OnMouseOut.AddListener(new Action(() => highlight.enabled = false));
         passive.OnMouseOver.AddListener(new Action(() => highlight.enabled = true));
-        
+
         var textMesh = button.GetComponentInChildren<TextMeshPro>();
         textMesh.TryDestroyComponent<TextTranslatorTMP>();
         textMesh.text = text;
@@ -237,7 +240,7 @@ public class GuesserButton
     private void Shoot()
     {
         if (!_target) return;
-        
+
         PlayerControl.LocalPlayer.RpcKillWithoutDeadBody(_target!);
         _guesser.GuessedTime++;
     }
@@ -248,21 +251,15 @@ public class GuesserButton
         var players = PlayerUtils.GetAllPlayers();
 
         var customRoles = players.Select(player => player.GetMainRole()).ToList();
-        
+
         if (canGuessSubRoles)
-        {
             players.Select(player => player.GetSubRoles()).ForEach(roles =>
             {
                 if (!roles.Any()) return;
                 foreach (var customRole in roles)
-                {
                     if (!customRoles.Select(role => role.Id).Contains(customRole.Id))
-                    {
                         customRoles.Add(customRole);
-                    }
-                }
             });
-        }
 
         return customRoles.ToArray();
     }

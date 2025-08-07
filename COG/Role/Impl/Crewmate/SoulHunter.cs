@@ -1,4 +1,6 @@
-﻿using COG.Config.Impl;
+﻿using System.Collections;
+using System.Linq;
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.States;
@@ -6,8 +8,6 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using Reactor.Utilities;
-using System.Collections;
-using System.Linq;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -17,9 +17,6 @@ public class SoulHunter : CustomRole, IListener
     private const string HasRevivedTag = "hasRevived_SoulHunter";
 
     private Vector2? _position;
-
-    private CustomOption ReviveAfter { get; }
-    private CustomOption SoulHunterKillCd { get; }
 
     public SoulHunter() : base(Color.green, CampType.Crewmate)
     {
@@ -33,6 +30,9 @@ public class SoulHunter : CustomRole, IListener
         DefaultKillButtonSetting.UsesLimit = 1;
         DefaultKillButtonSetting.CustomCooldown = SoulHunterKillCd.GetFloat;
     }
+
+    private CustomOption ReviveAfter { get; }
+    private CustomOption SoulHunterKillCd { get; }
 
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]

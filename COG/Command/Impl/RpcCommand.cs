@@ -10,9 +10,9 @@ namespace COG.Command.Impl;
 
 public class RpcCommand : CommandBase
 {
-    private RpcWriter? _writer;
     private byte _current;
     private int _initialSize;
+    private RpcWriter? _writer;
 
     public RpcCommand() : base("rpc")
     {
@@ -39,12 +39,13 @@ public class RpcCommand : CommandBase
                     else
                     {
                         if (Enum.TryParse<RpcCalls>(value, true, out var vanillaRpc))
-                            _writer = RpcUtils.StartRpcImmediately(player, vanillaRpc);
+                            _writer = player.StartRpcImmediately(vanillaRpc);
                         else if (Enum.TryParse<KnownRpc>(value, false, out var modRpc))
-                            _writer = RpcUtils.StartRpcImmediately(player, modRpc);
+                            _writer = player.StartRpcImmediately(modRpc);
                         else
                             throw new NotSupportedException("The RPC you request to send is not supported.");
                     }
+
                     _initialSize = _writer.GetWriters().First().Length;
 
                     GameUtils.SendSystemMessage("一个RpcWriter实例已启动！\n输入 /rpc help 获得更多信息。");
@@ -56,18 +57,18 @@ public class RpcCommand : CommandBase
                     sb.AppendLine("/rpc add %dataType% %context%")
                         .AppendLine("可用类型：byte, sbyte, int, ushort, uint, ulong, bool, float, string, player, vector")
                         .AppendLine("""
-                        例：
-                        /rpc add bool true
-                        /rpc add vector2 3 -1.2
-                        /rpc add player 3（玩家Id）
-                        /rpc add player 玩家名字
-                        /rpc add vector 1 -3
-                        """)
+                                    例：
+                                    /rpc add bool true
+                                    /rpc add vector2 3 -1.2
+                                    /rpc add player 3（玩家Id）
+                                    /rpc add player 玩家名字
+                                    /rpc add vector 1 -3
+                                    """)
                         .Append("""
-                        /rpc start %callId%
-                        /rpc send
-                        /rpc close
-                        """);
+                                /rpc start %callId%
+                                /rpc send
+                                /rpc close
+                                """);
                     GameUtils.SendSystemMessage(sb.ToString());
                 }
                     break;

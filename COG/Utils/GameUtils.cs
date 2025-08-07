@@ -18,8 +18,9 @@ public static class GameUtils
     public static List<CustomPlayerData> PlayerData { get; } = new();
 
     internal static GenericPopup? PopupPrefab { get; set; }
+
     public static GenericPopup? Popup
-    { 
+    {
         get
         {
             if (!PopupPrefab) return null;
@@ -40,7 +41,7 @@ public static class GameUtils
     }
 
     /// <summary>
-    /// 获取当前启用的内鬼数量
+    ///     获取当前启用的内鬼数量
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NullReferenceException"></exception>
@@ -82,7 +83,7 @@ public static class GameUtils
         var countInConfig = GlobalCustomOptionConstant.MaxNeutralNumber.GetInt();
         var finalCount = CustomRoleManager.GetManager().GetRoles()
             .Count(role => role.CampType == CampType.Neutral);
-        if (finalCount < countInConfig) countInConfig = finalCount; 
+        if (finalCount < countInConfig) countInConfig = finalCount;
         var result = count >= countInConfig ? countInConfig : count;
         return result < 0 ? 0 : result;
     }
@@ -126,7 +127,7 @@ public static class GameUtils
         // 先给自己发通知
         HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)id, text, true);
 
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.NotifySettingChange);
+        var writer = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.NotifySettingChange);
         writer.WritePacked(id).Write(text).Finish();
     }
 }

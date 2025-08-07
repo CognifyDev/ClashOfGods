@@ -71,7 +71,7 @@ public class OptionCommand : CommandBase
                     .Append("/option set %id% %selection% - Set the selection of option with %id%.\n")
                     .Append(" %id% : The ID of the option you want to change.\n")
                     .Append(" %selection% : The ID of the new selection.\n");
-                    //.Append("/option share - Share all option to other clients immediately.");
+                //.Append("/option share - Share all option to other clients immediately.");
 
                 GameUtils.SendSystemMessage(sb.ToString());
             }

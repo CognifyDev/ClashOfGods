@@ -1,3 +1,4 @@
+using System;
 using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl;
@@ -8,7 +9,6 @@ using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using COG.Utils.Coding;
 using InnerNet;
-using System;
 
 namespace COG.Patch;
 
@@ -39,7 +39,7 @@ internal class PlayerKillPatch
     [HarmonyPrefix]
     public static bool CheckMurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
-        var executeOrigin =  ListenerManager.GetManager()
+        var executeOrigin = ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerMurderEvent(__instance, target, null), EventHandlerType.Prefix);
 
         if (!target)
@@ -57,7 +57,8 @@ internal class PlayerKillPatch
 
     [HarmonyPatch(nameof(PlayerControl.MurderPlayer))]
     [HarmonyPostfix]
-    public static void MurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] MurderResultFlags resultFlags)
+    public static void MurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target,
+        [HarmonyArgument(1)] MurderResultFlags resultFlags)
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerMurderEvent(__instance, target, resultFlags), EventHandlerType.Postfix);
@@ -312,9 +313,9 @@ internal class PlayerControlAwakePatch
 }
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckProtect))]
-static class PlayerCheckProtectPatch
+internal static class PlayerCheckProtectPatch
 {
-    static bool Prefix(PlayerControl __instance, PlayerControl target)
+    private static bool Prefix(PlayerControl __instance, PlayerControl target)
     {
         __instance.RpcProtectPlayer(target, __instance.Data.DefaultOutfit.ColorId);
         return false; // always allow to protect
@@ -322,9 +323,9 @@ static class PlayerCheckProtectPatch
 }
 
 [HarmonyPatch(typeof(RoleManager), nameof(RoleManager.AssignRoleOnDeath))]
-static class GhostRoleAssignmentPatch
+internal static class GhostRoleAssignmentPatch
 {
-    static void Prefix(ref bool specialRolesAllowed)
+    private static void Prefix(ref bool specialRolesAllowed)
     {
         specialRolesAllowed = false;
     }

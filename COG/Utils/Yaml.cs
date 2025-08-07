@@ -47,10 +47,7 @@ public class Yaml
     public bool? GetBool(string location)
     {
         var str = GetString(location);
-        if (str == null)
-        {
-            return null;
-        }
+        if (str == null) return null;
 
         if (bool.TryParse(str, out var result)) return result;
 
@@ -60,10 +57,7 @@ public class Yaml
     public double? GetDouble(string location)
     {
         var str = GetString(location);
-        if (str == null)
-        {
-            return null;
-        }
+        if (str == null) return null;
 
         if (double.TryParse(str, out var result)) return result;
 

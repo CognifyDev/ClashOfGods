@@ -120,7 +120,7 @@ internal class MeetingHudCheckForEndVotingPatch
         return ListenerManager.GetManager()
             .ExecuteHandlers(new MeetingCheckForEndVotingEvent(__instance), EventHandlerType.Prefix);
     }
-    
+
     private static void Postfix(MeetingHud __instance)
     {
         ListenerManager.GetManager()

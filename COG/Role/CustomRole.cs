@@ -25,7 +25,6 @@ using Random = System.Random;
 namespace COG.Role;
 
 #pragma warning disable CS0659
-
 /*
  WARNING:
   Most of the members in CustomRole and PlayerControl won't synchronize automatically,
@@ -38,12 +37,12 @@ namespace COG.Role;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class CustomRole
 {
-    private static int _order = 0;
+    private static int _order;
     private KillButtonSetting _currentKillButtonSetting;
-    private Stack<KillButtonSetting> _killButtonSettings = new();
+    private readonly Stack<KillButtonSetting> _killButtonSettings = new();
 
     /// <summary>
-    /// Initializes a sub-role instance.
+    ///     Initializes a sub-role instance.
     /// </summary>
     /// <param name="color"></param>
     /// <param name="showInOptions"></param>
@@ -52,17 +51,18 @@ public class CustomRole
     }
 
     /// <summary>
-    /// Initializes a main role instance.
+    ///     Initializes a main role instance.
     /// </summary>
     /// <param name="color"></param>
     /// <param name="campType"></param>
     /// <param name="showInOptions"></param>
-    public CustomRole(Color color, CampType campType, bool showInOptions = true) : this(color, campType, false, showInOptions)
+    public CustomRole(Color color, CampType campType, bool showInOptions = true) : this(color, campType, false,
+        showInOptions)
     {
     }
 
     /// <summary>
-    /// Initializes an impostor role instance.
+    ///     Initializes an impostor role instance.
     /// </summary>
     /// <param name="showInOptions"></param>
     public CustomRole(bool showInOptions = true) : this(Palette.ImpostorRed, CampType.Impostor, showInOptions)
@@ -81,9 +81,9 @@ public class CustomRole
         CanSabotage = campType == CampType.Impostor;
         Id = _order++;
         ShowInOptions = showInOptions;
-        AllOptions = new();
+        AllOptions = new List<CustomOption>();
 
-        _currentKillButtonSetting = DefaultKillButtonSetting = new()
+        _currentKillButtonSetting = DefaultKillButtonSetting = new KillButtonSetting
         {
             ForceShow = () => CanKill,
             TargetOutlineColor = Color
@@ -111,28 +111,19 @@ public class CustomRole
             StringName = StringNames.None
         };
 
-        if (this is IWinnable winnable)
-        {
-            CustomWinnerManager.GetManager().RegisterCustomWinnable(winnable);
-        }
+        if (this is IWinnable winnable) CustomWinnerManager.GetManager().RegisterCustomWinnable(winnable);
 
         if (ShowInOptions)
         {
             // Actually name here is useless for new option
             RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage,
                 new IntOptionValueRule(0, 1, 15, 0));
-            RoleChanceOption = CreateOption(() => "Chance", 
+            RoleChanceOption = CreateOption(() => "Chance",
                 new IntOptionValueRule(0, 10, 100, 0));
-            
-            RoleCode = CreateOption(() => LanguageConfig.Instance.RoleCode, 
+
+            RoleCode = CreateOption(() => LanguageConfig.Instance.RoleCode,
                 new StringOptionValueRule(0, _ => Id.ToString().ToSingleElementArray()));
         }
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is not CustomRole role) return false;
-        return role.Id == Id;
     }
 
     /// <summary>
@@ -144,19 +135,11 @@ public class CustomRole
     ///     角色颜色
     /// </summary>
     public Color Color { get; }
-    
+
     /// <summary>
     ///     角色的名称
     /// </summary>
     public string Name { get; }
-    
-    protected string GetContextFromLanguage(string context)
-    {
-        var campName = IsSubRole ? "sub-roles" : CampType.ToString().ToLower();
-        var location = $"role.{campName}.{GetNameInConfig()}.{context}";
-        var toReturn = LanguageConfig.Instance.YamlReader!.GetString(location);
-        return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
-    }
 
     /// <summary>
     ///     是否是基本职业
@@ -167,15 +150,6 @@ public class CustomRole
     ///     显示在职业分配后职业介绍界面的简短介绍文本
     /// </summary>
     public string ShortDescription { get; protected set; }
-
-    /// <summary>
-    /// 显示在职业设置的职业详细介绍文本
-    /// </summary>
-    /// <returns>详细介绍</returns>
-    public string GetLongDescription()
-    {
-        return GetContextFromLanguage("long-description");
-    }
 
     /// <summary>
     ///     角色阵营
@@ -220,7 +194,7 @@ public class CustomRole
     /// <summary>
     ///     职业几率的选项
     /// </summary>
-    public CustomOption? RoleChanceOption { get; internal set;  }
+    public CustomOption? RoleChanceOption { get; internal set; }
 
     public CustomOption? RoleCode { get; internal set; }
 
@@ -231,7 +205,7 @@ public class CustomRole
     {
         get
         {
-            if (RoleNumberOption != null) 
+            if (RoleNumberOption != null)
                 return RoleNumberOption!.GetInt() > 0;
             return false;
         }
@@ -248,25 +222,9 @@ public class CustomRole
         EventRecorder.Instance.Record(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
     };
 
-    public bool IsAvailable()
-    {
-        if (!Enabled || IsBaseRole || !ShowInOptions) return false;
-        var chance = RoleChanceOption?.GetInt();
-        
-        if (chance == null)
-        {
-            return false;
-        }
-
-        return new Random().Next(0, 100) <= chance;
-    }
-
-    public string GetNormalName() => GetType().Name;
-
-    public virtual string GetNameInConfig() => GetType().Name.ToLower();
-
     public ReadOnlyCollection<PlayerControl> Players =>
-        new(GameUtils.PlayerData.Where(pr => !pr.IsDisconnected && pr.Player.IsRole(this)).Select(pr => pr.Player).ToList());
+        new(GameUtils.PlayerData.Where(pr => !pr.IsDisconnected && pr.Player.IsRole(this)).Select(pr => pr.Player)
+            .ToList());
 
     public List<CustomOption> AllOptions { get; internal set; }
 
@@ -287,8 +245,9 @@ public class CustomRole
     public KillButtonSetting DefaultKillButtonSetting { get; }
 
     /// <summary>
-    /// NOTE: Set to null to use previous setting.<para/>
-    /// PLEASE CAREFULLY CONSIDER WHETHER TO CLONE ONE OR TO JUST OVERRIDE!
+    ///     NOTE: Set to null to use previous setting.
+    ///     <para />
+    ///     PLEASE CAREFULLY CONSIDER WHETHER TO CLONE ONE OR TO JUST OVERRIDE!
     /// </summary>
     public KillButtonSetting CurrentKillButtonSetting
     {
@@ -313,6 +272,51 @@ public class CustomRole
                 _currentKillButtonSetting = value;
             }
         }
+    }
+
+    public List<CustomButton> AllButtons { get; } = new();
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not CustomRole role) return false;
+        return role.Id == Id;
+    }
+
+    protected string GetContextFromLanguage(string context)
+    {
+        var campName = IsSubRole ? "sub-roles" : CampType.ToString().ToLower();
+        var location = $"role.{campName}.{GetNameInConfig()}.{context}";
+        var toReturn = LanguageConfig.Instance.YamlReader!.GetString(location);
+        return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
+    }
+
+    /// <summary>
+    ///     显示在职业设置的职业详细介绍文本
+    /// </summary>
+    /// <returns>详细介绍</returns>
+    public string GetLongDescription()
+    {
+        return GetContextFromLanguage("long-description");
+    }
+
+    public bool IsAvailable()
+    {
+        if (!Enabled || IsBaseRole || !ShowInOptions) return false;
+        var chance = RoleChanceOption?.GetInt();
+
+        if (chance == null) return false;
+
+        return new Random().Next(0, 100) <= chance;
+    }
+
+    public string GetNormalName()
+    {
+        return GetType().Name;
+    }
+
+    public virtual string GetNameInConfig()
+    {
+        return GetType().Name.ToLower();
     }
 
     protected CustomOption CreateOption(Func<string> nameGetter, IValueRule rule)
@@ -345,8 +349,6 @@ public class CustomRole
         return CustomOption.Of(GetTabType(this), nameGetter, rule);
     }
 
-    public List<CustomButton> AllButtons { get; } = new();
-
     /// <summary>
     ///     添加一个按钮
     /// </summary>
@@ -363,7 +365,8 @@ public class CustomRole
 
         CustomButtonManager.GetManager().RegisterCustomButton(button);
 
-        button.Text = button.Text.Color(Color); // However because of the material of the font, the color string doesnt work
+        button.Text =
+            button.Text.Color(Color); // However because of the material of the font, the color string doesnt work
         AllButtons.Add(button);
     }
 
@@ -415,18 +418,23 @@ public class CustomRole
         return Name.Color(Color);
     }
 
-    public void RegisterRpcHandler(IRpcHandler handler) => IRpcHandler.Register(handler);
+    public void RegisterRpcHandler(IRpcHandler handler)
+    {
+        IRpcHandler.Register(handler);
+    }
 
-    public void ResetCurrentKillButtonSetting() => CurrentKillButtonSetting = null!;
+    public void ResetCurrentKillButtonSetting()
+    {
+        CurrentKillButtonSetting = null!;
+    }
 
     public static void ClearKillButtonSettings()
     {
-        CustomRoleManager.GetManager().GetRoles().
-            ForEach(r =>
-            {
-                r._killButtonSettings.Clear();
-                r.ResetCurrentKillButtonSetting();
-            });
+        CustomRoleManager.GetManager().GetRoles().ForEach(r =>
+        {
+            r._killButtonSettings.Clear();
+            r.ResetCurrentKillButtonSetting();
+        });
     }
 
     public static CustomOption.TabType GetTabType(CustomRole role)
@@ -437,7 +445,7 @@ public class CustomRole
             CampType.Crewmate => CustomOption.TabType.Crewmate,
             CampType.Impostor => CustomOption.TabType.Impostor,
             CampType.Neutral => CustomOption.TabType.Neutral,
-            _ => CustomOption.TabType.Addons,
+            _ => CustomOption.TabType.Addons
         };
     }
 
@@ -445,7 +453,7 @@ public class CustomRole
     {
         return IListener.EmptyListener;
     }
-    
+
     ~CustomRole()
     {
         ClearRoleGameData();

@@ -1,20 +1,20 @@
-using COG.Game.Events;
-using COG.Rpc;
-using COG.Utils;
-using System;
 using System.Linq;
+using COG.Game.Events;
+using COG.Utils;
+using Il2CppSystem;
+using UnityEngine;
 
 namespace COG.Patch;
 
 [HarmonyPatch]
-static class VanillaKillButtonPatch
+internal static class VanillaKillButtonPatch
 {
     public static bool IsHudActive { get; private set; } = true;
-    public static bool ActiveLastFrame { get; set; } = false;
+    public static bool ActiveLastFrame { get; set; }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     [HarmonyPostfix]
-    static void KillButtonUpdatePatch(PlayerControl __instance)
+    private static void KillButtonUpdatePatch(PlayerControl __instance)
     {
         if (!__instance.AmOwner) return; // Only local player
         if (!GameStates.InRealGame) return;
@@ -37,9 +37,11 @@ static class VanillaKillButtonPatch
 
         // never log here since it will fill log file with trash
 
-        killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) + (show && setting!.UsesLimit > 0 ? $" ({setting.RemainingUses})" : ""));
+        killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) +
+                                (show && setting!.UsesLimit > 0 ? $" ({setting.RemainingUses})" : ""));
 
-        if ((PlayerControl.LocalPlayer.IsKillTimerEnabled || PlayerControl.LocalPlayer.ForceKillTimerContinue) && IsHudActive) // Prevent meeting kill (as we canceled vanilla murder check)
+        if ((PlayerControl.LocalPlayer.IsKillTimerEnabled || PlayerControl.LocalPlayer.ForceKillTimerContinue) &&
+            IsHudActive) // Prevent meeting kill (as we canceled vanilla murder check)
         {
             if (!aliveUsable || (setting!.UsesLimit > 0 && setting.RemainingUses <= 0))
             {
@@ -53,10 +55,9 @@ static class VanillaKillButtonPatch
                 if (!player) return;
 
                 killButton.SetTarget(player);
-                player!.cosmetics.SetOutline(true, new(setting.TargetOutlineColor));
+                player!.cosmetics.SetOutline(true, new Nullable<Color>(setting.TargetOutlineColor));
             }
         }
-
     }
 
     public static void Initialize()
@@ -67,14 +68,16 @@ static class VanillaKillButtonPatch
 
     [HarmonyPatch(typeof(KillButton), nameof(KillButton.DoClick))]
     [HarmonyPrefix]
-    static bool ClickPatch(KillButton __instance)
+    private static bool ClickPatch(KillButton __instance)
     {
         if (__instance.isActiveAndEnabled
             && __instance.currentTarget
             && !__instance.isCoolingDown
             && PlayerControl.LocalPlayer.CanMove)
         {
-            var settings = PlayerControl.LocalPlayer.GetSubRoles().Concat(PlayerControl.LocalPlayer.GetMainRole().ToSingleElementArray()).Select(r => r.CurrentKillButtonSetting);
+            var settings = PlayerControl.LocalPlayer.GetSubRoles()
+                .Concat(PlayerControl.LocalPlayer.GetMainRole().ToSingleElementArray())
+                .Select(r => r.CurrentKillButtonSetting);
 
             var activatedSettings = settings.Where(s => s.ForceShow());
             if (!activatedSettings.Any()) return false;
@@ -112,7 +115,11 @@ static class VanillaKillButtonPatch
         return false;
     }
 
-    [HarmonyPatch(typeof(HudManager), nameof(HudManager.SetHudActive), new Type[] { typeof(PlayerControl), typeof(RoleBehaviour), typeof(bool) })]
+    [HarmonyPatch(typeof(HudManager), nameof(HudManager.SetHudActive), typeof(PlayerControl), typeof(RoleBehaviour),
+        typeof(bool))]
     [HarmonyPostfix]
-    static void SetHudActivePatch([HarmonyArgument(2)] bool isActive) => IsHudActive = isActive;
+    private static void SetHudActivePatch([HarmonyArgument(2)] bool isActive)
+    {
+        IsHudActive = isActive;
+    }
 }

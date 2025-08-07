@@ -3,7 +3,7 @@
 public class PluginLogger
 {
     private readonly PluginDescription _description;
-    
+
     public PluginLogger(PluginDescription description)
     {
         _description = description;

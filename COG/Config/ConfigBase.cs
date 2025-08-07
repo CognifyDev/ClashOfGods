@@ -9,8 +9,6 @@ public class ConfigBase
 {
     public const string DataDirectoryName = $"{Main.DisplayName}_DATA";
 
-    public static bool AutoReplace { get; set; } = false;
-
     public ConfigBase(string name, string path, string text, bool replace = false)
     {
         Name = name;
@@ -40,6 +38,8 @@ public class ConfigBase
 
         LoadConfigs(replace);
     }
+
+    public static bool AutoReplace { get; set; }
 
     public static List<ConfigBase> Configs { get; } = new();
     public string Name { get; }

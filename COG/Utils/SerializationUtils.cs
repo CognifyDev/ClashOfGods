@@ -1,7 +1,6 @@
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 
 namespace COG.Utils;
 

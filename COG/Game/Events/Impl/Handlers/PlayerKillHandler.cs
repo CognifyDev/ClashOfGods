@@ -1,10 +1,6 @@
-﻿using COG.Role.Impl.Impostor;
+﻿using System.Linq;
+using COG.Role.Impl.Impostor;
 using COG.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace COG.Game.Events.Impl.Handlers;
 
@@ -20,7 +16,8 @@ public class PlayerKillHandler : TypeEventHandlerBase
         {
             if (extraArguments[0] is not CustomPlayerData victim || extraArguments[1] is not string extraInfo)
             {
-                Main.Logger.LogWarning($"Invalid {nameof(extraArguments)} cause {nameof(victim)} or {nameof(extraInfo)} being null. ({extraArguments[0]}, {extraArguments[1]})");
+                Main.Logger.LogWarning(
+                    $"Invalid {nameof(extraArguments)} cause {nameof(victim)} or {nameof(extraInfo)} being null. ({extraArguments[0]}, {extraArguments[1]})");
                 return null!;
             }
 
@@ -28,7 +25,8 @@ public class PlayerKillHandler : TypeEventHandlerBase
             {
                 if (byte.TryParse(extraInfo.Replace(Stabber.ModifyKillAnimMessage, ""), out var id))
                 {
-                    player = GameUtils.PlayerData.FirstOrDefault(p => p.PlayerId == id)!; // Override killer for killAnimation
+                    player = GameUtils.PlayerData.FirstOrDefault(p =>
+                        p.PlayerId == id)!; // Override killer for killAnimation
                     if (player == null)
                     {
                         Main.Logger.LogWarning("Invalid player id");
@@ -44,6 +42,7 @@ public class PlayerKillHandler : TypeEventHandlerBase
 
             return new PlayerKillGameEvent(player, victim);
         }
+
         return null!;
     }
 }

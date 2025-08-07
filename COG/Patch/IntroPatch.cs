@@ -1,6 +1,5 @@
 using COG.Listener;
 using COG.Listener.Event.Impl.ICutscene;
-using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
 
 namespace COG.Patch;

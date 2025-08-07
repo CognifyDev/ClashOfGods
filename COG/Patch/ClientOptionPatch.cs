@@ -1,9 +1,6 @@
 using COG.Listener;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Impl;
-using COG.UI.ClientOption;
-using COG.Utils;
-using System.Linq;
 
 namespace COG.Patch;
 
@@ -48,13 +45,13 @@ internal class ClientOptionPatch
     {
         try
         {
-            ClientOptionListener.ModTabContainer!.SetActive(__instance.Tabs[index].name == ClientOptionListener.ModTabName);
+            ClientOptionListener.ModTabContainer!.SetActive(__instance.Tabs[index].name ==
+                                                            ClientOptionListener.ModTabName);
         }
         catch
         {
             ClientOptionListener.ModTabContainer!.SetActive(false);
         }
-
     }
 }
 
@@ -74,8 +71,6 @@ internal static class OnAnimateClose
     private static void Postfix(TransitionOpen._AnimateClose_d__7 __instance)
     {
         if (__instance.__4__this.name is "OptionsMenu" or "Menu" && ClientOptionListener.ModTabContainer)
-        {
             ClientOptionListener.ModTabContainer!.SetActive(false);
-        }
     }
 }

@@ -1,11 +1,9 @@
-using COG.Config.Impl;
-using COG.Utils;
-using COG.Utils.Coding.Debugging;
-using COG.Utils.Version;
-using COG.Utils.WinAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using COG.Config.Impl;
+using COG.Utils;
+using COG.Utils.Coding.Debugging;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -65,7 +63,8 @@ public static class MainMenuPatch
 
         __instance.createGameScreen.modeButtons[0].SelectButton(true);
         __instance.createGameScreen.modeButtons[1].SelectButton(false);
-        __instance.createGameScreen.modeButtons[1].gameObject.SetActive(false); // Hide HnS button & select classic button
+        __instance.createGameScreen.modeButtons[1].gameObject
+            .SetActive(false); // Hide HnS button & select classic button
     }
 
     /// <summary>

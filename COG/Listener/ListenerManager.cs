@@ -50,10 +50,14 @@ public class ListenerManager
 
     public Handler[] AsHandlers(IListener listener)
     {
-        return (from methodInfo in listener.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
-            let attributes = methodInfo.GetCustomAttributes(typeof(EventHandlerAttribute), false) 
-            where attributes.Length >= 1 let attribute = attributes[0] as EventHandlerAttribute 
-            let type = attribute!.EventHandlerType select new Handler(listener, methodInfo, type)).ToArray();
+        return (from methodInfo in listener.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public |
+                                                                 BindingFlags.NonPublic | BindingFlags.Static |
+                                                                 BindingFlags.DeclaredOnly)
+            let attributes = methodInfo.GetCustomAttributes(typeof(EventHandlerAttribute), false)
+            where attributes.Length >= 1
+            let attribute = attributes[0] as EventHandlerAttribute
+            let type = attribute!.EventHandlerType
+            select new Handler(listener, methodInfo, type)).ToArray();
     }
 
     /// <summary>
@@ -62,7 +66,7 @@ public class ListenerManager
     /// <param name="listener">the listener</param>
     public void RegisterListenerIfNotExists(IListener listener)
     {
-        if (GetHandlers(listener).ToList().IsEmpty()) 
+        if (GetHandlers(listener).ToList().IsEmpty())
             RegisterListener(listener);
     }
 
@@ -109,7 +113,7 @@ public class ListenerManager
     public bool ExecuteHandlers(Event.Event @event, EventHandlerType type)
     {
         var toReturn = true;
-        
+
         /* for only
          if you try to use foreach, then
          [Error  :Il2CppInterop] During invoking native->managed trampoline

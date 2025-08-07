@@ -4,7 +4,6 @@ using COG.Listener;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using System;
 using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
@@ -17,10 +16,10 @@ public class Sheriff : CustomRole, IListener
     {
         CanKill = true;
 
-        BaseRoleType = RoleTypes.Crewmate; 
-        
+        BaseRoleType = RoleTypes.Crewmate;
+
         SheriffKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
-                new FloatOptionValueRule(10f, 5f, 60f, 30f, NumberSuffixes.Seconds));
+            new FloatOptionValueRule(10f, 5f, 60f, 30f, NumberSuffixes.Seconds));
 
         DefaultKillButtonSetting.CustomCooldown = SheriffKillCd.GetFloat;
         DefaultKillButtonSetting.SetBeforeMurder(button =>
@@ -32,11 +31,9 @@ public class Sheriff : CustomRole, IListener
             {
                 return current;
             }
-            else
-            {
-                DefaultKillButtonSetting.ExtraRpcMessage = $"{MisfireMurderMessage}{current.PlayerId}";
-                return PlayerControl.LocalPlayer;
-            }
+
+            DefaultKillButtonSetting.ExtraRpcMessage = $"{MisfireMurderMessage}{current.PlayerId}";
+            return PlayerControl.LocalPlayer;
         });
 
         DefaultKillButtonSetting.AddAfterClick(() => DefaultKillButtonSetting.ExtraRpcMessage = null);

@@ -29,7 +29,7 @@ public static class RoleOptionPatch
     [HarmonyPrefix]
     private static void BeforeSettingCreation(RolesSettingsMenu __instance)
     {
-        __instance.advancedSettingChildren ??= new();
+        __instance.advancedSettingChildren ??= new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
         foreach (var behaviour in __instance.advancedSettingChildren)
             behaviour.gameObject.TryDestroy();
         __instance.advancedSettingChildren.Clear(); // Fix advanced tab couldn't be opened
@@ -56,13 +56,13 @@ public static class RoleOptionPatch
         headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.TryDestroy());
 
         __instance.AllButton.gameObject.SetActive(false);
-        
+
         Main.Logger.LogInfo("Creating tabs...");
-        
+
         var i = 0;
         foreach (var team in Enum.GetValues<CampType>())
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
-        
+
         chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.TryDestroy();
     }
 
@@ -75,6 +75,7 @@ public static class RoleOptionPatch
             __instance.cachedData = GameOptionsManager.Instance.CurrentGameOptions.RoleOptions;
             __instance.RefreshChildren();
         }
+
         return false;
     }
 
@@ -94,10 +95,10 @@ public static class RoleOptionPatch
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
         __instance.roleDescriptionText.text = CurrentAdvancedTabFor.GetLongDescription();
         var rolePreview = ResourceUtils.LoadSprite(
-            $"COG.Resources.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png", 
+            $"COG.Resources.Images.RolePreviews.{CurrentAdvancedTabFor.GetType().Name}.png",
             300);
-        __instance.roleScreenshot.sprite = !rolePreview ?
-            ResourceUtils.LoadSprite(ResourceConstant.DefaultRolePreview, 185) : rolePreview;
+        __instance.roleScreenshot.sprite =
+            !rolePreview ? ResourceUtils.LoadSprite(ResourceConstant.DefaultRolePreview, 185) : rolePreview;
         __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground").GetComponent<SpriteRenderer>().color =
             new Color(1, 1, 1, 1);
 
@@ -114,7 +115,7 @@ public static class RoleOptionPatch
 
         CurrentAdvancedTabFor.RoleCode!.OptionBehaviour!.SetAsPlayer();
     }
-    
+
     [HarmonyPatch(nameof(RolesSettingsMenu.OpenChancesTab))]
     [HarmonyPrefix]
     public static bool OnChanceTabOpened(RolesSettingsMenu __instance)
@@ -132,7 +133,8 @@ public static class RoleOptionPatch
     }
 
 
-    private static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp, int index)
+    private static void SetUpCustomRoleTab(RolesSettingsMenu menu, Transform chanceTabTemplate, CampType camp,
+        int index)
     {
         Main.Logger.LogDebug($"Creating tab for team {camp}...");
 
@@ -147,7 +149,7 @@ public static class RoleOptionPatch
         tab.localPosition = chanceTabTemplate.localPosition;
         var trueName = camp != CampType.Unknown ? camp.ToString() : "Addon";
         tab.name = trueName + "Tab";
-        
+
         var button = SetUpTabButton(menu, tab.gameObject, index, trueName, camp);
 
         var header = Object.Instantiate(menu.categoryHeaderEditRoleOrigin, tab);
@@ -220,7 +222,7 @@ public static class RoleOptionPatch
             passive.OnMouseOut = new UnityEvent();
             passive.OnMouseOver = new UnityEvent();
             passive.OnClick = new Button.ButtonClickedEvent();
-            
+
             if (role.RoleOptions.Count != 0)
             {
                 passive.OnMouseOut.AddListener((UnityAction)new Action(() => label.color = color));
@@ -239,7 +241,7 @@ public static class RoleOptionPatch
                     menu.ChangeTab(role.VanillaCategory, button);
                 }));
             }
-            
+
             roleSetting.OnValueChanged = new Action<OptionBehaviour>(ob =>
             {
                 var setting = ob.Cast<RoleOptionSetting>();
@@ -261,7 +263,7 @@ public static class RoleOptionPatch
     {
         var headerParent = menu.tabParent;
         Main.Logger.LogDebug($"Setting up tab button for {tab.name} ({index})");
-        
+
         var offset = RolesSettingsMenu.X_OFFSET;
         var xStart = menu.AllButton.transform.localPosition.x;
         var yStart = RolesSettingsMenu.TAB_Y_START;
@@ -336,7 +338,7 @@ public static class RoleOptionPatch
         CurrentButton = button;
         CurrentTab = tabToOpen;
         SetButtonActive(button, true);
-        if (tabToOpen) 
+        if (tabToOpen)
             tabToOpen.SetActive(true);
     }
 

@@ -12,10 +12,10 @@ public class CrewmatesCustomWinner : IWinnable
     {
         var taskComplete = PlayerUtils.GetAllPlayers().All(player => player.AllTasksCompleted());
         if (taskComplete ||
-            PlayerUtils.AllImpostors.Where(pair => pair.Player.IsAlive())
-                .Select(pair => pair.Player).ToList().Count <= 0
-            && PlayerUtils.GetAllAlivePlayers().Where(p => p.GetMainRole().CampType != CampType.Crewmate)
-                .Select(p => p.GetMainRole()).Where(role => role.CanKill).ToArray().Length <= 0)
+            (PlayerUtils.AllImpostors.Where(pair => pair.Player.IsAlive())
+                 .Select(pair => pair.Player).ToList().Count <= 0
+             && PlayerUtils.GetAllAlivePlayers().Where(p => p.GetMainRole().CampType != CampType.Crewmate)
+                 .Select(p => p.GetMainRole()).Where(role => role.CanKill).ToArray().Length <= 0))
         {
             data.GameOverReason = taskComplete ? GameOverReason.CrewmatesByTask : GameOverReason.CrewmatesByVote;
             data.WinnableCampType = CampType.Crewmate;

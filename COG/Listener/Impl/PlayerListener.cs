@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using COG.Listener.Event.Impl.Player;
-using COG.States;
 using COG.UI.CustomOption;
 using COG.Utils;
 using Reactor.Utilities;
@@ -36,7 +35,8 @@ public class PlayerListener : IListener
                     }
                     catch (SystemException ex)
                     {
-                        Main.Logger.LogWarning($"Error while sending options: \n{ex.ToString()}\nWill retry after 0.5s... ({i + 1}/{maxAttempts})");
+                        Main.Logger.LogWarning(
+                            $"Error while sending options: \n{ex}\nWill retry after 0.5s... ({i + 1}/{maxAttempts})");
                         failed = true;
 
                         if (i >= maxAttempts - 1)

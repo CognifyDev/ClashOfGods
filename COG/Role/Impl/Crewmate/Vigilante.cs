@@ -1,18 +1,17 @@
-﻿using COG.Config.Impl;
+﻿using System.Linq;
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using System.Linq;
 
 namespace COG.Role.Impl.Crewmate;
 
 public class Vigilante : CustomRole, IListener
 {
-    private bool _hasGiven;
-
     private readonly CustomOption _minCrewmateNumber;
+    private bool _hasGiven;
 
     public Vigilante() : base(ColorUtils.AsColor("#ffcc00"), CampType.Crewmate)
     {

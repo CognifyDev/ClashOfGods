@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener.Event;
@@ -10,17 +14,16 @@ using COG.Role;
 using COG.UI.Hud.CustomButton;
 using COG.UI.Hud.CustomMessage;
 using COG.Utils;
-using COG.Utils.Coding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace COG.Listener.Impl;
 
 public class GameListener : IListener
 {
+    private readonly List<Handler> _handlers = new();
+    private static readonly int Outline = Shader.PropertyToID("_Outline");
+    private static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
+
     [EventHandler(EventHandlerType.Postfix)]
     public void AfterPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
@@ -34,13 +37,11 @@ public class GameListener : IListener
             var changed = false;
 
             foreach (var role in Enum.GetValues<RoleTypes>())
-            {
                 if (roleOption.GetNumPerGame(role) != 0 || roleOption.GetChancePerGame(role) != 0)
                 {
                     roleOption.SetRoleRate(role, 0, 0);
                     changed = true;
                 }
-            }
 
             if (mainOption.RulesPreset != RulesPresets.Custom)
             {
@@ -48,17 +49,12 @@ public class GameListener : IListener
                 changed = true;
             }
 
-            if (changed)
-            {
-                GameManager.Instance.LogicOptions.SyncOptions();
-            }
+            if (changed) GameManager.Instance.LogicOptions.SyncOptions();
         }
-
-        var playersToDisplayInfo = new List<PlayerControl>() { PlayerControl.LocalPlayer };
 
         if (!PlayerControl.LocalPlayer.IsAlive())
         {
-            playersToDisplayInfo = PlayerControl.AllPlayerControls.ToArray().ToList();
+            var playersToDisplayInfo = PlayerControl.AllPlayerControls.ToArray().ToList();
             playersToDisplayInfo.ForEach(p => p.DisplayPlayerInfoOnName());
         }
         else
@@ -83,15 +79,13 @@ public class GameListener : IListener
             @event.SetResult(float.MaxValue);
             return false;
         }
-        else
+
+        var usable = @event.GetCanUse() && @event.GetCouldUse();
+        if (usable)
         {
-            var usable = @event.GetCanUse() && @event.GetCouldUse();
-            if (usable)
-            {
-                var vent = @event.Vent;
-                vent.myRend.material.SetFloat("_Outline", usable ? 1 : 0);
-                vent.myRend.material.SetColor("_OutlineColor", role.Color);
-            }
+            var vent = @event.Vent;
+            vent.myRend.material.SetFloat(Outline, usable ? 1 : 0);
+            vent.myRend.material.SetColor(OutlineColor, role.Color);
         }
 
         return true;
@@ -142,7 +136,8 @@ public class GameListener : IListener
         }
 
         controller.ImpostorText.text =
-            LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(("crew", crewCount), ("neutral", neutralCount), ("imp", impCount));
+            LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(("crew", crewCount), ("neutral", neutralCount),
+                ("imp", impCount));
         return;
 
         int GetCount(IEnumerable<CustomPlayerData> list)
@@ -151,8 +146,6 @@ public class GameListener : IListener
                 .Count(p => !p.IsDead);
         }
     }
-
-    private readonly List<Handler> _handlers = new();
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent _)
@@ -193,7 +186,7 @@ public class GameListener : IListener
     private static string GetRoleHintText()
     {
         var localRole = GameUtils.GetLocalPlayerRole();
-        bool isImpostorRole = localRole.CampType == CampType.Impostor;
+        var isImpostorRole = localRole.CampType == CampType.Impostor;
 
         var sb = new StringBuilder();
 

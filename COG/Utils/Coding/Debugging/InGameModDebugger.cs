@@ -1,7 +1,7 @@
-﻿using COG.Game.Events;
+﻿using System.Collections.Generic;
+using COG.Game.Events;
 using COG.Role;
 using Reactor.Utilities.Attributes;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace COG.Utils.Coding.Debugging;
@@ -16,7 +16,7 @@ public class InGameModDebugger : MonoBehaviour
 
     public static InGameModDebugger Instance { get; private set; }
 
-    void Start()
+    private void Start()
     {
         Instance = this;
         name = nameof(InGameModDebugger);
@@ -31,8 +31,13 @@ public class InGameModDebugger : MonoBehaviour
         player.RpcSetCustomRole(role);
     }
 
-    public void ForceSetRole(string name) => ForceSetRole(PlayerControl.LocalPlayer.PlayerId, name);
+    public void ForceSetRole(string name)
+    {
+        ForceSetRole(PlayerControl.LocalPlayer.PlayerId, name);
+    }
 
-    public PlayerControl GetPlayer(byte id) => PlayerUtils.GetPlayerById(id);
+    public PlayerControl GetPlayer(byte id)
+    {
+        return PlayerUtils.GetPlayerById(id);
+    }
 }
-#nullable restore

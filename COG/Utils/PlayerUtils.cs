@@ -1,22 +1,18 @@
-using AmongUs.Data;
-using COG.Config.Impl;
-using COG.Game.Events;
-using COG.Listener;
-using COG.Listener.Event.Impl.AuClient;
-using COG.Listener.Event.Impl.Player;
-using COG.Patch;
-using COG.Role;
-using COG.Role.Impl;
-using COG.Role.Impl.Impostor;
-using COG.Rpc;
-using COG.UI.Vanilla.KillButton;
-using Il2CppInterop.Runtime;
-using InnerNet;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using AmongUs.Data;
+using COG.Config.Impl;
+using COG.Game.Events;
+using COG.Patch;
+using COG.Role;
+using COG.Role.Impl;
+using COG.Rpc;
+using COG.UI.Vanilla.KillButton;
+using Il2CppInterop.Runtime;
+using InnerNet;
 using UnityEngine;
 
 namespace COG.Utils;
@@ -30,8 +26,12 @@ public enum ColorType
 
 public static class PlayerUtils
 {
+    public const MurderResultFlags SucceededFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
+
+    public const string DeleteTagPrefix = "DELETE010_TAG101_";
+
     public static PoolablePlayer PoolablePlayerPrefab
-            => Resources.FindObjectsOfTypeAll(Il2CppType.Of<PoolablePlayer>()).First().Cast<PoolablePlayer>();
+        => Resources.FindObjectsOfTypeAll(Il2CppType.Of<PoolablePlayer>()).First().Cast<PoolablePlayer>();
 
     public static IEnumerable<CustomPlayerData> AllImpostors => GetPlayersByCamp(CampType.Impostor);
 
@@ -40,7 +40,9 @@ public static class PlayerUtils
     public static IEnumerable<CustomPlayerData> AllNeutrals => GetPlayersByCamp(CampType.Neutral);
 
     public static IEnumerable<CustomPlayerData> GetPlayersByCamp(CampType camp)
-        => GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == camp);
+    {
+        return GameUtils.PlayerData.Where(pair => pair.Player && pair.MainRole.CampType == camp);
+    }
 
     /// <summary>
     ///     获取距离目标玩家位置最近的玩家
@@ -73,19 +75,18 @@ public static class PlayerUtils
         return closestPlayer;
     }
 
-    public const MurderResultFlags SucceededFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
-
     /// <summary>
-    /// 杀死一个玩家不留下鸡腿
+    ///     杀死一个玩家不留下鸡腿
     /// </summary>
     /// <param name="killer"></param>
     /// <param name="target"></param>
     /// <param name="showAnimationToEverybody"></param>
-    public static void RpcKillWithoutDeadBody(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
+    public static void RpcKillWithoutDeadBody(this PlayerControl killer, PlayerControl target,
+        bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
         KillWithoutDeadBody(killer, target, showAnimationToEverybody);
 
-        var rpc = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.KillWithoutDeadBody);
+        var rpc = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.KillWithoutDeadBody);
         rpc.WriteNetObject(killer);
         rpc.WriteNetObject(target);
         rpc.Write(showAnimationToEverybody);
@@ -99,7 +100,8 @@ public static class PlayerUtils
     /// <param name="killer"></param>
     /// <param name="target"></param>
     /// <param name="showAnimationToEverybody"></param>
-    public static void KillWithoutDeadBody(this PlayerControl killer, PlayerControl target, bool showAnimationToEverybody = false, bool anonymousKiller = true)
+    public static void KillWithoutDeadBody(this PlayerControl killer, PlayerControl target,
+        bool showAnimationToEverybody = false, bool anonymousKiller = true)
     {
         target.Exiled();
 
@@ -112,11 +114,13 @@ public static class PlayerUtils
                     pva.SetDead(pva.DidReport, true);
                     pva.Overlay.gameObject.SetActive(true);
                 }
+
                 if (pva.VotedFor != target.PlayerId) continue;
                 pva.UnsetVote();
                 if (!target.AmOwner) continue;
                 MeetingHud.Instance.ClearVote();
             }
+
             if (AmongUsClient.Instance.AmHost)
                 MeetingHud.Instance.CheckForEndVoting();
         }
@@ -124,7 +128,8 @@ public static class PlayerUtils
         var displayedKiller = anonymousKiller ? target : killer;
 
         if (target.IsSamePlayer(PlayerControl.LocalPlayer))
-            HudManager.Instance.KillOverlay.ShowKillAnimation(killer.Data, target.Data); // Always show the real killer to the victim
+            HudManager.Instance.KillOverlay.ShowKillAnimation(killer.Data,
+                target.Data); // Always show the real killer to the victim
         else if (showAnimationToEverybody)
             HudManager.Instance.KillOverlay.ShowKillAnimation(displayedKiller.Data, target.Data);
     }
@@ -172,7 +177,7 @@ public static class PlayerUtils
     }
 
     /// <summary>
-    /// 给玩家添加指定标签
+    ///     给玩家添加指定标签
     /// </summary>
     /// <param name="tag"></param>
     public static void RpcMark(this PlayerControl target, string tag)
@@ -180,27 +185,19 @@ public static class PlayerUtils
         var playerData = target.GetPlayerData();
         playerData?.Tags.Add(tag);
 
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.Mark);
+        var writer = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.Mark);
         writer.WriteNetObject(target);
         writer.Write(tag);
         writer.Finish();
     }
 
-    public const string DeleteTagPrefix = "DELETE010_TAG101_";
-
     public static void RemoveMark(this PlayerControl target, string tag)
     {
         var playerData = target.GetPlayerData();
-        if (playerData == null)
-        {
-            return;
-        }
-        if (!playerData.Tags.Contains(tag))
-        {
-            return;
-        }
+        if (playerData == null) return;
+        if (!playerData.Tags.Contains(tag)) return;
 
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.Mark);
+        var writer = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.Mark);
         writer.WriteNetObject(target);
         writer.Write(DeleteTagPrefix + tag);
         writer.Finish();
@@ -219,14 +216,14 @@ public static class PlayerUtils
     }
 
     /// <summary>
-    /// 复活一个玩家
+    ///     复活一个玩家
     /// </summary>
     /// <param name="player">欲复活的玩家</param>
     public static void RpcRevive(this PlayerControl player)
     {
         player.Revive();
 
-        var writer = RpcUtils.StartRpcImmediately(PlayerControl.LocalPlayer, KnownRpc.Revive);
+        var writer = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.Revive);
 
         // 写入对象实例
         writer.WriteNetObject(player);
@@ -265,10 +262,7 @@ public static class PlayerUtils
     // ReSharper disable once MemberCanBePrivate.Global
     public static ClientData? GetClient(this PlayerControl player)
     {
-        if (!AmongUsClient.Instance)
-        {
-            return null;
-        }
+        if (!AmongUsClient.Instance) return null;
         var client = AmongUsClient.Instance.allClients.ToArray()
             .FirstOrDefault(cd => cd.Character.PlayerId == player.PlayerId);
         return client;
@@ -401,12 +395,12 @@ public static class PlayerUtils
     /// <param name="color">颜色</param>
     public static void SetOutline(this PlayerControl pc, Color color)
     {
-        pc.cosmetics.SetOutline(true, new(color));
+        pc.cosmetics.SetOutline(true, new Il2CppSystem.Nullable<Color>(color));
     }
 
     public static void ClearOutline(this PlayerControl pc)
     {
-        pc.cosmetics.SetOutline(false, new());
+        pc.cosmetics.SetOutline(false, new Il2CppSystem.Nullable<Color>());
     }
 
     public static bool IsRole<T>(this PlayerControl pc) where T : CustomRole
@@ -440,7 +434,8 @@ public static class PlayerUtils
         if (!pc) return;
         if (role == null)
         {
-            Main.Logger.LogError("It shouldn't be possible but the role to set is null. Try checking if you're using a generic SetCustomRole<T> method and setting a role which is not registered yet.");
+            Main.Logger.LogError(
+                "It shouldn't be possible but the role to set is null. Try checking if you're using a generic SetCustomRole<T> method and setting a role which is not registered yet.");
             return;
         }
 
@@ -470,7 +465,7 @@ public static class PlayerUtils
     public static void RpcSetCustomRole(this PlayerControl pc, CustomRole role)
     {
         if (!pc) return;
-        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
+        var writer = pc.StartRpcImmediately(KnownRpc.SetRole);
         writer.Write(pc.PlayerId);
         writer.WritePacked(role.Id);
         writer.Finish();
@@ -481,7 +476,7 @@ public static class PlayerUtils
     {
         if (!pc) return;
         var role = CustomRoleManager.GetManager().GetTypeRoleInstance<T>();
-        var writer = RpcUtils.StartRpcImmediately(pc, KnownRpc.SetRole);
+        var writer = pc.StartRpcImmediately(KnownRpc.SetRole);
         writer.Write(pc.PlayerId);
         writer.WritePacked(role.Id);
         writer.Finish();
@@ -537,10 +532,10 @@ public static class PlayerUtils
         if (!onlyDisplayNameSuffix)
         {
             foreach (var (color, text) in subRoles.ToList()
-                     .Select(r => (
-                         r.Color,
-                         r.HandleAdditionalPlayerName(player)
-                     )))
+                         .Select(r => (
+                             r.Color,
+                             r.HandleAdditionalPlayerName(player)
+                         )))
                 additionalTextBuilder.Append(' ').Append(text.Color(color));
         }
         else
@@ -563,13 +558,14 @@ public static class PlayerUtils
     }
 
     /// <summary>
-    /// 检查 <see cref="GetClosestPlayer(PlayerControl, bool, float)"/> 返回的玩家是否在游戏设置击杀距离内
+    ///     检查 <see cref="GetClosestPlayer(PlayerControl, bool, float)" /> 返回的玩家是否在游戏设置击杀距离内
     /// </summary>
     /// <param name="closestValidPlayer"></param>
     /// <param name="mustAlive"></param>
     /// <param name="closestDistance"></param>
     /// <returns></returns>
-    public static bool CheckClosestTargetInKillDistance(this PlayerControl player, out PlayerControl? closestValidPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
+    public static bool CheckClosestTargetInKillDistance(this PlayerControl player,
+        out PlayerControl? closestValidPlayer, bool mustAlive = true, float closestDistance = float.PositiveInfinity)
     {
         if ((closestValidPlayer = player.GetClosestPlayer(mustAlive, closestDistance)) == null) return false;
 
@@ -584,7 +580,10 @@ public static class PlayerUtils
         return valid;
     }
 
-    public static void RpcSuicide(this PlayerControl player) => player.CmdCheckMurder(player);
+    public static void RpcSuicide(this PlayerControl player)
+    {
+        player.CmdCheckMurder(player);
+    }
 
     public static void ResetKillCooldown(this PlayerControl player)
     {
@@ -592,8 +591,8 @@ public static class PlayerUtils
 
         var cooldown = player.GetKillButtonSetting()?.CustomCooldown() ?? -1;
         player.SetKillTimer(cooldown < 0
-                            ? GameManager.Instance.LogicOptions.GetKillCooldown()
-                            : cooldown);
+            ? GameManager.Instance.LogicOptions.GetKillCooldown()
+            : cooldown);
     }
 
     public static KillButtonSetting? GetKillButtonSetting(this PlayerControl player)
@@ -611,7 +610,10 @@ public static class PlayerUtils
         return activatedSettings.First(); // there should be one settings active
     }
 
-    public static CustomRole[] GetRoles(this PlayerControl player) => player.GetSubRoles().Concat(player.GetMainRole().ToSingleElementArray()).ToArray();
+    public static CustomRole[] GetRoles(this PlayerControl player)
+    {
+        return player.GetSubRoles().Concat(player.GetMainRole().ToSingleElementArray()).ToArray();
+    }
 
     public static void RpcDie(this PlayerControl player, CustomDeathReason reason)
     {
@@ -650,18 +652,18 @@ public enum CustomDeathReason
 [Serializable]
 public class SerializablePlayerData
 {
-    public byte PlayerId { get; }
-
-    public int MainRoleId { get; }
-
-    public int[] SubRoleIds { get; }
-
     private SerializablePlayerData(byte playerId, int mainRoleId, int[] subRoleIds)
     {
         PlayerId = playerId;
         MainRoleId = mainRoleId;
         SubRoleIds = subRoleIds;
     }
+
+    public byte PlayerId { get; }
+
+    public int MainRoleId { get; }
+
+    public int[] SubRoleIds { get; }
 
     public CustomPlayerData ToPlayerData()
     {

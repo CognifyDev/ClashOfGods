@@ -1,11 +1,4 @@
 using COG.Config.Impl;
-using COG.Role;
-using COG.UI.CustomOption;
-using COG.Utils;
-using Reactor.Utilities;
-using System;
-using System.Collections;
-using System.Linq;
 
 namespace COG.Patch;
 

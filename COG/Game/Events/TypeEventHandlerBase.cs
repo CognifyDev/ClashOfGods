@@ -4,12 +4,12 @@ namespace COG.Game.Events;
 
 public abstract class TypeEventHandlerBase : IEventHandler
 {
-    public GameEventType EventType { get; }
-
     protected TypeEventHandlerBase(GameEventType @event)
     {
         EventType = @event;
     }
+
+    public GameEventType EventType { get; }
 
     IGameEvent IEventHandler.Handle(CustomPlayerData player, params object[] extraArguments)
     {

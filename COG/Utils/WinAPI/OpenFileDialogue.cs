@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace COG.Utils.WinAPI;
@@ -43,7 +42,8 @@ public static class OpenFileDialogue
     /// <param name="defaultDir">打开对话框后默认所在目录</param>
     /// <param name="defaultFilterIdx">默认文件筛选编号</param>
     /// <returns>文件名称与路径</returns>
-    public static OpenedFileInfo Display(OpenFileMode mode, string filter = "", string title = "", string defaultDir = "",
+    public static OpenedFileInfo Display(OpenFileMode mode, string filter = "", string title = "",
+        string defaultDir = "",
         int? defaultFilterIdx = null)
     {
         var ofn = new OPENFILENAME();

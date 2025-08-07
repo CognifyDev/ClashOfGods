@@ -12,14 +12,14 @@ public class Stabber : CustomRole
 {
     public const string ModifyKillAnimMessage = "stabber_kill";
 
-    private CustomButton _dispatchButton;
-    private CustomOption _maxUseTime;
+    private readonly CustomButton _dispatchButton;
 
     private int _killedTimes;
+    private readonly CustomOption _maxUseTime;
 
     private PlayerControl? _target;
-    
-    public Stabber() : base()
+
+    public Stabber()
     {
         BaseRoleType = RoleTypes.Impostor;
         CanKill = true;
@@ -27,7 +27,7 @@ public class Stabber : CustomRole
         CanSabotage = true;
 
         _maxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new IntOptionValueRule(1, 1, 15, 2));
-        
+
         _dispatchButton = CustomButton.Of(
             "stabber-dispatch",
             () =>
@@ -37,7 +37,7 @@ public class Stabber : CustomRole
             },
             () => _dispatchButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
-            () =>  _killedTimes < _maxUseTime.GetInt(),
+            () => _killedTimes < _maxUseTime.GetInt(),
             ResourceUtils.LoadSprite(ResourceConstant.DispatchButton)!,
             2,
             LanguageConfig.Instance.DispatchAction,
@@ -46,7 +46,7 @@ public class Stabber : CustomRole
         );
 
         DefaultKillButtonSetting.AddCustomCondition(() => _killedTimes >= _maxUseTime.GetInt());
-        
+
         AddButton(_dispatchButton);
     }
 

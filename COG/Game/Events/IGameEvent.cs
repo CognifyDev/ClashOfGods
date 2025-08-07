@@ -1,5 +1,5 @@
-﻿using COG.Utils;
-using System;
+﻿using System;
+using COG.Utils;
 
 namespace COG.Game.Events;
 

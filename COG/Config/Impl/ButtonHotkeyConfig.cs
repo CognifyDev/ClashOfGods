@@ -1,26 +1,24 @@
-using COG.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using COG.Utils;
 using UnityEngine;
 
 namespace COG.Config.Impl;
 
 public class ButtonHotkeyConfig : ConfigBase
 {
-    public static ButtonHotkeyConfig Instance { get; private set; }
-
     public const int MaxButtonCount = 5;
     public const string ButtonPrefix = "button";
 
-    private Dictionary<int, KeyCode> _hotkeys = new();
+    private readonly Dictionary<int, KeyCode> _hotkeys = new();
 
     static ButtonHotkeyConfig()
     {
-        Instance = new();
+        Instance = new ButtonHotkeyConfig();
     }
 
     public ButtonHotkeyConfig() : base("Hotkeys", DataDirectoryName + "/hotkeys.yml")
@@ -29,6 +27,8 @@ public class ButtonHotkeyConfig : ConfigBase
         ApplyConfigsFromFile();
     }
 
+    public static ButtonHotkeyConfig Instance { get; private set; }
+
     public void SetHotkey(int index, KeyCode hotkey)
     {
         _hotkeys[index] = hotkey;
@@ -36,7 +36,10 @@ public class ButtonHotkeyConfig : ConfigBase
         SaveConfigs();
     }
 
-    public ImmutableDictionary<int, KeyCode> GetHotkeys() => _hotkeys.ToImmutableDictionary();
+    public ImmutableDictionary<int, KeyCode> GetHotkeys()
+    {
+        return _hotkeys.ToImmutableDictionary();
+    }
 
     public void SaveConfigs()
     {

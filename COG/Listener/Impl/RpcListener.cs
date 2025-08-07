@@ -1,22 +1,18 @@
+using System;
+using System.Linq;
 using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
-using COG.Patch;
 using COG.Role;
-using COG.Role.Impl.Impostor;
 using COG.Rpc;
-using COG.States;
 using COG.UI.CustomOption;
 using COG.Utils;
 using InnerNet;
-using System;
-using System.Linq;
-using System.Reflection;
 
 namespace COG.Listener.Impl;
 
 public class RpcListener : IListener
 {
-    private string? _murderExtraMessage = null;
+    private string? _murderExtraMessage;
 
     [EventHandler(EventHandlerType.Prefix)]
     public void BeforeRpcBeingProceeded(PlayerHandleRpcEvent @event)
@@ -25,13 +21,11 @@ public class RpcListener : IListener
         var rpc = @event.CallId;
         reader.ReadNetObject<PlayerControl>();
         if (rpc == (byte)RpcCalls.CheckMurder && reader.BytesRemaining > 0) // with extra data
-        {
             // CheckMurder RPC will be sent to every client, but whether to perform depends if the client is the host
             // Killer ---Send CheckMurder--> Each client --> Perform
             // MuderPlayer will be sent even if the kill failed
             // Kinda complex...
             _murderExtraMessage = reader.ReadString();
-        }
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -39,7 +33,7 @@ public class RpcListener : IListener
     {
         if (@event.MurderResult!.Value.HasFlag(MurderResultFlags.Succeeded) && _murderExtraMessage != null)
             GameEventPatch.ExtraMessage = _murderExtraMessage;
-        
+
         _murderExtraMessage = null;
     }
 
@@ -63,7 +57,7 @@ public class RpcListener : IListener
                 option.Selection = selection;
                 break;
             }
-            
+
             case KnownRpc.ShareOptions:
             {
                 var count = reader.ReadPackedUInt32();
@@ -74,17 +68,17 @@ public class RpcListener : IListener
                         var optionId = reader.ReadPackedUInt32();
                         var selection = reader.ReadPackedUInt32();
                         var option = CustomOption.Options.FirstOrDefault(option => option.Id == (int)optionId);
-                        option?.UpdateSelection((int) selection);
+                        option?.UpdateSelection((int)selection);
                     }
                 }
                 catch (System.Exception e)
                 {
                     Main.Logger.LogError("Error while deserializing options: " + e.Message);
                 }
-                
+
                 break;
             }
-            
+
             case KnownRpc.SetRole:
             {
                 var playerId = reader.ReadByte();
@@ -92,15 +86,15 @@ public class RpcListener : IListener
                 PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
                 break;
             }
-            
+
             case KnownRpc.NotifySettingChange:
             {
                 var id = reader.ReadPackedInt32();
                 var text = reader.ReadString();
                 HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)id, text, true);
-                break;    
+                break;
             }
-            
+
             case KnownRpc.KillWithoutDeadBody:
             {
                 var killer = reader.ReadNetObject<PlayerControl>();
@@ -114,10 +108,10 @@ public class RpcListener : IListener
 
             case KnownRpc.Revive:
             {
-                // ´ÓRpcÖÐ¶ÁÈëPlayerControl
+                // ï¿½ï¿½Rpcï¿½Ð¶ï¿½ï¿½ï¿½PlayerControl
                 var target = reader.ReadNetObject<PlayerControl>();
-                
-                // ¸´»îÄ¿±êÍæ¼Ò
+
+                // ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½
                 target.Revive();
                 break;
             }
@@ -143,20 +137,20 @@ public class RpcListener : IListener
                     playerData?.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
                     break;
                 }
-                
+
                 playerData?.Tags.Add(tag);
                 break;
             }
 
             case KnownRpc.SyncRoleGameData:
             {
-                int roleId = -1;
+                var roleId = -1;
                 CustomRole role = null!;
 
                 try
                 {
                     roleId = reader.ReadPackedInt32();
-                    role = CustomRoleManager.GetManager().GetRoleById(roleId) ?? throw new();
+                    role = CustomRoleManager.GetManager().GetRoleById(roleId) ?? throw new System.Exception();
                 }
                 catch
                 {
@@ -182,8 +176,9 @@ public class RpcListener : IListener
                 var undeserializedPlayerData = reader.ReadBytesAndSize();
                 var serializedPlayerData = undeserializedPlayerData.DeserializeToData<SerializablePlayerData>();
 
-                var matchedEventType = typeof(Main).Assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(NetworkedGameEventBase)) && !t.IsAbstract && t.Name == eventName);
-                
+                var matchedEventType = typeof(Main).Assembly.GetTypes().FirstOrDefault(t =>
+                    t.IsSubclassOf(typeof(NetworkedGameEventBase)) && !t.IsAbstract && t.Name == eventName);
+
                 if (matchedEventType == null)
                 {
                     Main.Logger.LogError($"Unknown event type: {eventName}");

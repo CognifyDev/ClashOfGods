@@ -12,7 +12,7 @@ public sealed class WorkInProgressAttribute : Attribute
     public WorkInProgressAttribute(string message)
     {
     }
-    
+
     public WorkInProgressAttribute()
     {
     }

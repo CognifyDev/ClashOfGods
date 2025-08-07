@@ -1,5 +1,3 @@
-using Il2CppSystem.Collections;
-
 namespace COG.Listener.Event.Impl.ICutscene;
 
 public class IntroCutsceneShowRoleEvent : IntroCutsceneEvent
