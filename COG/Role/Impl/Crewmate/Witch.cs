@@ -69,7 +69,7 @@ public class Witch : CustomRole, IListener
     public void OnMeetingStarts(MeetingStartEvent @event)
     {
         if (_shouldDieWhenMeetingStarts) // Other players should always have this being false
-            PlayerControl.LocalPlayer.RpcDie(CustomDeathReason.InteractionAfterRevival);
+        { } // TODO
     }
 
     [EventHandler(EventHandlerType.Postfix)]

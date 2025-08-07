@@ -1,18 +1,20 @@
 ﻿using COG.Rpc;
 using COG.Utils;
+using COG.Utils.Coding;
 
 namespace COG.Game.Events;
 
 /// <summary>
 ///     NOTE: The subclasses must have two constructors, one for sending the event and one for deserializing the event
 /// </summary>
+[WorkInProgress]
 public abstract class NetworkedGameEventBase : GameEventBase
 {
     protected NetworkedGameEventBase(GameEventType eventType, CustomPlayerData player) : base(eventType, player)
     {
     }
 
-    protected abstract void Serialize(RpcWriter writer);
+    public abstract void Serialize(RpcWriter writer);
 
     /// <summary>
     ///     Called right after constructing.

@@ -269,10 +269,6 @@ public class CustomWinnerListener : IListener
                 {
                     states.Add(handler.GetString("revival").Color(Palette.AcceptedGreen));
                 }
-                else if (gameEvent is WitchRevivedInteractionDieGameEvent)
-                {
-                    states.Add(handler.GetString("force-death").Color(Palette.ImpostorRed));
-                }
                 else if (gameEvent is PlayerDieGameEvent @event)
                 {
                     var related = EventRecorder.Instance.GetEvents()

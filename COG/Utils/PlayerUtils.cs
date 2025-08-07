@@ -11,6 +11,7 @@ using COG.Role;
 using COG.Role.Impl;
 using COG.Rpc;
 using COG.UI.Vanilla.KillButton;
+using COG.Utils.Coding;
 using Il2CppInterop.Runtime;
 using InnerNet;
 using UnityEngine;
@@ -607,7 +608,7 @@ public static class PlayerUtils
 
         var activatedSettings = settings.Where(s => s.ForceShow());
         if (activatedSettings.Count() == 0) return null;
-        return activatedSettings.First(); // there should be one settings active
+        return activatedSettings.First(); // there should be only one settings active
     }
 
     public static CustomRole[] GetRoles(this PlayerControl player)
@@ -615,27 +616,81 @@ public static class PlayerUtils
         return player.GetSubRoles().Concat(player.GetMainRole().ToSingleElementArray()).ToArray();
     }
 
-    public static void RpcDie(this PlayerControl player, CustomDeathReason reason)
+    public static void RpcMurderAdvanced(this PlayerControl player, AdvancedKillOptions options)
     {
-        player.StartRpcImmediately(KnownRpc.DieWithoutAnimationAndBody).WritePacked((int)reason).Finish();
-        player.DieWithoutAnimationAndBody(reason);
+        var writer = player.StartRpcImmediately(KnownRpc.AdvancedMurder);
+        options.Serialize(writer);
+        writer.Finish();
+        MurderAdvanced(player, options);
     }
 
-    public static void DieWithoutAnimationAndBody(this PlayerControl player, CustomDeathReason reason)
+    [WorkInProgress]
+    public static void MurderAdvanced(this PlayerControl killer, AdvancedKillOptions options)
     {
-        EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, player.GetPlayerData(), reason);
-        player.Exiled();
+        var realVictim = options.Victim;
+        var animationOptions = options.AnimationOptions;
+        var showAnimationToAllPlayers = animationOptions.ShowToAllPlayers;
+        var animKiller = animationOptions.Killer;
+        var animVictim = animationOptions.Victim;
+
+        if (showAnimationToAllPlayers && PlayerControl.LocalPlayer != realVictim) // always show real killer to victim
+            KillAnimationPatch.NextKillerToBeReplaced = animKiller;
+
+        if (options.ShowDeadBody)
+            realVictim.Die(DeathReason.Kill, false);
+        else
+            killer.MurderPlayer(realVictim, GameUtils.DefaultFlags);
+    }
+}
+
+[WorkInProgress]
+public class AdvancedKillOptions
+{
+    public bool ShowDeadBody { get; }
+    public KillAnimationOptions AnimationOptions { get; }
+    public PlayerControl Victim { get; }
+
+    public AdvancedKillOptions(bool showDeadBody, KillAnimationOptions animationOptions, PlayerControl victim)
+    {
+        ShowDeadBody = showDeadBody;
+        AnimationOptions = animationOptions;
+        Victim = victim;
     }
 
-    public static void CmdExtraCheckMurder(this PlayerControl killer, PlayerControl target, string msg)
+    public void Serialize(RpcWriter writer)
     {
-        killer.isKilling = true;
-        GameEventPatch.ExtraMessage = msg;
+        writer.Write(ShowDeadBody);
+        writer.Write(AnimationOptions.ShowToAllPlayers);
+        writer.WriteNetObject(AnimationOptions.Killer);
+        writer.WriteNetObject(AnimationOptions.Victim);
+        writer.WriteNetObject(Victim);
+    }
 
-        if (AmongUsClient.Instance.AmLocalHost || AmongUsClient.Instance.AmModdedHost)
-            killer.CheckMurder(target);
+    public static AdvancedKillOptions Deserialize(MessageReader reader)
+    {
+        var showDeadBody = reader.ReadBoolean();
+        var showToAllPlayers = reader.ReadBoolean();
+        var animKiller = reader.ReadNetObject<NetworkedPlayerInfo>();
+        var animVictim = reader.ReadNetObject<NetworkedPlayerInfo>();
+        var victim = reader.ReadNetObject<PlayerControl>();
+        
+        return new(showDeadBody,
+            new(showToAllPlayers, animKiller, animVictim),
+            victim);
+    }
+}
 
-        RpcWriter.Start(RpcCalls.CheckMurder).WriteNetObject(target).Write(msg).Finish();
+public class KillAnimationOptions
+{
+    public bool ShowToAllPlayers { get; }
+    public NetworkedPlayerInfo Killer { get; }
+    public NetworkedPlayerInfo Victim { get; }
+
+    public KillAnimationOptions(bool showToAllPlayers, NetworkedPlayerInfo killer, NetworkedPlayerInfo victim)
+    {
+        ShowToAllPlayers = showToAllPlayers;
+        Killer = killer;
+        Victim = victim;
     }
 }
 

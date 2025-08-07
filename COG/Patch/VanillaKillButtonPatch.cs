@@ -89,16 +89,6 @@ internal static class VanillaKillButtonPatch
             var dead = setting.BeforeMurder();
             var extraMessage = setting.ExtraRpcMessage;
 
-            if (extraMessage == null)
-            {
-                GameEventPatch.ExtraMessage = null;
-                PlayerControl.LocalPlayer.CmdCheckMurder(dead);
-            }
-            else
-            {
-                PlayerControl.LocalPlayer.CmdExtraCheckMurder(dead, extraMessage);
-            }
-
             __instance.SetTarget(null);
 
             if (dead)

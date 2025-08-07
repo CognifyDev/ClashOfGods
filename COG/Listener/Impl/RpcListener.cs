@@ -12,31 +12,6 @@ namespace COG.Listener.Impl;
 
 public class RpcListener : IListener
 {
-    private string? _murderExtraMessage;
-
-    [EventHandler(EventHandlerType.Prefix)]
-    public void BeforeRpcBeingProceeded(PlayerHandleRpcEvent @event)
-    {
-        var reader = MessageReader.Get(@event.Reader);
-        var rpc = @event.CallId;
-        reader.ReadNetObject<PlayerControl>();
-        if (rpc == (byte)RpcCalls.CheckMurder && reader.BytesRemaining > 0) // with extra data
-            // CheckMurder RPC will be sent to every client, but whether to perform depends if the client is the host
-            // Killer ---Send CheckMurder--> Each client --> Perform
-            // MuderPlayer will be sent even if the kill failed
-            // Kinda complex...
-            _murderExtraMessage = reader.ReadString();
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerMurder(PlayerMurderEvent @event)
-    {
-        if (@event.MurderResult!.Value.HasFlag(MurderResultFlags.Succeeded) && _murderExtraMessage != null)
-            GameEventPatch.ExtraMessage = _murderExtraMessage;
-
-        _murderExtraMessage = null;
-    }
-
     [EventHandler(EventHandlerType.Postfix)]
     public void AfterRpcReceived(PlayerHandleRpcEvent @event)
     {
@@ -163,13 +138,6 @@ public class RpcListener : IListener
                 break;
             }
 
-            case KnownRpc.DieWithoutAnimationAndBody:
-            {
-                var reason = (CustomDeathReason)reader.ReadPackedInt32();
-                @event.Player.DieWithoutAnimationAndBody(reason);
-                break;
-            }
-
             case KnownRpc.SyncGameEvent:
             {
                 var eventName = reader.ReadString();
@@ -189,6 +157,13 @@ public class RpcListener : IListener
                 instance.Deserialize(reader);
 
                 Main.Logger.LogInfo("Deserialized networked game event: " + eventName);
+
+                break;
+            }
+
+            case KnownRpc.AdvancedMurder:
+            {
+                @event.Player.MurderAdvanced(AdvancedKillOptions.Deserialize(reader));
 
                 break;
             }

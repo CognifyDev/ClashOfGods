@@ -14,7 +14,7 @@ namespace COG.Utils;
 
 public static class GameUtils
 {
-    public const MurderResultFlags DefaultFlag = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
+    public const MurderResultFlags DefaultFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
     public static List<CustomPlayerData> PlayerData { get; } = new();
 
     internal static GenericPopup? PopupPrefab { get; set; }

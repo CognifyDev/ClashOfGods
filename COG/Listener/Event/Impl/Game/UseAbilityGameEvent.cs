@@ -21,7 +21,7 @@ public class UseAbilityGameEvent : NetworkedGameEventBase
 
     public string AbilityButtonIdentifier { get; private set; } = null!;
 
-    protected override void Serialize(RpcWriter writer)
+    public override void Serialize(RpcWriter writer)
     {
         writer.Write(AbilityButtonIdentifier);
     }

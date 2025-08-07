@@ -10,7 +10,6 @@ namespace COG.Role.Impl.Impostor;
 
 public class Stabber : CustomRole
 {
-    public const string ModifyKillAnimMessage = "stabber_kill";
 
     private readonly CustomButton _dispatchButton;
 
@@ -32,7 +31,7 @@ public class Stabber : CustomRole
             "stabber-dispatch",
             () =>
             {
-                _target!.CmdExtraCheckMurder(_target!, ModifyKillAnimMessage + PlayerControl.LocalPlayer.PlayerId);
+                _target!.RpcMurderAdvanced(new(true, new(false, PlayerControl.LocalPlayer.Data, _target!.Data), _target));
                 _killedTimes++;
             },
             () => _dispatchButton?.ResetCooldown(),

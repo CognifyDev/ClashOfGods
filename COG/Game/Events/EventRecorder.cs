@@ -1,28 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using COG.Listener.Event.Impl.Game;
-using COG.Listener.Event.Impl.Game.Handlers;
+﻿using COG.Listener.Event.Impl.Game;
 using COG.Utils;
+using COG.Utils.Coding;
+using System.Collections.Generic;
 // ReSharper disable InconsistentNaming
 
 namespace COG.Game.Events;
 
+[WorkInProgress]
 public class EventRecorder
 {
     private readonly List<IGameEvent?> _events;
-    private readonly List<IEventHandler> _handlers;
 
     public EventRecorder()
     {
         Instance = this;
         _events = new List<IGameEvent?>();
-        _handlers = new List<IEventHandler>();
-
-        _handlers.AddRange(new IEventHandler[]
-        {
-            new PlayerDeathHandler(),
-            new PlayerKillHandler()
-        });
     }
 
     public static EventRecorder Instance { get; private set; } = null!;
@@ -45,16 +37,9 @@ public class EventRecorder
         }
     }
 
-    public IGameEvent? RecordTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
+    public void DisableRecordOnceDeathEvent(CustomPlayerData player)
     {
-        var gameEvent = HandleTypeEvent(type, player, extraArguments);
-        Record(gameEvent);
-        return gameEvent;
-    }
 
-    public IGameEvent? HandleTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
-    {
-        return _handlers.FirstOrDefault(h => h.EventType == type)?.Handle(player, extraArguments) ?? null!;
     }
 
     public static void ResetAll()
@@ -64,12 +49,46 @@ public class EventRecorder
     }
 }
 
+// 原版游戏死亡方式：击杀，断联，驱逐
+// 以上三者都会调用Die方法
+// 修补Die方法会将问题复杂化
 [HarmonyPatch]
 public static class GameEventPatch // not use listener for flexibility in patching
 {
-    private static IGameEvent? _dieEvent;
+    #region 原版三种死亡方式
+    [HarmonyPatch(typeof(GameData), nameof(GameData.HandleDisconnect),
+        typeof(PlayerControl), typeof(DisconnectReasons))]
+    [HarmonyPrefix] // player might be null if we use postfix
+    private static void HandleDisconnectPatch(PlayerControl player)
+    {
+        EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()!));
+    }
 
-    public static string? ExtraMessage { get; set; }
+    internal readonly static List<CustomPlayerData> DisableOnceDeath = new();
+
+    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
+    [HarmonyPostfix]
+    private static void MurderPlayerPostfixPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] MurderResultFlags resultFlags)
+    {
+        if (!resultFlags.HasFlag(MurderResultFlags.Succeeded)) return;
+        var targetCached = target.GetPlayerData();
+
+        if (DisableOnceDeath.Contains(targetCached))
+        {
+            DisableOnceDeath.Remove(targetCached);
+            return;
+        }
+
+        EventRecorder.Instance.Record(new PlayerKillGameEvent(__instance.GetPlayerData(), target.GetPlayerData()));
+    }
+
+    [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
+    [HarmonyPostfix]
+    private static void ExilePatch([HarmonyArgument(0)] ExileController.InitProperties init)
+    {
+        EventRecorder.Instance.Record(new PlayerExileGameEvent(init.networkedPlayer.GetPlayerData()));
+    }
+    #endregion
 
     [HarmonyPatch(typeof(PlayerPhysics._CoEnterVent_d__47), nameof(PlayerPhysics._CoEnterVent_d__47.MoveNext))]
     [HarmonyPostfix] // not patch CoEnterVent as it is inlined
@@ -88,43 +107,6 @@ public static class GameEventPatch // not use listener for flexibility in patchi
         EventRecorder.Instance.Record(new FinishTaskGameEvent(__instance.GetPlayerData()!, idx));
     }
 
-    [HarmonyPatch(typeof(GameData), nameof(GameData.HandleDisconnect), typeof(PlayerControl),
-        typeof(DisconnectReasons))]
-    [HarmonyPrefix] // player might be null if we use postfix
-    private static void HandleDisconnectPatch(PlayerControl player)
-    {
-        EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()!));
-    }
-
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
-    [HarmonyPrefix]
-    private static void MurderPlayerPrefixPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target,
-        ref IGameEvent? __state)
-    {
-        EventRecorder.Instance.Record(__state = EventRecorder.Instance.HandleTypeEvent(GameEventType.Kill,
-            __instance.GetPlayerData(), target.GetPlayerData(), ExtraMessage!));
-    }
-
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
-    [HarmonyPostfix]
-    private static void
-        MurderPlayerPostfixPatch(IGameEvent __state) // PlayerControl.Die is called before MurderPlayer is done
-    {
-        ((PlayerKillGameEvent)__state).RelatedDeathEvent = _dieEvent!;
-    }
-
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Die))]
-    [HarmonyPostfix]
-    private static void DiePatch(PlayerControl __instance)
-    {
-        if (ExtraMessage != null)
-            _dieEvent = EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, __instance.GetPlayerData(),
-                ExtraMessage);
-        else
-            _dieEvent = EventRecorder.Instance.RecordTypeEvent(GameEventType.Die, __instance.GetPlayerData());
-
-        ExtraMessage = null;
-    }
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartGame))]
     [HarmonyPostfix]
@@ -149,10 +131,4 @@ public static class GameEventPatch // not use listener for flexibility in patchi
             __instance.target.GetPlayerData()));
     }
 
-    [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
-    [HarmonyPostfix]
-    private static void ExilePatch([HarmonyArgument(0)] ExileController.InitProperties init)
-    {
-        EventRecorder.Instance.Record(new PlayerExileGameEvent(init.networkedPlayer.GetPlayerData()));
-    }
 }

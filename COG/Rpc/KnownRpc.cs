@@ -24,5 +24,6 @@ public enum KnownRpc : uint
     SpyRevealClosestTarget,
     WitchUsesAntidote,
     DieWithoutAnimationAndBody,
-    SyncGameEvent
+    SyncGameEvent,
+    AdvancedMurder
 }
