@@ -59,7 +59,7 @@ public class CustomRoleManager
     }
 
     /// <summary>
-    ///     获取一个新的获取器
+    ///     获取一个获取器
     /// </summary>
     /// <returns>获取器实例</returns>
     public IGetter<CustomRole> NewGetter(Func<CustomRole, bool> predicate, CustomRole? defaultRole = null)
