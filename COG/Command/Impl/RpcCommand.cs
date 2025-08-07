@@ -51,7 +51,6 @@ public class RpcCommand : CommandBase
                 }
                     break;
                 default:
-                case "help":
                 {
                     StringBuilder sb = new();
                     sb.AppendLine("/rpc add %dataType% %context%")
@@ -165,7 +164,7 @@ public class RpcCommand : CommandBase
                                     _writer.WriteVector2(new Vector2(x, y));
                                 else
                                     throw new InvalidCastException("The position of the vector is invalid.");
-                                    break;
+                                break;
                             }
                         }
                     }
