@@ -1,5 +1,6 @@
 ﻿using COG.Config.Impl;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Game;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -23,15 +24,6 @@ public class SpeedBooster : CustomRole, IListener
     public void OnGameStart(GameStartEvent _)
     {
         PlayerControl.LocalPlayer.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
-        }
-
-        player.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
-        }
-
-        player.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
-        }
-
-        player.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
     }
 
     public override IListener GetListener()
