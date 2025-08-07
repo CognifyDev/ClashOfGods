@@ -1,5 +1,6 @@
 ﻿using COG.Config.Impl;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;

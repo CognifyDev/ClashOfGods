@@ -11,10 +11,10 @@ public abstract class TypeEventHandlerBase : IEventHandler
 
     public GameEventType EventType { get; }
 
-    IGameEvent IEventHandler.Handle(CustomPlayerData player, params object[] extraArguments)
+    IGameEvent? IEventHandler.Handle(CustomPlayerData player, params object[] extraArguments)
     {
         return Handle(player, extraArguments);
     }
 
-    public abstract IGameEvent Handle(CustomPlayerData player, params object[] extraArguments);
+    public abstract IGameEvent? Handle(CustomPlayerData player, params object[] extraArguments);
 }

@@ -1,20 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using COG.Game.Events.Impl;
-using COG.Game.Events.Impl.Handlers;
+using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.Game.Handlers;
 using COG.Utils;
+// ReSharper disable InconsistentNaming
 
 namespace COG.Game.Events;
 
 public class EventRecorder
 {
-    private readonly List<IGameEvent> _events;
+    private readonly List<IGameEvent?> _events;
     private readonly List<IEventHandler> _handlers;
 
     public EventRecorder()
     {
         Instance = this;
-        _events = new List<IGameEvent>();
+        _events = new List<IGameEvent?>();
         _handlers = new List<IEventHandler>();
 
         _handlers.AddRange(new IEventHandler[]
@@ -26,12 +27,12 @@ public class EventRecorder
 
     public static EventRecorder Instance { get; private set; } = null!;
 
-    public IEnumerable<IGameEvent> GetEvents()
+    public IEnumerable<IGameEvent?> GetEvents()
     {
         return _events;
     }
 
-    public void Record(IGameEvent gameEvent)
+    public void Record(IGameEvent? gameEvent)
     {
         if (gameEvent != null)
         {
@@ -44,14 +45,14 @@ public class EventRecorder
         }
     }
 
-    public IGameEvent RecordTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
+    public IGameEvent? RecordTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
     {
         var gameEvent = HandleTypeEvent(type, player, extraArguments);
         Record(gameEvent);
         return gameEvent;
     }
 
-    public IGameEvent HandleTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
+    public IGameEvent? HandleTypeEvent(GameEventType type, CustomPlayerData player, params object[] extraArguments)
     {
         return _handlers.FirstOrDefault(h => h.EventType == type)?.Handle(player, extraArguments) ?? null!;
     }
@@ -98,7 +99,7 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
     [HarmonyPrefix]
     private static void MurderPlayerPrefixPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target,
-        ref IGameEvent __state)
+        ref IGameEvent? __state)
     {
         EventRecorder.Instance.Record(__state = EventRecorder.Instance.HandleTypeEvent(GameEventType.Kill,
             __instance.GetPlayerData(), target.GetPlayerData(), ExtraMessage!));

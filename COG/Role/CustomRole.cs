@@ -8,8 +8,8 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.Events;
-using COG.Game.Events.Impl;
 using COG.Listener;
+using COG.Listener.Event.Impl.Game;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
@@ -458,11 +458,6 @@ public class CustomRole
     {
         ClearRoleGameData();
     }
-}
-
-[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-public sealed class OnlyLocalPlayerWithThisRoleInvokableAttribute : Attribute
-{
 }
 
 #pragma warning restore CS0659

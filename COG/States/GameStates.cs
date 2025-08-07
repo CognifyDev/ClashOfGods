@@ -1,5 +1,4 @@
 global using GameStates = COG.States.GameStates;
-using System;
 using COG.Game.Events;
 using COG.Patch;
 using COG.Role;
@@ -71,9 +70,4 @@ public static class GameStates
     public static bool IsVoting => IsMeeting &&
                                    MeetingHud.Instance.state is MeetingHud.VoteStates.Voted
                                        or MeetingHud.VoteStates.NotVoted;
-}
-
-[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-public sealed class OnlyInRealGameAttribute : Attribute
-{
 }

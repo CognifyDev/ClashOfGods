@@ -3,6 +3,7 @@ using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;

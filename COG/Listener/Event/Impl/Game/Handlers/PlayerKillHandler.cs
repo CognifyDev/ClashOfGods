@@ -1,8 +1,9 @@
 ﻿using System.Linq;
+using COG.Game.Events;
 using COG.Role.Impl.Impostor;
 using COG.Utils;
 
-namespace COG.Game.Events.Impl.Handlers;
+namespace COG.Listener.Event.Impl.Game.Handlers;
 
 public class PlayerKillHandler : TypeEventHandlerBase
 {
@@ -10,7 +11,7 @@ public class PlayerKillHandler : TypeEventHandlerBase
     {
     }
 
-    public override IGameEvent Handle(CustomPlayerData player, params object[] extraArguments)
+    public override IGameEvent? Handle(CustomPlayerData player, params object[] extraArguments)
     {
         if (extraArguments.Length == 2)
         {

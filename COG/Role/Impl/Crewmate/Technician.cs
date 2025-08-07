@@ -2,6 +2,7 @@ using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Rpc;
 using COG.UI.Hud.CustomButton;

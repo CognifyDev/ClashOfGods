@@ -1,6 +1,7 @@
-﻿using COG.Utils;
+﻿using COG.Game.Events;
+using COG.Utils;
 
-namespace COG.Game.Events.Impl;
+namespace COG.Listener.Event.Impl.Game;
 
 public class WitchRevivedInteractionDieGameEvent : GameEventBase
 {

@@ -7,7 +7,7 @@ public enum GameEventType
     StartMeeting,
     EnterVent,
     Kill,
-    UseAblity,
+    UseAbility,
     FinishTask,
     Disconnect,
     GameStart,

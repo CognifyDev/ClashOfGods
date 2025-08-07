@@ -8,7 +8,6 @@ using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
 using COG.Game.Events;
-using COG.Game.Events.Impl;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Role;

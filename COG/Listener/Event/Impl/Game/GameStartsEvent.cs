@@ -1,4 +1,6 @@
-﻿namespace COG.Game.Events.Impl;
+﻿using COG.Game.Events;
+
+namespace COG.Listener.Event.Impl.Game;
 
 public class GameStartsEvent : GameEventBase
 {

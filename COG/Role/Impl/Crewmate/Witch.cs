@@ -1,4 +1,5 @@
 ﻿using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;

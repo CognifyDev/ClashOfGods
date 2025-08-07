@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
 using COG.UI.CustomOption;
