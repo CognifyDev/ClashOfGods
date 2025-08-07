@@ -94,7 +94,10 @@ public partial class Main : BasePlugin
         {
             storagedInfo = File.ReadAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat");
         }
-        catch { }
+        catch
+        {
+            // ignored
+        }
 
         ConfigBase.AutoReplace = true;
 
@@ -118,8 +121,7 @@ public partial class Main : BasePlugin
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
-        ListenerManager.GetManager().RegisterListeners(new IListener[]
-        {
+        ListenerManager.GetManager().RegisterListeners([
             new CommandListener(),
             new PlayerListener(),
             new CustomButtonListener(),
@@ -133,7 +135,7 @@ public partial class Main : BasePlugin
             new LobbyListener(),
             new RoleAssignmentListener(),
             new IntroListener()
-        });
+        ]);
 
         // Register CustomWinners
         CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
