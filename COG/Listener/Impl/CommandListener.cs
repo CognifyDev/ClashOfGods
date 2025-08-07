@@ -28,7 +28,6 @@ public class CommandListener : IListener
     private string[] AsCommandStringArray(string text)
     {
         // /command <arg1> <arg3> <arg2>...
-        var args = ;
         return text.Split(' ').Skip(1).ToArray();
     }
 
