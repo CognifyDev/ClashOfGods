@@ -12,7 +12,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using Debug = System.Diagnostics.Debug;
 
-namespace COG.UI.CustomButton;
+namespace COG.UI.Hud.CustomButton;
 
 #pragma warning disable CS0659
 

@@ -5,17 +5,17 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 
-namespace COG.UI.CustomGameObject.HudMessage;
+namespace COG.UI.Hud.CustomMessage;
 
 #nullable disable
 [RegisterInIl2Cpp]
-public class HudMessage : MonoBehaviour
+public class CustomHudMessage : MonoBehaviour
 {
-    public HudMessage(IntPtr ptr) : base(ptr)
+    public CustomHudMessage(IntPtr ptr) : base(ptr)
     {
     }
 
-    public static HudMessage Instance { get; private set; }
+    public static CustomHudMessage Instance { get; private set; }
 
     private Dictionary<string, float> _messageTimers = new();
     private TextMeshPro _messageObject;
@@ -25,8 +25,8 @@ public class HudMessage : MonoBehaviour
         Instance = this;
 
         var template = HudManager.Instance.TaskPanel.taskText;
-        _messageObject = Object.Instantiate(template, HudManager.Instance.transform);
-        _messageObject.name = nameof(HudMessage);
+        _messageObject = Instantiate(template, HudManager.Instance.transform);
+        _messageObject.name = nameof(CustomHudMessage);
         _messageObject.transform.localPosition = new(0, -2, 0);
 
         _messageObject.fontSize = _messageObject.fontSizeMin = _messageObject.fontSizeMax = 3;

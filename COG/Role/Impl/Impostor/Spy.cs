@@ -1,9 +1,9 @@
 ﻿using COG.Rpc;
-using COG.UI.CustomButton;
-using COG.UI.CustomGameObject.Arrow;
-using COG.UI.CustomGameObject.HudMessage;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Hud.Arrow;
+using COG.UI.Hud.CustomButton;
+using COG.UI.Hud.CustomMessage;
 using COG.Utils;
 using COG.Utils.Coding;
 using Reactor.Utilities;
@@ -42,7 +42,7 @@ public class Spy : CustomRole
 
                     if (!IsLocalPlayerRole())
                     {
-                        HudMessage.Instance.AddMessage(GetContextFromLanguage(isByKill ? "get-target-arrow-message-kill" : "get-target-arrow-message-observe"), arrowTime);
+                        CustomHudMessage.Instance.AddMessage(GetContextFromLanguage(isByKill ? "get-target-arrow-message-kill" : "get-target-arrow-message-observe"), arrowTime);
                     }
 
                     while (timer > 0)
@@ -52,7 +52,7 @@ public class Spy : CustomRole
                         yield return null;
                     }
 
-                    arrow.gameObject.Destroy();
+                    arrow.gameObject.TryDestroy();
                 }
             },
             (writer, isByKill) => writer.Write(isByKill),

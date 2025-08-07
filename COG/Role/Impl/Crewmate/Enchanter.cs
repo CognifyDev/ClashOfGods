@@ -1,10 +1,9 @@
 ﻿using COG.Listener;
 using COG.Listener.Event.Impl.Player;
-using COG.Patch;
 using COG.Rpc;
-using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using InnerNet;
 using Reactor.Utilities;
@@ -76,7 +75,7 @@ public class Enchanter : CustomRole, IListener
                         duration -= Time.deltaTime;
                         yield return null;
                     }
-                    
+
                     p.moveable = true;
 
                     Main.Logger.LogDebug($"Increasing cooldown");

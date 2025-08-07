@@ -286,8 +286,8 @@ public partial class Main : BasePlugin
         EndGameResult.CachedWinners?.Clear();
         CustomWinnerManager.GetManager().Reset();
         Harmony.UnpatchAll();
-        MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.Destroy());
-        MainMenuPatch.CustomBanner!.Destroy();
+        MainMenuPatch.Buttons.Where(b => b).ToList().ForEach(b => b.gameObject.TryDestroy());
+        MainMenuPatch.CustomBanner!.TryDestroy();
         return false;
     }
 }

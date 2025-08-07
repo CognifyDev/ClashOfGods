@@ -1,6 +1,6 @@
 using COG.Config.Impl;
 using COG.Constant;
-using COG.UI.CustomButton;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using COG.Utils.Coding;
 using System;
@@ -58,7 +58,7 @@ public class Doorman : CustomRole
     {
         _isShowing = false;
         _lastRoom = null;
-        MapBehaviour.Instance.Destroy(); // destroy modified map, HudManager will auto instantiate when u open map next time
+        MapBehaviour.Instance.TryDestroy(); // destroy modified map, HudManager will auto instantiate when u open map next time
     }
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Show))]
@@ -101,6 +101,6 @@ public class Doorman : CustomRole
     static void MapClosePatch(MapBehaviour __instance)
     {
         if (_isShowing)
-            __instance.gameObject.Destroy();
+            __instance.gameObject.TryDestroy();
     }
 }

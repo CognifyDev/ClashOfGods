@@ -27,8 +27,8 @@ public class VersionShowerListener : IListener
         var modVersionShower = Object.Instantiate(prefab, HudManager.Instance.transform);
         modVersionShower.name = ShowerObjectName;
         modVersionShower.transform.localPosition = new Vector3(1.35f, 2.8f, 0);
-        modVersionShower.DestroyComponent<AspectPosition>();
-        modVersionShower.DestroyComponent<PingTracker>();
+        modVersionShower.TryDestroyComponent<AspectPosition>();
+        modVersionShower.TryDestroyComponent<PingTracker>();
         var tmp = modVersionShower.GetComponent<TextMeshPro>();
         tmp.text = VersionMsg;
         tmp.alignment = TextAlignmentOptions.TopRight;

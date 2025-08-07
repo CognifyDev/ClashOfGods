@@ -32,8 +32,8 @@ public static class PresetsButtonsPatch
         void DestroySelectableSprite(GameObject go)
         {
             var trans = go.transform;
-            trans.transform.FindChild("Active").FindChild("SelectionBackground").gameObject.Destroy();
-            trans.transform.FindChild("Selected").FindChild("SelectionBackground").gameObject.Destroy();
+            trans.transform.FindChild("Active").FindChild("SelectionBackground").gameObject.TryDestroy();
+            trans.transform.FindChild("Selected").FindChild("SelectionBackground").gameObject.TryDestroy();
         }
 
         // Set button text
@@ -56,7 +56,7 @@ public static class PresetsButtonsPatch
         }));
 
         __instance.PresetDescriptionText.gameObject.SetActive(false); // Hide preset introduction text
-        __instance.transform.Find("DividerImage").gameObject.Destroy();
+        __instance.transform.Find("DividerImage").gameObject.TryDestroy();
 
         void ResetActiveState(PassiveButton button)
         {

@@ -2,9 +2,9 @@
 using COG.Listener.Event.Impl.Meeting;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
-using COG.UI.CustomButton;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 
 namespace COG.Role.Impl.Crewmate;

@@ -1,6 +1,6 @@
 using COG.Config.Impl;
 using COG.Rpc;
-using COG.UI.CustomButton;
+using COG.UI.Hud.CustomButton;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
 using COG.Utils.Coding;

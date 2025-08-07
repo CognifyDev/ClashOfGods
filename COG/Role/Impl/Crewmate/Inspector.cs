@@ -6,11 +6,11 @@ using COG.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using COG.UI.CustomButton;
 using COG.Config.Impl;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Constant;
+using COG.UI.Hud.CustomButton;
 
 namespace COG.Role.Impl.Crewmate;
 

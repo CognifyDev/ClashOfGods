@@ -1,5 +1,5 @@
 ﻿using COG.Rpc;
-using COG.UI.CustomButton;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 
 namespace COG.Game.Events.Impl;

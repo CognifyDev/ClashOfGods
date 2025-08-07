@@ -108,7 +108,7 @@ public class RpcListener : IListener
                 var showAnimationToEverybody = reader.ReadBoolean();
                 var anonymousKiller = reader.ReadBoolean();
 
-                killer.RpcKillWithoutDeadBody(target, showAnimationToEverybody, anonymousKiller);
+                killer.KillWithoutDeadBody(target, showAnimationToEverybody, anonymousKiller);
                 break;
             }
 

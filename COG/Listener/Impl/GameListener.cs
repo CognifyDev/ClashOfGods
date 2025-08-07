@@ -7,8 +7,8 @@ using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Patch;
 using COG.Role;
-using COG.UI.CustomButton;
-using COG.UI.CustomGameObject.HudMessage;
+using COG.UI.Hud.CustomButton;
+using COG.UI.Hud.CustomMessage;
 using COG.Utils;
 using COG.Utils.Coding;
 using System;
@@ -183,7 +183,7 @@ public class GameListener : IListener
         impText.name = "RoleHintTask";
         impText.Text = GetRoleHintText();
 
-        new GameObject("HudMessageManager").AddComponent<HudMessage>();
+        new GameObject("HudMessageManager").AddComponent<CustomHudMessage>();
 
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
             foreach (var player in PlayerControl.AllPlayerControls)

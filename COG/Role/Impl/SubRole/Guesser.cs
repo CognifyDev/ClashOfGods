@@ -2,9 +2,9 @@
 using COG.Constant;
 using COG.Listener;
 using COG.Listener.Event.Impl.Meeting;
-using COG.UI.CustomGameObject.Meeting;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
+using COG.UI.Hud.Meeting;
 using COG.Utils;
 using UnityEngine;
 
@@ -19,7 +19,7 @@ public class Guesser : CustomRole, IListener
 
     public int GuessedTime { get; internal set; }
     
-    public Guesser() : base(ColorUtils.FromColor32(192, 0, 0, 100))
+    public Guesser() : base(ColorUtils.FromColor32(192, 0, 0))
     {
         MaxGuessTime = CreateOption(() => LanguageConfig.Instance.GuesserMaxGuessTime,
             new IntOptionValueRule(1, 1, 15, 3));
@@ -32,20 +32,22 @@ public class Guesser : CustomRole, IListener
     }
     
     [EventHandler(EventHandlerType.Postfix)]
+    [OnlyLocalPlayerWithThisRoleInvokable]
     public void AfterMeetingHudServerStart(MeetingStartEvent @event)
     {
         var player = PlayerControl.LocalPlayer;
-        if (!player.IsRole(this) || !player.IsAlive()) return;
+        if (!player.IsAlive()) return;
+
         var meetingHud = @event.MeetingHud;
-        var debugEnabled = GlobalCustomOptionConstant.DebugMode.GetBool();
-        
-        if (GuessedTime >= MaxGuessTime.GetInt())
-        {
-            GuessButton.Buttons.ForEach(guessButton => guessButton.Destroy());
-            GuessButton.Buttons.Clear();
-        }
-        
-        GuessButton.Buttons.Clear();
+
+        var infoTemplate = meetingHud.TitleText;
+        var infoText = Object.Instantiate(infoTemplate, meetingHud.transform);
+        infoText.TryDestroyComponent<TextTranslatorTMP>();
+        infoText.transform.localPosition = new(-2.9f, 2.2f, -1f);
+        infoText.name = "RemainingGuessInfo";
+        infoText.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game").GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
+
+        if (GuessedTime >= MaxGuessTime.GetInt()) return;
         
         // NO FOREACH
         for (var i = 0; i < meetingHud.playerStates.Count; i++)
@@ -53,12 +55,9 @@ public class Guesser : CustomRole, IListener
             var playerVoteArea = meetingHud.playerStates[i];
             
             // 如果死了或者是当前玩家则不要布置
-            if ((playerVoteArea == null || playerVoteArea.AmDead || playerVoteArea.TargetPlayerId == player.PlayerId) &&
-                !debugEnabled) continue;
-            var guessButton = new GuessButton(meetingHud, playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
+            if (playerVoteArea == null || playerVoteArea.AmDead || playerVoteArea.TargetPlayerId == player.PlayerId) continue;
+            var guessButton = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
                 playerVoteArea, this);
-            
-            guessButton.SetupListeners();
         }
     }
     
