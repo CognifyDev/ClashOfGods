@@ -16,14 +16,20 @@ public static class GameObjectUtils
             Object.DestroyImmediate(obj);
     }
 
-    public static void TryDestroyComponent<T>(this Component comp) where T : Component
+    public static void TryDestroyComponent<T>(this Component? comp) where T : Component
     {
-        comp.gameObject.TryDestroyComponent<T>();
+        comp.TryDestroyComponent<T>();
     }
 
     public static void TryDestroyComponent<T>(this GameObject? obj) where T : Component
     {
         if (!obj) return;
         obj!.GetComponent<T>().TryDestroy();
+    }
+
+    public static void TryDestroyGameObject(this Component? comp)
+    {
+        if (!comp) return;
+        comp!.gameObject.TryDestroy();
     }
 }

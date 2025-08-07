@@ -1,7 +1,7 @@
 namespace COG.Listener.Event.Impl.Meeting;
 
 /// <summary>
-///     此事件在会议Hud销毁前，向玩家展示投票票数结果这个行为完成后发生
+///     此事件在投票结束后、结果公布时触发
 /// </summary>
 public class MeetingVotingCompleteEvent : MeetingEvent
 {

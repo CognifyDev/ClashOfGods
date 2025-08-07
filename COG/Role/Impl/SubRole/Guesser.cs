@@ -33,7 +33,7 @@ public class Guesser : CustomRole, IListener
     
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
-    public void AfterMeetingHudServerStart(MeetingStartEvent @event)
+    public void OnMeetingStart(MeetingStartEvent @event)
     {
         var player = PlayerControl.LocalPlayer;
         if (!player.IsAlive()) return;
@@ -46,6 +46,7 @@ public class Guesser : CustomRole, IListener
         infoText.transform.localPosition = new(-2.9f, 2.2f, -1f);
         infoText.name = "RemainingGuessInfo";
         infoText.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game").GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
+        infoText.gameObject.SetActive(true);
 
         if (GuessedTime >= MaxGuessTime.GetInt()) return;
         
@@ -56,9 +57,15 @@ public class Guesser : CustomRole, IListener
             
             // 如果死了或者是当前玩家则不要布置
             if (playerVoteArea == null || playerVoteArea.AmDead || playerVoteArea.TargetPlayerId == player.PlayerId) continue;
-            var guessButton = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
+            _ = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
                 playerVoteArea, this);
         }
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnVotingComplete(MeetingVotingCompleteEvent @event)
+    {
+        GuesserButton.DestroyAll();
     }
     
     public override IListener GetListener()

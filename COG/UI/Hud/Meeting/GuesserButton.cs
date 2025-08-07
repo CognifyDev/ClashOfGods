@@ -7,6 +7,7 @@ using COG.Role;
 using COG.Role.Impl.SubRole;
 using COG.Utils;
 using COG.Utils.Coding;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 
@@ -15,7 +16,6 @@ namespace COG.UI.Hud.Meeting;
 public class GuesserButton
 {
     public static List<GuesserButton> Buttons { get; } = new();
-    public GameObject GameObject { get; private set; }
 
     private const string GuessButtonName = "GuessButton";
 
@@ -28,6 +28,7 @@ public class GuesserButton
     private IEnumerable<CustomRole> _roles;
     private PassiveButton? _confirmButton;
     private GameObject? _roleButtonContainer;
+    private GameObject _guessButton;
     private Guesser _guesser;
     private int _page = 1;
 
@@ -36,26 +37,26 @@ public class GuesserButton
     /// </summary>
     public GuesserButton(GameObject template, PlayerVoteArea playerVoteArea, Guesser guesser)
     {
-        GameObject = Object.Instantiate(template, playerVoteArea.transform);
+        _guessButton = Object.Instantiate(template, playerVoteArea.transform);
         _guesser = guesser;
         _target = PlayerUtils.GetPlayerById(playerVoteArea.TargetPlayerId);
         _area = playerVoteArea;
-        GameObject.name = GuessButtonName;
-        GameObject.transform.localPosition = new(-0.95f, 0.03f, -1.3f);
-        var renderer = GameObject.GetComponent<SpriteRenderer>();
+        _guessButton.name = GuessButtonName;
+        _guessButton.transform.localPosition = new(-0.95f, 0.03f, -1.3f);
+        var renderer = _guessButton.GetComponent<SpriteRenderer>();
         renderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.GuessButton, 150F);
-        var passive = GameObject.GetComponent<PassiveButton>();
+        var passive = _guessButton.GetComponent<PassiveButton>();
         passive.StopAllCoroutines();
-        passive.OnClick.AddListener(new Action(SetUp));
+        passive.OnClick.AddListener(new Action(OpenGuessUI));
 
         Buttons.Add(this);
 
         _roles = _guesser.EnabledRolesOnly.GetBool() ? GetCustomRolesFromPlayers() : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole);
     }
 
-    public void SetUp()
+    public void OpenGuessUI()
     {
-        Reset();
+        ResetState();
         MeetingHud.Instance.ButtonParent.gameObject.SetActive(false);
 
         _container = new("GuesserButtons");
@@ -194,17 +195,12 @@ public class GuesserButton
 
     public void SetUpCancelButton()
     {
-        CreateBottomButton(LanguageConfig.Instance.Cancel, new(-3.6f, -2.2f, 0f), () =>
-        {
-            _container.TryDestroy();
-            MeetingHud.Instance.ButtonParent.gameObject.SetActive(true);
-            Reset();
-        });
+        CreateBottomButton(LanguageConfig.Instance.Cancel, new(-3.6f, -2.2f, 0f), CloseGuessUI);
     }
 
     public void SetUpConfirmButton()
     {
-        _confirmButton = CreateBottomButton(LanguageConfig.Instance.Confirm, new(3.6f, -2.2f, 0f), Shoot);
+        _confirmButton = CreateBottomButton(LanguageConfig.Instance.Confirm, new(3.6f, -2.2f, 0f), DestroyAll);
     }
 
     public PassiveButton CreateBottomButton(string text, Vector3 localPosition, Action onClick)
@@ -233,8 +229,16 @@ public class GuesserButton
         return passive;
     }
 
+    public void CloseGuessUI()
+    {
+        _container.TryDestroy();
+        MeetingHud.Instance.ButtonParent.gameObject.SetActive(true);
+        ResetState();
+    }
+
+
     [Todo("Sync in EventRecorder for every player")]
-    private void Shoot()
+    private void Guess()
     {
         if (!_target) return;
         
@@ -267,13 +271,25 @@ public class GuesserButton
         return customRoles.ToArray();
     }
 
-    public void Reset()
+    public void ResetState()
     {
         _container.TryDestroy();
-        _container = null;
         _selectedButton = null;
         _selectedRole = null;
         _confirmButton.TryDestroy();
-        _confirmButton = null;
+        _roles = Array.Empty<CustomRole>();
+        _roleButtonContainer.TryDestroy(); 
+        _roleButtonContainer = null;
+        _area.TryDestroyGameObject();
+    }
+
+    public static void DestroyAll()
+    {
+        Buttons.ForEach(b =>
+        {
+            b.ResetState();
+            b._guessButton.TryDestroy();
+        });
+        Buttons.Clear();
     }
 }
