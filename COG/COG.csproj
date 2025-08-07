@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>11</LangVersion>
+        <LangVersion>preview</LangVersion>
         <DebugType>embedded</DebugType>
 
         <Description>An epoch-making Among Us mod with a plugin system that allows you to make your own plugin by EASY computer language JavaScript</Description>
