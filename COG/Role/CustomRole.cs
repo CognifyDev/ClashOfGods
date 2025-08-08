@@ -406,6 +406,11 @@ public class CustomRole
     {
     }
 
+    public virtual void OnUpdate()
+    {
+    }
+
+
     public void SyncRoleGameData()
     {
         var writer = RpcWriter.Start(KnownRpc.SyncRoleGameData).WritePacked(Id);
@@ -427,6 +432,7 @@ public class CustomRole
     {
         CurrentKillButtonSetting = null!;
     }
+
 
     public static void ClearKillButtonSettings()
     {

@@ -3,17 +3,18 @@ namespace COG.Patch;
 [HarmonyPatch]
 internal static class KillAnimationPatch
 {
-    public static NetworkedPlayerInfo? NextKillerToBeReplaced { get; set; }
+    public static bool DisableNextAnim = false;
 
-    [HarmonyPatch(typeof(KillOverlay), nameof(KillOverlay.ShowKillAnimation), typeof(NetworkedPlayerInfo),
-        typeof(NetworkedPlayerInfo))]
+    [HarmonyPatch(typeof(KillAnimation._CoPerformKill_d__2), nameof(KillAnimation._CoPerformKill_d__2.MoveNext))]
     [HarmonyPrefix]
-    private static void AnimationPerformPatch(ref NetworkedPlayerInfo killer)
+    private static bool AnimationPerformPatch(ref bool __result)
     {
-        if (NextKillerToBeReplaced)
+        if (DisableNextAnim)
         {
-            killer = NextKillerToBeReplaced!;
-            NextKillerToBeReplaced = null;
+            __result = false;
+            DisableNextAnim = false;
+            return false;
         }
+        return true;
     }
 }

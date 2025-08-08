@@ -1,5 +1,4 @@
 using System.Linq;
-using COG.Game.Events;
 using COG.Utils;
 using Il2CppSystem;
 using UnityEngine;
@@ -87,7 +86,6 @@ internal static class VanillaKillButtonPatch
                 return false;
 
             var dead = setting.BeforeMurder();
-            var extraMessage = setting.ExtraRpcMessage;
 
             __instance.SetTarget(null);
 

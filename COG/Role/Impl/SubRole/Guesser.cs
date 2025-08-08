@@ -6,6 +6,7 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.Meeting;
 using COG.Utils;
+using TMPro;
 using UnityEngine;
 
 namespace COG.Role.Impl.SubRole;
@@ -26,11 +27,13 @@ public class Guesser : CustomRole, IListener
 
     public CustomOption MaxGuessTime { get; }
     public CustomOption GuessContinuously { get; }
-
     public CustomOption EnabledRolesOnly { get; }
     //public CustomOption CanGuessSubRoles { get; }
 
     public int GuessedTime { get; internal set; }
+
+    private TextMeshPro? _remainingGuessText;
+
 
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
@@ -42,13 +45,13 @@ public class Guesser : CustomRole, IListener
         var meetingHud = @event.MeetingHud;
 
         var infoTemplate = meetingHud.TitleText;
-        var infoText = Object.Instantiate(infoTemplate, meetingHud.transform);
-        infoText.TryDestroyComponent<TextTranslatorTMP>();
-        infoText.transform.localPosition = new Vector3(-2.9f, 2.2f, -1f);
-        infoText.name = "RemainingGuessInfo";
-        infoText.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
+        _remainingGuessText = Object.Instantiate(infoTemplate, meetingHud.transform);
+        _remainingGuessText.TryDestroyComponent<TextTranslatorTMP>();
+        _remainingGuessText.transform.localPosition = new Vector3(-2.9f, 2.2f, -1f);
+        _remainingGuessText.name = "RemainingGuessInfo";
+        _remainingGuessText.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
             .GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
-
+        
         if (GuessedTime >= MaxGuessTime.GetInt()) return;
 
         // NO FOREACH
@@ -68,6 +71,13 @@ public class Guesser : CustomRole, IListener
     public void OnVotingComplete(MeetingVotingCompleteEvent @event)
     {
         GuesserButton.DestroyAll();
+    }
+
+    public override void OnUpdate()
+    {
+        if (!_remainingGuessText) return;
+        _remainingGuessText!.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
+            .GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
     }
 
     public override IListener GetListener()

@@ -109,6 +109,8 @@ public class GameListener : IListener
             manager.SabotageButton.ToggleVisible(false);
         }
 
+        CustomRoleManager.GetManager().GetRoles().ForEach(r => r.OnUpdate());
+
         var hint = GameObject.Find("RoleHintTask");
         if (!hint) return;
 

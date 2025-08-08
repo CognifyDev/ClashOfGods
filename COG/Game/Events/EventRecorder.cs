@@ -9,12 +9,12 @@ namespace COG.Game.Events;
 [WorkInProgress]
 public class EventRecorder
 {
-    private readonly List<IGameEvent?> _events;
+    private readonly List<IGameEvent> _events;
 
     public EventRecorder()
     {
         Instance = this;
-        _events = new List<IGameEvent?>();
+        _events = new List<IGameEvent>();
     }
 
     public static EventRecorder Instance { get; private set; } = null!;
@@ -86,6 +86,7 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     [HarmonyPostfix]
     private static void ExilePatch([HarmonyArgument(0)] ExileController.InitProperties init)
     {
+        if (!init.networkedPlayer) return;
         EventRecorder.Instance.Record(new PlayerExileGameEvent(init.networkedPlayer.GetPlayerData()));
     }
     #endregion

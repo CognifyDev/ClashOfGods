@@ -42,7 +42,6 @@ public class KillButtonSetting
 
     public int RemainingUses { get; set; }
 
-    public string? ExtraRpcMessage { get; set; }
 
     public void AfterClick()
     {
@@ -85,7 +84,6 @@ public class KillButtonSetting
             ForceShow = ForceShow,
             InitialCooldown = InitialCooldown,
             RemainingUses = RemainingUses,
-            ExtraRpcMessage = ExtraRpcMessage,
             _afterClick = _afterClick,
             _customCondition = _customCondition,
             _beforeMurder = _beforeMurder

@@ -14,6 +14,7 @@ using COG.UI.Vanilla.KillButton;
 using COG.Utils.Coding;
 using Il2CppInterop.Runtime;
 using InnerNet;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace COG.Utils;
@@ -629,17 +630,31 @@ public static class PlayerUtils
     {
         var realVictim = options.Victim;
         var animationOptions = options.AnimationOptions;
-        var showAnimationToAllPlayers = animationOptions.ShowToAllPlayers;
+        var showAnimation = animationOptions.ShowAnimation;
+        var players = animationOptions.Participants;
         var animKiller = animationOptions.Killer;
         var animVictim = animationOptions.Victim;
 
-        if (showAnimationToAllPlayers && PlayerControl.LocalPlayer != realVictim) // always show real killer to victim
-            KillAnimationPatch.NextKillerToBeReplaced = animKiller;
-
-        if (options.ShowDeadBody)
-            realVictim.Die(DeathReason.Kill, false);
+        if (!options.ShowDeadBody)
+        {
+            realVictim.Exiled();
+        }
         else
+        {
+            KillAnimationPatch.DisableNextAnim = true;
             killer.MurderPlayer(realVictim, GameUtils.DefaultFlags);
+        }
+
+        var isParticipant = realVictim.AmOwner || players.Any(p => p.AmOwner);
+        if (isParticipant)
+        {
+           PlayKillAnimation(animKiller, animVictim);
+        }
+    }
+
+    public static void PlayKillAnimation(NetworkedPlayerInfo killer, NetworkedPlayerInfo victim)
+    {
+        HudManager.Instance.KillOverlay.ShowKillAnimation(killer, victim);
     }
 }
 
@@ -660,7 +675,8 @@ public class AdvancedKillOptions
     public void Serialize(RpcWriter writer)
     {
         writer.Write(ShowDeadBody);
-        writer.Write(AnimationOptions.ShowToAllPlayers);
+        writer.Write(AnimationOptions.ShowAnimation);
+        writer.WriteBytesAndSize(AnimationOptions.Participants.Select(p => p.PlayerId).ToArray());
         writer.WriteNetObject(AnimationOptions.Killer);
         writer.WriteNetObject(AnimationOptions.Victim);
         writer.WriteNetObject(Victim);
@@ -669,26 +685,29 @@ public class AdvancedKillOptions
     public static AdvancedKillOptions Deserialize(MessageReader reader)
     {
         var showDeadBody = reader.ReadBoolean();
-        var showToAllPlayers = reader.ReadBoolean();
+        var showAnim = reader.ReadBoolean();
+        var participants = reader.ReadBytesAndSize();
         var animKiller = reader.ReadNetObject<NetworkedPlayerInfo>();
         var animVictim = reader.ReadNetObject<NetworkedPlayerInfo>();
         var victim = reader.ReadNetObject<PlayerControl>();
         
         return new(showDeadBody,
-            new(showToAllPlayers, animKiller, animVictim),
+            new(showAnim, participants.Select(id => PlayerUtils.GetPlayerById(id)!), animKiller, animVictim),
             victim);
     }
 }
 
 public class KillAnimationOptions
 {
-    public bool ShowToAllPlayers { get; }
+    public bool ShowAnimation { get; }
+    public PlayerControl[] Participants { get; } // Players able to watch the animation
     public NetworkedPlayerInfo Killer { get; }
     public NetworkedPlayerInfo Victim { get; }
 
-    public KillAnimationOptions(bool showToAllPlayers, NetworkedPlayerInfo killer, NetworkedPlayerInfo victim)
+    public KillAnimationOptions(bool showAnimation, IEnumerable<PlayerControl> participants, NetworkedPlayerInfo killer, NetworkedPlayerInfo victim)
     {
-        ShowToAllPlayers = showToAllPlayers;
+        ShowAnimation = showAnimation;
+        Participants = participants.ToArray();
         Killer = killer;
         Victim = victim;
     }
