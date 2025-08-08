@@ -10,8 +10,6 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Sheriff : CustomRole, IListener
 {
-    public const string MisfireMurderMessage = "sheriff_misfire";
-
     public Sheriff() : base(Color.yellow, CampType.Crewmate)
     {
         CanKill = true;
@@ -32,11 +30,8 @@ public class Sheriff : CustomRole, IListener
                 return current;
             }
 
-            DefaultKillButtonSetting.ExtraRpcMessage = $"{MisfireMurderMessage}{current.PlayerId}";
             return PlayerControl.LocalPlayer;
         });
-
-        DefaultKillButtonSetting.AddAfterClick(() => DefaultKillButtonSetting.ExtraRpcMessage = null);
     }
 
     private CustomOption SheriffKillCd { get; }
