@@ -5,6 +5,7 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
 using COG.Utils;
+using System;
 
 namespace COG.Role.Impl.Impostor;
 
@@ -31,7 +32,7 @@ public class Stabber : CustomRole
             "stabber-dispatch",
             () =>
             {
-                _target!.RpcMurderAdvanced(new(true, new(false, PlayerControl.LocalPlayer.Data, _target!.Data), _target));
+                _target!.RpcMurderAdvanced(new(true, new(false, Array.Empty<PlayerControl>(), PlayerControl.LocalPlayer.Data, _target!.Data), _target));
                 _killedTimes++;
             },
             () => _dispatchButton?.ResetCooldown(),
