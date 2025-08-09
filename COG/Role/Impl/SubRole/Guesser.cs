@@ -6,6 +6,7 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.Meeting;
 using COG.Utils;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -31,6 +32,8 @@ public class Guesser : CustomRole, IListener
     //public CustomOption CanGuessSubRoles { get; }
 
     public int GuessedTime { get; internal set; }
+
+    public NetworkedPlayerInfo? CurrentGuessing { get; set; }
 
     private TextMeshPro? _remainingGuessText;
 
@@ -59,9 +62,12 @@ public class Guesser : CustomRole, IListener
         {
             var playerVoteArea = meetingHud.playerStates[i];
 
-            // 如果死了或者是当前玩家则不要布置
+            // 如果断联或死了或者是当前玩家则不要布置
             if (playerVoteArea == null || playerVoteArea.AmDead ||
-                playerVoteArea.TargetPlayerId == player.PlayerId) continue;
+                playerVoteArea.TargetPlayerId == player.PlayerId ||
+                GameUtils.PlayerData.First(
+                    pd => pd.PlayerId == playerVoteArea.TargetPlayerId)
+                    .IsDisconnected) continue;
             _ = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
                 playerVoteArea, this);
         }
@@ -75,9 +81,18 @@ public class Guesser : CustomRole, IListener
 
     public override void OnUpdate()
     {
-        if (!_remainingGuessText) return;
-        _remainingGuessText!.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
-            .GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
+        if (_remainingGuessText)
+        {
+            _remainingGuessText!.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
+                .GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
+        }
+
+        if (CurrentGuessing)
+        {
+            var playerData = GameUtils.PlayerData.First(pd => CurrentGuessing!.PlayerId == pd.PlayerId);
+            if (playerData.IsDisconnected)
+                GuesserButton.Buttons.ForEach(b => b.CloseGuessUI());
+        }
     }
 
     public override IListener GetListener()
