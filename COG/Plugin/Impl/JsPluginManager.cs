@@ -25,8 +25,8 @@ public class JsPluginManager : IPluginManager
         if (plugin is not JsPlugin jsPlugin) return;
         jsPlugin.Enabled = true;
         var description = plugin.GetDescription();
-        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been enabled.");
         jsPlugin.OnEnable();
+        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been enabled.");
     }
 
     public void DisablePlugin(IPlugin plugin)
@@ -34,8 +34,8 @@ public class JsPluginManager : IPluginManager
         if (plugin is not JsPlugin jsPlugin) return;
         jsPlugin.Enabled = false;
         var description = plugin.GetDescription();
-        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been disabled.");
         jsPlugin.OnDisable();
+        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been disabled.");
     }
 
     public IPlugin LoadPlugin(string path)
@@ -117,8 +117,8 @@ public class JsPluginManager : IPluginManager
 
         var plugin = new JsPlugin(description, engine);
         _plugins.Add(plugin);
-        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been loaded.");
         plugin.OnLoad();
+        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been loaded.");
         EnablePlugin(plugin);
 
         return plugin;
