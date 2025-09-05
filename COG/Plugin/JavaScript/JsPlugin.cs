@@ -1,6 +1,6 @@
 ﻿using Jint;
 
-namespace COG.Plugin.Impl;
+namespace COG.Plugin.JavaScript;
 
 public class JsPlugin : IPlugin
 {

@@ -18,7 +18,8 @@ using COG.Game.CustomWinner.Winnable;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Patch;
-using COG.Plugin.Impl;
+using COG.Plugin;
+using COG.Plugin.JavaScript;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
@@ -278,7 +279,7 @@ public partial class Main : BasePlugin
             Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
 
             foreach (var file in enumerable)
-                JsPluginManager.GetManager().LoadPlugin(file);
+                IPluginManager.GetDefaultManager().LoadPlugin(file);
         }
 
         _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
@@ -287,7 +288,7 @@ public partial class Main : BasePlugin
     public override bool Unload()
     {
         if (SettingsConfig.Instance.EnablePluginSystem)
-            JsPluginManager.GetManager().GetPlugins().ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
+            IPluginManager.GetDefaultManager().GetPlugins().ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();
