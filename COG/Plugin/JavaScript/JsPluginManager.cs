@@ -9,7 +9,7 @@ using COG.Config.Impl;
 using COG.Utils;
 using Jint;
 
-namespace COG.Plugin.Impl;
+namespace COG.Plugin.JavaScript;
 
 public class JsPluginManager : IPluginManager
 {

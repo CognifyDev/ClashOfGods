@@ -1,4 +1,4 @@
-﻿using COG.Plugin.Impl;
+﻿using COG.Plugin.JavaScript;
 
 namespace COG.Plugin;
 

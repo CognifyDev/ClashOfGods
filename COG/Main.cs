@@ -19,7 +19,7 @@ using COG.Listener;
 using COG.Listener.Impl;
 using COG.Patch;
 using COG.Plugin;
-using COG.Plugin.Impl;
+using COG.Plugin.JavaScript;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
