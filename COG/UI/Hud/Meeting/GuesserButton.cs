@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using COG.Config.Impl;
+﻿using COG.Config.Impl;
 using COG.Constant;
 using COG.Role;
 using COG.Role.Impl.SubRole;
 using COG.Utils;
 using COG.Utils.Coding;
-using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -19,7 +18,7 @@ public class GuesserButton
 
     private const string GuessButtonName = "GuessButton";
 
-    private readonly PlayerControl? _target;
+    private readonly NetworkedPlayerInfo? _target;
     private readonly PlayerVoteArea _area;
 
     private GameObject? _container = null;
@@ -39,7 +38,7 @@ public class GuesserButton
     {
         _guessButton = Object.Instantiate(template, playerVoteArea.transform);
         _guesser = guesser;
-        _target = PlayerUtils.GetPlayerById(playerVoteArea.TargetPlayerId);
+        _target = PlayerUtils.GetPlayerById(playerVoteArea.TargetPlayerId)!.Data;
         _area = playerVoteArea;
         _guessButton.name = GuessButtonName;
         _guessButton.transform.localPosition = new(-0.95f, 0.03f, -1.3f);
@@ -56,6 +55,8 @@ public class GuesserButton
 
     public void OpenGuessUI()
     {
+        _guesser.CurrentGuessing = _target;
+
         ResetState();
         MeetingHud.Instance.ButtonParent.gameObject.SetActive(false);
 
@@ -114,7 +115,7 @@ public class GuesserButton
         for (var i = 0; i < maxRow; i++)
         {
             var x = initialX + i * deltaX;
-            
+
             for (var j = 0; j < maxLine; j++)
             {
                 var y = initialY + j * deltaY;
@@ -221,7 +222,7 @@ public class GuesserButton
         passive.OnMouseOver = new();
         passive.OnMouseOut.AddListener(new Action(() => highlight.enabled = false));
         passive.OnMouseOver.AddListener(new Action(() => highlight.enabled = true));
-        
+
         var textMesh = button.GetComponentInChildren<TextMeshPro>();
         textMesh.TryDestroyComponent<TextTranslatorTMP>();
         textMesh.text = text;
@@ -241,8 +242,11 @@ public class GuesserButton
     private void Guess()
     {
         if (!_target) return;
-        
-        PlayerControl.LocalPlayer.RpcKillWithoutDeadBody(_target!);
+
+        PlayerControl.LocalPlayer.RpcMurderAdvanced(new(false,
+            new(true, PlayerControl.AllPlayerControls.ToArray()
+            .Where(p => !p.AmOwner), // Dont show animtion to guesser
+            _target!, _target!), _target!.Object));
         _guesser.GuessedTime++;
     }
 
@@ -252,7 +256,7 @@ public class GuesserButton
         var players = PlayerUtils.GetAllPlayers();
 
         var customRoles = players.Select(player => player.GetMainRole()).ToList();
-        
+
         if (canGuessSubRoles)
         {
             players.Select(player => player.GetSubRoles()).ForEach(roles =>
@@ -278,7 +282,7 @@ public class GuesserButton
         _selectedRole = null;
         _confirmButton.TryDestroy();
         _roles = Array.Empty<CustomRole>();
-        _roleButtonContainer.TryDestroy(); 
+        _roleButtonContainer.TryDestroy();
         _roleButtonContainer = null;
         _area.TryDestroyGameObject();
     }

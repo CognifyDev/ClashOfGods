@@ -700,7 +700,7 @@ public class AdvancedKillOptions
 public class KillAnimationOptions
 {
     public bool ShowAnimation { get; }
-    public PlayerControl[] Participants { get; } // Players able to watch the animation
+    public PlayerControl[] Participants { get; } // Other players (except the victim) able to watch the animation
     public NetworkedPlayerInfo Killer { get; }
     public NetworkedPlayerInfo Victim { get; }
 
