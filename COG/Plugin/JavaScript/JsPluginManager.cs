@@ -20,6 +20,10 @@ public class JsPluginManager : IPluginManager
 
     private readonly Dictionary<ResourceDescription, byte[]> _resources = new();
 
+    private JsPluginManager()
+    {
+    }
+
     public void EnablePlugin(IPlugin plugin)
     {
         if (plugin is not JsPlugin jsPlugin) return;
@@ -140,7 +144,7 @@ public class JsPluginManager : IPluginManager
         return _plugins.ToArray();
     }
 
-    public static JsPluginManager GetManager()
+    public static IPluginManager GetManager()
     {
         return _manager ??= new JsPluginManager();
     }
