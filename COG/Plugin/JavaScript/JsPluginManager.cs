@@ -9,7 +9,7 @@ using COG.Config.Impl;
 using COG.Utils;
 using Jint;
 
-namespace COG.Plugin.Impl;
+namespace COG.Plugin.JavaScript;
 
 public class JsPluginManager : IPluginManager
 {
@@ -20,13 +20,17 @@ public class JsPluginManager : IPluginManager
 
     private readonly Dictionary<ResourceDescription, byte[]> _resources = new();
 
+    private JsPluginManager()
+    {
+    }
+
     public void EnablePlugin(IPlugin plugin)
     {
         if (plugin is not JsPlugin jsPlugin) return;
         jsPlugin.Enabled = true;
         var description = plugin.GetDescription();
-        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been enabled.");
         jsPlugin.OnEnable();
+        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been enabled.");
     }
 
     public void DisablePlugin(IPlugin plugin)
@@ -34,8 +38,8 @@ public class JsPluginManager : IPluginManager
         if (plugin is not JsPlugin jsPlugin) return;
         jsPlugin.Enabled = false;
         var description = plugin.GetDescription();
-        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been disabled.");
         jsPlugin.OnDisable();
+        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been disabled.");
     }
 
     public IPlugin LoadPlugin(string path)
@@ -117,8 +121,8 @@ public class JsPluginManager : IPluginManager
 
         var plugin = new JsPlugin(description, engine);
         _plugins.Add(plugin);
-        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been loaded.");
         plugin.OnLoad();
+        Main.Logger.LogInfo($"Plugin {description.Name} v{description.Version} has been loaded.");
         EnablePlugin(plugin);
 
         return plugin;
@@ -140,7 +144,7 @@ public class JsPluginManager : IPluginManager
         return _plugins.ToArray();
     }
 
-    public static JsPluginManager GetManager()
+    public static IPluginManager GetManager()
     {
         return _manager ??= new JsPluginManager();
     }
