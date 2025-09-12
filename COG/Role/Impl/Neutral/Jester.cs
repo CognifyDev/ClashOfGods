@@ -60,7 +60,7 @@ public class Jester : CustomRole, IListener, IWinnable
         var allowReport = _allowReportDeadBody.GetBool();
 
         if (!allowMeeting && !victim)
-            return false; // Reject if meeting is unallowed (It's a meeting when victim is null)
+            return false; // Reject if meeting is not allowed (meeting when victim is null)
         if (!allowReport && victim) return false; // Reject if reporting is unallowed
         return true;
     }

@@ -12,17 +12,20 @@
 .
 ├── ExamplePlugin
 │   ├── resources
-│       ├── example.png
-│       └── ...
+│   │   ├── example.png
+│   │   └── ...
 │   ├── scripts
-│       ├── main.js
-│       ├── modules
-│           ├── myModule.zip
-│       └── ...
-│   └── plugin.yml
+│   │   ├── main.js
+│   │   ├── modules
+│   │   │   ├── myModule.zip
+│   │   │   └── ...
+│   │   └── ...
+│   ├── plugin.yml
+│   └── ...
+└── ...
 ~~~
 
-随后，将 `ExamplePlugin`（实际为您的插件目录）下的所有文件及文件夹以 `.zip` 文件的形式进行压缩，随后将压缩包文件的后缀名修改为 `.cog` ，放置于 `\ClashOfGods_DATA\plugins\` 目录下。
+随后，将 `ExamplePlugin`（实际为您的插件根目录）下的所有文件及文件夹以 `.zip` 文件的形式进行压缩，随后将压缩包文件的后缀名修改为 `.cog` ，放置于 `\ClashOfGods_DATA\plugins\` 目录下。
 
 > [!NOTE]
 > `ClashOfGods_DATA` 目录位于您的 Among Us 游戏根目录，即放有 Among Us 游戏可执行文件 `Among Us.exe` 的目录。
