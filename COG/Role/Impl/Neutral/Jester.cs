@@ -30,7 +30,7 @@ public class Jester : CustomRole, IListener, IWinnable
     {
         var ejectionEvents = EventRecorder.Instance.GetEvents().Where(e => e is PlayerExileGameEvent);
         var matchedEvent =
-            ejectionEvents.FirstOrDefault(e => e.Player!.IsRole(this)); // select last exiled jester as winner
+            ejectionEvents.FirstOrDefault(e => e!.Player!.IsRole(this)); // select last exiled jester as winner
 
         if (matchedEvent == null) return;
 
