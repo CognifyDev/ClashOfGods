@@ -1,7 +1,7 @@
 ﻿using COG.Game.Events;
 using COG.Utils;
 
-namespace COG.Listener.Event.Impl.Game;
+namespace COG.Listener.Event.Impl.Game.Record;
 
 public class StartMeetingEvent : GameEventBase
 {

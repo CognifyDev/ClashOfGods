@@ -4,7 +4,7 @@ using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
 using COG.Game.Events;
 using COG.Listener;
-using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.Game.Record;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;

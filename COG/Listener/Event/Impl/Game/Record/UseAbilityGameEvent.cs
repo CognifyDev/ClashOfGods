@@ -1,0 +1,41 @@
+﻿using COG.Game.Events;
+using COG.Rpc;
+using COG.UI.Hud.CustomButton;
+using COG.Utils;
+using System.Linq;
+
+namespace COG.Listener.Event.Impl.Game.Record;
+
+public class UseAbilityGameEvent : NetworkedGameEventBase<UseAbilityEventSender>
+{
+    public UseAbilityGameEvent(CustomPlayerData player, CustomButton button) : base(GameEventType.UseAbility, player)
+    {
+        UsedButton = button;
+    }
+
+    public CustomButton UsedButton { get; private set; } = null!;
+}
+
+public class UseAbilityEventSender : NetworkedGameEventSender<UseAbilityGameEvent>
+{
+    public UseAbilityEventSender() : base("use-ability")
+    {
+    }
+
+    public override void Serialize(RpcWriter writer, UseAbilityGameEvent correspondinEvent)
+    {
+        writer.WriteBytesAndSize(SerializablePlayerData.Of(correspondinEvent.Player!).SerializeToData());
+        writer.Write(correspondinEvent.UsedButton.Identifier);
+    }
+
+    public override UseAbilityGameEvent Deserialize(MessageReader reader)
+    {
+        var rawPlayerData = reader.ReadBytesAndSize();
+        var playerData = rawPlayerData.DeserializeToData<SerializablePlayerData>().ToPlayerData();
+
+        var buttonString = reader.ReadString();
+        var button = CustomButtonManager.GetManager().GetButtons().First(b => b.Identifier == buttonString);
+
+        return new(playerData, button);
+    }
+}

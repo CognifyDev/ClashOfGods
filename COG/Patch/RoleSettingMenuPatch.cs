@@ -238,7 +238,7 @@ public static class RoleOptionPatch
                     var scroller = menu.scrollBar;
                     ScrollerLocationPercent = scroller.GetScrollPercY();
                     scroller.ScrollToTop();
-                    menu.ChangeTab(role.VanillaCategory, button);
+                    menu.ChangeTab(role.VanillaRole, button);
                 }));
             }
 

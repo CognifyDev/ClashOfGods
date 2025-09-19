@@ -236,12 +236,6 @@ public class CustomRole
 
     public RoleBehaviour VanillaRole { get; }
 
-    public RoleRulesCategory VanillaCategory => new()
-    {
-        AllGameSettings = RoleOptions.Select(o => o.ToVanillaOptionData()).ToList().ToIl2CppList(),
-        Role = VanillaRole
-    };
-
     public KillButtonSetting DefaultKillButtonSetting { get; }
 
     /// <summary>
