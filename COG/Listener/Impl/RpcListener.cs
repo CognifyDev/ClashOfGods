@@ -142,7 +142,16 @@ public class RpcListener : IListener
 
             case KnownRpc.SyncGameEvent:
             {
+                var id = reader.ReadString();
+                dynamic? sender = INetworkedGameEventSender.AllSenders.FirstOrDefault(s => s.Id == id);
+                
+                if (sender == null)
+                {
+                    Main.Logger.LogWarning("Null serializer while receiving game event");
+                    break;
+                }
 
+                EventRecorder.Instance.Record(sender.Deserialize(reader));
                 break;
             }
         }

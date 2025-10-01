@@ -1,11 +1,7 @@
 global using HarmonyLib;
 global using Hazel;
-global using Object = UnityEngine.Object;
 global using GitInfo = ThisAssembly.Git;
-using System;
-using System.IO;
-using System.Linq;
-using System.Text;
+global using Object = UnityEngine.Object;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Command;
@@ -15,7 +11,9 @@ using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Winnable;
+using COG.Game.Events;
 using COG.Listener;
+using COG.Listener.Event.Impl.Game.Record;
 using COG.Listener.Impl;
 using COG.Patch;
 using COG.Plugin;
@@ -29,14 +27,18 @@ using COG.Role.Impl.SubRole;
 using COG.UI.ClientOption;
 using COG.UI.ClientOption.Impl;
 using COG.Utils;
+using COG.Utils.OSApi.Windows;
 using COG.Utils.Version;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using OpenFileMode = COG.Utils.OSApi.Windows.OpenFileDialogue.OpenFileMode;
-using COG.Utils.OSApi.Windows;
-using UnityEngine;
 
 namespace COG;
 
@@ -186,6 +188,11 @@ public partial class Main : BasePlugin
             // Sub-roles
             new Guesser(),
             new SpeedBooster()
+        });
+
+        INetworkedGameEventSender.AllSenders.AddRange(new[]
+        {
+            new UseAbilityEventSender()
         });
 
         // Register mod options

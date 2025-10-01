@@ -22,10 +22,10 @@ public class UseAbilityEventSender : NetworkedGameEventSender<UseAbilityGameEven
     {
     }
 
-    public override void Serialize(RpcWriter writer, UseAbilityGameEvent correspondinEvent)
+    public override void Serialize(RpcWriter writer, UseAbilityGameEvent correspondingEvent)
     {
-        writer.WriteBytesAndSize(SerializablePlayerData.Of(correspondinEvent.Player!).SerializeToData());
-        writer.Write(correspondinEvent.UsedButton.Identifier);
+        writer.WriteBytesAndSize(SerializablePlayerData.Of(correspondingEvent.Player!).SerializeToData());
+        writer.Write(correspondingEvent.UsedButton.Identifier);
     }
 
     public override UseAbilityGameEvent Deserialize(MessageReader reader)

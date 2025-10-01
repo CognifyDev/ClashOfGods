@@ -24,20 +24,20 @@ public interface INetworkedGameEventBase
 {
 }
 
-public abstract class NetworkedGameEventBase<T> : GameEventBase, INetworkedGameEventBase where T : INetworkedGameEventSender, new()
+public abstract class NetworkedGameEventBase<T> : GameEventBase, INetworkedGameEventBase where T : INetworkedGameEventSender
 {
     public NetworkedGameEventBase(GameEventType eventType, CustomPlayerData? player) : base(eventType, player)
     {
     }
 
-    public T EventSender { get; } = new();
+    public T EventSender => (T)INetworkedGameEventSender.AllSenders.First(s => s is T);
 }
 
-public interface INetworkedGameEventSender // TODO: 更加科学的构造
+public interface INetworkedGameEventSender
 {
     public static List<INetworkedGameEventSender> AllSenders { get; } = new();
 
-    public Type GenericType { get; }
+    public string Id { get; }
 }
 
 public abstract class NetworkedGameEventSender<T> : INetworkedGameEventSender where T : INetworkedGameEventBase
@@ -45,13 +45,9 @@ public abstract class NetworkedGameEventSender<T> : INetworkedGameEventSender wh
     public NetworkedGameEventSender(string id)
     {
         Id = id;
-        GenericType = typeof(T);
-        if (!INetworkedGameEventSender.AllSenders.Any(s => s.GenericType == GenericType))
-            INetworkedGameEventSender.AllSenders.Add(this);
     }
 
     public string Id { get; }
-    public Type GenericType { get; }
 
     public abstract void Serialize(RpcWriter writer, T correspondingEvent);
 

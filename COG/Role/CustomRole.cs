@@ -10,6 +10,7 @@ using COG.Game.CustomWinner;
 using COG.Game.Events;
 using COG.Listener;
 using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.Game.Record;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
@@ -204,7 +205,7 @@ public class CustomRole
     public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
     {
         if (button == null) return;
-        //EventRecorder.Instance.Record(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
+        EventRecorder.Instance.RpcRecord(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
     };
 
     public ReadOnlyCollection<PlayerControl> Players =>
