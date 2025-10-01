@@ -9,10 +9,10 @@ using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
-using COG.Utils.WinAPI;
+using COG.Utils.OSApi.Windows;
 using Reactor.Utilities;
 using UnityEngine;
-using Mode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
+using Mode = COG.Utils.OSApi.Windows.OpenFileDialogue.OpenFileMode;
 
 // ReSharper disable InconsistentNaming
 

@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using System.Security.Principal;
-using COG.Utils.WinAPI;
+using COG.Utils.OSApi.Windows;
 using Il2CppSystem.Diagnostics;
 using Microsoft.Win32;
 

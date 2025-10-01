@@ -30,12 +30,13 @@ using COG.UI.ClientOption;
 using COG.UI.ClientOption.Impl;
 using COG.Utils;
 using COG.Utils.Version;
-using COG.Utils.WinAPI;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
-using OpenFileMode = COG.Utils.WinAPI.OpenFileDialogue.OpenFileMode;
+using OpenFileMode = COG.Utils.OSApi.Windows.OpenFileDialogue.OpenFileMode;
+using COG.Utils.OSApi.Windows;
+using UnityEngine;
 
 namespace COG;
 
@@ -188,9 +189,10 @@ public partial class Main : BasePlugin
         });
 
         // Register mod options
-        ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
+
+        if (Application.platform == RuntimePlatform.WindowsPlayer)
         {
-            new ToggleClientOption("main.load-custom-lang",
+            ClientOptionManager.GetManager().RegisterClientOption(new ToggleClientOption("main.load-custom-lang",
                 false,
                 _ =>
                 {
@@ -209,7 +211,11 @@ public partial class Main : BasePlugin
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     SceneManager.LoadScene(Constants.MAIN_MENU_SCENE);
                     return false;
-                }),
+                }));
+        }
+
+        ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
+        {
             new ToggleClientOption("main.unload-mod.name",
                 false,
                 _ =>
