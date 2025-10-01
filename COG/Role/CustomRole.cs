@@ -96,21 +96,6 @@ public class CustomRole
         ShortDescription = GetContextFromLanguage("description");
         ActionNameContext = LanguageConfig.Instance.GetHandler("action");
 
-        var vanillaType = CampType switch
-        {
-            CampType.Crewmate => RoleTeamTypes.Crewmate,
-            CampType.Impostor => RoleTeamTypes.Impostor,
-            CampType.Neutral => (RoleTeamTypes)99,
-            _ => (RoleTeamTypes)100
-        };
-        // ReSharper disable once Unity.IncorrectMonoBehaviourInstantiation
-        VanillaRole = new RoleBehaviour
-        {
-            TeamType = vanillaType,
-            Role = (RoleTypes)(Id + 100),
-            StringName = StringNames.None
-        };
-
         if (this is IWinnable winnable) CustomWinnerManager.GetManager().RegisterCustomWinnable(winnable);
 
         if (ShowInOptions)
@@ -219,7 +204,7 @@ public class CustomRole
     public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
     {
         if (button == null) return;
-        EventRecorder.Instance.Record(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
+        //EventRecorder.Instance.Record(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
     };
 
     public ReadOnlyCollection<PlayerControl> Players =>
@@ -234,7 +219,19 @@ public class CustomRole
     public ReadOnlyCollection<CustomOption> RoleOptions =>
         new(AllOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption).ToList());
 
-    public RoleBehaviour VanillaRole { get; }
+    public RoleBehaviour VanillaRole => new()
+    {
+        TeamType = CampType switch
+        {
+            CampType.Crewmate => RoleTeamTypes.Crewmate,
+            CampType.Impostor => RoleTeamTypes.Impostor,
+            CampType.Neutral => (RoleTeamTypes)99,
+            _ => (RoleTeamTypes)100
+        },
+        Role = (RoleTypes)(Id + 100),
+        StringName = StringNames.None,
+        AllGameSettings = RoleOptions.Select(o => o.ToVanillaOptionData()).ToIl2CppList()
+    };
 
     public KillButtonSetting DefaultKillButtonSetting { get; }
 

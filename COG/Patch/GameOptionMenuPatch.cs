@@ -11,7 +11,7 @@ internal static class GameOptionMenuPatch
 {
     [HarmonyPatch(nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]
-    public static void OnSettingsCreated(GameOptionsMenu __instance)
+    public static void OnSettingsCreation(GameOptionsMenu __instance)
     {
         var layer = GameOptionsMenu.MASK_LAYER;
         var xStart = GameOptionsMenu.START_POS_X;
@@ -117,7 +117,7 @@ internal static class GameOptionMenuPatch
 
     [HarmonyPatch(nameof(GameOptionsMenu.ValueChanged))]
     [HarmonyPrefix]
-    public static bool OnValueChangedVanilla(OptionBehaviour option)
+    public static bool OnVanillaValueChange(OptionBehaviour option)
     {
         return !CustomOption.TryGetOption(option, out _);
     }

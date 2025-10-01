@@ -52,7 +52,7 @@ public static class CollectionUtils
         return false;
     }
 
-    public static Il2CppGenericCollections.List<T> ToIl2CppList<T>(this List<T> list)
+    public static Il2CppGenericCollections.List<T> ToIl2CppList<T>(this IEnumerable<T> list)
     {
         var toReturn = new Il2CppGenericCollections.List<T>();
         list.ForEach(toReturn.Add);

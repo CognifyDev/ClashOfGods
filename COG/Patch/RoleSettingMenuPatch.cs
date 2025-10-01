@@ -25,15 +25,15 @@ public static class RoleOptionPatch
     public static float ScrollerLocationPercent { get; set; }
     public static Dictionary<CampType, (GameObject gameObject, PassiveButton tabButton)> CampTabs { get; } = new();
 
-    [HarmonyPatch(nameof(RolesSettingsMenu.CreateAdvancedSettings))]
-    [HarmonyPrefix]
-    private static void BeforeSettingCreation(RolesSettingsMenu __instance)
-    {
-        __instance.advancedSettingChildren ??= new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
-        foreach (var behaviour in __instance.advancedSettingChildren)
-            behaviour.gameObject.TryDestroy();
-        __instance.advancedSettingChildren.Clear(); // Fix advanced tab couldn't be opened
-    }
+    //[HarmonyPatch(nameof(RolesSettingsMenu.CreateAdvancedSettings))]
+    //[HarmonyPrefix]
+    //private static void BeforeSettingCreation(RolesSettingsMenu __instance)
+    //{
+    //    __instance.advancedSettingChildren ??= new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
+    //    foreach (var behaviour in __instance.advancedSettingChildren.ToArray().Where(o => o))
+    //        behaviour.gameObject.TryDestroy();
+    //    __instance.advancedSettingChildren.Clear(); // Fix advanced tab couldn't be opened
+    //}
 
     [HarmonyPatch(nameof(RolesSettingsMenu.OnEnable))]
     [HarmonyPostfix]
@@ -52,7 +52,7 @@ public static class RoleOptionPatch
         chanceTab.GetAllChildren().Where(t => t.name != "CategoryHeaderMasked")
             .ForEach(t => t.gameObject.SetActive(false));
 
-        var headers = __instance.tabParent;
+        var headers = __instance.roleSettingsTabParent;
         headers.GetComponentsInChildren<RoleSettingsTabButton>().ForEach(btn => btn.gameObject.TryDestroy());
 
         __instance.AllButton.gameObject.SetActive(false);
@@ -234,10 +234,17 @@ public static class RoleOptionPatch
                 passive.AddOnClickListeners(new Action(() =>
                 {
                     CloseAllTab(menu);
+
                     CurrentAdvancedTabFor = role;
                     var scroller = menu.scrollBar;
                     ScrollerLocationPercent = scroller.GetScrollPercY();
                     scroller.ScrollToTop();
+
+                    if (menu.advancedSettingChildren == null)
+                        menu.advancedSettingChildren = new();
+                    else
+                        menu.advancedSettingChildren = menu.advancedSettingChildren.ToArray().Where(o => o).ToIl2CppList();
+                    
                     menu.ChangeTab(role.VanillaRole, button);
                 }));
             }
@@ -261,7 +268,7 @@ public static class RoleOptionPatch
     public static PassiveButton SetUpTabButton(RolesSettingsMenu menu, GameObject tab, int index, string imageName,
         CampType camp)
     {
-        var headerParent = menu.tabParent;
+        var headerParent = menu.roleSettingsTabParent;
         Main.Logger.LogDebug($"Setting up tab button for {tab.name} ({index})");
 
         var offset = RolesSettingsMenu.X_OFFSET;
@@ -276,11 +283,11 @@ public static class RoleOptionPatch
         {
             var elements = tab.GetComponentsInChildren<UiElement>();
             ControllerManager.Instance.OpenOverlayMenu(tab.name, menu.BackButton, elements.FirstOrDefault(),
-                elements.ToList().ToIl2CppList());
+                elements.ToIl2CppList());
             ChangeCustomTab(menu, tab, button, camp);
             // idk if code below is useful, but keeping it is not a bad idea
             menu.ControllerSelectable.Clear();
-            menu.ControllerSelectable = elements.ToList().ToIl2CppList();
+            menu.ControllerSelectable = elements.ToIl2CppList();
             ControllerManager.Instance.CurrentUiState.SelectableUiElements = menu.ControllerSelectable;
             ControllerManager.Instance.SetDefaultSelection(menu.ControllerSelectable.ToArray()[0]);
         }));

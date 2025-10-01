@@ -1,4 +1,5 @@
 ﻿using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.Game.Record;
 using COG.Utils;
 using COG.Utils.Coding;
 using System.Collections.Generic;
