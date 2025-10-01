@@ -39,12 +39,13 @@ public class EventRecorder
         }
     }
 
+    [FixMe("BUG")]
     public void RpcRecord<T>(NetworkedGameEventBase<T> gameEvent) where T : INetworkedGameEventSender, new()
     {
         var writer = RpcWriter.Start(KnownRpc.SyncGameEvent);
         dynamic sender = gameEvent.EventSender;
         writer.Write(sender.Id);
-        sender.Serialize(writer, gameEvent);
+        //sender.Serialize(writer, gameEvent);
         writer.Finish();
     }
 
