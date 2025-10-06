@@ -1,10 +1,11 @@
-#if WINDOWS
 using System;
 using System.Globalization;
+#if WINDOWS
 using System.Security.Principal;
 using COG.Utils.OSApi.Windows;
 using Il2CppSystem.Diagnostics;
 using Microsoft.Win32;
+#endif
 
 namespace COG.Utils;
 
@@ -22,15 +23,17 @@ public static class SystemUtils
         return timeStamp;
     }
 
+    public static int GetLanguageAsLcid()
+    {
+        return CultureInfo.CurrentCulture.LCID;
+    }
+
+#if WINDOWS
+
     public static double GetCpuUsage()
     {
         var performanceCounter = new PerformanceCounter();
         return performanceCounter.NextValue();
-    }
-
-    public static int GetLanguageAsLcid()
-    {
-        return CultureInfo.CurrentCulture.LCID;
     }
 
     public static string GetHwid()
@@ -73,6 +76,7 @@ public static class SystemUtils
             return false;
         }
     }
+#pragma warning restore
 
     public static MessageBoxDialogue.ClickedButton OpenMessageBox(string text, string title,
         MessageBoxDialogue.OpenTypes type = MessageBoxDialogue.OpenTypes.MB_DEFBUTTON1 |
@@ -80,5 +84,7 @@ public static class SystemUtils
     {
         return MessageBoxDialogue.OpenMessageBox(text, title, type);
     }
-}
+
 #endif
+
+}
