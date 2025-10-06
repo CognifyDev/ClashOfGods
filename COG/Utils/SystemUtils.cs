@@ -1,3 +1,4 @@
+#if WINDOWS
 using System;
 using System.Globalization;
 using System.Security.Principal;
@@ -80,3 +81,4 @@ public static class SystemUtils
         return MessageBoxDialogue.OpenMessageBox(text, title, type);
     }
 }
+#endif

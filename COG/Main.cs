@@ -27,7 +27,6 @@ using COG.Role.Impl.SubRole;
 using COG.UI.ClientOption;
 using COG.UI.ClientOption.Impl;
 using COG.Utils;
-using COG.Utils.OSApi.Windows;
 using COG.Utils.Version;
 using Reactor;
 using Reactor.Networking;
@@ -38,7 +37,10 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if WINDOWS
+using COG.Utils.OSApi.Windows;
 using OpenFileMode = COG.Utils.OSApi.Windows.OpenFileDialogue.OpenFileMode;
+#endif
 
 namespace COG;
 
@@ -196,10 +198,25 @@ public partial class Main : BasePlugin
         });
 
         // Register mod options
-
-        if (Application.platform == RuntimePlatform.WindowsPlayer)
+        ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
         {
-            ClientOptionManager.GetManager().RegisterClientOption(new ToggleClientOption("main.load-custom-lang",
+            new ToggleClientOption("main.unload-mod.name",
+                false,
+                _ =>
+                {
+                    DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
+                    if (GameStates.InRealGame || GameStates.InLobby)
+                    {
+                        GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
+                        return false;
+                    }
+
+                    Unload();
+                    GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
+                    return false;
+                }),
+#if WINDOWS
+            new ToggleClientOption("main.load-custom-lang",
                 false,
                 _ =>
                 {
@@ -218,26 +235,8 @@ public partial class Main : BasePlugin
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     SceneManager.LoadScene(Constants.MAIN_MENU_SCENE);
                     return false;
-                }));
-        }
-
-        ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
-        {
-            new ToggleClientOption("main.unload-mod.name",
-                false,
-                _ =>
-                {
-                    DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-                    if (GameStates.InRealGame || GameStates.InLobby)
-                    {
-                        GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
-                        return false;
-                    }
-
-                    Unload();
-                    GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
-                    return false;
                 }),
+#endif
             new ToggleClientOption("hotkey.name",
                 false,
                 _ =>

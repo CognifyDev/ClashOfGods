@@ -29,17 +29,36 @@ internal class CoBeginPatch
     }
 }
 
+#if WINDOWS
 [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
+#elif ANDROID
+[HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.StartSFX))]
+[HarmonyPatch(typeof(FungleShipStatus), nameof(FungleShipStatus.StartSFX))]
+#endif
 internal class IntroDestroyPatch
 {
-    public static bool Prefix(IntroCutscene __instance)
+    public static bool Prefix(
+#if WINDOWS
+        IntroCutscene __instance
+#endif
+        )
     {
+#if ANDROID
+        var __instance = DestroyableSingleton<IntroCutscene>.Instance;
+#endif
         return ListenerManager.GetManager()
             .ExecuteHandlers(new IntroCutsceneDestroyEvent(__instance), EventHandlerType.Prefix);
     }
 
-    public static void Postfix(IntroCutscene __instance)
+    public static void Postfix(
+#if WINDOWS
+        IntroCutscene __instance
+#endif
+        )
     {
+#if ANDROID
+        var __instance = DestroyableSingleton<IntroCutscene>.Instance;
+#endif
         ListenerManager.GetManager()
             .ExecuteHandlers(new IntroCutsceneDestroyEvent(__instance), EventHandlerType.Postfix);
     }

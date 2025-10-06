@@ -1,3 +1,4 @@
+#if WINDOWS
 using System;
 using System.Runtime.InteropServices;
 
@@ -107,3 +108,4 @@ public static class OpenFileDialogue
         public string? FileName { get; }
     }
 }
+#endif

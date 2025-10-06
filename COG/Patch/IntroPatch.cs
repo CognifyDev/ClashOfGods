@@ -4,12 +4,22 @@ using Il2CppSystem.Collections.Generic;
 
 namespace COG.Patch;
 
+#if WINDOWS
 [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
+#elif ANDROID
+[HarmonyPatch(typeof(IntroCutscene._ShowRole_d__40), nameof(IntroCutscene._ShowRole_d__40.MoveNext))]
+#endif
 internal class SetUpRoleTextPatch
 {
-    public static void Postfix(IntroCutscene._ShowRole_d__41 __instance)
+    public static void Postfix(
+#if WINDOWS
+        IntroCutscene._ShowRole_d__41
+#elif ANDROID
+        IntroCutscene._ShowRole_d__40
+#endif
+        __instance)
     {
-        var @event = new IntroCutsceneShowRoleEvent(__instance);
+        var @event = new IntroCutsceneShowRoleEvent(__instance.__4__this);
         ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Postfix);
     }
 }

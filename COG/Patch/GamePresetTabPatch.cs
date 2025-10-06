@@ -45,14 +45,14 @@ public static class PresetsButtonsPatch
         std.OnClick.AddListener((UnityAction)new Action(() =>
         {
             ResetActiveState(std);
-            CustomOption.LoadPresetWithDialogue();
+            CustomOption.OnLoadPresetButtonClicked();
         }));
 
         alter.OnClick = new Button.ButtonClickedEvent();
         alter.OnClick.AddListener((UnityAction)new Action(() =>
         {
             ResetActiveState(alter);
-            CustomOption.SavePresetWithDialogue();
+            CustomOption.OnSavePresetButtonClicked();
         }));
 
         __instance.PresetDescriptionText.gameObject.SetActive(false); // Hide preset introduction text

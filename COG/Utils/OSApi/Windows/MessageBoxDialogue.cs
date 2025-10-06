@@ -1,3 +1,4 @@
+#if WINDOWS
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -65,3 +66,4 @@ public static class MessageBoxDialogue
         return (ClickedButton)MessageBox(Process.GetCurrentProcess().MainWindowHandle, text, title, (uint)type);
     }
 }
+#endif
