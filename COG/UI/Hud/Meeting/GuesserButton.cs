@@ -120,7 +120,7 @@ public class GuesserButton
             {
                 var y = initialY + j * deltaY;
 
-                if (!roles.Any()) break;
+                if (!roles.Any()) break;// <!>即使开启职业，也会break
 
                 var position = new Vector3(x, y, 0);
                 var roleButton = Object.Instantiate(roleButtonTemplate, _roleButtonContainer.transform);
@@ -284,7 +284,7 @@ public class GuesserButton
         _roles = Array.Empty<CustomRole>();
         _roleButtonContainer.TryDestroy();
         _roleButtonContainer = null;
-        _area.TryDestroyGameObject();
+        //_area.TryDestroyGameObject(); // <!> 销毁area会导致MeetingHud报错
     }
 
     public static void DestroyAll()
