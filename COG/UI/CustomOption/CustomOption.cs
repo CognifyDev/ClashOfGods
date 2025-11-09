@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
@@ -12,8 +13,6 @@ using COG.Utils;
 using Reactor.Utilities;
 using UnityEngine;
 #if WINDOWS
-using COG.Utils.OSApi.Windows;
-using Mode = COG.Utils.OSApi.Windows.OpenFileDialogue.OpenFileMode;
 #endif
 
 // ReSharper disable InconsistentNaming
@@ -209,24 +208,25 @@ public sealed class CustomOption
 
     public static void OnSavePresetButtonClicked()
     {
-#if WINDOWS
-        var file = OpenFileDialogue.Display(Mode.Save, "Preset File(*.cfg)\0*.cfg\0\0");
-        if (file.FilePath is null or "") return;
-        SaveCurrentOption(file.FilePath);
-#elif ANDROID
-        // TODO: save preset to a fixed location
-#endif
+        var saveFileDialog = new SaveFileDialog();
+        saveFileDialog.Filter = "Preset File(*.cfg)\0*.cfg\0\0";
+        if (saveFileDialog.ShowDialog() != DialogResult.OK)
+        {
+            return;
+        }
+        SaveCurrentOption(saveFileDialog.FileName);
     }
 
     public static void OnLoadPresetButtonClicked()
     {
-#if WINDOWS
-        var file = OpenFileDialogue.Display(Mode.Open, "Preset File(*.cfg)\0*.cfg\0\0");
-        if (file.FilePath is null or "") return;
-        LoadOptionFromPreset(file.FilePath);
-#elif ANDROID
-
-#endif
+        var openFileDialog = new OpenFileDialog();
+        openFileDialog.Filter = "Preset File(*.cfg)\0*.cfg\0\0";
+        if (openFileDialog.ShowDialog() != DialogResult.OK)
+        {
+            return;
+        }
+        
+        LoadOptionFromPreset(openFileDialog.FileName);
     }
 
     public dynamic GetDynamicValue()

@@ -37,8 +37,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine.SceneManagement;
 #if WINDOWS
-using COG.Utils.OSApi.Windows;
-using OpenFileMode = COG.Utils.OSApi.Windows.OpenFileDialogue.OpenFileMode;
+using System.Windows.Forms;
 #endif
 
 namespace COG;
@@ -245,12 +244,15 @@ public partial class Main : BasePlugin
                             "You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
                         return false;
                     }
+                    
+                    var openFileDialog = new OpenFileDialog();
+                    openFileDialog.DefaultExt = "yml";
+                    openFileDialog.InitialDirectory =
+                        @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}";
+                    if (openFileDialog.ShowDialog() != DialogResult.OK)
+                        return false;
 
-                    var p = OpenFileDialogue.Display(OpenFileMode.Open,
-                        defaultDir: @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}");
-                    if (p.FilePath.IsNullOrEmptyOrWhiteSpace()) return false;
-
-                    LanguageConfig.LoadLanguageConfig(p.FilePath!);
+                    LanguageConfig.LoadLanguageConfig(openFileDialog.FileName);
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     SceneManager.LoadScene(Constants.MAIN_MENU_SCENE);
                     return false;

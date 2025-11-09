@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 #if WINDOWS
 using System.Security.Principal;
-using COG.Utils.OSApi.Windows;
 using Il2CppSystem.Diagnostics;
 using Microsoft.Win32;
 #endif
@@ -76,15 +75,5 @@ public static class SystemUtils
             return false;
         }
     }
-#pragma warning restore
-
-    public static MessageBoxDialogue.ClickedButton OpenMessageBox(string text, string title,
-        MessageBoxDialogue.OpenTypes type = MessageBoxDialogue.OpenTypes.MB_DEFBUTTON1 |
-                                            MessageBoxDialogue.OpenTypes.MB_ICONINFORMATION)
-    {
-        return MessageBoxDialogue.OpenMessageBox(text, title, type);
-    }
-
 #endif
-
 }

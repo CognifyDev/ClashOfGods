@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using COG.Constant;
-using COG.UI.ClientOption.Impl;
-using COG.UI.CustomOption;
+﻿using COG.UI.ClientOption.Impl;
 
 namespace COG.Patch
 {
