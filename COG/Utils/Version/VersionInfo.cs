@@ -5,7 +5,7 @@ namespace COG.Utils.Version;
 
 public class VersionInfo
 {
-    internal VersionInfo(string parent, bool beta = false, ulong? betaVersion = null)
+    private VersionInfo(string parent, bool beta = false, ulong? betaVersion = null)
     {
         Parent = parent;
         Beta = beta;

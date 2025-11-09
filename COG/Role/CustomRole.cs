@@ -30,7 +30,6 @@ namespace COG.Role;
   Most of the members in CustomRole and PlayerControl won't synchronize automatically,
   so you probably gotta use RPC to synchronize them.
  */
-
 /// <summary>
 ///     用来表示一个职业
 /// </summary>
@@ -81,7 +80,7 @@ public class CustomRole
         CanSabotage = campType == CampType.Impostor;
         Id = _order++;
         ShowInOptions = showInOptions;
-        AllOptions = new List<CustomOption>();
+        AllOptions = [];
 
         _currentKillButtonSetting = DefaultKillButtonSetting = new KillButtonSetting
         {
@@ -203,7 +202,6 @@ public class CustomRole
     /// </summary>
     public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
     {
-        if (button == null) return;
         EventRecorder.Instance.RpcRecord(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
     };
 
@@ -245,7 +243,7 @@ public class CustomRole
         get => _currentKillButtonSetting;
         set
         {
-            if (value == null)
+            if (value == null!)
             {
                 if (_killButtonSettings.Count > 0)
                 {

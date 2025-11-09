@@ -22,14 +22,14 @@ public class Guesser : CustomRole, IListener
             new BoolOptionValueRule(true));
         EnabledRolesOnly = CreateOption(() => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
             new BoolOptionValueRule(true));
-        /*CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
-            new BoolOptionValueRule(false));*/
+        /* CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
+            new BoolOptionValueRule(false)); */
     }
 
     public CustomOption MaxGuessTime { get; }
     public CustomOption GuessContinuously { get; }
     public CustomOption EnabledRolesOnly { get; }
-    //public CustomOption CanGuessSubRoles { get; }
+    // public CustomOption CanGuessSubRoles { get; }
 
     public int GuessedTime { get; internal set; }
 
@@ -57,7 +57,7 @@ public class Guesser : CustomRole, IListener
         
         if (GuessedTime >= MaxGuessTime.GetInt()) return;
 
-        // NO FOREACH
+        // WARNING: NO FOREACH
         for (var i = 0; i < meetingHud.playerStates.Count; i++)
         {
             var playerVoteArea = meetingHud.playerStates[i];

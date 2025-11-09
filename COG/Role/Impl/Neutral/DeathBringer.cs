@@ -15,8 +15,8 @@ namespace COG.Role.Impl.Neutral;
 [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]
 public class DeathBringer : CustomRole, IListener
 {
-    private const string PlayerStaredAtTag = "staredAt_DeathBringer";
-
+    // private const string PlayerStaredAtTag = "staredAt_DeathBringer";
+    
     private readonly CustomOption _killCooldown, _neededPlayerNumber;
 
     private readonly CustomButton _stareButton;
@@ -64,7 +64,7 @@ public class DeathBringer : CustomRole, IListener
 
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnHostCheckPlayerReport(PlayerReportDeadBodyEvent @event)
+    public void OnHostCheckPlayerReport(PlayerReportDeadBodyEvent _)
     {
         foreach (var target in _staredPlayers)
             target.CmdCheckMurder(target);

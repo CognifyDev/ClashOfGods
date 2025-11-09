@@ -61,8 +61,7 @@ public class Jester : CustomRole, IListener, IWinnable
 
         if (!allowMeeting && !victim)
             return false; // Reject if meeting is not allowed (meeting when victim is null)
-        if (!allowReport && victim) return false; // Reject if reporting is unallowed
-        return true;
+        return allowReport || !victim; // Reject if reporting is unallowed
     }
 
     public override IListener GetListener()
