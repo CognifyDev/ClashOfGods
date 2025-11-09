@@ -34,7 +34,7 @@ public class GuesserButton
     /// <summary>
     ///     赌怪按钮
     /// </summary>
-    public GuesserButton(GameObject template, PlayerVoteArea playerVoteArea, Guesser guesser)
+    public GuesserButton(GameObject template, PlayerVoteArea playerVoteArea, Guesser guesser ,MeetingHud meetingHud)
     {
         _guessButton = Object.Instantiate(template, playerVoteArea.transform);
         _guesser = guesser;
@@ -46,15 +46,16 @@ public class GuesserButton
         renderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.GuessButton, 150F);
         var passive = _guessButton.GetComponent<PassiveButton>();
         passive.StopAllCoroutines();
-        passive.OnClick.AddListener(new Action(OpenGuessUI));
+        passive.OnClick.AddListener(new Action(() => OpenGuessUI(meetingHud)));
 
         Buttons.Add(this);
-
+        Main.Logger.LogInfo($"赌怪仅显示启用职业预设 {_guesser.EnabledRolesOnly.GetBool().ToString()}");
         _roles = _guesser.EnabledRolesOnly.GetBool() ? GetCustomRolesFromPlayers() : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole);
     }
 
-    public void OpenGuessUI()
+    public void OpenGuessUI(MeetingHud meetingHud)
     {
+        if (meetingHud.state != MeetingHud.VoteStates.NotVoted) return;//在等待投票过程中，弃票按钮不显示，导致无法实例化页面取消按钮
         _guesser.CurrentGuessing = _target;
 
         ResetState();
@@ -119,8 +120,8 @@ public class GuesserButton
             for (var j = 0; j < maxLine; j++)
             {
                 var y = initialY + j * deltaY;
-
-                if (!roles.Any()) break;// <!>即使开启职业，也会break
+                Main.Logger.LogInfo($"开启职业数量: {roles.ToArray().Count()}");
+                if (!roles.Any()) break;
 
                 var position = new Vector3(x, y, 0);
                 var roleButton = Object.Instantiate(roleButtonTemplate, _roleButtonContainer.transform);
@@ -235,6 +236,7 @@ public class GuesserButton
         _container.TryDestroy();
         MeetingHud.Instance.ButtonParent.gameObject.SetActive(true);
         ResetState();
+        ResetRoleArea();
     }
 
 
@@ -281,17 +283,22 @@ public class GuesserButton
         _selectedButton = null;
         _selectedRole = null;
         _confirmButton.TryDestroy();
-        _roles = Array.Empty<CustomRole>();
+        //_roles = Array.Empty<CustomRole>();<!> 清空_role会导致role在猜测界面无法显示
         _roleButtonContainer.TryDestroy();
         _roleButtonContainer = null;
-        //_area.TryDestroyGameObject(); // <!> 销毁area会导致MeetingHud报错
+        //_area.TryDestroyGameObject(); // <!> 销毁_area会导致MeetingHud报错
     }
-
+    public void ResetRoleArea()
+    {
+        _area.TryDestroyGameObject();
+        _roles = Array.Empty<CustomRole>();
+    }
     public static void DestroyAll()
     {
         Buttons.ForEach(b =>
         {
             b.ResetState();
+            b.ResetRoleArea();
             b._guessButton.TryDestroy();
         });
         Buttons.Clear();

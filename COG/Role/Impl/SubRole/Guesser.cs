@@ -21,7 +21,7 @@ public class Guesser : CustomRole, IListener
         GuessContinuously = CreateOption(() => LanguageConfig.Instance.GuesserGuessContinuously,
             new BoolOptionValueRule(true));
         EnabledRolesOnly = CreateOption(() => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
-            new BoolOptionValueRule(false));
+            new BoolOptionValueRule(true));
         /*CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
             new BoolOptionValueRule(false));*/
     }
@@ -69,7 +69,7 @@ public class Guesser : CustomRole, IListener
                     pd => pd.PlayerId == playerVoteArea.TargetPlayerId)
                     .IsDisconnected) continue;
             _ = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
-                playerVoteArea, this);
+                playerVoteArea, this, meetingHud);
         }
     }
 

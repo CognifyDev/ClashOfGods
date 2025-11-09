@@ -183,6 +183,11 @@ option:
     name: "热键设置"
     press-key-to-set: "请在%sec%秒内按下新热键"
     button: "技能按钮"
+  no-end-game: 
+    name: "测试模式"
+    success: "成功启用，开始游戏最少人数缩短到1人"
+    off: "已被关闭"
+    error: "该选项不能在对局中被修改"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 main-menu:

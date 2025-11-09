@@ -1,4 +1,5 @@
 using System.Linq;
+using COG.Constant;
 using COG.Utils;
 using UnityEngine;
 
@@ -48,5 +49,13 @@ internal static class GameStartManagerPatch
         var size = button.inactiveSprites.GetComponent<SpriteRenderer>().size;
         size.x *= 2;
         collider.size = size;
+    }
+
+    [HarmonyPatch(nameof(GameStartManager.Update))]
+    [HarmonyPrefix]
+    public static void ChangeMinNum(GameStartManager __instance)
+    {
+        //if (!AmongUsClient.Instance.AmHost) return;
+        if(CheckEndCriteriaPatch.NoEndGame) __instance.MinPlayers = 1;
     }
 }
