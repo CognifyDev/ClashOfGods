@@ -9,7 +9,6 @@ using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.Events;
 using COG.Listener;
-using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Game.Record;
 using COG.Rpc;
 using COG.UI.CustomOption;

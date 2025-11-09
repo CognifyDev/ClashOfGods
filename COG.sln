@@ -13,13 +13,13 @@ Global
 		Release|Windows = Release|Windows
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Debug|Android.ActiveCfg = Debug|Android
-		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Debug|Android.Build.0 = Debug|Android
 		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Debug|Windows.ActiveCfg = Debug|Windows
 		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Debug|Windows.Build.0 = Debug|Windows
 		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Release|Android.ActiveCfg = Release|Android
 		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Release|Android.Build.0 = Release|Android
 		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Release|Windows.ActiveCfg = Release|Windows
+		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Debug|Android.ActiveCfg = Debug|Windows
+		{CD7F7366-9255-46CA-A9B1-6FCC48D24704}.Debug|Android.Build.0 = Debug|Windows
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

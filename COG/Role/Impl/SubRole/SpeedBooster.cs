@@ -4,7 +4,6 @@ using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Game;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
-using COG.Utils;
 using UnityEngine;
 
 namespace COG.Role.Impl.SubRole;

@@ -35,7 +35,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 #if WINDOWS
 using COG.Utils.OSApi.Windows;

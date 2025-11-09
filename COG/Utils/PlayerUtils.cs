@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using AmongUs.Data;
 using COG.Config.Impl;
-using COG.Game.Events;
 using COG.Patch;
 using COG.Role;
 using COG.Role.Impl;
@@ -14,7 +13,6 @@ using COG.UI.Vanilla.KillButton;
 using COG.Utils.Coding;
 using Il2CppInterop.Runtime;
 using InnerNet;
-using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace COG.Utils;
