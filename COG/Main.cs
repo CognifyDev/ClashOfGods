@@ -190,11 +190,6 @@ public partial class Main : BasePlugin
             new SpeedBooster()
         });
 
-        INetworkedGameEventSender.AllSenders.AddRange(new[]
-        {
-            new UseAbilityEventSender()
-        });
-
         // Register mod options
         ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
         {
