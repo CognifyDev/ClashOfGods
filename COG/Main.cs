@@ -190,11 +190,6 @@ public partial class Main : BasePlugin
         //    new SpeedBooster()
         //});
 
-        INetworkedGameEventSender.AllSenders.AddRange(new[]
-        {
-            new UseAbilityEventSender()
-        });
-
         // Register mod options
         ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
         {
@@ -213,7 +208,7 @@ public partial class Main : BasePlugin
                     GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }),
-            CheckEndCriteriaPatch.NoEndGameButton = new ToggleClientOption("no-end-game.name",
+            new ToggleClientOption("no-end-game.name",
                 false,
                 _ =>
                 {
@@ -229,11 +224,10 @@ public partial class Main : BasePlugin
                         return false;
                     }
 
-                    if(CheckEndCriteriaPatch.NoEndGame)
-                    {
+                    if (CheckEndCriteriaPatch.NoEndGame)
                         CheckEndCriteriaPatch.NoEndGame = false;
-                    }
-                    else CheckEndCriteriaPatch.NoEndGame = true;
+                    else
+                        CheckEndCriteriaPatch.NoEndGame = true;
 
                     GameUtils.Popup?.Show(CheckEndCriteriaPatch.NoEndGame?LanguageConfig.Instance.NoEndGameInfoMessage:LanguageConfig.Instance.NoEndGameOff);
                     return false;
