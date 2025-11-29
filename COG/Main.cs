@@ -127,22 +127,22 @@ public partial class Main : BasePlugin
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
-        ListenerManager.GetManager().RegisterListeners(new IListener[]
-        {
-            new CommandListener(),
-            new PlayerListener(),
-            new CustomButtonListener(),
-            new GameListener(),
-            new ClientOptionListener(),
-            new RpcListener(),
-            new TaskAdderListener(),
-            new VersionShowerListener(),
-            new VanillaBugFixListener(),
-            new CustomWinnerListener(),
-            new LobbyListener(),
-            new RoleAssignmentListener(),
-            new IntroListener()
-        });
+        //ListenerManager.GetManager().RegisterListeners(new IListener[]
+        //{
+        //    new CommandListener(),
+        //    new PlayerListener(),
+        //    new CustomButtonListener(),
+        //    new GameListener(),
+        //    new ClientOptionListener(),
+        //    new RpcListener(),
+        //    new TaskAdderListener(),
+        //    new VersionShowerListener(),
+        //    new VanillaBugFixListener(),
+        //    new CustomWinnerListener(),
+        //    new LobbyListener(),
+        //    new RoleAssignmentListener(),
+        //    new IntroListener()
+        //});
 
         // Register CustomWinners
         //CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
@@ -185,10 +185,10 @@ public partial class Main : BasePlugin
         //    new Reporter(),
         //    new DeathBringer(),
 
-        INetworkedGameEventSender.AllSenders.AddRange(new[]
-        {
-            new UseAbilityEventSender()
-        });
+        //INetworkedGameEventSender.AllSenders.AddRange(new[]
+        //{
+        //    new UseAbilityEventSender()
+        //});
 
         // Register mod options
         ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]

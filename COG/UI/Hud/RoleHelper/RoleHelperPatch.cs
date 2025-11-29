@@ -18,10 +18,6 @@ namespace COG.UI.Hud.RoleHelper
         public static TextMeshPro Text;
         public static void IntiAll(HudManager hud)
         {
-            Panel.name = "RolePanel";
-            Panel.transform.SetParent(hud.transform);
-            var sr = Panel.AddComponent<SpriteRenderer>();
-            sr.sprite = LoadSprite("COG.")
         }
     }
 }
