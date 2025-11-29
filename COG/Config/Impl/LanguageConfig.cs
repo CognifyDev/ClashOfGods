@@ -133,6 +133,7 @@ public class LanguageConfig : ConfigBase
     public string UnloadModInGameErrorMsg { get; private set; } = null!;
     public string NoEndGameButtonName { get; private set; } = null!;
     public string NoEndGameErrorMessage { get; private set; } = null!;
+    public string NoEndGameTipMessage { get; private set; } = null!;
     public string NoEndGameInfoMessage { get; private set; } = null!;
     public string NoEndGameOff { get; private set; } = null!;
 
@@ -152,6 +153,22 @@ public class LanguageConfig : ConfigBase
     public string HotkeySettingName { get; private set; } = null!;
     public string PressKeyToSet { get; internal set; } = null!;
 
+    //Load
+    public string Loading {  get; private set; } = null!;
+    public string LoadingHotKey { get; private set; } = null!;
+    public string LoadingSettings { get; private set; } = null!;
+    public string LoadingRoles { get; private set; } = null!;
+    public string LoadingWinners { get; private set; } = null!;
+    public string LoadingListeners { get; private set; } = null!;
+    public string LoadingClientOptions { get; private set; } = null!;
+    public string LoadingPlugins { get; private set; } = null!;
+    public string LoadingCommand { get; private set; } = null!;
+
+    public string LoadingCompeleted { get; private set; } = null!;
+
+    //Credits
+    public string Developer { get; private set; } = null!;
+    public string Creators { get; private set; } = null!;
     private void SetTranslations()
     {
         MakePublicMessage = GetString("lobby.make-public-message");
@@ -246,6 +263,7 @@ public class LanguageConfig : ConfigBase
         NoEndGameInfoMessage = GetString("option.no-end-game.success");
         NoEndGameErrorMessage = GetString("option.no-end-game.error");
         NoEndGameOff = GetString("option.no-end-game.off");
+        NoEndGameTipMessage = GetString("option.no-end-game.tip");
 
         UpToDate = GetString("main-menu.update.up-to-date");
         NonCheck = GetString("main-menu.update.check-failed");
@@ -259,6 +277,22 @@ public class LanguageConfig : ConfigBase
         AlivePlayerInfo = GetString("game.exile.alive-player-info");
 
         SystemMessage = GetString("game.chat.system-message");
+
+        //Load
+        Loading = GetString("load.loading");
+        LoadingSettings = GetString("load.loadsettingconfig");
+        LoadingHotKey = GetString("load.loadhotkeycofig");
+        LoadingRoles = GetString("load.loadroles");
+        LoadingListeners = GetString("load.loadlisteners");
+        LoadingWinners = GetString("load.loadwinners");
+        LoadingClientOptions = GetString("load.loadclientoptions");
+        LoadingPlugins = GetString("load.loadplugins");
+        LoadingCommand = GetString("load.loadcommand");
+        LoadingCompeleted = GetString("load.loadcompeleted");
+
+        //Credits
+        Developer = GetString("credits.developers");
+        Creators = GetString("credits.ÎÄ´´×é");
     }
 
     private string GetString(string location)

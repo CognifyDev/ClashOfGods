@@ -184,10 +184,11 @@ option:
     press-key-to-set: "请在%sec%秒内按下新热键"
     button: "技能按钮"
   no-end-game: 
-    name: "测试模式"
+    name: "开房人数缩小"
     success: "成功启用，开始游戏最少人数缩短到1人"
-    off: "已被关闭"
+    off: "已被关闭，开始游戏最少人数以还原"
     error: "该选项不能在对局中被修改"
+    tip: "请重新进入游戏以启用"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 main-menu:
@@ -199,6 +200,21 @@ main-menu:
     up-to-date: "你已经更新到最新版本"
     check-failed: "未能找到最新版本"
     fetched: "搜索到最新版：%version%\r\n%description%\r\n是否安装？"
+load:
+ loading: "正在加载..."
+ loadsettingconfig: "正在加载预设配置文件"
+ loadhotkeycofig: "正在加载热键配置文件"
+ loadroles: "正在初始化职业系统"
+ loadlisteners: "正在初始化监听系统"
+ loadwinners: "正在初始化对局必要参数"
+ loadclientoptions: "正在初始化客户端选项"
+ loadplugins: "正在加载模组插件"
+ loadcommand: "正在加载模组指令"
+ loadcompeleted: "加载完成！"
+credits:
+ developers: "开发组"
+ creators: "文创组"
+
 action:
   kill: "击杀"
   clean: "清理"

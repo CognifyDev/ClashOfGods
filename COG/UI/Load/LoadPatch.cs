@@ -1,0 +1,447 @@
+﻿using System.Collections;
+using System.IO;
+using System.Linq;
+using BepInEx.Unity.IL2CPP.Utils;
+using BepInEx.Unity.IL2CPP.Utils.Collections;
+using COG;
+using COG.Command;
+using COG.Command.Impl;
+using COG.Config.Impl;
+using COG.Game.CustomWinner;
+using COG.Game.CustomWinner.Winnable;
+using COG.Listener;
+using COG.Listener.Impl;
+using COG.Plugin;
+using COG.Plugin.JavaScript;
+using COG.Role;
+using COG.Role.Impl;
+using COG.Role.Impl.Crewmate;
+using COG.Role.Impl.Impostor;
+using COG.Role.Impl.Neutral;
+using COG.Role.Impl.SubRole;
+using HarmonyLib;
+using UnityEngine;
+using static COG.Utils.GameObjectUtils;
+using static COG.Utils.ResourceUtils;
+
+namespace FracturedTruth.Patches.Load;
+
+[HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
+public static class LoadPatch
+{
+    static Sprite logoSprite = LoadSprite("COG.Resources.Images.COG-BG.png", 300f);
+    static Sprite bgSprite = LoadSprite("COG.Resources.Images.COG-LOADBG.png", 100f);
+    public static TMPro.TextMeshPro loadText = null!;
+    public static string LoadingText { set { loadText.text = value; } }
+
+    public static IEnumerator CoLoadTeamLogo(SplashManager __instance)
+    {
+        teamLogoActive = true;
+
+        // 创建logo对象，初始状态为透明
+        var logo = CreateObject<SpriteRenderer>("TeamLogo", null, new Vector3(0, 0.5f, -5f));
+        logo.sprite = LoadSprite("COG.Resources.Images.TeamLogo.png", 70f);
+        logo.color = Color.clear;
+        logo.transform.localScale = Vector3.one * 0.8f;
+
+        // 创建团队名称文字
+        var teamText = GameObject.Instantiate(__instance.errorPopup.InfoText, null);
+        teamText.transform.localPosition = new(0f, -1f, -10f); // 放在logo下方
+        teamText.fontStyle = TMPro.FontStyles.Bold;
+        teamText.text = "CognifyDev";
+        teamText.color = new Color(1, 1, 1, 0); // 初始透明
+        teamText.fontSize = 0.8f; // 调整字体大小
+
+        // 第一阶段：平滑淡入 + 缩放
+        float duration = 1.2f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+
+            logo.color = Color.Lerp(Color.clear, Color.white, t);
+            logo.transform.localScale = Vector3.Lerp(Vector3.one * 0.8f, Vector3.one, t);
+            teamText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.7f), t);
+
+            yield return null;
+        }
+
+        logo.color = Color.white;
+        logo.transform.localScale = Vector3.one;
+        teamText.color = new Color(1, 1, 1, 0.7f);
+
+        // 第二阶段：保持显示
+        yield return new WaitForSeconds(3f);
+
+        // 第三阶段：平滑淡出
+        elapsed = 0f;
+        duration = 1.5f;
+        Color startColor = logo.color;
+        Color startTextColor = teamText.color;
+        Vector3 originalScale = logo.transform.localScale;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+
+            logo.color = Color.Lerp(startColor, Color.clear, t);
+            logo.transform.localScale = Vector3.Lerp(originalScale, originalScale * 0.9f, t);
+            teamText.color = Color.Lerp(startTextColor, new Color(1, 1, 1, 0), t);
+
+            yield return null;
+        }
+
+        logo.color = Color.clear;
+        teamText.color = new Color(1, 1, 1, 0);
+
+        // 清理对象
+        if (logo != null)
+            GameObject.Destroy(logo.gameObject);
+        if (teamText != null)
+            GameObject.Destroy(teamText.gameObject);
+
+        teamLogoActive = false;
+    }
+
+    public static bool loadedTeamLogo = false;
+    static IEnumerator CoLoadFracturedTruth(SplashManager __instance)
+    {
+        var logo = CreateObject<SpriteRenderer>("COG-BG", null, new Vector3(0, 0.5f, -5f));
+        logo.sprite = logoSprite;
+        logo.color = Color.clear;
+
+        var bg = CreateObject<SpriteRenderer>("COG-LOADBG", null, new Vector3(0, 0.5f, -5f));
+        bg.sprite = bgSprite;
+        bg.color = Color.clear;
+
+        // 使用 Mathf.SmoothStep 替代复杂的缓动函数
+        float duration = 1.5f;
+        float elapsed = 0f;
+
+        // logo 淡入动画
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            logo.color = Color.Lerp(Color.clear, Color.white, t);
+            logo.transform.localScale = Vector3.Lerp(Vector3.one * 0.9f, Vector3.one, t);
+            yield return null;
+        }
+
+        // bg 延迟淡入
+        yield return new WaitForSeconds(0.2f);
+        elapsed = 0f;
+
+        while (elapsed < duration * 0.7f)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / (duration * 0.7f));
+            bg.color = Color.Lerp(Color.clear, Color.white, t);
+            yield return null;
+        }
+
+        // 创建初始加载文字
+        loadText = GameObject.Instantiate(__instance.errorPopup.InfoText, null);
+        loadText.transform.localPosition = new(0f, -0.28f, -10f);
+        loadText.fontStyle = TMPro.FontStyles.Bold;
+        loadText.text = LanguageConfig.Instance.Loading;
+        loadText.color = new Color(1, 1, 1, 0);
+
+        // 文字淡入
+        elapsed = 0f;
+        while (elapsed < 0.8f)
+        {
+            elapsed += Time.deltaTime;
+            loadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), elapsed / 0.8f);
+            yield return null;
+        }
+
+        // 加载步骤
+        string[] loadingSteps = {
+        LanguageConfig.Instance.LoadingHotKey,
+        LanguageConfig.Instance.LoadingListeners,
+        LanguageConfig.Instance.LoadingWinners,
+        LanguageConfig.Instance.LoadingRoles,
+        LanguageConfig.Instance.LoadingSettings,
+        LanguageConfig.Instance.LoadingPlugins,
+        LanguageConfig.Instance.LoadingCommand,
+        LanguageConfig.Instance.LoadingCompeleted
+    };
+
+        // 执行每个加载步骤
+        for (int i = 0; i < loadingSteps.Length; i++)
+        {
+            string step = loadingSteps[i];
+
+            // 如果是最后一步（加载完成），先等待一下再显示
+            if (i == loadingSteps.Length - 1)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            // 使用协程来确保文字切换动画完成
+            yield return ChangeLoadingText(step, 0.3f);
+
+            // 执行实际的加载操作
+            if (step == LanguageConfig.Instance.LoadingHotKey)
+            {
+                _ = ButtonHotkeyConfig.Instance;
+            }
+            else if (step == LanguageConfig.Instance.LoadingListeners)
+            {
+                ListenerManager.GetManager().RegisterListeners(new IListener[]
+                {
+                    new CommandListener(),
+                    new PlayerListener(),
+                    new CustomButtonListener(),
+                    new GameListener(),
+                    new ClientOptionListener(),
+                    new RpcListener(),
+                    new TaskAdderListener(),
+                    new VersionShowerListener(),
+                    new VanillaBugFixListener(),
+                    new CustomWinnerListener(),
+                    new LobbyListener(),
+                    new RoleAssignmentListener(),
+                    new IntroListener()
+                });
+            }
+            else if(step == LanguageConfig.Instance.LoadingWinners)
+            {
+                CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
+                {
+                    new CrewmatesCustomWinner(),
+                    new ImpostorsCustomWinner(),
+                    new LastPlayerCustomWinner()
+                });
+            }
+            else if (step == LanguageConfig.Instance.LoadingRoles)
+            {
+                CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
+        {
+            // Unknown
+            new Unknown(),
+
+            // Crewmate
+            new Crewmate(),
+            new Bait(),
+            new Sheriff(),
+            new Vigilante(),
+            new SoulHunter(),
+            new Technician(),
+            new Inspector(),
+            new Doorman(),
+            new Chief(),
+            new Enchanter(),
+            new Witch(),
+
+            // Impostor
+            new Impostor(),
+            new Cleaner(),
+            new Stabber(),
+            new Reaper(),
+            new Troublemaker(),
+            new Nightmare(),
+            new Spy(),
+
+            // Neutral
+            new Jester(),
+            new Reporter(),
+            new DeathBringer(),
+
+            // Sub-roles
+            new Guesser(),
+            new SpeedBooster()
+        });
+            }
+            else if (step == LanguageConfig.Instance.LoadingSettings)
+            {
+                _ = SettingsConfig.Instance;
+            }
+            else if (step == LanguageConfig.Instance.LoadingPlugins)
+            {
+                if (SettingsConfig.Instance.EnablePluginSystem)
+                {
+                    if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
+                        Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
+
+                    var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
+                        .Where(name => name.ToLower().EndsWith(".cog"));
+                    var enumerable = files.ToArray();
+                    Main.Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
+
+                    foreach (var file in enumerable)
+                        IPluginManager.GetDefaultManager().LoadPlugin(file);
+                }
+            }
+            else if (step == LanguageConfig.Instance.LoadingCommand)
+            {
+                CommandManager.GetManager().RegisterCommands(new CommandBase[]
+                {
+                    new RpcCommand(),
+                    new OptionCommand(),
+                    new DebugCommand()
+                });
+            }
+            // 如果不是最后一步，等待一下再继续
+            if (i < loadingSteps.Length - 1)
+            {
+                yield return new WaitForSeconds(0.3f);
+            }
+        }
+
+        // 加载完成后的效果 - 确保只有"加载完成"显示
+        yield return new WaitForSeconds(0.5f);
+
+        // 将文字颜色改为绿色
+        elapsed = 0f;
+        Color startColor = loadText.color;
+        Color targetColor = Color.green.AlphaMultiplied(0.6f);
+
+        while (elapsed < 0.5f)
+        {
+            elapsed += Time.deltaTime;
+            loadText.color = Color.Lerp(startColor, targetColor, elapsed / 0.5f);
+            yield return null;
+        }
+
+        // 平滑闪烁效果
+        for (int i = 0; i < 2; i++)
+        {
+            elapsed = 0f;
+            while (elapsed < 0.3f)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = 0.6f + Mathf.Sin(elapsed * 20f) * 0.2f;
+                loadText.color = Color.green.AlphaMultiplied(alpha);
+                yield return null;
+            }
+        }
+
+        // 同时淡出所有元素
+        elapsed = 0f;
+        Color originalLogoColor = logo.color;
+        Color originalBgColor = bg.color;
+        Color originalTextColor = loadText.color;
+
+        while (elapsed < 1f)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / 1f;
+
+            logo.color = Color.Lerp(originalLogoColor, Color.clear, t);
+            bg.color = Color.Lerp(originalBgColor, Color.clear, t);
+            loadText.color = Color.Lerp(originalTextColor, new Color(originalTextColor.r, originalTextColor.g, originalTextColor.b, 0), t);
+
+            yield return null;
+        }
+
+        // 清理
+        if (loadText != null) GameObject.Destroy(loadText.gameObject);
+        if (logo != null) GameObject.Destroy(logo.gameObject);
+        if (bg != null) GameObject.Destroy(bg.gameObject);
+
+        __instance.sceneChanger.AllowFinishLoadingScene();
+        __instance.startedSceneLoad = true;
+    }
+
+    // 专门处理文字切换的方法
+    private static IEnumerator ChangeLoadingText(string newText, float duration)
+    {
+        // 如果是第一次显示文字，不需要淡出效果
+        if (loadText.text == LanguageConfig.Instance.Loading)
+        {
+            loadText.text = newText;
+            yield break;
+        }
+
+        float elapsed = 0f;
+
+        // 先淡出当前文字
+        while (elapsed < duration / 2)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / (duration / 2);
+            loadText.color = Color.Lerp(new Color(1, 1, 1, 0.3f), new Color(1, 1, 1, 0), t);
+            yield return null;
+        }
+
+        // 更新文字
+        loadText.text = newText;
+
+        // 再淡入新文字
+        elapsed = 0f;
+        while (elapsed < duration / 2)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / (duration / 2);
+            loadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), t);
+            yield return null;
+        }
+    }
+    public static bool Prefix(SplashManager __instance)
+    {
+        if (__instance.doneLoadingRefdata && !__instance.startedSceneLoad && Time.time - __instance.startTime > 4.2f && !loadedTeamLogo)
+        {
+            loadedTeamLogo = true;
+            __instance.StartCoroutine(CoLoadTeamLogo(__instance).WrapToIl2Cpp());
+            return false;
+        }
+
+        // 只有在TeamLogo完全结束后才触发FracturedTruth加载
+        if (__instance.doneLoadingRefdata && !__instance.startedSceneLoad && loadedTeamLogo && !teamLogoActive && !loadedFracturedTruth)
+        {
+            loadedFracturedTruth = true;
+            __instance.StartCoroutine(CoLoadFracturedTruth(__instance).WrapToIl2Cpp());
+        }
+        return false;
+    }
+
+    // 辅助方法：更新加载文字（带动画）
+    private static void UpdateLoadingText(string text)
+    {
+        if (loadText != null)
+        {
+            loadText.text = text;
+        }
+    }
+
+    // 辅助方法：文字变化动画
+    private static IEnumerator AnimateTextChange(string newText)
+    {
+        float elapsed = 0f;
+        float duration = 0.2f;
+
+        // 先缩小淡出
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            loadText.transform.localScale = Vector3.Lerp(Vector3.one, Vector3.one * 0.8f, t);
+            loadText.color = Color.Lerp(new Color(1, 1, 1, 0.3f), new Color(1, 1, 1, 0), t);
+            yield return null;
+        }
+
+        // 更新文字
+        loadText.text = newText;
+
+        // 再放大淡入
+        elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            loadText.transform.localScale = Vector3.Lerp(Vector3.one * 0.8f, Vector3.one, t);
+            loadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), t);
+            yield return null;
+        }
+    }
+
+    static bool loadedFracturedTruth = false;
+
+    // 添加一个标志来跟踪TeamLogo是否还在显示
+    public static bool teamLogoActive = false;
+}

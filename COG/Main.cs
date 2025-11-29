@@ -116,8 +116,8 @@ public partial class Main : BasePlugin
         }
 
         // Read configs by calling static constructors
-        _ = SettingsConfig.Instance;
-        _ = ButtonHotkeyConfig.Instance;
+        //_ = SettingsConfig.Instance;
+        //_ = ButtonHotkeyConfig.Instance;
 
         File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
 
@@ -127,68 +127,68 @@ public partial class Main : BasePlugin
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
-        ListenerManager.GetManager().RegisterListeners(new IListener[]
-        {
-            new CommandListener(),
-            new PlayerListener(),
-            new CustomButtonListener(),
-            new GameListener(),
-            new ClientOptionListener(),
-            new RpcListener(),
-            new TaskAdderListener(),
-            new VersionShowerListener(),
-            new VanillaBugFixListener(),
-            new CustomWinnerListener(),
-            new LobbyListener(),
-            new RoleAssignmentListener(),
-            new IntroListener()
-        });
+        //ListenerManager.GetManager().RegisterListeners(new IListener[]
+        //{
+        //    new CommandListener(),
+        //    new PlayerListener(),
+        //    new CustomButtonListener(),
+        //    new GameListener(),
+        //    new ClientOptionListener(),
+        //    new RpcListener(),
+        //    new TaskAdderListener(),
+        //    new VersionShowerListener(),
+        //    new VanillaBugFixListener(),
+        //    new CustomWinnerListener(),
+        //    new LobbyListener(),
+        //    new RoleAssignmentListener(),
+        //    new IntroListener()
+        //});
 
         // Register CustomWinners
-        CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
-        {
-            new CrewmatesCustomWinner(),
-            new ImpostorsCustomWinner(),
-            new LastPlayerCustomWinner()
-        });
+        //CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
+        //{
+        //    new CrewmatesCustomWinner(),
+        //    new ImpostorsCustomWinner(),
+        //    new LastPlayerCustomWinner()
+        //});
 
         // Register roles
-        CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
-        {
-            // Unknown
-            new Unknown(),
+        //CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
+        //{
+        //    // Unknown
+        //    new Unknown(),
 
-            // Crewmate
-            new Crewmate(),
-            new Bait(),
-            new Sheriff(),
-            new Vigilante(),
-            new SoulHunter(),
-            new Technician(),
-            new Inspector(),
-            new Doorman(),
-            new Chief(),
-            new Enchanter(),
-            new Witch(),
+        //    // Crewmate
+        //    new Crewmate(),
+        //    new Bait(),
+        //    new Sheriff(),
+        //    new Vigilante(),
+        //    new SoulHunter(),
+        //    new Technician(),
+        //    new Inspector(),
+        //    new Doorman(),
+        //    new Chief(),
+        //    new Enchanter(),
+        //    new Witch(),
 
-            // Impostor
-            new Impostor(),
-            new Cleaner(),
-            new Stabber(),
-            new Reaper(),
-            new Troublemaker(),
-            new Nightmare(),
-            new Spy(),
+        //    // Impostor
+        //    new Impostor(),
+        //    new Cleaner(),
+        //    new Stabber(),
+        //    new Reaper(),
+        //    new Troublemaker(),
+        //    new Nightmare(),
+        //    new Spy(),
 
-            // Neutral
-            new Jester(),
-            new Reporter(),
-            new DeathBringer(),
+        //    // Neutral
+        //    new Jester(),
+        //    new Reporter(),
+        //    new DeathBringer(),
 
-            // Sub-roles
-            new Guesser(),
-            new SpeedBooster()
-        });
+        //    // Sub-roles
+        //    new Guesser(),
+        //    new SpeedBooster()
+        //});
 
         INetworkedGameEventSender.AllSenders.AddRange(new[]
         {
@@ -221,6 +221,11 @@ public partial class Main : BasePlugin
                     if (GameStates.InRealGame)
                     {
                         GameUtils.Popup?.Show(LanguageConfig.Instance.NoEndGameErrorMessage);
+                        return false;
+                    }
+                    else if (GameStates.InLobby)
+                    {
+                        GameUtils.Popup?.Show(LanguageConfig.Instance.NoEndGameTipMessage);
                         return false;
                     }
 
@@ -291,29 +296,29 @@ public partial class Main : BasePlugin
         });
 
         // Register Commands
-        CommandManager.GetManager().RegisterCommands(new CommandBase[]
-        {
-            new RpcCommand(),
-            new OptionCommand(),
-            new DebugCommand()
-        });
+        //CommandManager.GetManager().RegisterCommands(new CommandBase[]
+        //{
+        //    new RpcCommand(),
+        //    new OptionCommand(),
+        //    new DebugCommand()
+        //});
 
         Harmony.PatchAll();
 
         // Start to load plugins
-        if (SettingsConfig.Instance.EnablePluginSystem)
-        {
-            if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
-                Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
+        //if (SettingsConfig.Instance.EnablePluginSystem)
+        //{
+        //    if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
+        //        Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
 
-            var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
-                .Where(name => name.ToLower().EndsWith(".cog"));
-            var enumerable = files.ToArray();
-            Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
+        //    var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
+        //        .Where(name => name.ToLower().EndsWith(".cog"));
+        //    var enumerable = files.ToArray();
+        //    Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
 
-            foreach (var file in enumerable)
-                IPluginManager.GetDefaultManager().LoadPlugin(file);
-        }
+        //    foreach (var file in enumerable)
+        //        IPluginManager.GetDefaultManager().LoadPlugin(file);
+        //}
 
         _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
     }
