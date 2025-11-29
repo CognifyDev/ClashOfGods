@@ -138,7 +138,7 @@ public partial class Main : BasePlugin
             new TaskAdderListener(),
             new VersionShowerListener(),
             new VanillaBugFixListener(),
-            new CustomWinnerListener(),
+            new CustomGameEndLogicListener(),
             new LobbyListener(),
             new RoleAssignmentListener(),
             new IntroListener()
@@ -213,7 +213,7 @@ public partial class Main : BasePlugin
                     GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }),
-            CheckEndCriteriaPatch.NoEndGameButton = new ToggleClientOption("no-end-game.name",
+            new ToggleClientOption("no-end-game.name",
                 false,
                 _ =>
                 {
@@ -224,11 +224,10 @@ public partial class Main : BasePlugin
                         return false;
                     }
 
-                    if(CheckEndCriteriaPatch.NoEndGame)
-                    {
+                    if (CheckEndCriteriaPatch.NoEndGame)
                         CheckEndCriteriaPatch.NoEndGame = false;
-                    }
-                    else CheckEndCriteriaPatch.NoEndGame = true;
+                    else
+                        CheckEndCriteriaPatch.NoEndGame = true;
 
                     GameUtils.Popup?.Show(CheckEndCriteriaPatch.NoEndGame?LanguageConfig.Instance.NoEndGameInfoMessage:LanguageConfig.Instance.NoEndGameOff);
                     return false;

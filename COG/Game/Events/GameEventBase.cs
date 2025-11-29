@@ -20,36 +20,23 @@ public abstract class GameEventBase : IGameEvent
     public CustomPlayerData? Player { get; }
 }
 
-public interface INetworkedGameEventBase
-{
-}
-
-public abstract class NetworkedGameEventBase<T> : GameEventBase, INetworkedGameEventBase where T : INetworkedGameEventSender
+public abstract class NetworkedGameEventBase<TEvent, TSender> : GameEventBase 
+    where TEvent : NetworkedGameEventBase<TEvent, TSender>
+    where TSender : NetworkedGameEventSender<TSender, TEvent>, new()
 {
     public NetworkedGameEventBase(GameEventType eventType, CustomPlayerData? player) : base(eventType, player)
     {
     }
 
-    public T EventSender => (T)INetworkedGameEventSender.AllSenders.First(s => s is T);
+    public TSender EventSender => NetworkedGameEventSender<TSender, TEvent>.Instance;
 }
 
-public interface INetworkedGameEventSender
+public abstract class NetworkedGameEventSender<TSelf, TEvent> where TSelf : NetworkedGameEventSender<TSelf, TEvent>, new()
 {
-    public static List<INetworkedGameEventSender> AllSenders { get; } = new();
+    public static TSelf Instance => _instance ??= new();
+    private static TSelf? _instance;
 
-    public string Id { get; }
-}
+    public abstract void Serialize(RpcWriter writer, TEvent correspondingEvent);
 
-public abstract class NetworkedGameEventSender<T> : INetworkedGameEventSender where T : INetworkedGameEventBase
-{
-    public NetworkedGameEventSender(string id)
-    {
-        Id = id;
-    }
-
-    public string Id { get; }
-
-    public abstract void Serialize(RpcWriter writer, T correspondingEvent);
-
-    public abstract T Deserialize(MessageReader reader);
+    public abstract TEvent Deserialize(MessageReader reader);
 }
