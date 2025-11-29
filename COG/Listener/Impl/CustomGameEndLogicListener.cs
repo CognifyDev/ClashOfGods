@@ -19,13 +19,15 @@ using UnityEngine;
 
 namespace COG.Listener.Impl;
 
-public class CustomWinnerListener : IListener
+public class CustomGameEndLogicListener : IListener
 {
+    public static bool DisableGameEndLogic { get; set; }
+
     private static readonly int Color1 = Shader.PropertyToID("_Color");
     private readonly RpcHandler<byte[]> _winnerDataHandler;
     private bool _isEnding;
 
-    public CustomWinnerListener()
+    public CustomGameEndLogicListener()
     {
         _winnerDataHandler = new RpcHandler<byte[]>(KnownRpc.ShareWinners,
             d =>

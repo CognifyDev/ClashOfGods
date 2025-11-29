@@ -202,7 +202,7 @@ public class CustomRole
     /// </summary>
     public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
     {
-        EventRecorder.Instance.RpcRecord(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
+        EventRecorder.Instance.RpcRecord<UseAbilityGameEvent, UseAbilityEventSender>(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
     };
 
     public ReadOnlyCollection<PlayerControl> Players =>

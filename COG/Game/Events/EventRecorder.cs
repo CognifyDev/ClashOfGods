@@ -4,6 +4,7 @@ using COG.Rpc;
 using COG.Utils;
 using COG.Utils.Coding;
 using System.Collections.Generic;
+using UnityEngine.Analytics;
 // ReSharper disable InconsistentNaming
 
 namespace COG.Game.Events;
@@ -39,13 +40,12 @@ public class EventRecorder
         }
     }
 
-    [FixMe("BUG")]
-    public void RpcRecord<T>(NetworkedGameEventBase<T> gameEvent) where T : INetworkedGameEventSender, new()
+    public void RpcRecord<TEvent, TSender>(TEvent gameEvent)
+        where TEvent : NetworkedGameEventBase<TEvent, TSender>
+        where TSender : NetworkedGameEventSender<TSender, TEvent>, new()
     {
         var writer = RpcWriter.Start(KnownRpc.SyncGameEvent);
-        dynamic sender = gameEvent.EventSender;
-        writer.Write(sender.Id);
-        //sender.Serialize(writer, gameEvent);
+        gameEvent.EventSender.Serialize(writer, gameEvent);
         writer.Finish();
     }
 

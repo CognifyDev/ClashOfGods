@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace COG.Listener.Event.Impl.Game.Record;
 
-public class UseAbilityGameEvent : NetworkedGameEventBase<UseAbilityEventSender>
+public class UseAbilityGameEvent : NetworkedGameEventBase<UseAbilityGameEvent, UseAbilityEventSender>
 {
     public UseAbilityGameEvent(CustomPlayerData player, CustomButton button) : base(GameEventType.UseAbility, player)
     {
@@ -16,12 +16,8 @@ public class UseAbilityGameEvent : NetworkedGameEventBase<UseAbilityEventSender>
     public CustomButton UsedButton { get; private set; } = null!;
 }
 
-public class UseAbilityEventSender : NetworkedGameEventSender<UseAbilityGameEvent>
+public class UseAbilityEventSender : NetworkedGameEventSender<UseAbilityEventSender, UseAbilityGameEvent>
 {
-    public UseAbilityEventSender() : base("use-ability")
-    {
-    }
-
     public override void Serialize(RpcWriter writer, UseAbilityGameEvent correspondingEvent)
     {
         writer.WriteBytesAndSize(SerializablePlayerData.Of(correspondingEvent.Player!).SerializeToData());
