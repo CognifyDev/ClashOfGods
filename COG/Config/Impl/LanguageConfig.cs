@@ -292,7 +292,7 @@ public class LanguageConfig : ConfigBase
 
         //Credits
         Developer = GetString("credits.developers");
-        Creators = GetString("credits.ÎÄ´´×é");
+        Creators = GetString("credits.creators");
     }
 
     private string GetString(string location)

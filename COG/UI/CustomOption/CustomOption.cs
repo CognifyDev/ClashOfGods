@@ -10,6 +10,7 @@ using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
+using COG.Utils.Coding;
 using Reactor.Utilities;
 using UnityEngine;
 #if WINDOWS
@@ -297,7 +298,8 @@ public sealed class CustomOption
             .WritePacked(newSelection)
             .Finish();
     }
-
+    [ShitCode]
+    //[<!>: ]目前不会修，可能是代码对所有类型的选项都调用了数值相关的方法，但ToggleOption不支持这些方法。
     private void NotifySettingChange()
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -309,13 +311,13 @@ public sealed class CustomOption
         {
             var valueText = "";
 
-            if (OptionBehaviour!.GetComponent<StringOption>())
+            if (OptionBehaviour!.GetComponent<StringOption>() != null)
                 valueText = GetString();
-            else if (OptionBehaviour!.GetComponent<ToggleOption>())
+            else if (OptionBehaviour!.GetComponent<ToggleOption>() != null)
                 valueText = TranslationController.Instance.GetString(GetBool()
                     ? StringNames.SettingsOn
                     : StringNames.SettingsOff);
-            else if (OptionBehaviour!.GetComponent<NumberOption>())
+            else if (OptionBehaviour!.GetComponent<NumberOption>() != null)
                 valueText = OptionBehaviour!.Data.GetValueString(OptionBehaviour.GetFloat());
 
             var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotification,
@@ -324,50 +326,51 @@ public sealed class CustomOption
             );
             GameUtils.RpcNotifySettingChange(int.MinValue + Id, item);
         }
-        else if (OptionBehaviour is RoleOptionSetting setting)
-        {
-            var roleName = setting.Role.TeamType switch
-            {
-                RoleTeamTypes.Crewmate => role.GetColorName(),
-                RoleTeamTypes.Impostor => role.Name.Color(Palette.ImpostorRed),
-                _ => role.Name.Color(Color.grey)
-            };
-            var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotificationRole,
-                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}</font>",
-                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount + "</font>",
-                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance + "%"
-            );
-
-            GameUtils.RpcNotifySettingChange(int.MaxValue - role.Id, item);
-        }
         else
         {
-            var roleName = role.CampType switch
+            if (OptionBehaviour is RoleOptionSetting setting)
             {
-                CampType.Crewmate => role.GetColorName(),
-                CampType.Impostor => role.Name.Color(Palette.ImpostorRed),
-                _ => role.Name.Color(Color.grey)
-            };
+                var roleName = setting.Role.TeamType switch
+                {
+                    RoleTeamTypes.Crewmate => role.GetColorName(),
+                    RoleTeamTypes.Impostor => role.Name.Color(Palette.ImpostorRed),
+                    _ => role.Name.Color(Color.grey)
+                };
+                var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotificationRole,
+                    $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}</font>",
+                    "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleMaxCount + "</font>",
+                    "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + setting.roleChance + "%"
+                );
 
-            var valueText = "";
+                GameUtils.RpcNotifySettingChange(int.MaxValue - role.Id, item);
+            }
+            else
+            {
+                var roleName = role.CampType switch
+                {
+                    CampType.Crewmate => role.GetColorName(),
+                    CampType.Impostor => role.Name.Color(Palette.ImpostorRed),
+                    _ => role.Name.Color(Color.grey)
+                };
 
-            if (OptionBehaviour!
-                .GetComponent<
-                    StringOption>()) // It's strange that using (OptionBehaviour is TargetType) expression is useless
-                valueText = GetString();
-            else if (OptionBehaviour!.GetComponent<ToggleOption>())
-                valueText = TranslationController.Instance.GetString(GetBool()
-                    ? StringNames.SettingsOn
-                    : StringNames.SettingsOff);
-            else if (OptionBehaviour!.GetComponent<NumberOption>())
-                valueText = OptionBehaviour!.Data.GetValueString(OptionBehaviour.GetFloat());
+                var valueText = "";
 
-            var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotification,
-                $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}: {Name()} </font>",
-                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\"> " + valueText + " </font>"
-            );
+                if (OptionBehaviour!.GetComponent<StringOption>() != null)
+                    valueText = GetString();
+                else if (OptionBehaviour!.GetComponent<ToggleOption>() != null)
+                    valueText = TranslationController.Instance.GetString(GetBool()
+                        ? StringNames.SettingsOn
+                        : StringNames.SettingsOff);
+                else if (OptionBehaviour!.GetComponent<NumberOption>() != null)
+                    valueText = OptionBehaviour!.Data.GetValueString(OptionBehaviour.GetFloat());
 
-            GameUtils.RpcNotifySettingChange(int.MaxValue - Id, item);
+                var item = TranslationController.Instance.GetString(StringNames.LobbyChangeSettingNotification,
+                    $"<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">{roleName}: {Name()} </font>",
+                    "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\"> " + valueText + " </font>"
+                );
+
+                GameUtils.RpcNotifySettingChange(int.MaxValue - Id, item);
+            }
         }
     }
 
