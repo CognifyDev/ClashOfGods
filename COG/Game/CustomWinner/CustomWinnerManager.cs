@@ -13,7 +13,7 @@ public class CustomWinnerManager
 {
     private static CustomWinnerManager? _manager;
 
-    private readonly List<IWinnable> _winnable = new();
+    private readonly List<IWinnable> _winnable = [];
 
     private CustomWinnerManager()
     {

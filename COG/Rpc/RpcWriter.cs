@@ -134,7 +134,7 @@ public class RpcWriter
     public static RpcWriter Start(PlayerControl playerControl, byte callId,
         PlayerControl[]? targets = null)
     {
-        List<string> parts = new();
+        List<string> parts = [];
 
         var writers = new List<MessageWriter>();
 

@@ -41,7 +41,7 @@ public class ConfigBase
 
     public static bool AutoReplace { get; set; }
 
-    public static List<ConfigBase> Configs { get; } = new();
+    public static List<ConfigBase> Configs { get; } = [];
     public string Name { get; }
     public string Path { get; }
     public string Text { get; protected set; }

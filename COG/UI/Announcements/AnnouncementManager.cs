@@ -8,7 +8,7 @@ namespace COG.UI.Announcements;
 
 internal class AnnouncementManager
 {
-    private static readonly List<AnnouncementBase> _allModNews = new();
+    private static readonly List<AnnouncementBase> _allModNews = [];
     private static bool _isInitialized;
 
     public static void Initialize()
@@ -31,7 +31,7 @@ internal class AnnouncementManager
     public static List<AnnouncementBase> GetAllModNews()
     {
         if (!_isInitialized) Initialize();
-        return new List<AnnouncementBase>(_allModNews);
+        return [.._allModNews];
     }
 
     public static List<Announcement> GetAllAnnouncements()

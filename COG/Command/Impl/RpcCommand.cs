@@ -79,15 +79,15 @@ public class RpcCommand : CommandBase
                         throw new NullReferenceException(
                             "You haven't started a RpcWriter instance yet or the name of the type you entered is null. (Normally, the second situation won't occur.)");
 
-                    List<(string, string)> nameToClass = new()
-                    {
+                    List<(string, string)> nameToClass =
+                    [
                         ("sbyte", "SByte"),
                         ("int", "Int32"),
                         ("ushort", "UInt16"),
                         ("uint", "UInt32"),
                         ("ulong", "UInt64"),
                         ("float", "Single")
-                    };
+                    ];
 
                     if (typeName is not ("player" or "string" or "vector"))
                     {
@@ -99,13 +99,12 @@ public class RpcCommand : CommandBase
                         var type = assembly.GetType(typeLocation);
                         if (type == null) throw new NotSupportedException($"The data type {typeName} is null.");
 
-                        object[] array = { args[2], new() };
+                        object[] array = [args[2], new()];
                         var method = type.GetMethod("TryParse",
-                            new[]
-                            {
-                                typeof(string),
+                        [
+                            typeof(string),
                                 assembly.GetType(typeLocation + "&")! /* Out argument actually is a pointer */
-                            });
+                        ]);
                         if (method == null)
                             throw new NotSupportedException(
                                 "The parsing method is null. (Normally, you aren't able to see this message.)");

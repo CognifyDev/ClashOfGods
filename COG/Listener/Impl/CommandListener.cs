@@ -30,11 +30,8 @@ public class CommandListener : IListener
         return text.Split(' ').Skip(1).ToArray();
     }
 
-    private bool ContainAliases(string text, CommandBase command)
+    private static bool ContainAliases(string text, CommandBase command)
     {
-        foreach (var alias in command.Aliases)
-            if (text.Split(" ")[0].ToLower().Equals("/" + alias.ToLower()))
-                return true;
-        return false;
+        return command.Aliases.Any(alias => text.Split(" ")[0].ToLower().Equals("/" + alias.ToLower()));
     }
 }

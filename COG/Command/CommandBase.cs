@@ -26,7 +26,7 @@ public abstract class CommandBase
     /// <summary>
     ///     命令其他形式
     /// </summary>
-    public string[] Aliases { get; set; } = Array.Empty<string>();
+    public string[] Aliases { get; set; } = [];
 
     /// <summary>
     ///     玩家运行命令执行逻辑

@@ -48,7 +48,7 @@ public sealed class CustomOption
         Page = type;
     }
 
-    public static List<CustomOption> Options { get; } = new();
+    public static List<CustomOption> Options { get; } = [];
 
     public int Id { get; }
     public Func<string> Name { get; set; }

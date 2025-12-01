@@ -14,7 +14,7 @@ namespace COG.Patch;
 public static class MainMenuPatch
 {
     public static GameObject? CustomBanner;
-    public static readonly List<PassiveButton> Buttons = new();
+    public static readonly List<PassiveButton> Buttons = [];
     public static bool PopupCreated;
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]

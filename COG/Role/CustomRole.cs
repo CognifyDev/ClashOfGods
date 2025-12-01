@@ -264,7 +264,7 @@ public class CustomRole
         }
     }
 
-    public List<CustomButton> AllButtons { get; } = new();
+    public List<CustomButton> AllButtons { get; } = [];
 
     public override bool Equals(object? obj)
     {

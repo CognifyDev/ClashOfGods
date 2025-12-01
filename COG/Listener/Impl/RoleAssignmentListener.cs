@@ -215,7 +215,7 @@ public class RoleAssignmentListener : IListener
             var subRolesList = subRoleData.Where(pair =>
                 pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList();
 
-            var subRoles = subRolesList.Any() ? subRolesList[0] : Array.Empty<CustomRole>();
+            var subRoles = subRolesList.Any() ? subRolesList[0] : [];
 
             target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles); // 先本地设置职业，后面ShareRole会把职业发出去的
         }

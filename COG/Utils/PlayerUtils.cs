@@ -206,7 +206,7 @@ public static class PlayerUtils
     public static string[] GetMarks(this PlayerControl target)
     {
         var tags = target.GetPlayerData()?.Tags;
-        return tags == null ? Array.Empty<string>() : tags.ToArray();
+        return tags == null ? [] : tags.ToArray();
     }
 
     public static bool HasMarkAs(this PlayerControl target, string tag)
@@ -492,7 +492,7 @@ public static class PlayerUtils
     {
         var data = pc.GetPlayerData();
         if (data == null)
-            return Array.Empty<CustomRole>();
+            return [];
         return data.SubRoles;
     }
 
@@ -515,7 +515,7 @@ public static class PlayerUtils
 
         if (!onlyDisplayNameSuffix)
         {
-            if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
+            if (!subRoles.SequenceEqual([]))
                 foreach (var role in subRoles)
                     subRoleNameBuilder.Append(' ').Append(role.GetColorName());
 
@@ -760,10 +760,10 @@ public class CustomPlayerData
         PlayerName = data.PlayerName;
         PlayerId = data.PlayerId;
         ColorId = data.DefaultOutfit.ColorId;
-        Tags = new List<string>();
+        Tags = [];
         SubRoles = subRoles != null
             ? subRoles.Where(subRole => subRole.IsSubRole).ToArray()
-            : Array.Empty<CustomRole>();
+            : [];
     }
 
     public PlayerControl Player { get; }

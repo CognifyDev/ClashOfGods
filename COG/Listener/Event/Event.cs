@@ -22,6 +22,6 @@ public class Event
 
     public static List<Type> GetSubClasses()
     {
-        return new List<Type>(SubClasses);
+        return [..SubClasses];
     }
 }

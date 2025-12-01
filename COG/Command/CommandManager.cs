@@ -6,7 +6,7 @@ public class CommandManager
 {
     private static CommandManager? _manager;
 
-    private readonly List<CommandBase> _commands = new();
+    private readonly List<CommandBase> _commands = [];
 
     public static CommandManager GetManager()
     {

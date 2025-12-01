@@ -191,7 +191,7 @@ public class CustomGameEndLogicListener : IListener
             var subRoleNameBuilder = new StringBuilder();
             var subRoles = data.SubRoles;
 
-            if (!subRoles.SequenceEqual(Array.Empty<CustomRole>()))
+            if (!subRoles.SequenceEqual([]))
                 foreach (var role in subRoles)
                     subRoleNameBuilder.Append(' ').Append(role.GetColorName());
 

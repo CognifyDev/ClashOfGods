@@ -66,10 +66,10 @@ public class Yaml
 
     public List<string>? GetStringList(string location)
     {
-        var locations = location.Contains('.') ? location.Split(".") : new[] { location };
+        var locations = location.Contains('.') ? location.Split(".") : [location];
         var rootNode = (YamlMappingNode)YamlStream.Documents[0].RootNode;
 
-        if (locations.Length < 1) return new List<string>();
+        if (locations.Length < 1) return [];
 
         YamlNode? valueNode = rootNode;
         foreach (var loc in locations)
@@ -102,7 +102,7 @@ public class Yaml
         }
 
         // 如果值节点不是列表节点，则返回空列表
-        return new List<string>();
+        return [];
     }
 
     public byte? GetByte(string location)
@@ -116,7 +116,7 @@ public class Yaml
 
     public string? GetString(string location)
     {
-        var locations = location.Contains('.') ? location.Split(".") : new[] { location };
+        var locations = location.Contains('.') ? location.Split(".") : [location];
         var rootNode = (YamlMappingNode)YamlStream.Documents[0].RootNode;
 
         if (locations.Length < 1) return null;

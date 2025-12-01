@@ -17,7 +17,7 @@ public class EventRecorder
     public EventRecorder()
     {
         Instance = this;
-        _events = new List<IGameEvent>();
+        _events = [];
     }
 
     public static EventRecorder Instance { get; private set; } = null!;
@@ -113,7 +113,7 @@ public static class GameEventPatch // not use listener for flexibility in patchi
         EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()!));
     }
 
-    internal static readonly List<CustomPlayerData> DisableOnceDeath = new();
+    public static readonly List<CustomPlayerData> DisableOnceDeath = [];
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
     [HarmonyPostfix]

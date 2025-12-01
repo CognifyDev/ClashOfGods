@@ -5,7 +5,7 @@ namespace COG.UI.ClientOption;
 public class ClientOptionManager
 {
     private static readonly ClientOptionManager Manager = new();
-    private readonly List<IClientOption> _options = new();
+    private readonly List<IClientOption> _options = [];
 
     public static ClientOptionManager GetManager()
     {

@@ -25,7 +25,7 @@ internal class ClientOptionListener : IListener
     private static float _timer = TimerCountdown;
     private static TabGroup? _modTabButton;
 
-    public static List<GameObject> HotkeyButtons { get; } = new();
+    public static List<GameObject> HotkeyButtons { get; } = [];
     public static GameObject? ModTabContainer { get; set; }
 
 

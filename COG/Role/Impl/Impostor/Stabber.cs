@@ -32,7 +32,7 @@ public class Stabber : CustomRole
             () =>
             {
                 _target!.RpcMurderAdvanced(new AdvancedKillOptions(true,
-                    new KillAnimationOptions(false, Array.Empty<PlayerControl>(), PlayerControl.LocalPlayer.Data,
+                    new KillAnimationOptions(false, [], PlayerControl.LocalPlayer.Data,
                         _target!.Data), _target));
                 _killedTimes++;
             },

@@ -18,7 +18,7 @@ public class ListenerManager
     /// <summary>
     ///     The list of listeners
     /// </summary>
-    private readonly List<Handler> _handlers = new();
+    private readonly List<Handler> _handlers = [];
 
     /// <summary>
     ///     Get the instance of a listener manager
@@ -141,7 +141,7 @@ public class ListenerManager
                 continue;
 
             var returnType = handler.Method.ReturnType;
-            var result = handler.Method.Invoke(handler.Listener, new object?[] { @event });
+            var result = handler.Method.Invoke(handler.Listener, [@event]);
 
             if (type == EventHandlerType.Prefix && returnType == typeof(bool) && !(bool)result!) toReturn = false;
         }

@@ -14,7 +14,7 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Inspector : CustomRole, IListener
 {
-    private readonly List<PlayerControl> _abilityUsedPlayers = new();
+    private readonly List<PlayerControl> _abilityUsedPlayers = [];
     private bool _abilityUsedThisRound;
     private PlayerControl? _buttonTarget;
     private PlayerControl? _examinedTarget;

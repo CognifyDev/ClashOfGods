@@ -10,7 +10,7 @@ public class PluginDescription
         Version = version;
         Authors = authors;
         Main = main;
-        Modules = modules ?? Array.Empty<string>();
+        Modules = modules ?? [];
     }
 
     public string Name { get; }

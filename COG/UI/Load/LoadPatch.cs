@@ -170,7 +170,7 @@ public static class LoadPatch
 
         // 加载步骤
         string[] loadingSteps =
-        {
+        [
             LanguageConfig.Instance.LoadingHotKey,
             LanguageConfig.Instance.LoadingListeners,
             LanguageConfig.Instance.LoadingWinners,
@@ -179,7 +179,7 @@ public static class LoadPatch
             LanguageConfig.Instance.LoadingPlugins,
             LanguageConfig.Instance.LoadingCommand,
             LanguageConfig.Instance.LoadingCompeleted
-        };
+        ];
 
         // 执行每个加载步骤
         for (var i = 0; i < loadingSteps.Length; i++)
@@ -199,8 +199,7 @@ public static class LoadPatch
             }
             else if (step == LanguageConfig.Instance.LoadingListeners)
             {
-                ListenerManager.GetManager().RegisterListeners(new IListener[]
-                {
+                ListenerManager.GetManager().RegisterListeners([
                     new CommandListener(),
                     new PlayerListener(),
                     new CustomButtonListener(),
@@ -214,21 +213,19 @@ public static class LoadPatch
                     new LobbyListener(),
                     new RoleAssignmentListener(),
                     new IntroListener()
-                });
+                ]);
             }
             else if (step == LanguageConfig.Instance.LoadingWinners)
             {
-                CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
-                {
+                CustomWinnerManager.GetManager().RegisterCustomWinnables([
                     new CrewmatesCustomWinner(),
                     new ImpostorsCustomWinner(),
                     new LastPlayerCustomWinner()
-                });
+                ]);
             }
             else if (step == LanguageConfig.Instance.LoadingRoles)
             {
-                CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
-                {
+                CustomRoleManager.GetManager().RegisterRoles([
                     // Unknown
                     new Unknown(),
 
@@ -262,7 +259,7 @@ public static class LoadPatch
                     // Sub-roles
                     new Guesser(),
                     new SpeedBooster()
-                });
+                ]);
             }
             else if (step == LanguageConfig.Instance.LoadingSettings)
             {
@@ -286,12 +283,11 @@ public static class LoadPatch
             }
             else if (step == LanguageConfig.Instance.LoadingCommand)
             {
-                CommandManager.GetManager().RegisterCommands(new CommandBase[]
-                {
+                CommandManager.GetManager().RegisterCommands([
                     new RpcCommand(),
                     new OptionCommand(),
                     new DebugCommand()
-                });
+                ]);
             }
 
             // 如果不是最后一步，等待一下再继续

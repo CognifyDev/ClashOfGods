@@ -4,7 +4,7 @@ namespace COG.UI.CustomOption.ValueRules.Impl;
 
 public class BoolOptionValueRule : IValueRule<bool>
 {
-    public bool[] Selections => new[] { false, true };
+    public bool[] Selections => [false, true];
     object[] IValueRule.Selections => Selections.Select(s => (object)s).ToArray();
     public int DefaultSelection { get; }
 

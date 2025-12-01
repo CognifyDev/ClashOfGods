@@ -55,7 +55,7 @@ public class GuesserButton
             : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole);
     }
 
-    public static List<GuesserButton> Buttons { get; } = new();
+    public static List<GuesserButton> Buttons { get; } = [];
 
     public void OpenGuessUI(MeetingHud meetingHud)
     {
@@ -289,7 +289,7 @@ public class GuesserButton
     public void ResetRoleArea()
     {
         _area.TryDestroyGameObject();
-        _roles = Array.Empty<CustomRole>();
+        _roles = [];
     }
 
     public static void DestroyAll()

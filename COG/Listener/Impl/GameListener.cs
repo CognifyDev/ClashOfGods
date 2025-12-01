@@ -22,7 +22,7 @@ public class GameListener : IListener
 {
     private static readonly int Outline = Shader.PropertyToID("_Outline");
     private static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
-    private readonly List<Handler> _handlers = new();
+    private readonly List<Handler> _handlers = [];
 
     [EventHandler(EventHandlerType.Postfix)]
     public void AfterPlayerFixedUpdate(PlayerFixedUpdateEvent @event)

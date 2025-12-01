@@ -15,8 +15,8 @@ public class StackTraceLogger
         RegisteredCustomLogger.Add(this);
     }
 
-    public static List<StackTraceLogger> RegisteredCustomLogger { get; } = new();
-    public List<MethodInfo> DisabledMethodSource { get; } = new();
+    public static List<StackTraceLogger> RegisteredCustomLogger { get; } = [];
+    public List<MethodInfo> DisabledMethodSource { get; } = [];
     public ManualLogSource NativeLogger { get; }
 
     public void DisableSource(Type toDisable)

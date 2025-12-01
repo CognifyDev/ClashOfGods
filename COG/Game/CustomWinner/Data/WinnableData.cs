@@ -15,13 +15,13 @@ public class WinnableData
 
     public GameOverReason GameOverReason { get; set; } = GameOverReason.ImpostorsByKill;
 
-    public List<NetworkedPlayerInfo> WinnablePlayers { get; } = new();
+    public List<NetworkedPlayerInfo> WinnablePlayers { get; } = [];
 
     public CampType WinnableCampType { get; set; } = CampType.Unknown;
 
     public List<CachedPlayerData> GetWinnablePlayersAsCachedPlayerData()
     {
-        return new List<CachedPlayerData>(WinnablePlayers.Select(info => new CachedPlayerData(info)).ToList());
+        return [..WinnablePlayers.Select(info => new CachedPlayerData(info)).ToList()];
     }
 
     public static WinnableData Of()

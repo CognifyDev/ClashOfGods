@@ -21,7 +21,7 @@ public class DeathBringer : CustomRole, IListener
 
     private readonly CustomButton _stareButton;
 
-    private readonly List<PlayerControl> _staredPlayers = new();
+    private readonly List<PlayerControl> _staredPlayers = [];
 
     private PlayerControl? _target;
 

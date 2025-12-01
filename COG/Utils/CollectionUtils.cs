@@ -76,7 +76,7 @@ public static class CollectionUtils
 
     public static T[] ToSingleElementArray<T>(this T obj)
     {
-        return new[] { obj };
+        return [obj];
     }
 
     public static Il2CppReferenceArray<T> ToIl2CppArray<T>(this T[] array) where T : Il2CppObjectBase

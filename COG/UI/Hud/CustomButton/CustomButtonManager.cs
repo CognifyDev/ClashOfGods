@@ -5,7 +5,7 @@ namespace COG.UI.Hud.CustomButton;
 public class CustomButtonManager
 {
     private static readonly CustomButtonManager Manager = new();
-    private readonly List<CustomButton> _buttons = new();
+    private readonly List<CustomButton> _buttons = [];
 
     public static CustomButtonManager GetManager()
     {

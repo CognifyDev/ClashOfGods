@@ -16,7 +16,7 @@ public class JsPluginManager : IPluginManager
     public const string PluginDirectoryPath = ConfigBase.DataDirectoryName + "\\plugins";
     private static JsPluginManager? _manager;
 
-    private readonly List<IPlugin> _plugins = new();
+    private readonly List<IPlugin> _plugins = [];
 
     private readonly Dictionary<ResourceDescription, byte[]> _resources = new();
 
@@ -104,9 +104,9 @@ public class JsPluginManager : IPluginManager
         engine.SetValue("getResource", new Func<string, byte[]>(s =>
         {
             var descriptionByPath = ResourceDescription.GetDescriptionByPath(s);
-            if (descriptionByPath == null) return Array.Empty<byte>();
+            if (descriptionByPath == null) return [];
 
-            return _resources.TryGetValue(descriptionByPath, out var value) ? value : Array.Empty<byte>();
+            return _resources.TryGetValue(descriptionByPath, out var value) ? value : [];
         }));
 
         engine.SetValue("logger", new PluginLogger(description));

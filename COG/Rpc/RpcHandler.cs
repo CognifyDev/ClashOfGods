@@ -5,7 +5,7 @@ namespace COG.Rpc;
 
 public interface IRpcHandler
 {
-    public static HashSet<IRpcHandler> Handlers { get; } = new();
+    public static HashSet<IRpcHandler> Handlers { get; } = [];
 
     public Action<MessageReader> OnReceive { get; }
 

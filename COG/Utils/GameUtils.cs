@@ -15,7 +15,7 @@ namespace COG.Utils;
 public static class GameUtils
 {
     public const MurderResultFlags DefaultFlags = MurderResultFlags.Succeeded | MurderResultFlags.DecisionByHost;
-    public static List<CustomPlayerData> PlayerData { get; } = new();
+    public static List<CustomPlayerData> PlayerData { get; } = [];
 
     internal static GenericPopup? PopupPrefab { get; set; }
 
@@ -100,7 +100,7 @@ public static class GameUtils
 
     public static List<Transform> GetAllChildren(this Transform transform)
     {
-        List<Transform> result = new();
+        List<Transform> result = [];
         for (var i = 0; i < transform.childCount; i++)
             result.Add(transform.GetChild(i));
         return result;
