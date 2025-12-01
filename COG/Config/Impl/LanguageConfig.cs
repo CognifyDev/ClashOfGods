@@ -154,7 +154,7 @@ public class LanguageConfig : ConfigBase
     public string PressKeyToSet { get; internal set; } = null!;
 
     //Load
-    public string Loading {  get; private set; } = null!;
+    public string Loading { get; private set; } = null!;
     public string LoadingHotKey { get; private set; } = null!;
     public string LoadingSettings { get; private set; } = null!;
     public string LoadingRoles { get; private set; } = null!;
@@ -169,6 +169,7 @@ public class LanguageConfig : ConfigBase
     //Credits
     public string Developer { get; private set; } = null!;
     public string Creators { get; private set; } = null!;
+
     private void SetTranslations()
     {
         MakePublicMessage = GetString("lobby.make-public-message");

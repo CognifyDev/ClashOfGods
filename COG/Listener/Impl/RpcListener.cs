@@ -104,18 +104,18 @@ public class RpcListener : IListener
 
                 if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
                 {
-                    playerData?.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
+                    playerData.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
                     break;
                 }
 
-                playerData?.Tags.Add(tag);
+                playerData.Tags.Add(tag);
                 break;
             }
 
             case KnownRpc.SyncRoleGameData:
             {
                 var roleId = -1;
-                CustomRole role = null!;
+                CustomRole role;
 
                 try
                 {
@@ -141,16 +141,18 @@ public class RpcListener : IListener
 
             case KnownRpc.SyncGameEvent:
             {
+                // TODO: MAKE THIS WORK
+                /*
                 var id = reader.ReadString();
                 dynamic? sender = INetworkedGameEventSender.AllSenders.FirstOrDefault(s => s.Id == id);
-                
+
                 if (sender == null)
                 {
                     Main.Logger.LogWarning("Null serializer while receiving game event");
                     break;
                 }
 
-                EventRecorder.Instance.Record(sender.Deserialize(reader));
+                EventRecorder.Instance.Record(sender.Deserialize(reader));*/
                 break;
             }
         }

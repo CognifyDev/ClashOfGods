@@ -55,6 +55,6 @@ internal static class GameStartManagerPatch
     public static void ChangeMinNum(GameStartManager __instance)
     {
         //if (!AmongUsClient.Instance.AmHost) return;
-        if(CheckEndCriteriaPatch.NoEndGame) __instance.MinPlayers = 1;
+        if (CheckEndCriteriaPatch.NoEndGame) __instance.MinPlayers = 1;
     }
 }

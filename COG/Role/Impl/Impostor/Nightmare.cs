@@ -18,13 +18,13 @@ public class Nightmare : CustomRole
     private const int MaxKillsStored = 2;
     private const float ResponseTimeout = 5f;
     private readonly RpcHandler<PlayerControl, PlayerControl, float> _cooldownCheckHandler;
-    private bool _receivedCooldownSent;
     private readonly CustomButton _storeButton;
     private readonly CustomOption _storeCooldown;
+    private readonly RpcHandler<PlayerControl> _storeHandler;
+    private bool _receivedCooldownSent;
 
     // GAMEPLAY VARIABLES
     private int _storedKills;
-    private readonly RpcHandler<PlayerControl> _storeHandler;
     private PlayerControl? _target;
     private float _teammateCurrentCooldown = float.MaxValue;
 

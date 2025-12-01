@@ -644,10 +644,7 @@ public static class PlayerUtils
         }
 
         var isParticipant = realVictim.AmOwner || players.Any(p => p.AmOwner);
-        if (isParticipant)
-        {
-           PlayKillAnimation(animKiller, animVictim);
-        }
+        if (isParticipant) PlayKillAnimation(animKiller, animVictim);
     }
 
     public static void PlayKillAnimation(NetworkedPlayerInfo killer, NetworkedPlayerInfo victim)
@@ -659,16 +656,16 @@ public static class PlayerUtils
 [WorkInProgress]
 public class AdvancedKillOptions
 {
-    public bool ShowDeadBody { get; }
-    public KillAnimationOptions AnimationOptions { get; }
-    public PlayerControl Victim { get; }
-
     public AdvancedKillOptions(bool showDeadBody, KillAnimationOptions animationOptions, PlayerControl victim)
     {
         ShowDeadBody = showDeadBody;
         AnimationOptions = animationOptions;
         Victim = victim;
     }
+
+    public bool ShowDeadBody { get; }
+    public KillAnimationOptions AnimationOptions { get; }
+    public PlayerControl Victim { get; }
 
     public void Serialize(RpcWriter writer)
     {
@@ -688,27 +685,29 @@ public class AdvancedKillOptions
         var animKiller = reader.ReadNetObject<NetworkedPlayerInfo>();
         var animVictim = reader.ReadNetObject<NetworkedPlayerInfo>();
         var victim = reader.ReadNetObject<PlayerControl>();
-        
-        return new(showDeadBody,
-            new(showAnim, participants.Select(id => PlayerUtils.GetPlayerById(id)!), animKiller, animVictim),
+
+        return new AdvancedKillOptions(showDeadBody,
+            new KillAnimationOptions(showAnim, participants.Select(id => PlayerUtils.GetPlayerById(id)!), animKiller,
+                animVictim),
             victim);
     }
 }
 
 public class KillAnimationOptions
 {
-    public bool ShowAnimation { get; }
-    public PlayerControl[] Participants { get; } // Other players (except the victim) able to watch the animation
-    public NetworkedPlayerInfo Killer { get; }
-    public NetworkedPlayerInfo Victim { get; }
-
-    public KillAnimationOptions(bool showAnimation, IEnumerable<PlayerControl> participants, NetworkedPlayerInfo killer, NetworkedPlayerInfo victim)
+    public KillAnimationOptions(bool showAnimation, IEnumerable<PlayerControl> participants, NetworkedPlayerInfo killer,
+        NetworkedPlayerInfo victim)
     {
         ShowAnimation = showAnimation;
         Participants = participants.ToArray();
         Killer = killer;
         Victim = victim;
     }
+
+    public bool ShowAnimation { get; }
+    public PlayerControl[] Participants { get; } // Other players (except the victim) able to watch the animation
+    public NetworkedPlayerInfo Killer { get; }
+    public NetworkedPlayerInfo Victim { get; }
 }
 
 public enum CustomDeathReason

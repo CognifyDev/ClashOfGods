@@ -211,10 +211,7 @@ public sealed class CustomOption
     {
         var saveFileDialog = new SaveFileDialog();
         saveFileDialog.Filter = "Preset File(*.cfg)\0*.cfg\0\0";
-        if (saveFileDialog.ShowDialog() != DialogResult.OK)
-        {
-            return;
-        }
+        if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
         SaveCurrentOption(saveFileDialog.FileName);
     }
 
@@ -222,11 +219,8 @@ public sealed class CustomOption
     {
         var openFileDialog = new OpenFileDialog();
         openFileDialog.Filter = "Preset File(*.cfg)\0*.cfg\0\0";
-        if (openFileDialog.ShowDialog() != DialogResult.OK)
-        {
-            return;
-        }
-        
+        if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+
         LoadOptionFromPreset(openFileDialog.FileName);
     }
 
@@ -257,10 +251,7 @@ public sealed class CustomOption
 
     public int GetInt()
     {
-        if (ValueRule is IntOptionValueRule rule)
-        {
-            return rule.Selections[Selection];
-        }
+        if (ValueRule is IntOptionValueRule rule) return rule.Selections[Selection];
 
         if (ValueRule is FloatOptionValueRule floatRule)
         {
@@ -298,8 +289,9 @@ public sealed class CustomOption
             .WritePacked(newSelection)
             .Finish();
     }
+
     [ShitCode]
-    //[<!>: ]Ä¿Ç°²»»áÐÞ£¬¿ÉÄÜÊÇ´úÂë¶ÔËùÓÐÀàÐÍµÄÑ¡Ïî¶¼µ÷ÓÃÁËÊýÖµÏà¹ØµÄ·½·¨£¬µ«ToggleOption²»Ö§³ÖÕâÐ©·½·¨¡£
+    //[<!>: ]Ä¿Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Þ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½Ñ¡ï¿½î¶¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ØµÄ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ToggleOptionï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½Ð©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     private void NotifySettingChange()
     {
         if (!AmongUsClient.Instance.AmHost) return;

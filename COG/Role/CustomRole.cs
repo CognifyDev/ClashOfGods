@@ -37,8 +37,8 @@ namespace COG.Role;
 public class CustomRole
 {
     private static int _order;
-    private KillButtonSetting _currentKillButtonSetting;
     private readonly Stack<KillButtonSetting> _killButtonSettings = new();
+    private KillButtonSetting _currentKillButtonSetting;
 
     /// <summary>
     ///     Initializes a sub-role instance.
@@ -202,7 +202,8 @@ public class CustomRole
     /// </summary>
     public static Action<CustomRole, CustomButton> OnRoleAbilityUsed { get; set; } = (_, button) =>
     {
-        EventRecorder.Instance.RpcRecord<UseAbilityGameEvent, UseAbilityEventSender>(new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
+        EventRecorder.Instance.RpcRecord<UseAbilityGameEvent, UseAbilityEventSender>(
+            new UseAbilityGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), button));
     };
 
     public ReadOnlyCollection<PlayerControl> Players =>

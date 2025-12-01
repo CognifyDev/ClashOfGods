@@ -1,31 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
+﻿using TMPro;
 
-namespace COG.UI.Hud.RoleHelp
+namespace COG.UI.Hud.RoleHelp;
+
+public class RoleHelpersBase
 {
-    public class RoleHelpersBase
+    public RoleHelpersBase(TextMeshPro title, TextMeshPro subtitle, TextMeshPro text, SecondTextType type)
     {
-        public RoleHelpersBase(TextMeshPro title, TextMeshPro subtitle, TextMeshPro text, SecondTextType type)
-        {
-            Title = title;
-            SubTtile = subtitle;
-            Text = text;
-            Type = type;
-        }
-        public TextMeshPro Title {  get; set; }
-        public TextMeshPro SubTtile { get; set; }
-        public TextMeshPro Text { get; set; }
-        public SecondTextType Type {  get; set; }
+        Title = title;
+        SubTtile = subtitle;
+        Text = text;
+        Type = type;
     }
-    public enum SecondTextType
-    {
-        None,
-        Option,
-        Button,
-        Special
-    }
+
+    public TextMeshPro Title { get; set; }
+    public TextMeshPro SubTtile { get; set; }
+    public TextMeshPro Text { get; set; }
+    public SecondTextType Type { get; set; }
+}
+
+public enum SecondTextType
+{
+    None,
+    Option,
+    Button,
+    Special
 }

@@ -241,10 +241,11 @@ public static class RoleOptionPatch
                     scroller.ScrollToTop();
 
                     if (menu.advancedSettingChildren == null)
-                        menu.advancedSettingChildren = new();
+                        menu.advancedSettingChildren = new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
                     else
-                        menu.advancedSettingChildren = menu.advancedSettingChildren.ToArray().Where(o => o).ToIl2CppList();
-                    
+                        menu.advancedSettingChildren =
+                            menu.advancedSettingChildren.ToArray().Where(o => o).ToIl2CppList();
+
                     menu.ChangeTab(role.VanillaRole, button);
                 }));
             }

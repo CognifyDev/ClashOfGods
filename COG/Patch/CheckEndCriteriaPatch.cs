@@ -4,8 +4,9 @@
 public static class CheckEndCriteriaPatch
 {
     public static bool NoEndGame { get; internal set; } = false!;
+
     public static bool Prefix()
     {
-        return !(NoEndGame);
+        return !NoEndGame;
     }
 }

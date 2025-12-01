@@ -25,10 +25,7 @@ public class Sheriff : CustomRole, IListener
             var localData = PlayerControl.LocalPlayer.Data;
             var current = button.currentTarget;
 
-            if (current!.GetMainRole().CampType != CampType.Crewmate)
-            {
-                return current;
-            }
+            if (current!.GetMainRole().CampType != CampType.Crewmate) return current;
 
             return PlayerControl.LocalPlayer;
         });

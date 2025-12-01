@@ -16,7 +16,7 @@ namespace COG.Role.Impl.Neutral;
 public class DeathBringer : CustomRole, IListener
 {
     // private const string PlayerStaredAtTag = "staredAt_DeathBringer";
-    
+
     private readonly CustomOption _killCooldown, _neededPlayerNumber;
 
     private readonly CustomButton _stareButton;

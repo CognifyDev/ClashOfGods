@@ -69,7 +69,8 @@ public class Witch : CustomRole, IListener
     public void OnMeetingStarts(MeetingStartEvent @event)
     {
         if (_shouldDieWhenMeetingStarts) // Other players should always have this being false
-        { } // TODO
+        {
+        } // TODO
     }
 
     [EventHandler(EventHandlerType.Postfix)]

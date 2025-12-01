@@ -10,11 +10,11 @@ namespace COG.Role.Impl.Impostor;
 
 public class Troublemaker : CustomRole
 {
-    private GameObject? _commsDown;
     private readonly CustomButton _disturbButton;
     private readonly CustomOption _disturbCooldown;
     private readonly CustomOption _disturbDuration;
     private readonly RpcHandler _disturbRpcHandler;
+    private GameObject? _commsDown;
 
     private bool _usedThisRound;
 

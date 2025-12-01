@@ -21,8 +21,6 @@ namespace COG.Listener.Impl;
 
 public class CustomGameEndLogicListener : IListener
 {
-    public static bool DisableGameEndLogic { get; set; }
-
     private static readonly int Color1 = Shader.PropertyToID("_Color");
     private readonly RpcHandler<byte[]> _winnerDataHandler;
     private bool _isEnding;
@@ -42,6 +40,8 @@ public class CustomGameEndLogicListener : IListener
 
         IRpcHandler.Register(_winnerDataHandler);
     }
+
+    public static bool DisableGameEndLogic { get; set; }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent _)

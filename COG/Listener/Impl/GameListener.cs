@@ -20,9 +20,9 @@ namespace COG.Listener.Impl;
 
 public class GameListener : IListener
 {
-    private readonly List<Handler> _handlers = new();
     private static readonly int Outline = Shader.PropertyToID("_Outline");
     private static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
+    private readonly List<Handler> _handlers = new();
 
     [EventHandler(EventHandlerType.Postfix)]
     public void AfterPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
@@ -164,8 +164,8 @@ public class GameListener : IListener
             _handlers.Clear();
         }
 
-        CustomRoleManager.GetManager().GetRoles().Select(role => role.GetListener()).ForEach(
-            listener => _handlers.AddRange(ListenerManager.GetManager().AsHandlers(listener)));
+        CustomRoleManager.GetManager().GetRoles().Select(role => role.GetListener()).ForEach(listener =>
+            _handlers.AddRange(ListenerManager.GetManager().AsHandlers(listener)));
 
         ListenerManager.GetManager().RegisterHandlers(_handlers.ToArray());
 

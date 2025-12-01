@@ -1,10 +1,10 @@
-﻿using COG.Listener.Event.Impl.Game;
+﻿using System.Collections.Generic;
+using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Game.Record;
 using COG.Rpc;
 using COG.Utils;
 using COG.Utils.Coding;
-using System.Collections.Generic;
-using UnityEngine.Analytics;
+
 // ReSharper disable InconsistentNaming
 
 namespace COG.Game.Events;
@@ -62,42 +62,6 @@ public class EventRecorder
 [HarmonyPatch]
 public static class GameEventPatch // not use listener for flexibility in patching
 {
-    #region 原版三种死亡方式
-    [HarmonyPatch(typeof(GameData), nameof(GameData.HandleDisconnect),
-        typeof(PlayerControl), typeof(DisconnectReasons))]
-    [HarmonyPrefix] // player might be null if we use postfix
-    private static void HandleDisconnectPatch(PlayerControl player)
-    {
-        EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()!));
-    }
-
-    internal readonly static List<CustomPlayerData> DisableOnceDeath = new();
-
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
-    [HarmonyPostfix]
-    private static void MurderPlayerPostfixPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] MurderResultFlags resultFlags)
-    {
-        if (!resultFlags.HasFlag(MurderResultFlags.Succeeded)) return;
-        var targetCached = target.GetPlayerData();
-
-        if (DisableOnceDeath.Contains(targetCached))
-        {
-            DisableOnceDeath.Remove(targetCached);
-            return;
-        }
-
-        EventRecorder.Instance.Record(new PlayerKillGameEvent(__instance.GetPlayerData(), target.GetPlayerData()));
-    }
-
-    [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
-    [HarmonyPostfix]
-    private static void ExilePatch([HarmonyArgument(0)] ExileController.InitProperties init)
-    {
-        if (!init.networkedPlayer) return;
-        EventRecorder.Instance.Record(new PlayerExileGameEvent(init.networkedPlayer.GetPlayerData()));
-    }
-    #endregion
-
     [HarmonyPatch(typeof(PlayerPhysics._CoEnterVent_d__47), nameof(PlayerPhysics._CoEnterVent_d__47.MoveNext))]
     [HarmonyPostfix] // not patch CoEnterVent as it is inlined
     private static void EnterVentPatch(PlayerPhysics._CoEnterVent_d__47 __instance, bool __result)
@@ -139,4 +103,42 @@ public static class GameEventPatch // not use listener for flexibility in patchi
             __instance.target.GetPlayerData()));
     }
 
+    #region 原版三种死亡方式
+
+    [HarmonyPatch(typeof(GameData), nameof(GameData.HandleDisconnect),
+        typeof(PlayerControl), typeof(DisconnectReasons))]
+    [HarmonyPrefix] // player might be null if we use postfix
+    private static void HandleDisconnectPatch(PlayerControl player)
+    {
+        EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()!));
+    }
+
+    internal static readonly List<CustomPlayerData> DisableOnceDeath = new();
+
+    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
+    [HarmonyPostfix]
+    private static void MurderPlayerPostfixPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target,
+        [HarmonyArgument(1)] MurderResultFlags resultFlags)
+    {
+        if (!resultFlags.HasFlag(MurderResultFlags.Succeeded)) return;
+        var targetCached = target.GetPlayerData();
+
+        if (DisableOnceDeath.Contains(targetCached))
+        {
+            DisableOnceDeath.Remove(targetCached);
+            return;
+        }
+
+        EventRecorder.Instance.Record(new PlayerKillGameEvent(__instance.GetPlayerData(), target.GetPlayerData()));
+    }
+
+    [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
+    [HarmonyPostfix]
+    private static void ExilePatch([HarmonyArgument(0)] ExileController.InitProperties init)
+    {
+        if (!init.networkedPlayer) return;
+        EventRecorder.Instance.Record(new PlayerExileGameEvent(init.networkedPlayer.GetPlayerData()));
+    }
+
+    #endregion
 }

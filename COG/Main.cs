@@ -2,28 +2,22 @@ global using HarmonyLib;
 global using Hazel;
 global using GitInfo = ThisAssembly.Git;
 global using Object = UnityEngine.Object;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using COG.Command;
-using COG.Command.Impl;
 using COG.Config;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Game.CustomWinner;
-using COG.Game.CustomWinner.Winnable;
-using COG.Game.Events;
 using COG.Listener;
-using COG.Listener.Event.Impl.Game.Record;
 using COG.Listener.Impl;
 using COG.Patch;
 using COG.Plugin;
-using COG.Plugin.JavaScript;
 using COG.Role;
-using COG.Role.Impl;
-using COG.Role.Impl.Crewmate;
-using COG.Role.Impl.Impostor;
-using COG.Role.Impl.Neutral;
-using COG.Role.Impl.SubRole;
 using COG.UI.ClientOption;
 using COG.UI.ClientOption.Impl;
 using COG.Utils;
@@ -31,10 +25,6 @@ using COG.Utils.Version;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
-using System;
-using System.IO;
-using System.Linq;
-using System.Text;
 using UnityEngine.SceneManagement;
 #if WINDOWS
 using System.Windows.Forms;
@@ -218,7 +208,8 @@ public partial class Main : BasePlugin
                         GameUtils.Popup?.Show(LanguageConfig.Instance.NoEndGameErrorMessage);
                         return false;
                     }
-                    else if (GameStates.InLobby)
+
+                    if (GameStates.InLobby)
                     {
                         GameUtils.Popup?.Show(LanguageConfig.Instance.NoEndGameTipMessage);
                         return false;
@@ -229,7 +220,9 @@ public partial class Main : BasePlugin
                     else
                         CheckEndCriteriaPatch.NoEndGame = true;
 
-                    GameUtils.Popup?.Show(CheckEndCriteriaPatch.NoEndGame?LanguageConfig.Instance.NoEndGameInfoMessage:LanguageConfig.Instance.NoEndGameOff);
+                    GameUtils.Popup?.Show(CheckEndCriteriaPatch.NoEndGame
+                        ? LanguageConfig.Instance.NoEndGameInfoMessage
+                        : LanguageConfig.Instance.NoEndGameOff);
                     return false;
                 }),
 #if WINDOWS
@@ -243,7 +236,7 @@ public partial class Main : BasePlugin
                             "You're trying to load the custom language in the game.\nIt may occur some unexpected glitches.\nPlease leave to reload.");
                         return false;
                     }
-                    
+
                     var openFileDialog = new OpenFileDialog();
                     openFileDialog.DefaultExt = "yml";
                     openFileDialog.InitialDirectory =
@@ -257,7 +250,7 @@ public partial class Main : BasePlugin
                     return false;
                 }),
 #endif
-             new ToggleClientOption("hotkey.name",
+            new ToggleClientOption("hotkey.name",
                 false,
                 _ =>
                 {
@@ -320,7 +313,8 @@ public partial class Main : BasePlugin
     public override bool Unload()
     {
         if (SettingsConfig.Instance.EnablePluginSystem)
-            IPluginManager.GetDefaultManager().GetPlugins().ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
+            IPluginManager.GetDefaultManager().GetPlugins()
+                .ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();

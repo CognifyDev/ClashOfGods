@@ -41,7 +41,7 @@ internal class IntroDestroyPatch
 #if WINDOWS
         IntroCutscene __instance
 #endif
-        )
+    )
     {
 #if ANDROID
         var __instance = DestroyableSingleton<IntroCutscene>.Instance;
@@ -54,7 +54,7 @@ internal class IntroDestroyPatch
 #if WINDOWS
         IntroCutscene __instance
 #endif
-        )
+    )
     {
 #if ANDROID
         var __instance = DestroyableSingleton<IntroCutscene>.Instance;

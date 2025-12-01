@@ -17,7 +17,7 @@ internal class SetUpRoleTextPatch
 #elif ANDROID
         IntroCutscene._ShowRole_d__40
 #endif
-        __instance)
+            __instance)
     {
         var @event = new IntroCutsceneShowRoleEvent(__instance.__4__this);
         ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Postfix);

@@ -1,47 +1,47 @@
-﻿using COG.Config.Impl;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using COG.Config.Impl;
 using COG.Constant;
 using COG.Role;
 using COG.Role.Impl.SubRole;
 using COG.Utils;
 using COG.Utils.Coding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace COG.UI.Hud.Meeting;
 
 public class GuesserButton
 {
-    public static List<GuesserButton> Buttons { get; } = new();
-
     private const string GuessButtonName = "GuessButton";
+    private readonly PlayerVoteArea _area;
+    private readonly GameObject _guessButton;
+    private readonly Guesser _guesser;
 
     private readonly NetworkedPlayerInfo? _target;
-    private readonly PlayerVoteArea _area;
+    private PassiveButton? _confirmButton;
 
-    private GameObject? _container = null;
+    private GameObject? _container;
+    private int _page = 1;
+    private GameObject? _roleButtonContainer;
+    private IEnumerable<CustomRole> _roles;
     private SpriteRenderer? _selectedButton;
     private CustomRole? _selectedRole;
-    private IEnumerable<CustomRole> _roles;
-    private PassiveButton? _confirmButton;
-    private GameObject? _roleButtonContainer;
-    private GameObject _guessButton;
-    private Guesser _guesser;
-    private int _page = 1;
 
     /// <summary>
     ///     赌怪按钮
     /// </summary>
-    public GuesserButton(GameObject template, PlayerVoteArea playerVoteArea, Guesser guesser ,MeetingHud meetingHud)
+    public GuesserButton(GameObject template, PlayerVoteArea playerVoteArea, Guesser guesser, MeetingHud meetingHud)
     {
         _guessButton = Object.Instantiate(template, playerVoteArea.transform);
         _guesser = guesser;
         _target = PlayerUtils.GetPlayerById(playerVoteArea.TargetPlayerId)!.Data;
         _area = playerVoteArea;
         _guessButton.name = GuessButtonName;
-        _guessButton.transform.localPosition = new(-0.95f, 0.03f, -1.3f);
+        _guessButton.transform.localPosition = new Vector3(-0.95f, 0.03f, -1.3f);
         var renderer = _guessButton.GetComponent<SpriteRenderer>();
         renderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.GuessButton, 150F);
         var passive = _guessButton.GetComponent<PassiveButton>();
@@ -50,25 +50,29 @@ public class GuesserButton
 
         Buttons.Add(this);
         Main.Logger.LogInfo($"赌怪仅显示启用职业预设 {_guesser.EnabledRolesOnly.GetBool().ToString()}");
-        _roles = _guesser.EnabledRolesOnly.GetBool() ? GetCustomRolesFromPlayers() : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole);
+        _roles = _guesser.EnabledRolesOnly.GetBool()
+            ? GetCustomRolesFromPlayers()
+            : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole);
     }
+
+    public static List<GuesserButton> Buttons { get; } = new();
 
     public void OpenGuessUI(MeetingHud meetingHud)
     {
-        if (meetingHud.state != MeetingHud.VoteStates.NotVoted) return;//在等待投票过程中，弃票按钮不显示，导致无法实例化页面取消按钮
+        if (meetingHud.state != MeetingHud.VoteStates.NotVoted) return; //在等待投票过程中，弃票按钮不显示，导致无法实例化页面取消按钮
         _guesser.CurrentGuessing = _target;
 
         ResetState();
         MeetingHud.Instance.ButtonParent.gameObject.SetActive(false);
 
-        _container = new("GuesserButtons");
+        _container = new GameObject("GuesserButtons");
         _container.transform.SetParent(MeetingHud.Instance.ButtonParent.transform.parent);
         _container.transform.localPosition = Vector3.zero;
         _container.transform.localScale = Vector3.one;
 
         var titleTemplate = MeetingHud.Instance.TitleText;
         var title = Object.Instantiate(titleTemplate, _container.transform);
-        title.transform.localPosition = new(0, 2.2f, -1);
+        title.transform.localPosition = new Vector3(0, 2.2f, -1);
         title.TryDestroyComponent<TextTranslatorTMP>();
         title.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game").GetString("ui-title");
 
@@ -81,7 +85,7 @@ public class GuesserButton
     {
         var newArea = Object.Instantiate(_area, _container!.transform);
         newArea.transform.localScale = Vector3.one;
-        newArea.transform.localPosition = new(0, 1.5f, 0);
+        newArea.transform.localPosition = new Vector3(0, 1.5f, 0);
         newArea.transform.FindChild(GuessButtonName).gameObject.TryDestroy();
     }
 
@@ -133,10 +137,13 @@ public class GuesserButton
                 nameText.text = currentRole.GetColorName();
 
                 nameText.transform.localPosition = Vector3.zero;
-                nameText.transform.localScale = new(1.5f, 1.5f, 1f);
-                roleButton.transform.FindChild("votePlayerBase").FindChild("ControllerHighlight").GetComponentInChildren<SpriteRenderer>().enabled = false;
-                roleButton.transform.localScale = new(0.7f, 0.7f, 1f);
-                roleButton.transform.GetAllChildren().DoIf(c => !new[] { "MaskArea", "votePlayerBase", "NameText" }.Contains(c.name), c => c.gameObject.TryDestroy());
+                nameText.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+                roleButton.transform.FindChild("votePlayerBase").FindChild("ControllerHighlight")
+                    .GetComponentInChildren<SpriteRenderer>().enabled = false;
+                roleButton.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
+                roleButton.transform.GetAllChildren()
+                    .DoIf(c => !new[] { "MaskArea", "votePlayerBase", "NameText" }.Contains(c.name),
+                        c => c.gameObject.TryDestroy());
 
                 roleButton.SetActive(false);
                 roleButton.TryDestroyComponent<PlayerVoteArea>();
@@ -146,7 +153,7 @@ public class GuesserButton
                 var highlight = votePlayerBase.FindChild("ControllerHighlight").GetComponent<SpriteRenderer>();
                 highlight.enabled = false;
                 var passive = votePlayerBase.GetComponent<PassiveButton>();
-                passive.OnClick = new();
+                passive.OnClick = new Button.ButtonClickedEvent();
                 passive.OnClick.AddListener(new Action(() =>
                 {
                     if (_selectedButton)
@@ -161,8 +168,8 @@ public class GuesserButton
                     if (!_confirmButton)
                         SetUpConfirmButton();
                 }));
-                passive.OnMouseOut = new();
-                passive.OnMouseOver = new();
+                passive.OnMouseOut = new UnityEvent();
+                passive.OnMouseOver = new UnityEvent();
                 passive.OnMouseOut.AddListener(new Action(() =>
                     highlight.enabled = _selectedButton == highlight));
                 passive.OnMouseOver.AddListener(new Action(() =>
@@ -178,31 +185,27 @@ public class GuesserButton
     public void SetUpPageButton(bool previousPage, bool nextPage)
     {
         if (previousPage)
-        {
-            CreateBottomButton(LanguageConfig.Instance.PreviousPage, new(-2.5f, -2.2f, 0f), () =>
+            CreateBottomButton(LanguageConfig.Instance.PreviousPage, new Vector3(-2.5f, -2.2f, 0f), () =>
             {
                 _roleButtonContainer.TryDestroy();
                 SetUpRolePage(_page - 1);
             });
-        }
         if (nextPage)
-        {
-            CreateBottomButton(LanguageConfig.Instance.NextPage, new(2.5f, -2.2f, 0f), () =>
+            CreateBottomButton(LanguageConfig.Instance.NextPage, new Vector3(2.5f, -2.2f, 0f), () =>
             {
                 _roleButtonContainer.TryDestroy();
                 SetUpRolePage(_page + 1);
             });
-        }
     }
 
     public void SetUpCancelButton()
     {
-        CreateBottomButton(LanguageConfig.Instance.Cancel, new(-3.6f, -2.2f, 0f), CloseGuessUI);
+        CreateBottomButton(LanguageConfig.Instance.Cancel, new Vector3(-3.6f, -2.2f, 0f), CloseGuessUI);
     }
 
     public void SetUpConfirmButton()
     {
-        _confirmButton = CreateBottomButton(LanguageConfig.Instance.Confirm, new(3.6f, -2.2f, 0f), DestroyAll);
+        _confirmButton = CreateBottomButton(LanguageConfig.Instance.Confirm, new Vector3(3.6f, -2.2f, 0f), DestroyAll);
     }
 
     public PassiveButton CreateBottomButton(string text, Vector3 localPosition, Action onClick)
@@ -217,10 +220,10 @@ public class GuesserButton
         var highlight = passive.transform.FindChild("ControllerHighlight").GetComponent<SpriteRenderer>();
         highlight.enabled = false;
 
-        passive.OnClick = new();
+        passive.OnClick = new Button.ButtonClickedEvent();
         passive.OnClick.AddListener(onClick);
-        passive.OnMouseOut = new();
-        passive.OnMouseOver = new();
+        passive.OnMouseOut = new UnityEvent();
+        passive.OnMouseOver = new UnityEvent();
         passive.OnMouseOut.AddListener(new Action(() => highlight.enabled = false));
         passive.OnMouseOver.AddListener(new Action(() => highlight.enabled = true));
 
@@ -245,10 +248,10 @@ public class GuesserButton
     {
         if (!_target) return;
 
-        PlayerControl.LocalPlayer.RpcMurderAdvanced(new(false,
-            new(true, PlayerControl.AllPlayerControls.ToArray()
-            .Where(p => !p.AmOwner), // Dont show animtion to guesser
-            _target!, _target!), _target!.Object));
+        PlayerControl.LocalPlayer.RpcMurderAdvanced(new AdvancedKillOptions(false,
+            new KillAnimationOptions(true, PlayerControl.AllPlayerControls.ToArray()
+                    .Where(p => !p.AmOwner), // Dont show animtion to guesser
+                _target!, _target!), _target!.Object));
         _guesser.GuessedTime++;
     }
 
@@ -260,19 +263,13 @@ public class GuesserButton
         var customRoles = players.Select(player => player.GetMainRole()).ToList();
 
         if (canGuessSubRoles)
-        {
             players.Select(player => player.GetSubRoles()).ForEach(roles =>
             {
                 if (!roles.Any()) return;
                 foreach (var customRole in roles)
-                {
                     if (!customRoles.Select(role => role.Id).Contains(customRole.Id))
-                    {
                         customRoles.Add(customRole);
-                    }
-                }
             });
-        }
 
         return customRoles.ToArray();
     }
@@ -288,11 +285,13 @@ public class GuesserButton
         _roleButtonContainer = null;
         //_area.TryDestroyGameObject(); // <!> 销毁_area会导致MeetingHud报错
     }
+
     public void ResetRoleArea()
     {
         _area.TryDestroyGameObject();
         _roles = Array.Empty<CustomRole>();
     }
+
     public static void DestroyAll()
     {
         Buttons.ForEach(b =>

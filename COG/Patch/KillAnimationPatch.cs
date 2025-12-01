@@ -3,7 +3,7 @@ namespace COG.Patch;
 [HarmonyPatch]
 internal static class KillAnimationPatch
 {
-    public static bool DisableNextAnim = false;
+    public static bool DisableNextAnim;
 
     [HarmonyPatch(typeof(KillAnimation._CoPerformKill_d__2), nameof(KillAnimation._CoPerformKill_d__2.MoveNext))]
     [HarmonyPrefix]
@@ -15,6 +15,7 @@ internal static class KillAnimationPatch
             DisableNextAnim = false;
             return false;
         }
+
         return true;
     }
 }

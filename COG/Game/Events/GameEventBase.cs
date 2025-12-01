@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using COG.Rpc;
 using COG.Utils;
 
@@ -20,7 +18,7 @@ public abstract class GameEventBase : IGameEvent
     public CustomPlayerData? Player { get; }
 }
 
-public abstract class NetworkedGameEventBase<TEvent, TSender> : GameEventBase 
+public abstract class NetworkedGameEventBase<TEvent, TSender> : GameEventBase
     where TEvent : NetworkedGameEventBase<TEvent, TSender>
     where TSender : NetworkedGameEventSender<TSender, TEvent>, new()
 {
@@ -31,10 +29,11 @@ public abstract class NetworkedGameEventBase<TEvent, TSender> : GameEventBase
     public TSender EventSender => NetworkedGameEventSender<TSender, TEvent>.Instance;
 }
 
-public abstract class NetworkedGameEventSender<TSelf, TEvent> where TSelf : NetworkedGameEventSender<TSelf, TEvent>, new()
+public abstract class NetworkedGameEventSender<TSelf, TEvent>
+    where TSelf : NetworkedGameEventSender<TSelf, TEvent>, new()
 {
-    public static TSelf Instance => _instance ??= new();
     private static TSelf? _instance;
+    public static TSelf Instance => _instance ??= new TSelf();
 
     public abstract void Serialize(RpcWriter writer, TEvent correspondingEvent);
 

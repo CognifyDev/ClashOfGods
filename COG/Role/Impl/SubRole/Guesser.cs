@@ -1,4 +1,5 @@
-﻿using COG.Config.Impl;
+﻿using System.Linq;
+using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
@@ -6,7 +7,6 @@ using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.Meeting;
 using COG.Utils;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -14,6 +14,8 @@ namespace COG.Role.Impl.SubRole;
 
 public class Guesser : CustomRole, IListener
 {
+    private TextMeshPro? _remainingGuessText;
+
     public Guesser() : base(ColorUtils.FromColor32(192, 0, 0))
     {
         MaxGuessTime = CreateOption(() => LanguageConfig.Instance.GuesserMaxGuessTime,
@@ -28,14 +30,13 @@ public class Guesser : CustomRole, IListener
 
     public CustomOption MaxGuessTime { get; }
     public CustomOption GuessContinuously { get; }
+
     public CustomOption EnabledRolesOnly { get; }
     // public CustomOption CanGuessSubRoles { get; }
 
     public int GuessedTime { get; internal set; }
 
     public NetworkedPlayerInfo? CurrentGuessing { get; set; }
-
-    private TextMeshPro? _remainingGuessText;
 
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -54,7 +55,7 @@ public class Guesser : CustomRole, IListener
         _remainingGuessText.name = "RemainingGuessInfo";
         _remainingGuessText.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
             .GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
-        
+
         if (GuessedTime >= MaxGuessTime.GetInt()) return;
 
         // WARNING: NO FOREACH
@@ -65,8 +66,7 @@ public class Guesser : CustomRole, IListener
             // 如果断联或死了或者是当前玩家则不要布置
             if (playerVoteArea == null || playerVoteArea.AmDead ||
                 playerVoteArea.TargetPlayerId == player.PlayerId ||
-                GameUtils.PlayerData.First(
-                    pd => pd.PlayerId == playerVoteArea.TargetPlayerId)
+                GameUtils.PlayerData.First(pd => pd.PlayerId == playerVoteArea.TargetPlayerId)
                     .IsDisconnected) continue;
             _ = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
                 playerVoteArea, this, meetingHud);
@@ -82,10 +82,8 @@ public class Guesser : CustomRole, IListener
     public override void OnUpdate()
     {
         if (_remainingGuessText)
-        {
             _remainingGuessText!.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
                 .GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
-        }
 
         if (CurrentGuessing)
         {

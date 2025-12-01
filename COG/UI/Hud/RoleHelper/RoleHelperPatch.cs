@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
-using static COG.Utils.ResourceUtils;
 
-namespace COG.UI.Hud.RoleHelper
+namespace COG.UI.Hud.RoleHelper;
+
+[HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
+public static class RoleHelperPatch
 {
-    [HarmonyPatch(typeof(HudManager),nameof(HudManager.Update))]
-    public static class RoleHelperPatch
+    public static GameObject Panel;
+    public static TextMeshPro Title;
+    public static TextMeshPro SubTitle;
+    public static TextMeshPro Text;
+
+    public static void IntiAll(HudManager hud)
     {
-        public static GameObject Panel;
-        public static TextMeshPro Title;
-        public static TextMeshPro SubTitle;
-        public static TextMeshPro Text;
-        public static void IntiAll(HudManager hud)
-        {
-        }
     }
 }

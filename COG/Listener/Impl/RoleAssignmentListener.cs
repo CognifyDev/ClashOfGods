@@ -1,13 +1,13 @@
-using COG.Constant;
-using COG.Listener.Event.Impl.RManager;
-using COG.Role;
-using COG.Rpc;
-using COG.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using COG.Constant;
+using COG.Listener.Event.Impl.RManager;
+using COG.Role;
+using COG.Rpc;
+using COG.Utils;
 
 namespace COG.Listener.Impl;
 
@@ -26,8 +26,9 @@ public class RoleAssignmentListener : IListener
                     data.Player.SetCustomRole(data.MainRole, data.SubRoles);
                 }
 
-                Main.Logger.LogDebug(playerData.Select(playerRole => $"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
-                                    $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}"));
+                Main.Logger.LogDebug(playerData.Select(playerRole =>
+                    $"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
+                    $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}"));
             },
             (writer, count, data) =>
             {
@@ -48,8 +49,9 @@ public class RoleAssignmentListener : IListener
                 var count = reader.ReadPackedInt32();
                 var list = new List<CustomPlayerData>();
 
-                for (int i = 0; i < count; i++)
-                    list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<SerializablePlayerData>().ToPlayerData());
+                for (var i = 0; i < count; i++)
+                    list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<SerializablePlayerData>()
+                        .ToPlayerData());
 
                 return (count, list.ToArray());
             }
@@ -187,10 +189,7 @@ public class RoleAssignmentListener : IListener
             subRoleData.TryGetValue(randomPlayer, out var existRoles);
             if (existRoles != null && existRoles.Length >= maxSubRoleNumber) continue;
             var roles = new List<CustomRole>();
-            if (existRoles != null)
-            {
-                roles.AddRange(existRoles);
-            }
+            if (existRoles != null) roles.AddRange(existRoles);
 
             var customRole = subRoleGetter.GetNext();
 
@@ -225,10 +224,10 @@ public class RoleAssignmentListener : IListener
         var sb = new StringBuilder();
         foreach (var playerRole in GameUtils.PlayerData)
             sb.AppendLine($"""
-                {playerRole.Player.name}({playerRole.PlayerId}) 
-                    => {playerRole.MainRole.GetNormalName()}  with sub role(s):
-                    {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).AsString()}
-                """);
+                           {playerRole.Player.name}({playerRole.PlayerId}) 
+                               => {playerRole.MainRole.GetNormalName()}  with sub role(s):
+                               {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).AsString()}
+                           """);
 
         Main.Logger.LogWarning("Message below is for debugging, not for cheating!");
         Main.Logger.LogInfo(sb.ToString());

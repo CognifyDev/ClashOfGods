@@ -33,6 +33,7 @@ public static class GameObjectUtils
         if (!comp) return;
         comp!.gameObject.TryDestroy();
     }
+
     public static GameObject CreateObject(string objName, Transform parent, Vector3 localPosition, int? layer = null)
     {
         var obj = new GameObject(objName);
@@ -46,7 +47,8 @@ public static class GameObjectUtils
         return obj;
     }
 
-    public static T CreateObject<T>(string objName, Transform parent, Vector3 localPosition, int? layer = null) where T : Component
+    public static T CreateObject<T>(string objName, Transform parent, Vector3 localPosition, int? layer = null)
+        where T : Component
     {
         return CreateObject(objName, parent, localPosition, layer).AddComponent<T>();
     }
