@@ -4,28 +4,18 @@ using COG.Utils;
 
 namespace COG.Game.Events;
 
-public abstract class GameEventBase : IGameEvent
+public abstract class GameEventBase(GameEventType eventType, CustomPlayerData? player) : IGameEvent
 {
-    public GameEventBase(GameEventType eventType, CustomPlayerData? player)
-    {
-        Time = DateTime.Now;
-        EventType = eventType;
-        Player = player;
-    }
-
-    public DateTime Time { get; }
-    public GameEventType EventType { get; }
-    public CustomPlayerData? Player { get; }
+    public DateTime Time { get; } = DateTime.Now;
+    public GameEventType EventType { get; } = eventType;
+    public CustomPlayerData? Player { get; } = player;
 }
 
-public abstract class NetworkedGameEventBase<TEvent, TSender> : GameEventBase
+public abstract class NetworkedGameEventBase<TEvent, TSender>(GameEventType eventType, CustomPlayerData? player)
+    : GameEventBase(eventType, player)
     where TEvent : NetworkedGameEventBase<TEvent, TSender>
     where TSender : NetworkedGameEventSender<TSender, TEvent>, new()
 {
-    public NetworkedGameEventBase(GameEventType eventType, CustomPlayerData? player) : base(eventType, player)
-    {
-    }
-
     public TSender EventSender => NetworkedGameEventSender<TSender, TEvent>.Instance;
 }
 

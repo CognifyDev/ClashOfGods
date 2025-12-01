@@ -7,6 +7,9 @@ namespace COG.Utils;
 
 public static class DeadBodyUtils
 {
+    private static readonly int Outline = Shader.PropertyToID("_Outline");
+    private static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
+
     public static List<DeadBody> GetDeadBodies()
     {
         return Object.FindObjectsOfType<DeadBody>().ToList();
@@ -30,13 +33,13 @@ public static class DeadBodyUtils
     {
         body.bodyRenderers.Do(r =>
         {
-            r.material.SetInt("_Outline", 1);
-            r.material.SetColor("_OutlineColor", color);
+            r.material.SetInt(Outline, 1);
+            r.material.SetColor(OutlineColor, color);
         });
     }
 
     public static void ClearOutline(this DeadBody body)
     {
-        body.bodyRenderers.Do(r => r.material.SetInt("_Outline", 0));
+        body.bodyRenderers.Do(r => r.material.SetInt(Outline, 0));
     }
 }

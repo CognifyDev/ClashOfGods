@@ -10,7 +10,7 @@ public class CustomRoleManager
 {
     private static readonly CustomRoleManager Manager = new();
 
-    private readonly List<CustomRole> _roles = new();
+    private readonly List<CustomRole> _roles = [];
 
     public CustomRole[] GetTypeCampRoles(CampType campType)
     {
@@ -92,7 +92,7 @@ public class CustomRoleManager
             CustomRoles = CustomRoles.Disarrange();
         }
 
-        private List<CustomRole> CustomRoles { get; } = new();
+        private List<CustomRole> CustomRoles { get; } = [];
 
         public CustomRole GetNext()
         {

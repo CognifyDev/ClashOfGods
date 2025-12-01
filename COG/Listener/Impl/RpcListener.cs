@@ -1,5 +1,4 @@
 using System.Linq;
-using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Rpc;
