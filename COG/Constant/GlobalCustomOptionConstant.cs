@@ -20,6 +20,10 @@ public static class GlobalCustomOptionConstant
             new IntOptionValueRule(0, 1, 10, 1)).Register();
     }
 
+    public static void Init()
+    {
+    }
+
     public static CustomOption DebugMode { get; }
     public static CustomOption MaxSubRoleNumber { get; }
     public static CustomOption MaxNeutralNumber { get; }

@@ -68,19 +68,6 @@ public partial class Main : BasePlugin
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
         Logger.LogInfo($"GitInfo: {GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})");
-/*
-        ResourceUtils.WriteToFileFromResource(
-            @".\BepInEx\core\Jint.dll",
-            ResourceUtils.GetResourcePath("Libraries.Jint.dll")
-        );
-        ResourceUtils.WriteToFileFromResource(
-            @".\BepInEx\core\YamlDotNet.dll",
-            ResourceUtils.GetResourcePath("Libraries.YamlDotNet.dll")
-        );
-        ResourceUtils.WriteToFileFromResource(
-            @".\BepInEx\core\Acornima.dll",
-            ResourceUtils.GetResourcePath("Libraries.Acornima.dll")
-        );*/
 
         var longVersionInfo = StringUtils.EncodeToBase64($"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}");
         var storagedInfo = "";
@@ -316,7 +303,7 @@ public partial class Main : BasePlugin
         //        IPluginManager.GetDefaultManager().LoadPlugin(file);
         //}
 
-        _ = GlobalCustomOptionConstant.DebugMode; //调用静态构造函数
+        GlobalCustomOptionConstant.Init();
     }
 
     public override bool Unload()
