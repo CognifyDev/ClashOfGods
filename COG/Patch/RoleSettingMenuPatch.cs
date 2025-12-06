@@ -25,16 +25,6 @@ public static class RoleOptionPatch
     public static float ScrollerLocationPercent { get; set; }
     public static Dictionary<CampType, (GameObject gameObject, PassiveButton tabButton)> CampTabs { get; } = new();
 
-    //[HarmonyPatch(nameof(RolesSettingsMenu.CreateAdvancedSettings))]
-    //[HarmonyPrefix]
-    //private static void BeforeSettingCreation(RolesSettingsMenu __instance)
-    //{
-    //    __instance.advancedSettingChildren ??= new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
-    //    foreach (var behaviour in __instance.advancedSettingChildren.ToArray().Where(o => o))
-    //        behaviour.gameObject.TryDestroy();
-    //    __instance.advancedSettingChildren.Clear(); // Fix advanced tab couldn't be opened
-    //}
-
     [HarmonyPatch(nameof(RolesSettingsMenu.OnEnable))]
     [HarmonyPostfix]
     private static void OnMenuInitialization(RolesSettingsMenu __instance)
@@ -105,8 +95,7 @@ public static class RoleOptionPatch
         var options = __instance.advancedSettingChildren;
         foreach (var option in options)
         {
-            var customOption = CustomOption.Options.Where(o => o != null)
-                .FirstOrDefault(o => o.VanillaData == option.Data);
+            var customOption = CustomOption.Options.FirstOrDefault(o => o.VanillaData == option.Data);
             if (customOption == null) return;
 
             customOption.OptionBehaviour = option;
@@ -286,7 +275,7 @@ public static class RoleOptionPatch
             ControllerManager.Instance.OpenOverlayMenu(tab.name, menu.BackButton, elements.FirstOrDefault(),
                 elements.ToIl2CppList());
             ChangeCustomTab(menu, tab, button, camp);
-            // idk if code below is useful, but keeping it is not a bad idea
+            // idk whether code below works or not, but keeping it is not a bad idea
             menu.ControllerSelectable.Clear();
             menu.ControllerSelectable = elements.ToIl2CppList();
             ControllerManager.Instance.CurrentUiState.SelectableUiElements = menu.ControllerSelectable;

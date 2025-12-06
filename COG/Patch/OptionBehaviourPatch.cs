@@ -1,4 +1,5 @@
 using System.Linq;
+using AmongUs.GameOptions;
 using COG.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -56,6 +57,22 @@ public static class OptionBehaviourPatch
         if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
         customOption!.UpdateSelection(__instance.GetInt());
         return false;
+    }
+
+    [HarmonyPatch(typeof(NumberOption), nameof(NumberOption.AdjustButtonsActiveState))]
+    [HarmonyPrefix]
+    private static bool NumberOptionAdjectButtonsActiveStateFixer(NumberOption __instance)
+    {
+        if (!CustomOption.TryGetOption(__instance, out _)) return true;
+        return !__instance.TitleText.text.Equals("STRMISS");
+    }
+    
+    [HarmonyPatch(typeof(StringOption), nameof(StringOption.AdjustButtonsActiveState))]
+    [HarmonyPrefix]
+    private static bool StringOptionAdjectButtonsActiveStateFixer(StringOption __instance)
+    {
+        if (!CustomOption.TryGetOption(__instance, out _)) return true;
+        return !__instance.TitleText.text.Equals("STRMISS");
     }
 
     [HarmonyPatch(typeof(ToggleOption), nameof(ToggleOption.Toggle))]
