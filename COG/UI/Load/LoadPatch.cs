@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
-using COG;
 using COG.Command;
 using COG.Command.Impl;
 using COG.Config.Impl;
@@ -23,30 +22,30 @@ using UnityEngine;
 using static COG.Utils.GameObjectUtils;
 using static COG.Utils.ResourceUtils;
 
-namespace FracturedTruth.Patches.Load;
+namespace COG.UI.Load;
 
 [HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
 public static class LoadPatch
 {
-    private static readonly Sprite logoSprite = LoadSprite("COG.Resources.Images.COG-BG.png", 300f);
-    private static readonly Sprite bgSprite = LoadSprite("COG.Resources.Images.COG-LOADBG.png");
-    public static TextMeshPro loadText = null!;
+    private static readonly Sprite LogoSprite = LoadSprite("COG.Resources.Images.COG-BG.png", 300f);
+    private static readonly Sprite BgSprite = LoadSprite("COG.Resources.Images.COG-LOADBG.png");
+    public static TextMeshPro LoadText = null!;
 
-    public static bool loadedTeamLogo;
+    public static bool LoadedTeamLogo;
 
-    private static bool loadedFracturedTruth;
+    private static bool _loadedFracturedTruth;
 
     // 添加一个标志来跟踪TeamLogo是否还在显示
-    public static bool teamLogoActive;
+    public static bool TeamLogoActive;
 
     public static string LoadingText
     {
-        set => loadText.text = value;
+        set => LoadText.text = value;
     }
 
-    public static IEnumerator CoLoadTeamLogo(SplashManager __instance)
+    public static IEnumerator CoLoadTeamLogo(SplashManager instance)
     {
-        teamLogoActive = true;
+        TeamLogoActive = true;
 
         // 创建logo对象，初始状态为透明
         var logo = CreateObject<SpriteRenderer>("TeamLogo", null, new Vector3(0, 0.5f, -5f));
@@ -55,7 +54,7 @@ public static class LoadPatch
         logo.transform.localScale = Vector3.one * 0.8f;
 
         // 创建团队名称文字
-        var teamText = GameObject.Instantiate(__instance.errorPopup.InfoText, null);
+        var teamText = GameObject.Instantiate(instance.errorPopup.InfoText, null);
         teamText.transform.localPosition = new Vector3(0f, -1f, -10f); // 放在logo下方
         teamText.fontStyle = FontStyles.Bold;
         teamText.text = "CognifyDev";
@@ -113,17 +112,17 @@ public static class LoadPatch
         if (teamText != null)
             GameObject.Destroy(teamText.gameObject);
 
-        teamLogoActive = false;
+        TeamLogoActive = false;
     }
 
-    private static IEnumerator CoLoadFracturedTruth(SplashManager __instance)
+    private static IEnumerator CoLoadFracturedTruth(SplashManager instance)
     {
         var logo = CreateObject<SpriteRenderer>("COG-BG", null, new Vector3(0, 0.5f, -5f));
-        logo.sprite = logoSprite;
+        logo.sprite = LogoSprite;
         logo.color = Color.clear;
 
         var bg = CreateObject<SpriteRenderer>("COG-LOADBG", null, new Vector3(0, 0.5f, -5f));
-        bg.sprite = bgSprite;
+        bg.sprite = BgSprite;
         bg.color = Color.clear;
 
         // 使用 Mathf.SmoothStep 替代复杂的缓动函数
@@ -153,18 +152,18 @@ public static class LoadPatch
         }
 
         // 创建初始加载文字
-        loadText = GameObject.Instantiate(__instance.errorPopup.InfoText, null);
-        loadText.transform.localPosition = new Vector3(0f, -0.28f, -10f);
-        loadText.fontStyle = FontStyles.Bold;
-        loadText.text = LanguageConfig.Instance.Loading;
-        loadText.color = new Color(1, 1, 1, 0);
+        LoadText = GameObject.Instantiate(instance.errorPopup.InfoText, null);
+        LoadText.transform.localPosition = new Vector3(0f, -0.28f, -10f);
+        LoadText.fontStyle = FontStyles.Bold;
+        LoadText.text = LanguageConfig.Instance.Loading;
+        LoadText.color = new Color(1, 1, 1, 0);
 
         // 文字淡入
         elapsed = 0f;
         while (elapsed < 0.8f)
         {
             elapsed += Time.deltaTime;
-            loadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), elapsed / 0.8f);
+            LoadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), elapsed / 0.8f);
             yield return null;
         }
 
@@ -299,13 +298,13 @@ public static class LoadPatch
 
         // 将文字颜色改为绿色
         elapsed = 0f;
-        var startColor = loadText.color;
+        var startColor = LoadText.color;
         var targetColor = Color.green.AlphaMultiplied(0.6f);
 
         while (elapsed < 0.5f)
         {
             elapsed += Time.deltaTime;
-            loadText.color = Color.Lerp(startColor, targetColor, elapsed / 0.5f);
+            LoadText.color = Color.Lerp(startColor, targetColor, elapsed / 0.5f);
             yield return null;
         }
 
@@ -317,7 +316,7 @@ public static class LoadPatch
             {
                 elapsed += Time.deltaTime;
                 var alpha = 0.6f + Mathf.Sin(elapsed * 20f) * 0.2f;
-                loadText.color = Color.green.AlphaMultiplied(alpha);
+                LoadText.color = Color.green.AlphaMultiplied(alpha);
                 yield return null;
             }
         }
@@ -326,7 +325,7 @@ public static class LoadPatch
         elapsed = 0f;
         var originalLogoColor = logo.color;
         var originalBgColor = bg.color;
-        var originalTextColor = loadText.color;
+        var originalTextColor = LoadText.color;
 
         while (elapsed < 1f)
         {
@@ -335,28 +334,28 @@ public static class LoadPatch
 
             logo.color = Color.Lerp(originalLogoColor, Color.clear, t);
             bg.color = Color.Lerp(originalBgColor, Color.clear, t);
-            loadText.color = Color.Lerp(originalTextColor,
+            LoadText.color = Color.Lerp(originalTextColor,
                 new Color(originalTextColor.r, originalTextColor.g, originalTextColor.b, 0), t);
 
             yield return null;
         }
 
         // 清理
-        if (loadText != null) GameObject.Destroy(loadText.gameObject);
+        if (LoadText != null) GameObject.Destroy(LoadText.gameObject);
         if (logo != null) GameObject.Destroy(logo.gameObject);
         if (bg != null) GameObject.Destroy(bg.gameObject);
 
-        __instance.sceneChanger.AllowFinishLoadingScene();
-        __instance.startedSceneLoad = true;
+        instance.sceneChanger.AllowFinishLoadingScene();
+        instance.startedSceneLoad = true;
     }
 
     // 专门处理文字切换的方法
     private static IEnumerator ChangeLoadingText(string newText, float duration)
     {
         // 如果是第一次显示文字，不需要淡出效果
-        if (loadText.text == LanguageConfig.Instance.Loading)
+        if (LoadText.text == LanguageConfig.Instance.Loading)
         {
-            loadText.text = newText;
+            LoadText.text = newText;
             yield break;
         }
 
@@ -367,12 +366,12 @@ public static class LoadPatch
         {
             elapsed += Time.deltaTime;
             var t = elapsed / (duration / 2);
-            loadText.color = Color.Lerp(new Color(1, 1, 1, 0.3f), new Color(1, 1, 1, 0), t);
+            LoadText.color = Color.Lerp(new Color(1, 1, 1, 0.3f), new Color(1, 1, 1, 0), t);
             yield return null;
         }
 
         // 更新文字
-        loadText.text = newText;
+        LoadText.text = newText;
 
         // 再淡入新文字
         elapsed = 0f;
@@ -380,27 +379,27 @@ public static class LoadPatch
         {
             elapsed += Time.deltaTime;
             var t = elapsed / (duration / 2);
-            loadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), t);
+            LoadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), t);
             yield return null;
         }
     }
 
-    public static bool Prefix(SplashManager __instance)
+    public static bool Prefix(SplashManager instance)
     {
-        if (__instance.doneLoadingRefdata && !__instance.startedSceneLoad && Time.time - __instance.startTime > 4.2f &&
-            !loadedTeamLogo)
+        if (instance.doneLoadingRefdata && !instance.startedSceneLoad && Time.time - instance.startTime > 4.2f &&
+            !LoadedTeamLogo)
         {
-            loadedTeamLogo = true;
-            __instance.StartCoroutine(CoLoadTeamLogo(__instance).WrapToIl2Cpp());
+            LoadedTeamLogo = true;
+            instance.StartCoroutine(CoLoadTeamLogo(instance).WrapToIl2Cpp());
             return false;
         }
 
         // 只有在TeamLogo完全结束后才触发FracturedTruth加载
-        if (__instance.doneLoadingRefdata && !__instance.startedSceneLoad && loadedTeamLogo && !teamLogoActive &&
-            !loadedFracturedTruth)
+        if (instance.doneLoadingRefdata && !instance.startedSceneLoad && LoadedTeamLogo && !TeamLogoActive &&
+            !_loadedFracturedTruth)
         {
-            loadedFracturedTruth = true;
-            __instance.StartCoroutine(CoLoadFracturedTruth(__instance).WrapToIl2Cpp());
+            _loadedFracturedTruth = true;
+            instance.StartCoroutine(CoLoadFracturedTruth(instance).WrapToIl2Cpp());
         }
 
         return false;
@@ -409,7 +408,7 @@ public static class LoadPatch
     // 辅助方法：更新加载文字（带动画）
     private static void UpdateLoadingText(string text)
     {
-        if (loadText != null) loadText.text = text;
+        if (LoadText != null) LoadText.text = text;
     }
 
     // 辅助方法：文字变化动画
@@ -423,13 +422,13 @@ public static class LoadPatch
         {
             elapsed += Time.deltaTime;
             var t = elapsed / duration;
-            loadText.transform.localScale = Vector3.Lerp(Vector3.one, Vector3.one * 0.8f, t);
-            loadText.color = Color.Lerp(new Color(1, 1, 1, 0.3f), new Color(1, 1, 1, 0), t);
+            LoadText.transform.localScale = Vector3.Lerp(Vector3.one, Vector3.one * 0.8f, t);
+            LoadText.color = Color.Lerp(new Color(1, 1, 1, 0.3f), new Color(1, 1, 1, 0), t);
             yield return null;
         }
 
         // 更新文字
-        loadText.text = newText;
+        LoadText.text = newText;
 
         // 再放大淡入
         elapsed = 0f;
@@ -437,8 +436,8 @@ public static class LoadPatch
         {
             elapsed += Time.deltaTime;
             var t = elapsed / duration;
-            loadText.transform.localScale = Vector3.Lerp(Vector3.one * 0.8f, Vector3.one, t);
-            loadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), t);
+            LoadText.transform.localScale = Vector3.Lerp(Vector3.one * 0.8f, Vector3.one, t);
+            LoadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), t);
             yield return null;
         }
     }
