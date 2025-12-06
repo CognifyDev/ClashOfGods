@@ -1,5 +1,4 @@
-﻿using System;
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.UI.CustomOption;

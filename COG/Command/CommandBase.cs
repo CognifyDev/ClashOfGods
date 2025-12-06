@@ -1,5 +1,3 @@
-using System;
-
 namespace COG.Command;
 
 public abstract class CommandBase

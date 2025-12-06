@@ -11,7 +11,6 @@ using COG.Game.Events;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Game.Record;
-using COG.Role;
 using COG.Rpc;
 using COG.Utils;
 using TMPro;

@@ -1,5 +1,4 @@
 using System.Linq;
-using AmongUs.GameOptions;
 using COG.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
