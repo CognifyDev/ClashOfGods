@@ -373,15 +373,19 @@ public static class LocalPlayerExitPatch
 [HarmonyPatch(typeof(Vent), nameof(Vent.SetOutline))]
 public static class VentOutlinePatch
 {
+    private static readonly int Outline = Shader.PropertyToID("_Outline");
+    private static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
+    private static readonly int AddColor = Shader.PropertyToID("_AddColor");
+
     public static bool Prefix(Vent __instance, bool on, bool mainTarget)
     {
         var myRole = PlayerControl.LocalPlayer.GetMainRole();
         if (myRole is { CanVent: false }) return true;
 
         var color = myRole.Color;
-        __instance.myRend.material.SetFloat("_Outline", on ? 1 : 0);
-        __instance.myRend.material.SetColor("_OutlineColor", color);
-        __instance.myRend.material.SetColor("_AddColor", mainTarget ? color : Color.clear);
+        __instance.myRend.material.SetFloat(Outline, on ? 1 : 0);
+        __instance.myRend.material.SetColor(OutlineColor, color);
+        __instance.myRend.material.SetColor(AddColor, mainTarget ? color : Color.clear);
 
         return false;
     }

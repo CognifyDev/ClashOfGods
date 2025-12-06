@@ -11,6 +11,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Patch;
 using COG.Role;
+using COG.States;
 using COG.UI.Hud.CustomButton;
 using COG.UI.Hud.CustomMessage;
 using COG.Utils;
@@ -102,11 +103,31 @@ public class GameListener : IListener
             manager.ImpostorVentButton.SetDisabled();
             manager.ImpostorVentButton.ToggleVisible(false);
         }
+        else
+        {
+            var playerControl = PlayerControl.LocalPlayer;
+            if (playerControl.IsAlive() && !GameStates.IsMeeting && !ExileController.Instance &&
+                !PlayerStates.IsShowingMap())
+            {
+                manager.ImpostorVentButton.SetEnabled();
+                manager.ImpostorVentButton.ToggleVisible(true);
+            }
+        }
 
         if (!role.CanSabotage)
         {
             manager.SabotageButton.SetDisabled();
             manager.SabotageButton.ToggleVisible(false);
+        }
+        else
+        {
+            var playerControl = PlayerControl.LocalPlayer;
+            if (playerControl.IsAlive() && !GameStates.IsMeeting && !ExileController.Instance &&
+                !PlayerStates.IsShowingMap())
+            {
+                manager.SabotageButton.SetEnabled();
+                manager.SabotageButton.ToggleVisible(true);
+            }
         }
 
         CustomRoleManager.GetManager().GetRoles().ForEach(r => r.OnUpdate());

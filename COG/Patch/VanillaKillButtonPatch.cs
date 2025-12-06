@@ -37,12 +37,12 @@ internal static class VanillaKillButtonPatch
         // never log here since it will fill log file with trash
 
         killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) +
-                                (show && setting!.UsesLimit > 0 ? $" ({setting.RemainingUses})" : ""));
+                                (show && setting.UsesLimit > 0 ? $" ({setting.RemainingUses})" : ""));
 
         if ((PlayerControl.LocalPlayer.IsKillTimerEnabled || PlayerControl.LocalPlayer.ForceKillTimerContinue) &&
             IsHudActive) // Prevent meeting kill (as we canceled vanilla murder check)
         {
-            if (!aliveUsable || (setting!.UsesLimit > 0 && setting.RemainingUses <= 0))
+            if (!aliveUsable || (setting.UsesLimit > 0 && setting.RemainingUses <= 0))
             {
                 killButton.SetTarget(null);
                 return;
@@ -91,6 +91,7 @@ internal static class VanillaKillButtonPatch
 
             if (dead)
             {
+                PlayerControl.LocalPlayer.RpcMurderPlayer(dead, true);
                 PlayerControl.LocalPlayer.ResetKillCooldown();
 
                 if (setting.UsesLimit > 0)
