@@ -34,7 +34,7 @@ public class CustomButton
         CouldUse = couldUse;
         HasButton = hasButton;
         Sprite = sprite;
-        Position = position.HasValue ? position.Value : Vector3.zero;
+        Position = position ?? Vector3.zero;
         if (!position.HasValue) AutoPosition = true;
         Hotkey = null;
         Text = text;
@@ -404,10 +404,10 @@ public class CustomButton
     {
         var hotkeys = ButtonHotkeyConfig.Instance.GetHotkeys();
         var sortedActiveButtons = CustomButtonManager.GetManager().GetButtons()
-            .Where(b => b.GameObject.activeInHierarchy).OrderBy(b => b.GameObject.transform.localPosition.x);
+            .Where(b => b.GameObject != null && b.GameObject.activeInHierarchy).OrderBy(b => b.GameObject.transform.localPosition.x).ToList();
 
         if (sortedActiveButtons.Count() > ButtonHotkeyConfig.MaxButtonCount ||
-            hotkeys.Count < sortedActiveButtons.Count())
+            hotkeys.Count < sortedActiveButtons.Count)
             return false;
 
         var index = 1;
@@ -433,7 +433,7 @@ public class CustomButton
                 if (OnEffect == null)
                     Main.Logger.LogError($"{nameof(OnEffect)} shouldn't be null");
 
-                OnEffect();
+                if (OnEffect != null) OnEffect();
             }
             else
             {
