@@ -5,9 +5,6 @@ using COG.Utils;
 
 namespace COG.Command.Impl;
 
-/// <summary>
-///     �����ڵ���
-/// </summary>
 public class DebugCommand : CommandBase
 {
     public DebugCommand() : base("debug")

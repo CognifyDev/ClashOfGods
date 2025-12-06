@@ -68,7 +68,7 @@ public partial class Main : BasePlugin
         Logger.LogInfo("Loading...");
         Logger.LogInfo("Mod Version => " + PluginVersion);
         Logger.LogInfo($"GitInfo: {GitInfo.Branch} ({GitInfo.Commit} at {GitInfo.CommitDate})");
-
+/*
         ResourceUtils.WriteToFileFromResource(
             @".\BepInEx\core\Jint.dll",
             ResourceUtils.GetResourcePath("Libraries.Jint.dll")
@@ -80,7 +80,7 @@ public partial class Main : BasePlugin
         ResourceUtils.WriteToFileFromResource(
             @".\BepInEx\core\Acornima.dll",
             ResourceUtils.GetResourcePath("Libraries.Acornima.dll")
-        );
+        );*/
 
         var longVersionInfo = StringUtils.EncodeToBase64($"{VersionInfo}{GitInfo.Branch}{GitInfo.Sha}");
         var storagedInfo = "";
@@ -108,7 +108,12 @@ public partial class Main : BasePlugin
         // Read configs by calling static constructors
         //_ = SettingsConfig.Instance;
         //_ = ButtonHotkeyConfig.Instance;
-
+        
+        if (!Directory.Exists(ConfigBase.DataDirectoryName))
+        {
+            Directory.CreateDirectory(ConfigBase.DataDirectoryName);
+        }
+        
         File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
 
         /*
@@ -269,6 +274,10 @@ public partial class Main : BasePlugin
                     ChatController? controller = null;
                     if (controller == Object.FindObjectOfType<ChatController>())
                     {
+                        if (controller == null)
+                        {
+                            return value;
+                        }
                         var pool = controller.chatBubblePool;
                         var current = pool.activeChildren.Count + pool.inactiveChildren.Count;
                         var toClone = value - current;

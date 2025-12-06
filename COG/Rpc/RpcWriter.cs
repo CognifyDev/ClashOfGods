@@ -168,7 +168,7 @@ public class RpcWriter
             }
         }
 
-        Main.Logger.LogInfo($"Rpc {callId} sent to {string.Join(", ", parts)}");
+        Main.Logger.LogDebug($"Rpc {callId} sent to {string.Join(", ", parts)}");
 
         return new RpcWriter(writers.ToArray());
     }
