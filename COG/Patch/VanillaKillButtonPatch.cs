@@ -35,7 +35,6 @@ internal static class VanillaKillButtonPatch
         if (!show) return;
 
         // never log here since it will fill log file with trash
-
         killButton.OverrideText(TranslationController.Instance.GetString(StringNames.KillLabel) +
                                 (show && setting.UsesLimit > 0 ? $" ({setting.RemainingUses})" : ""));
 
