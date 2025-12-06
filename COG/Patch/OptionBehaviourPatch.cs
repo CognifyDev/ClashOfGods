@@ -58,12 +58,14 @@ public static class OptionBehaviourPatch
         return false;
     }
 
-    [HarmonyPatch(typeof(ToggleOption), nameof(ToggleOption.UpdateValue))]
+    [HarmonyPatch(typeof(ToggleOption), nameof(ToggleOption.Toggle))]
     [HarmonyPrefix]
     private static bool ToggleOptionValueUpdatePatch(ToggleOption __instance)
     {
         if (!CustomOption.TryGetOption(__instance, out var customOption)) return true;
+        __instance.CheckMark.enabled = !__instance.CheckMark.enabled;
         customOption!.UpdateSelection(__instance.GetBool());
+        __instance.OnValueChanged?.Invoke(__instance);
         return false;
     }
 

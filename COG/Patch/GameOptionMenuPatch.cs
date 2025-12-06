@@ -112,7 +112,7 @@ internal static class GameOptionMenuPatch
         var scroller = __instance.scrollBar;
         scroller.SetYBoundsMax(-num - mapPickerHeight);
         scroller.UpdateScrollBars();
-        if (scroller.GetScrollPercY() == 1) scroller.ScrollPercentY(1); // 修复可能的超出滚动条范围的bug
+        if (Mathf.Approximately(scroller.GetScrollPercY(), 1)) scroller.ScrollPercentY(1); // 修复可能的超出滚动条范围的bug
     }
 
     [HarmonyPatch(nameof(GameOptionsMenu.ValueChanged))]
