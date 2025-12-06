@@ -540,7 +540,7 @@ public static class PlayerUtils
         }
         else
         {
-            var data = PlayerControl.LocalPlayer.GetPlayerData()!;
+            var data = PlayerControl.LocalPlayer.GetPlayerData();
             foreach (var role in CustomRoleManager.GetManager().GetRoles())
                 additionalTextBuilder.Append(role.HandleAdditionalPlayerName(player));
         }

@@ -29,7 +29,7 @@ public class Chief : CustomRole
                 {
                     var role = player.GetMainRole();
 
-                    role!.CurrentKillButtonSetting = new KillButtonSetting
+                    role.CurrentKillButtonSetting = new KillButtonSetting
                     {
                         ForceShow = () => true,
                         InitialCooldown = 0,
@@ -37,8 +37,8 @@ public class Chief : CustomRole
                         RemainingUses = 1
                     };
 
-                    role!.CurrentKillButtonSetting.AddAfterClick(() =>
-                        role!.ResetCurrentKillButtonSetting()); // restore setting after use
+                    role.CurrentKillButtonSetting.AddAfterClick(() =>
+                        role.ResetCurrentKillButtonSetting()); // restore setting after use
                 }
             },
             (writer, player) => writer.WriteNetObject(player),

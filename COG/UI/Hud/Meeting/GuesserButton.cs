@@ -14,6 +14,7 @@ using UnityEngine.UI;
 
 namespace COG.UI.Hud.Meeting;
 
+[ShitCode]
 public class GuesserButton
 {
     private const string GuessButtonName = "GuessButton";
@@ -27,14 +28,14 @@ public class GuesserButton
     private GameObject? _container;
     private int _page = 1;
     private GameObject? _roleButtonContainer;
-    private IEnumerable<CustomRole> _roles;
+    private readonly IEnumerable<CustomRole> _roles;
     private SpriteRenderer? _selectedButton;
     private CustomRole? _selectedRole;
 
     /// <summary>
     ///     赌怪按钮
     /// </summary>
-    public GuesserButton(GameObject template, PlayerVoteArea playerVoteArea, Guesser guesser, MeetingHud meetingHud)
+    public GuesserButton(GameObject template, PlayerVoteArea playerVoteArea, Guesser guesser, MeetingHud meetingHud, IEnumerable<CustomRole> roles)
     {
         _guessButton = Object.Instantiate(template, playerVoteArea.transform);
         _guesser = guesser;
@@ -47,13 +48,10 @@ public class GuesserButton
         var passive = _guessButton.GetComponent<PassiveButton>();
         passive.StopAllCoroutines();
         passive.OnClick.AddListener(new Action(() => OpenGuessUI(meetingHud)));
-
-        Buttons.Add(this);
-        Main.Logger.LogInfo($"赌怪仅显示启用职业预设 {_guesser.EnabledRolesOnly.GetBool().ToString()}");
-        _roles = _guesser.EnabledRolesOnly.GetBool()
-            ? GetCustomRolesFromPlayers()
-            : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole);
+        _roles = roles;
     }
+    
+    public void Register() => Buttons.Add(this);
 
     public static List<GuesserButton> Buttons { get; } = [];
 
@@ -236,8 +234,8 @@ public class GuesserButton
 
     public void CloseGuessUI()
     {
-        _container.TryDestroy();
         MeetingHud.Instance.ButtonParent.gameObject.SetActive(true);
+        _guesser.CurrentGuessing = null;
         ResetState();
         ResetRoleArea();
     }
@@ -255,32 +253,12 @@ public class GuesserButton
         _guesser.GuessedTime++;
     }
 
-    private CustomRole[] GetCustomRolesFromPlayers()
-    {
-        var canGuessSubRoles = /*Guesser.CanGuessSubRoles.GetBool()*/false;
-        var players = PlayerUtils.GetAllPlayers();
-
-        var customRoles = players.Select(player => player.GetMainRole()).ToList();
-
-        if (canGuessSubRoles)
-            players.Select(player => player.GetSubRoles()).ForEach(roles =>
-            {
-                if (!roles.Any()) return;
-                foreach (var customRole in roles)
-                    if (!customRoles.Select(role => role.Id).Contains(customRole.Id))
-                        customRoles.Add(customRole);
-            });
-
-        return customRoles.ToArray();
-    }
-
     public void ResetState()
     {
         _container.TryDestroy();
         _selectedButton = null;
         _selectedRole = null;
         _confirmButton.TryDestroy();
-        //_roles = Array.Empty<CustomRole>();<!> 清空_role会导致role在猜测界面无法显示
         _roleButtonContainer.TryDestroy();
         _roleButtonContainer = null;
         //_area.TryDestroyGameObject(); // <!> 销毁_area会导致MeetingHud报错
@@ -289,7 +267,6 @@ public class GuesserButton
     public void ResetRoleArea()
     {
         _area.TryDestroyGameObject();
-        _roles = [];
     }
 
     public static void DestroyAll()

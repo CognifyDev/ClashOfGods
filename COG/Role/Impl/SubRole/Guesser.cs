@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Listener;
 using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
@@ -24,8 +25,6 @@ public class Guesser : CustomRole, IListener
             new BoolOptionValueRule(true));
         EnabledRolesOnly = CreateOption(() => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
             new BoolOptionValueRule(true));
-        /* CanGuessSubRoles = CreateOption(() => LanguageConfig.Instance.GuesserCanGuessSubRoles,
-            new BoolOptionValueRule(false)); */
     }
 
     public CustomOption MaxGuessTime { get; }
@@ -58,6 +57,10 @@ public class Guesser : CustomRole, IListener
 
         if (GuessedTime >= MaxGuessTime.GetInt()) return;
 
+        var guessableRoles = (EnabledRolesOnly.GetBool()
+            ? GetCustomRolesFromPlayers()
+            : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole)).ToList();
+
         // WARNING: NO FOREACH
         for (var i = 0; i < meetingHud.playerStates.Count; i++)
         {
@@ -65,12 +68,19 @@ public class Guesser : CustomRole, IListener
 
             // 如果断联或死了或者是当前玩家则不要布置
             if (playerVoteArea == null || playerVoteArea.AmDead ||
-                playerVoteArea.TargetPlayerId == player.PlayerId ||
+                (playerVoteArea.TargetPlayerId == player.PlayerId && !GlobalCustomOptionConstant.DebugMode.GetBool()) ||
                 GameUtils.PlayerData.First(pd => pd.PlayerId == playerVoteArea.TargetPlayerId)
                     .IsDisconnected) continue;
-            _ = new GuesserButton(playerVoteArea!.Buttons.transform.Find("CancelButton").gameObject,
-                playerVoteArea, this, meetingHud);
+            new GuesserButton(playerVoteArea.Buttons.transform.Find("CancelButton").gameObject,
+                playerVoteArea, this, meetingHud, guessableRoles).Register();
         }
+    }
+    
+    private CustomRole[] GetCustomRolesFromPlayers()
+    {
+        var players = PlayerUtils.GetAllPlayers();
+        var customRoles = players.Select(player => player.GetMainRole()).ToList();
+        return customRoles.ToArray();
     }
 
     [EventHandler(EventHandlerType.Postfix)]

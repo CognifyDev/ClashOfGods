@@ -13,7 +13,7 @@ public class IntroListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSetUpRoleText(IntroCutsceneShowRoleEvent @event)
     {
-        var intro = @event.IntroCutscene!;
+        var intro = @event.IntroCutscene;
         Main.Logger.LogInfo("Set up role text for the player...");
 
         var myRole = GameUtils.GetLocalPlayerRole();

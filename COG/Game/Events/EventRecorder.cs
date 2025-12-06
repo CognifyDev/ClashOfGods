@@ -69,14 +69,14 @@ public static class GameEventPatch // not use listener for flexibility in patchi
         if (!__result) return; // only record if player actually entered the vent
         var vent = __instance._vent_5__2;
         var playerPhysics = __instance.__4__this;
-        EventRecorder.Instance.Record(new EnterVentGameEvent(playerPhysics.myPlayer.GetPlayerData()!, vent.Id));
+        EventRecorder.Instance.Record(new EnterVentGameEvent(playerPhysics.myPlayer.GetPlayerData(), vent.Id));
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CompleteTask))]
     [HarmonyPostfix]
     private static void CompleteTaskPatch(PlayerControl __instance, [HarmonyArgument(1)] uint idx)
     {
-        EventRecorder.Instance.Record(new FinishTaskGameEvent(__instance.GetPlayerData()!, idx));
+        EventRecorder.Instance.Record(new FinishTaskGameEvent(__instance.GetPlayerData(), idx));
     }
 
 
@@ -91,7 +91,7 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     [HarmonyPostfix]
     private static void RevivePatch(PlayerControl __instance)
     {
-        EventRecorder.Instance.Record(new PlayerReviveGameEvent(__instance.GetPlayerData()!));
+        EventRecorder.Instance.Record(new PlayerReviveGameEvent(__instance.GetPlayerData()));
     }
 
     [HarmonyPatch(typeof(ShipStatus._CoStartMeeting_d__102), nameof(ShipStatus._CoStartMeeting_d__102.MoveNext))]
@@ -110,7 +110,7 @@ public static class GameEventPatch // not use listener for flexibility in patchi
     [HarmonyPrefix] // player might be null if we use postfix
     private static void HandleDisconnectPatch(PlayerControl player)
     {
-        EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()!));
+        EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()));
     }
 
     public static readonly List<CustomPlayerData> DisableOnceDeath = [];

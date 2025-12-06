@@ -22,7 +22,6 @@ public class LobbyListener : IListener
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         GameUtils.SendGameMessage(LanguageConfig.Instance.MakePublicMessage);
-        // 禁止设置为公开
         return false;
     }
 }
