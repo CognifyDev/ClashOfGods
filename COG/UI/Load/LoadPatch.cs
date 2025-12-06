@@ -117,11 +117,11 @@ public static class LoadPatch
 
     private static IEnumerator CoLoadFracturedTruth(SplashManager __instance)
     {
-        var logo = CreateObject<SpriteRenderer>("COG-BG", null, new Vector3(0, 0.5f, -5f));
+        var logo = CreateObject<SpriteRenderer>("COG-BG", null!, new Vector3(0, 0.5f, -5f));
         logo.sprite = LogoSprite;
         logo.color = Color.clear;
 
-        var bg = CreateObject<SpriteRenderer>("COG-LOADBG", null, new Vector3(0, 0.5f, -5f));
+        var bg = CreateObject<SpriteRenderer>("COG-LOADBG", null!, new Vector3(0, 0.5f, -5f));
         bg.sprite = BgSprite;
         bg.color = Color.clear;
 

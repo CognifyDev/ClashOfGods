@@ -16,6 +16,8 @@ public class UseAbilityEventSender : NetworkedGameEventSender<UseAbilityEventSen
 {
     public override void Serialize(RpcWriter writer, UseAbilityGameEvent correspondingEvent)
     {
+        if (correspondingEvent == null! || correspondingEvent.UsedButton == null!)
+            return;
         writer.WriteBytesAndSize(SerializablePlayerData.Of(correspondingEvent.Player!).SerializeToData());
         writer.Write(correspondingEvent.UsedButton.Identifier);
     }

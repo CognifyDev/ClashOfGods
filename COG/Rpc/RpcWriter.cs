@@ -150,21 +150,19 @@ public class RpcWriter
         }
         else // legacy rpc sending, for unable to send rpc by directly using -1 for argument targetClientId
         {
-            if (targets == null)
+            // {
+            //     writers.Add(
+            //         AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable));
+            //     parts.Add("everyone");
+            // }
+            targets ??= PlayerUtils.GetAllPlayers().ToArray();
+
+            foreach (var control in targets)
             {
-                writers.Add(
-                    AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId, SendOption.Reliable));
-                parts.Add("everyone");
-            }
-            else
-            {
-                foreach (var control in targets)
-                {
-                    writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId,
-                        SendOption.Reliable,
-                        control.GetClientID()));
-                    parts.Add($"{control.name}({control.PlayerId})");
-                }
+                writers.Add(AmongUsClient.Instance.StartRpcImmediately(playerControl.NetId, callId,
+                    SendOption.Reliable,
+                    control.GetClientID()));
+                parts.Add($"{control.name}({control.PlayerId})");
             }
         }
 

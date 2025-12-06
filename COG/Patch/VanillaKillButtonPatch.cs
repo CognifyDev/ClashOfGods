@@ -26,7 +26,7 @@ internal static class VanillaKillButtonPatch
         if (setting == null) return;
 
         var aliveUsable = setting.OnlyUsableWhenAlive && __instance.IsAlive();
-        var show = setting != null && setting.ForceShow() && IsHudActive && aliveUsable;
+        var show = setting.ForceShow() && IsHudActive && aliveUsable;
 
         killButton.ToggleVisible(show);
 

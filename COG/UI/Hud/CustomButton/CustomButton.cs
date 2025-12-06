@@ -82,6 +82,7 @@ public class CustomButton
     /// <summary>
     ///     在游戏中创建一个按钮 (Effect)
     /// </summary>
+    /// <param name="identifier"></param>
     /// <param name="onClick">点击后按钮的动作（自动判断是否还在冷却）</param>
     /// <param name="onMeetingEnds">会议结束后按钮的动作</param>
     /// <param name="onEffect">

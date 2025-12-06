@@ -20,6 +20,7 @@ using COG.Plugin;
 using COG.Role;
 using COG.UI.ClientOption;
 using COG.UI.ClientOption.Impl;
+using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using COG.Utils.Version;
 using Reactor;
@@ -285,6 +286,8 @@ public partial class Main : BasePlugin
         //    new OptionCommand(),
         //    new DebugCommand()
         //});
+        
+        // CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
 
         Harmony.PatchAll();
 

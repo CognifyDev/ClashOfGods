@@ -165,9 +165,7 @@ public static class PlayerUtils
     [return: NotNullIfNotNull(nameof(player))]
     public static CustomPlayerData? GetPlayerData(this PlayerControl? player)
     {
-        if (!player)
-            return null;
-        return player!.Data.GetPlayerData();
+        return !player ? null : player!.Data.GetPlayerData();
     }
 
     [return: NotNullIfNotNull(nameof(player))]
@@ -504,7 +502,7 @@ public static class PlayerUtils
     public static void DisplayPlayerInfoOnName(this PlayerControl player, bool onlyDisplayNameSuffix = false)
     {
         var playerRole = player.GetPlayerData();
-        if (playerRole is null || playerRole.MainRole is null) return;
+        if (playerRole == null! || playerRole.MainRole == null!) return;
 
         var subRoles = playerRole.SubRoles;
         var mainRole = playerRole.MainRole;

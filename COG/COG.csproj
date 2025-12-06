@@ -24,7 +24,6 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Resources\Configs\*.*"/>
-        <EmbeddedResource Include="Resources\Libraries\*.*"/>
     </ItemGroup>
 
     <ItemGroup>
