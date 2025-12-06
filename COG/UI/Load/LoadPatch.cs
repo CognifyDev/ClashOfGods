@@ -27,8 +27,8 @@ namespace COG.UI.Load;
 [HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
 public static class LoadPatch
 {
-    private static readonly Sprite LogoSprite = LoadSprite("COG.Resources.Images.COG-BG.png", 300f);
-    private static readonly Sprite BgSprite = LoadSprite("COG.Resources.Images.COG-LOADBG.png");
+    private static readonly Sprite LogoSprite = LoadSprite("COG.Resources.Images.COG-BG.png", 300f)!;
+    private static readonly Sprite BgSprite = LoadSprite("COG.Resources.Images.COG-LOADBG.png")!;
     public static TextMeshPro LoadText = null!;
 
     public static bool LoadedTeamLogo;
@@ -43,7 +43,7 @@ public static class LoadPatch
         set => LoadText.text = value;
     }
 
-    public static IEnumerator CoLoadTeamLogo(SplashManager instance)
+    public static IEnumerator CoLoadTeamLogo(SplashManager __instance)
     {
         TeamLogoActive = true;
 
@@ -54,7 +54,7 @@ public static class LoadPatch
         logo.transform.localScale = Vector3.one * 0.8f;
 
         // 创建团队名称文字
-        var teamText = GameObject.Instantiate(instance.errorPopup.InfoText, null);
+        var teamText = Object.Instantiate(__instance.errorPopup.InfoText, null);
         teamText.transform.localPosition = new Vector3(0f, -1f, -10f); // 放在logo下方
         teamText.fontStyle = FontStyles.Bold;
         teamText.text = "CognifyDev";
@@ -108,14 +108,14 @@ public static class LoadPatch
 
         // 清理对象
         if (logo != null)
-            GameObject.Destroy(logo.gameObject);
+            Object.Destroy(logo.gameObject);
         if (teamText != null)
-            GameObject.Destroy(teamText.gameObject);
+            Object.Destroy(teamText.gameObject);
 
         TeamLogoActive = false;
     }
 
-    private static IEnumerator CoLoadFracturedTruth(SplashManager instance)
+    private static IEnumerator CoLoadFracturedTruth(SplashManager __instance)
     {
         var logo = CreateObject<SpriteRenderer>("COG-BG", null, new Vector3(0, 0.5f, -5f));
         logo.sprite = LogoSprite;
@@ -152,7 +152,7 @@ public static class LoadPatch
         }
 
         // 创建初始加载文字
-        LoadText = GameObject.Instantiate(instance.errorPopup.InfoText, null);
+        LoadText = Object.Instantiate(__instance.errorPopup.InfoText, null);
         LoadText.transform.localPosition = new Vector3(0f, -0.28f, -10f);
         LoadText.fontStyle = FontStyles.Bold;
         LoadText.text = LanguageConfig.Instance.Loading;
@@ -341,12 +341,12 @@ public static class LoadPatch
         }
 
         // 清理
-        if (LoadText != null) GameObject.Destroy(LoadText.gameObject);
-        if (logo != null) GameObject.Destroy(logo.gameObject);
-        if (bg != null) GameObject.Destroy(bg.gameObject);
+        if (LoadText != null) Object.Destroy(LoadText.gameObject);
+        if (logo != null) Object.Destroy(logo.gameObject);
+        if (bg != null) Object.Destroy(bg.gameObject);
 
-        instance.sceneChanger.AllowFinishLoadingScene();
-        instance.startedSceneLoad = true;
+        __instance.sceneChanger.AllowFinishLoadingScene();
+        __instance.startedSceneLoad = true;
     }
 
     // 专门处理文字切换的方法
@@ -384,22 +384,22 @@ public static class LoadPatch
         }
     }
 
-    public static bool Prefix(SplashManager instance)
+    public static bool Prefix(SplashManager __instance)
     {
-        if (instance.doneLoadingRefdata && !instance.startedSceneLoad && Time.time - instance.startTime > 4.2f &&
+        if (__instance.doneLoadingRefdata && !__instance.startedSceneLoad && Time.time - __instance.startTime > 4.2f &&
             !LoadedTeamLogo)
         {
             LoadedTeamLogo = true;
-            instance.StartCoroutine(CoLoadTeamLogo(instance).WrapToIl2Cpp());
+            __instance.StartCoroutine(CoLoadTeamLogo(__instance).WrapToIl2Cpp());
             return false;
         }
 
         // 只有在TeamLogo完全结束后才触发FracturedTruth加载
-        if (instance.doneLoadingRefdata && !instance.startedSceneLoad && LoadedTeamLogo && !TeamLogoActive &&
+        if (__instance.doneLoadingRefdata && !__instance.startedSceneLoad && LoadedTeamLogo && !TeamLogoActive &&
             !_loadedFracturedTruth)
         {
             _loadedFracturedTruth = true;
-            instance.StartCoroutine(CoLoadFracturedTruth(instance).WrapToIl2Cpp());
+            __instance.StartCoroutine(CoLoadFracturedTruth(__instance).WrapToIl2Cpp());
         }
 
         return false;
