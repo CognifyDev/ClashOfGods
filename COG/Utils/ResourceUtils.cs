@@ -67,31 +67,38 @@ public static class ResourceUtils
             var bytes = File.ReadAllBytes(filePath);
             Cache.Add(path, bytes);
         }
-        
-        var fileList = Encoding.UTF8.GetString(DownloadFromURLOrGetFromCache(FileListURL, true));
-        foreach (var currentFile in fileList.Split("\n"))
-        {
-            if (!currentFile.Contains(",")) continue;
-            var split = currentFile.Split(",");
-            var filePath = split[0];
-            var sha1 = split[0];
 
-            var target = CacheDataDir + "\\" + filePath;
-            if (File.Exists(target))
+        var fileListBytes = DownloadFromURLOrGetFromCache(FileListURL, true);
+        if (fileListBytes.Length > 0)
+        {
+            var fileList = Encoding.UTF8.GetString(fileListBytes);
+            foreach (var currentFile in fileList.Split("\n"))
             {
-                if (!sha1.Equals(GetFileSHA1(target)))
+                if (!currentFile.Contains(',')) continue;
+                var split = currentFile.Split(",");
+                var filePath = split[0];
+                var sha1 = split[0];
+
+                var target = CacheDataDir + "\\" + filePath;
+                if (File.Exists(target))
                 {
+                    if (sha1.Equals(GetFileSHA1(target))) continue;
                     File.Delete(target);
                     File.WriteAllBytes(target, DownloadFromURLOrGetFromCache(filePath));
                 }
+                else
+                {
+                    var directoryName = Path.GetDirectoryName(target);
+                    if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName)) 
+                        Directory.CreateDirectory(directoryName);
+                    File.WriteAllBytes(target, DownloadFromURLOrGetFromCache(filePath));
+                }
             }
-            else
-            {
-                var directoryName = Path.GetDirectoryName(target);
-                if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName)) 
-                    Directory.CreateDirectory(directoryName);
-                File.WriteAllBytes(target, DownloadFromURLOrGetFromCache(filePath));
-            }
+        }
+        else
+        {
+            Main.Logger.LogError("Failed to update cache");
+            Main.Logger.LogError("Please reboot the game and then try again");
         }
     }
     
@@ -126,7 +133,15 @@ public static class ResourceUtils
         {
             using var httpClient = new HttpClient();
             Main.Logger.LogInfo("Downloading needed file from: " + targetURL);
-            return await httpClient.GetByteArrayAsync(targetURL);
+            try
+            {
+                return await httpClient.GetByteArrayAsync(targetURL);
+            }
+            catch
+            {
+                Main.Logger.LogError("Failed to download target file.");
+                return [];
+            }
         }).Result;
         
         if (!isURL) Cache.Add(path, result);
