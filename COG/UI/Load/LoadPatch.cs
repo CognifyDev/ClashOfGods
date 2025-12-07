@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.IO;
+using System.Globalization;
 using System.Linq;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Command;
@@ -17,6 +18,7 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
+using COG.Utils;
 using TMPro;
 using UnityEngine;
 using static COG.Utils.GameObjectUtils;
@@ -192,6 +194,12 @@ public static class LoadPatch
             yield return ChangeLoadingText(step, 0.3f);
 
             // 执行实际的加载操作
+            //if (step == LanguageConfig.Instance.LoadingCopyLibraries)
+            //{
+            //    //下载存储库
+
+            //    //PathUtils.CopyResourcesToDisk(PathUtils.GetAmongUsPath(),"Libraries.Jint.dll");
+            //}
             if (step == LanguageConfig.Instance.LoadingHotKey)
             {
                 _ = ButtonHotkeyConfig.Instance;
@@ -440,5 +448,14 @@ public static class LoadPatch
             LoadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), t);
             yield return null;
         }
+    }
+    public static string YmalCheck()
+    {
+
+        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+        {
+            return CultureInfo.CurrentUICulture.Name.StartsWith("zh") ? "请稍后，正在下载语言依赖库" : "Please Wait , Downloading YamlDotNet.dll";
+        }
+        else return "Please Wait , Downloading YamlDotNet.dll";
     }
 }

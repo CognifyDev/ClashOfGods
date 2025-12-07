@@ -244,11 +244,11 @@ public static class PlayerUtils
 
     public static void SetNamePrivately(PlayerControl target, PlayerControl seer, string name)
     {
-        var writer =
+        var riter =
             AmongUsClient.Instance.StartRpcImmediately(target.NetId, (byte)RpcCalls.SetName, SendOption.Reliable,
                 seer.GetClientID());
         writer.Write(name);
-        writer.Write(false);
+        wriwter.Write(false);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
 

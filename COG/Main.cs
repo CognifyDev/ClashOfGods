@@ -93,10 +93,12 @@ public partial class Main : BasePlugin
                 ConfigBase.AutoReplace = false;
         }
 
+        #region 配置文件迁移
         // Read configs by calling static constructors
         //_ = SettingsConfig.Instance;
         //_ = ButtonHotkeyConfig.Instance;
-        
+        #endregion
+
         if (!Directory.Exists(ConfigBase.DataDirectoryName))
         {
             Directory.CreateDirectory(ConfigBase.DataDirectoryName);
@@ -110,6 +112,7 @@ public partial class Main : BasePlugin
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
 
+        #region 监听迁移
         //ListenerManager.GetManager().RegisterListeners(new IListener[]
         //{
         //    new CommandListener(),
@@ -172,6 +175,7 @@ public partial class Main : BasePlugin
         //{
         //    new UseAbilityEventSender()
         //});
+        #endregion
 
         // Register mod options
         ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
@@ -279,6 +283,7 @@ public partial class Main : BasePlugin
                 (value, origin) => origin + $": {(int)value}")
         });
 
+        #region 指令迁移
         // Register Commands
         //CommandManager.GetManager().RegisterCommands(new CommandBase[]
         //{
@@ -286,11 +291,13 @@ public partial class Main : BasePlugin
         //    new OptionCommand(),
         //    new DebugCommand()
         //});
-        
+
         // CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
+        #endregion
 
         Harmony.PatchAll();
 
+        #region 插件迁移
         // Start to load plugins
         //if (SettingsConfig.Instance.EnablePluginSystem)
         //{
@@ -305,6 +312,7 @@ public partial class Main : BasePlugin
         //    foreach (var file in enumerable)
         //        IPluginManager.GetDefaultManager().LoadPlugin(file);
         //}
+        #endregion
 
         GlobalCustomOptionConstant.Init();
     }

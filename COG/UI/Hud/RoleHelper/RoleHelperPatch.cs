@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using COG.Listener.Event.Impl.Game;
+using TMPro;
 using UnityEngine;
 
 namespace COG.UI.Hud.RoleHelper;
@@ -7,11 +8,14 @@ namespace COG.UI.Hud.RoleHelper;
 public static class RoleHelperPatch
 {
     public static GameObject Panel;
-    public static TextMeshPro Title;
-    public static TextMeshPro SubTitle;
-    public static TextMeshPro Text;
+    public static string Title;
+    public static string SubTitle;
+    public static string Text;
 
-    public static void IntiAll(HudManager hud)
+    public static bool _isOpen;
+
+    public static void Postfix(HudManager hud)
     {
+        if(InGame)
     }
 }

@@ -4,7 +4,7 @@ namespace COG.UI.Hud.RoleHelper;
 
 public class RoleHelpersBase
 {
-    public RoleHelpersBase(TextMeshPro title, TextMeshPro subtitle, TextMeshPro text, SecondTextType type)
+    public RoleHelpersBase(string title, string subtitle, string text, SecondTextType type)
     {
         Title = title;
         SubTtile = subtitle;
@@ -12,9 +12,9 @@ public class RoleHelpersBase
         Type = type;
     }
 
-    public TextMeshPro Title { get; set; }
-    public TextMeshPro SubTtile { get; set; }
-    public TextMeshPro Text { get; set; }
+    public string Title { get; set; }
+    public string SubTtile { get; set; }
+    public string Text { get; set; }
     public SecondTextType Type { get; set; }
 }
 
