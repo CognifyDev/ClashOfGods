@@ -13,19 +13,18 @@ internal static class VanillaKillButtonPatch
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     [HarmonyPostfix]
-    private static void KillButtonUpdatePatch(PlayerControl __instance)
+    private static void KillButtonUpdatePatch()
     {
-        if (!__instance.AmOwner) return; // Only local player
+        var playerControl = PlayerControl.LocalPlayer;
         if (!GameStates.InRealGame) return;
+        playerControl.Data.Role.CanUseKillButton = true;
 
-        __instance.Data.Role.CanUseKillButton = true;
-
-        var setting = __instance.GetKillButtonSetting();
+        var setting = playerControl.GetKillButtonSetting();
         var killButton = HudManager.Instance.KillButton;
 
         if (setting == null) return;
 
-        var aliveUsable = setting.OnlyUsableWhenAlive && __instance.IsAlive();
+        var aliveUsable = setting.OnlyUsableWhenAlive && playerControl.IsAlive();
         var show = setting.ForceShow() && IsHudActive && aliveUsable;
 
         killButton.ToggleVisible(show);

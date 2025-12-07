@@ -7,7 +7,7 @@ using UnityEngine;
 namespace COG.Utils.Coding.Debugging;
 
 #nullable disable
-// This class is for viewing custom roles in UnityExplorer in game so as to debug easily
+// This class is for viewing custom roles in UnityExplorer in game to debug easily
 [RegisterInIl2Cpp]
 public class InGameModDebugger : MonoBehaviour
 {

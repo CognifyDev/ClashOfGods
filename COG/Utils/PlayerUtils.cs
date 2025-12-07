@@ -416,7 +416,7 @@ public static class PlayerUtils
         var target = pc.GetClosestPlayer();
         PlayerControl.AllPlayerControls.ForEach(new Action<PlayerControl>(p => p.ClearOutline()));
         if (!target) return null;
-        if (GameUtils.GetGameOptions().KillDistance >=
+        if (GameUtils.GetKillDistance() >=
             Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(),
                 target!.GetTruePosition()) && checkDist)
         {
@@ -570,7 +570,7 @@ public static class PlayerUtils
         var localLocation = player.GetTruePosition();
         var targetLocation = closestValidPlayer.GetTruePosition();
         var distance = Vector2.Distance(localLocation, targetLocation);
-        var valid = GameUtils.GetGameOptions().KillDistance >= distance;
+        var valid = GameUtils.GetKillDistance() >= distance;
 
         if (!valid)
             closestValidPlayer = null;
@@ -599,12 +599,12 @@ public static class PlayerUtils
 
         var killButton = HudManager.Instance.KillButton;
 
-        var settings = GetRoles(player).Select(r => r.CurrentKillButtonSetting);
+        var settings = GetRoles(player).Select(r => r.CurrentKillButtonSetting).ToList();
 
         killButton.ToggleVisible(settings.Any(r => r.ForceShow()) && VanillaKillButtonPatch.IsHudActive);
 
-        var activatedSettings = settings.Where(s => s.ForceShow());
-        if (activatedSettings.Count() == 0) return null;
+        var activatedSettings = settings.Where(s => s.ForceShow()).ToList();
+        if (!activatedSettings.Any()) return null;
         return activatedSettings.First(); // there should be only one settings active
     }
 

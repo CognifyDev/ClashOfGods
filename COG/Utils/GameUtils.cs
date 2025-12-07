@@ -93,6 +93,11 @@ public static class GameUtils
         return PlayerControl.LocalPlayer.GetMainRole();
     }
 
+    public static double GetKillDistance()
+    {
+        return NormalGameOptionsV10.KillDistances[Mathf.Clamp(GetGameOptions().KillDistance, 0, 2)];
+    }
+
     public static NormalGameOptionsV10 GetGameOptions()
     {
         return GameOptionsManager.Instance.currentNormalGameOptions;
