@@ -223,11 +223,14 @@ public class RoleAssignmentListener : IListener
         // 打印职业分配信息
         var sb = new StringBuilder();
         foreach (var playerRole in GameUtils.PlayerData)
+        {
+            playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType, true);
             sb.AppendLine($"""
                            {playerRole.Player.name}({playerRole.PlayerId}) 
                                => {playerRole.MainRole.GetNormalName()}  with sub role(s):
                                {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).AsString()}
                            """);
+        }
 
         Main.Logger.LogDebug(sb.ToString());
         Main.Logger.LogInfo("Successfully selected roles.");
