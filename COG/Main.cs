@@ -20,7 +20,6 @@ using COG.Plugin;
 using COG.Role;
 using COG.UI.ClientOption;
 using COG.UI.ClientOption.Impl;
-using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using COG.Utils.Version;
 using Reactor;

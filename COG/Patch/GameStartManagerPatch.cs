@@ -54,7 +54,6 @@ internal static class GameStartManagerPatch
     [HarmonyPrefix]
     public static void ChangeMinNum(GameStartManager __instance)
     {
-        //if (!AmongUsClient.Instance.AmHost) return;
         if (CheckEndCriteriaPatch.NoEndGame) __instance.MinPlayers = 1;
     }
 }

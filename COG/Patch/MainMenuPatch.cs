@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Utils;
 using COG.Utils.Coding.Debugging;
 using TMPro;
@@ -99,10 +100,15 @@ public static class MainMenuPatch
     [HarmonyPostfix]
     private static void LoadImage()
     {
-        CustomBanner = new GameObject("CustomBG");
-        CustomBanner.transform.position = new Vector3(1.8f, 0.2f, 0f);
+        CustomBanner = new GameObject("CustomBG")
+        {
+            transform =
+            {
+                position = new Vector3(1.8f, 0.2f, 0f)
+            }
+        };
         var bgRenderer = CustomBanner.AddComponent<SpriteRenderer>();
-        bgRenderer.sprite = ResourceUtils.LoadSprite("COG.Resources.Images.COG-BG.png", 295f);
+        bgRenderer.sprite = ResourceUtils.LoadSprite(ResourceConstant.BgLogoSprite, 295f);
     }
 
     [HarmonyPatch(nameof(MainMenuManager.Start))]

@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.IO;
-using System.Globalization;
 using System.Linq;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Command;
 using COG.Command.Impl;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Winnable;
 using COG.Listener;
@@ -18,7 +18,6 @@ using COG.Role.Impl.Crewmate;
 using COG.Role.Impl.Impostor;
 using COG.Role.Impl.Neutral;
 using COG.Role.Impl.SubRole;
-using COG.Utils;
 using TMPro;
 using UnityEngine;
 using static COG.Utils.GameObjectUtils;
@@ -29,8 +28,8 @@ namespace COG.UI.Load;
 [HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
 public static class LoadPatch
 {
-    private static readonly Sprite LogoSprite = LoadSprite("COG.Resources.Images.COG-BG.png", 300f)!;
-    private static readonly Sprite BgSprite = LoadSprite("COG.Resources.Images.COG-LOADBG.png")!;
+    private static readonly Sprite LogoSprite = LoadSprite(ResourceConstant.BgLogoSprite, 300f)!;
+    private static readonly Sprite BgSprite = LoadSprite(ResourceConstant.LoadBgSprite)!;
     public static TextMeshPro LoadText = null!;
 
     public static bool LoadedTeamLogo;
@@ -50,8 +49,8 @@ public static class LoadPatch
         TeamLogoActive = true;
 
         // 创建logo对象，初始状态为透明
-        var logo = CreateObject<SpriteRenderer>("TeamLogo", null, new Vector3(0, 0.5f, -5f));
-        logo.sprite = LoadSprite("COG.Resources.Images.TeamLogo.png", 70f);
+        var logo = CreateObject<SpriteRenderer>("TeamLogo", null!, new Vector3(0, 0.5f, -5f));
+        logo.sprite = LoadSprite(ResourceConstant.TeamLogoSprite, 70f);
         logo.color = Color.clear;
         logo.transform.localScale = Vector3.one * 0.8f;
 
@@ -192,14 +191,7 @@ public static class LoadPatch
 
             // 使用协程来确保文字切换动画完成
             yield return ChangeLoadingText(step, 0.3f);
-
-            // 执行实际的加载操作
-            //if (step == LanguageConfig.Instance.LoadingCopyLibraries)
-            //{
-            //    //下载存储库
-
-            //    //PathUtils.CopyResourcesToDisk(PathUtils.GetAmongUsPath(),"Libraries.Jint.dll");
-            //}
+            
             if (step == LanguageConfig.Instance.LoadingHotKey)
             {
                 _ = ButtonHotkeyConfig.Instance;
@@ -448,14 +440,5 @@ public static class LoadPatch
             LoadText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.3f), t);
             yield return null;
         }
-    }
-    public static string YmalCheck()
-    {
-
-        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
-        {
-            return CultureInfo.CurrentUICulture.Name.StartsWith("zh") ? "请稍后，正在下载语言依赖库" : "Please Wait , Downloading YamlDotNet.dll";
-        }
-        else return "Please Wait , Downloading YamlDotNet.dll";
     }
 }

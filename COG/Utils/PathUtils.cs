@@ -1,14 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Diagnostics;
-using Mono.Cecil.Cil;
 
 namespace COG.Utils
 {
     public static class PathUtils
     {
-        public static string GetAmongUsPath(string additionPath = "")
+        public static string? GetAmongUsPath(string additionPath = "")
         {
             Process[] processes = Process.GetProcessesByName("Among Us");
             if (processes.Length == 0)
