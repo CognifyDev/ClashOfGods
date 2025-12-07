@@ -229,8 +229,8 @@ public class RoleAssignmentListener : IListener
                                {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).AsString()}
                            """);
 
-        Main.Logger.LogWarning("Message below is for debugging, not for cheating!");
-        Main.Logger.LogInfo(sb.ToString());
+        Main.Logger.LogDebug(sb.ToString());
+        Main.Logger.LogInfo("Successfully selected roles.");
     }
 
 
