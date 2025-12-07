@@ -27,13 +27,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\Images\*.*"/>
-        <EmbeddedResource Include="Resources\Images\Buttons\*.*"/>
-        <EmbeddedResource Include="Resources\Images\Settings\*.*"/>
-        <EmbeddedResource Include="Resources\Images\RolePreviews\*.*"/>
-    </ItemGroup>
-
-    <ItemGroup>
 <!--        <Reference Include="Assembly-CSharp-2025.11.18.dll" HintPath="..\Libs\Assembly-CSharp-2025.11.18.dll"/>-->
         <PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.11.18"/>
         <PackageReference Include="Jint" Version="4.1.0"/>

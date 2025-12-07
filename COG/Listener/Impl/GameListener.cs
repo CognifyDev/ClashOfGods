@@ -11,7 +11,6 @@ using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Patch;
 using COG.Role;
-using COG.States;
 using COG.UI.Hud.CustomButton;
 using COG.UI.Hud.CustomMessage;
 using COG.Utils;
@@ -103,33 +102,13 @@ public class GameListener : IListener
             manager.ImpostorVentButton.SetDisabled();
             manager.ImpostorVentButton.ToggleVisible(false);
         }
-        else
-        {
-            var playerControl = PlayerControl.LocalPlayer;
-            if (playerControl.IsAlive() && !GameStates.IsMeeting && !ExileController.Instance &&
-                !PlayerStates.IsShowingMap())
-            {
-                manager.ImpostorVentButton.SetEnabled();
-                manager.ImpostorVentButton.ToggleVisible(true);
-            }
-        }
 
         if (!role.CanSabotage)
         {
             manager.SabotageButton.SetDisabled();
             manager.SabotageButton.ToggleVisible(false);
         }
-        else
-        {
-            var playerControl = PlayerControl.LocalPlayer;
-            if (playerControl.IsAlive() && !GameStates.IsMeeting && !ExileController.Instance &&
-                !PlayerStates.IsShowingMap())
-            {
-                manager.SabotageButton.SetEnabled();
-                manager.SabotageButton.ToggleVisible(true);
-            }
-        }
-
+        
         CustomRoleManager.GetManager().GetRoles().ForEach(r => r.OnUpdate());
 
         var hint = GameObject.Find("RoleHintTask");
@@ -204,6 +183,22 @@ public class GameListener : IListener
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
             foreach (var player in PlayerControl.AllPlayerControls)
                 player.RpcSetCustomRole<Crewmate>();
+
+        var localPlayerRoles = PlayerControl.LocalPlayer.GetRoles();
+        if (localPlayerRoles.Any(role => role.CanSabotage))
+        {
+            DestroyableSingleton<HudManager>.Instance.SabotageButton.Show();
+            DestroyableSingleton<HudManager>.Instance.AdminButton.Show();
+            
+            DestroyableSingleton<HudManager>.Instance.SabotageButton.ToggleVisible(true);
+            DestroyableSingleton<HudManager>.Instance.AdminButton.ToggleVisible(true);
+        }
+
+        if (localPlayerRoles.Any(role => role.CanVent))
+        {
+            DestroyableSingleton<HudManager>.Instance.ImpostorVentButton.Show();
+            DestroyableSingleton<HudManager>.Instance.ImpostorVentButton.ToggleVisible(true);
+        }
     }
 
     private static string GetRoleHintText()

@@ -1,41 +1,32 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
+using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using COG.Config;
 using UnityEngine;
 
 namespace COG.Utils;
 
 public static class ResourceUtils
 {
+    private const string FileListURL =
+        "https://gh.halonice.com/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/resources.txt";
+    private const string TargetURL =
+        "https://gh.halonice.com/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/";
+    
+    private static readonly Dictionary<string, byte[]> Cache = new();
     private static readonly Dictionary<string, Sprite> CachedSprites = new();
 
-    public static void WriteToFileFromResource(string toPath, string resourcePath)
+    private const string CacheDataDir = ".\\" + ConfigBase.DataDirectoryName + "\\cache";
+
+    public static bool ContainResource(string path)
     {
-        if (File.Exists(toPath)) return;
-        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
-        if (stream != null) File.WriteAllBytes(toPath, stream.ReadFully());
+        return Cache.ContainsKey(path);
     }
-
-    public static Texture2D? LoadTextureFromDisk(string path)
-    {
-        try
-        {
-            if (File.Exists(path))
-            {
-                var texture = new Texture2D(2, 2, TextureFormat.ARGB32, true);
-                var byteTexture = Il2CppSystem.IO.File.ReadAllBytes(path);
-                texture.LoadImage(byteTexture, false);
-                return texture;
-            }
-        }
-        catch
-        {
-            return null;
-        }
-
-        return null;
-    }
-
+    
     public static Sprite? LoadSprite(string path, float pixelsPerUnit = 100f)
     {
         try
@@ -54,26 +45,106 @@ public static class ResourceUtils
         }
     }
 
-    public static Texture2D LoadTextureFromResources(string path)
+    private static Texture2D LoadTextureFromResources(string path)
     {
-        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
         var texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-        using MemoryStream ms = new();
-        stream?.CopyTo(ms);
-        var succeed = texture.LoadImage(ms.ToArray(), false);
+        var succeed = texture.LoadImage(DownloadFromURLOrGetFromCache(path), false);
         if (!succeed) Main.Logger.LogError("Failed to load texture: " + path);
         return texture;
     }
 
-    public static byte[] ReadFully(this Stream input)
+    static ResourceUtils()
     {
-        using var ms = new MemoryStream();
-        input.CopyTo(ms);
-        return ms.ToArray();
+        if (!Directory.Exists(CacheDataDir))
+        {
+            Directory.CreateDirectory(CacheDataDir);
+        }
+        
+        foreach (var filePath in Directory.GetFiles(CacheDataDir, "*.*", SearchOption.AllDirectories))
+        {
+            // .\ClashOfGods_DATA\cache\filename
+            var path = filePath.Replace(CacheDataDir + "\\", "").Replace("\\", "/");
+            var bytes = File.ReadAllBytes(filePath);
+            Cache.Add(path, bytes);
+        }
+
+        var fileListBytes = DownloadFromURLOrGetFromCache(FileListURL, true);
+        if (fileListBytes.Length > 0)
+        {
+            var fileList = Encoding.UTF8.GetString(fileListBytes);
+            foreach (var currentFile in fileList.Split("\n"))
+            {
+                if (!currentFile.Contains(',')) continue;
+                var split = currentFile.Split(",");
+                var filePath = split[0];
+                var sha1 = split[0];
+
+                var target = CacheDataDir + "\\" + filePath;
+                if (File.Exists(target))
+                {
+                    if (sha1.Equals(GetFileSHA1(target))) continue;
+                    File.Delete(target);
+                    File.WriteAllBytes(target, DownloadFromURLOrGetFromCache(filePath));
+                }
+                else
+                {
+                    var directoryName = Path.GetDirectoryName(target);
+                    if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName)) 
+                        Directory.CreateDirectory(directoryName);
+                    File.WriteAllBytes(target, DownloadFromURLOrGetFromCache(filePath));
+                }
+            }
+        }
+        else
+        {
+            Main.Logger.LogError("Failed to update cache");
+            Main.Logger.LogError("Please reboot the game and then try again");
+        }
+    }
+    
+    private static string GetFileSHA1(string filePath)
+    {
+        if (string.IsNullOrEmpty(filePath))
+            throw new ArgumentNullException(nameof(filePath));
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException($"Cannot find file：{filePath}");
+
+        using var sha1 = SHA1.Create();
+        using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        var hashBytes = sha1.ComputeHash(fs);
+
+        var sb = new StringBuilder();
+        foreach (var b in hashBytes)
+        {
+            sb.Append(b.ToString("x2")); // "x2" 表示以小写十六进制格式输出，两位对齐
+        }
+        return sb.ToString();
     }
 
-    public static string GetResourcePath(string pathToFile)
+    private static byte[] DownloadFromURLOrGetFromCache(string path, bool isURL = false)
     {
-        return $"COG.Resources.{pathToFile}";
+        if (!isURL)
+            if (Cache.TryGetValue(path, out var bytes))
+                return bytes;
+        
+        var targetURL = isURL ? path : $"{TargetURL}{path}";
+        
+        var result = Task.Run(async () =>
+        {
+            using var httpClient = new HttpClient();
+            Main.Logger.LogInfo("Downloading needed file from: " + targetURL);
+            try
+            {
+                return await httpClient.GetByteArrayAsync(targetURL);
+            }
+            catch
+            {
+                Main.Logger.LogError("Failed to download target file.");
+                return [];
+            }
+        }).Result;
+        
+        if (!isURL) Cache.Add(path, result);
+        return result;
     }
 }

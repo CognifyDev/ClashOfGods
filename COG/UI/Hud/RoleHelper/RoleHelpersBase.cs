@@ -1,6 +1,4 @@
-﻿using TMPro;
-
-namespace COG.UI.Hud.RoleHelper;
+﻿namespace COG.UI.Hud.RoleHelper;
 
 public class RoleHelpersBase
 {
