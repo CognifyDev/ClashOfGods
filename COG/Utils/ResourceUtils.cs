@@ -27,22 +27,31 @@ public static class ResourceUtils
         return Cache.ContainsKey(path);
     }
     
-    public static Sprite? LoadSprite(string path, float pixelsPerUnit = 100f)
+    public static Sprite LoadSprite(string path, float pixelsPerUnit = 100f)
     {
         try
         {
             if (CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
-            var texture = LoadTextureFromResources(path);
-            sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f),
-                pixelsPerUnit);
-            sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
-            return CachedSprites[path + pixelsPerUnit] = sprite;
+            try
+            {
+                var texture = LoadTextureFromResources(path);
+                sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f),
+                    pixelsPerUnit);
+                sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
+                return CachedSprites[path + pixelsPerUnit] = sprite;
+            }
+            catch (System.Exception e)
+            {
+                Main.Logger.LogError($"Failed to load sprite: {e}");
+            }
         }
         catch (System.Exception e)
         {
             Main.Logger.LogError($"Error while loading {path} ({pixelsPerUnit}): {e}");
-            return null;
+            throw new System.Exception($"Failed to load {path}");
         }
+
+        throw new System.Exception("Failed to load sprite");
     }
 
     private static Texture2D LoadTextureFromResources(string path)

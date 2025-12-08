@@ -5,7 +5,7 @@ namespace COG.Constant;
 ///     <para />
 ///     记录了各种常用资源位置
 /// </summary>
-public class ResourceConstant
+public static class ResourceConstant
 {
     // Buttons
     public const string CleanDeadBodyButton = "Images/Buttons/CleanDeadBody.png";

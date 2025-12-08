@@ -40,7 +40,7 @@ public class Doorman : CustomRole
             },
             () => !_usedThisRound,
             () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.BlockButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.BlockButton),
             2,
             LanguageConfig.Instance.BlockAction,
             () => 0f,

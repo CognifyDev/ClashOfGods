@@ -28,8 +28,8 @@ namespace COG.UI.Load;
 [HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
 public static class LoadPatch
 {
-    private static readonly Sprite LogoSprite = LoadSprite(ResourceConstant.BgLogoSprite, 300f)!;
-    private static readonly Sprite BgSprite = LoadSprite(ResourceConstant.LoadBgSprite)!;
+    private static readonly Sprite LogoSprite = LoadSprite(ResourceConstant.BgLogoSprite, 300f);
+    private static readonly Sprite BgSprite = LoadSprite(ResourceConstant.LoadBgSprite);
     public static TextMeshPro LoadText = null!;
 
     public static bool LoadedTeamLogo;

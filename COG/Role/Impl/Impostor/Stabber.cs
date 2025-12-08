@@ -38,7 +38,7 @@ public class Stabber : CustomRole
             () => _dispatchButton?.ResetCooldown(),
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
             () => _killedTimes < _maxUseTime.GetInt(),
-            ResourceUtils.LoadSprite(ResourceConstant.DispatchButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.DispatchButton),
             2,
             LanguageConfig.Instance.DispatchAction,
             () => GameUtils.GetGameOptions().KillCooldown,

@@ -44,7 +44,7 @@ public class DeathBringer : CustomRole, IListener
             () => _stareButton!.ResetCooldown(),
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
             () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.StareButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.StareButton),
             3,
             LanguageConfig.Instance.StareAction,
             _killCooldown.GetFloat,
