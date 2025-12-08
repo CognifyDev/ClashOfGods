@@ -116,15 +116,17 @@ public static class LoadPatch
         TeamLogoActive = false;
     }
 
-    private static IEnumerator CoLoadFracturedTruth(SplashManager __instance)
+    private static IEnumerator CoLoadMod(SplashManager __instance)
     {
-        var logo = CreateObject<SpriteRenderer>("COG-BG", null!, new Vector3(0, 0.5f, -5f));
+        var logo = CreateObject<SpriteRenderer>("COG-BG", null!, new Vector3(0, 0.5f, -4.9f));
         logo.sprite = LogoSprite;
         logo.color = Color.clear;
+        logo.sortingOrder = 1;
 
         var bg = CreateObject<SpriteRenderer>("COG-LOADBG", null!, new Vector3(0, 0.5f, -5f));
         bg.sprite = BgSprite;
         bg.color = Color.clear;
+        bg.sortingOrder = 0;
 
         // 使用 Mathf.SmoothStep 替代复杂的缓动函数
         var duration = 1.5f;
@@ -399,7 +401,7 @@ public static class LoadPatch
             !_loadedFracturedTruth)
         {
             _loadedFracturedTruth = true;
-            __instance.StartCoroutine(CoLoadFracturedTruth(__instance).WrapToIl2Cpp());
+            __instance.StartCoroutine(CoLoadMod(__instance).WrapToIl2Cpp());
         }
 
         return false;
