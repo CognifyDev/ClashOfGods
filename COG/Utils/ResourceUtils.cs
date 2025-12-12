@@ -22,7 +22,7 @@ public static class ResourceUtils
 
     private const string CacheDataDir = ".\\" + ConfigBase.DataDirectoryName + "\\cache";
 
-    public static bool ContainResource(string path)
+    public static bool ContainsResource(string path)
     {
         return Cache.ContainsKey(path);
     }

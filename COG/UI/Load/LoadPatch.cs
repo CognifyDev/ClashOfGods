@@ -193,15 +193,17 @@ public static class LoadPatch
 
             // 使用协程来确保文字切换动画完成
             yield return ChangeLoadingText(step, 0.3f);
-            
-            if (step == LanguageConfig.Instance.LoadingHotKey)
+
+            try
             {
-                _ = ButtonHotkeyConfig.Instance;
-            }
-            else if (step == LanguageConfig.Instance.LoadingListeners)
-            {
-                ListenerManager.GetManager().RegisterListeners([
-                    new CommandListener(),
+                if (step == LanguageConfig.Instance.LoadingHotKey)
+                {
+                    _ = ButtonHotkeyConfig.Instance;
+                }
+                else if (step == LanguageConfig.Instance.LoadingListeners)
+                {
+                    ListenerManager.GetManager().RegisterListeners([
+                        new CommandListener(),
                     new PlayerListener(),
                     new CustomButtonListener(),
                     new GameListener(),
@@ -214,21 +216,21 @@ public static class LoadPatch
                     new LobbyListener(),
                     new RoleAssignmentListener(),
                     new IntroListener()
-                ]);
-            }
-            else if (step == LanguageConfig.Instance.LoadingWinners)
-            {
-                CustomWinnerManager.GetManager().RegisterCustomWinnables([
-                    new CrewmatesCustomWinner(),
+                    ]);
+                }
+                else if (step == LanguageConfig.Instance.LoadingWinners)
+                {
+                    CustomWinnerManager.GetManager().RegisterCustomWinnables([
+                        new CrewmatesCustomWinner(),
                     new ImpostorsCustomWinner(),
                     new LastPlayerCustomWinner()
-                ]);
-            }
-            else if (step == LanguageConfig.Instance.LoadingRoles)
-            {
-                CustomRoleManager.GetManager().RegisterRoles([
-                    // Unknown
-                    new Unknown(),
+                    ]);
+                }
+                else if (step == LanguageConfig.Instance.LoadingRoles)
+                {
+                    CustomRoleManager.GetManager().RegisterRoles([
+                        // Unknown
+                        new Unknown(),
 
                     // Crewmate
                     new Crewmate(),
@@ -260,35 +262,40 @@ public static class LoadPatch
                     // Sub-roles
                     new Guesser(),
                     new SpeedBooster()
-                ]);
-            }
-            else if (step == LanguageConfig.Instance.LoadingSettings)
-            {
-                _ = SettingsConfig.Instance;
-            }
-            else if (step == LanguageConfig.Instance.LoadingPlugins)
-            {
-                if (SettingsConfig.Instance.EnablePluginSystem)
-                {
-                    if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
-                        Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
-
-                    var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
-                        .Where(name => name.ToLower().EndsWith(".cog"));
-                    var enumerable = files.ToArray();
-                    Main.Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
-
-                    foreach (var file in enumerable)
-                        IPluginManager.GetDefaultManager().LoadPlugin(file);
+                    ]);
                 }
-            }
-            else if (step == LanguageConfig.Instance.LoadingCommand)
-            {
-                CommandManager.GetManager().RegisterCommands([
-                    new RpcCommand(),
+                else if (step == LanguageConfig.Instance.LoadingSettings)
+                {
+                    _ = SettingsConfig.Instance;
+                }
+                else if (step == LanguageConfig.Instance.LoadingPlugins)
+                {
+                    if (SettingsConfig.Instance.EnablePluginSystem)
+                    {
+                        if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
+                            Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
+
+                        var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
+                            .Where(name => name.ToLower().EndsWith(".cog"));
+                        var enumerable = files.ToArray();
+                        Main.Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
+
+                        foreach (var file in enumerable)
+                            IPluginManager.GetDefaultManager().LoadPlugin(file);
+                    }
+                }
+                else if (step == LanguageConfig.Instance.LoadingCommand)
+                {
+                    CommandManager.GetManager().RegisterCommands([
+                        new RpcCommand(),
                     new OptionCommand(),
                     new DebugCommand()
-                ]);
+                    ]);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Main.Logger.LogError($"Error while loading: " + e);
             }
 
             // 如果不是最后一步，等待一下再继续

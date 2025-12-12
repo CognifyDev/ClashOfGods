@@ -85,7 +85,7 @@ public static class RoleOptionPatch
         __instance.roleHeaderText.text = CurrentAdvancedTabFor.Name;
         __instance.roleDescriptionText.text = CurrentAdvancedTabFor.GetLongDescription();
         var path = $"Images/RolePreviews/{CurrentAdvancedTabFor.GetType().Name}.png";
-        var rolePreviewable = ResourceUtils.ContainResource(path);
+        var rolePreviewable = ResourceUtils.ContainsResource(path);
         var rolePreview = rolePreviewable ?
             ResourceUtils.LoadSprite(path, 300) :
             ResourceUtils.LoadSprite(ResourceConstant.DefaultRolePreview, 300);
