@@ -1,6 +1,7 @@
-﻿using System;
-using COG.Rpc;
+﻿using COG.Rpc;
 using COG.Utils;
+using System;
+using UnityEngine.Analytics;
 
 namespace COG.Game.Events;
 
@@ -21,6 +22,7 @@ public abstract class NetworkedGameEventBase<TEvent, TSender>(GameEventType even
 
 public abstract class NetworkedGameEventSender<TSelf, TEvent>
     where TSelf : NetworkedGameEventSender<TSelf, TEvent>, new()
+    where TEvent : NetworkedGameEventBase<TEvent, TSelf>
 {
     private static TSelf? _instance;
     public static TSelf Instance => _instance ??= new TSelf();

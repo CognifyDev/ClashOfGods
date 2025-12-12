@@ -45,6 +45,7 @@ public class EventRecorder
         where TSender : NetworkedGameEventSender<TSender, TEvent>, new()
     {
         var writer = RpcWriter.Start(KnownRpc.SyncGameEvent);
+        writer.Write(typeof(TEvent).FullName!).Write(typeof(TSender).FullName!);
         gameEvent.EventSender.Serialize(writer, gameEvent);
         writer.Finish();
     }
