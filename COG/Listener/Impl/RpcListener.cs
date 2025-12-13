@@ -1,4 +1,6 @@
 using System.Linq;
+using System.Reflection;
+using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Rpc;
@@ -140,18 +142,33 @@ public class RpcListener : IListener
 
             case KnownRpc.SyncGameEvent:
             {
-                // TODO: MAKE THIS WORK
-                /*
-                var id = reader.ReadString();
-                dynamic? sender = INetworkedGameEventSender.AllSenders.FirstOrDefault(s => s.Id == id);
+                var eventNameFull = reader.ReadString();
+                var typeNameFull = reader.ReadString();
 
-                if (sender == null)
+                var eventType = Main.Assembly.GetTypes().FirstOrDefault(t => t.FullName == eventNameFull);
+                var deserializerType = Main.Assembly.GetTypes().FirstOrDefault(t => t.FullName == typeNameFull);
+
+                if (eventType == null || deserializerType == null)
                 {
-                    Main.Logger.LogWarning("Null serializer while receiving game event");
+                    Main.Logger.LogError($"Unsupported event type: {eventNameFull} ({typeNameFull})");
                     break;
                 }
 
-                EventRecorder.Instance.Record(sender.Deserialize(reader));*/
+                try
+                {
+                    var eventSenderBaseType = typeof(NetworkedGameEventSender<,>);
+                    var genericSenderType = eventSenderBaseType.MakeGenericType(deserializerType, eventType);
+
+                    var instance = genericSenderType.GetProperty("Instance")!.GetValue(null)!;
+                    var deserializedEvent = genericSenderType.GetMethod("Deserialize")!.Invoke(instance, [reader]);
+
+                    EventRecorder.Instance.Record(deserializedEvent as IGameEvent);
+                }
+                catch (System.Exception e)
+                {
+                    Main.Logger.LogError($"Error deserializing game event {eventNameFull} ({typeNameFull}): {e}");
+                }
+
                 break;
             }
         }

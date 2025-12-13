@@ -26,6 +26,8 @@ using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
+using System.Reflection;
+
 #if WINDOWS
 using System.Windows.Forms;
 #endif
@@ -46,6 +48,8 @@ public partial class Main : BasePlugin
     public static VersionInfo VersionInfo { get; private set; } = null!;
     public static string PluginVersion { get; private set; } = null!;
     public static DateTime CommitTime => DateTime.Parse(GitInfo.CommitDate);
+    public static Assembly Assembly { get; } = typeof(Main).Assembly;
+
     private Harmony Harmony { get; } = new(PluginGuid);
 
     public static Main Instance { get; private set; } = null!;

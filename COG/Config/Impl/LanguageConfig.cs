@@ -281,15 +281,15 @@ public class LanguageConfig : ConfigBase
 
         //Load
         Loading = GetString("load.loading");
-        LoadingSettings = GetString("load.loadsettingconfig");
-        LoadingHotKey = GetString("load.loadhotkeycofig");
-        LoadingRoles = GetString("load.loadroles");
-        LoadingListeners = GetString("load.loadlisteners");
-        LoadingWinners = GetString("load.loadwinners");
-        LoadingClientOptions = GetString("load.loadclientoptions");
-        LoadingPlugins = GetString("load.loadplugins");
-        LoadingCommand = GetString("load.loadcommand");
-        LoadingCompeleted = GetString("load.loadcompeleted");
+        LoadingSettings = GetString("load.load-setting-config");
+        LoadingHotKey = GetString("load.load-hotkey-cofig");
+        LoadingRoles = GetString("load.load-roles");
+        LoadingListeners = GetString("load.load-listeners");
+        LoadingWinners = GetString("load.load-winners");
+        LoadingClientOptions = GetString("load.load-client-options");
+        LoadingPlugins = GetString("load.load-plugins");
+        LoadingCommand = GetString("load.load-command");
+        LoadingCompeleted = GetString("load.load-compeleted");
 
         //Credits
         Developer = GetString("credits.developers");

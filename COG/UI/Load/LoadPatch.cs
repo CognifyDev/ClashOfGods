@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
@@ -28,8 +30,8 @@ namespace COG.UI.Load;
 [HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
 public static class LoadPatch
 {
-    private static readonly Sprite LogoSprite = LoadSprite(ResourceConstant.BgLogoSprite, 300f)!;
-    private static readonly Sprite BgSprite = LoadSprite(ResourceConstant.LoadBgSprite)!;
+    private static readonly Sprite LogoSprite = LoadSprite(ResourceConstant.BgLogoSprite, 300f);
+    private static readonly Sprite BgSprite = LoadSprite(ResourceConstant.LoadBgSprite);
     public static TextMeshPro LoadText = null!;
 
     public static bool LoadedTeamLogo;
@@ -183,23 +185,10 @@ public static class LoadPatch
             LanguageConfig.Instance.LoadingCompeleted
         ];
 
-        // 执行每个加载步骤
-        for (var i = 0; i < loadingSteps.Length; i++)
-        {
-            var step = loadingSteps[i];
-
-            // 如果是最后一步（加载完成），先等待一下再显示
-            if (i == loadingSteps.Length - 1) yield return new WaitForSeconds(0.5f);
-
-            // 使用协程来确保文字切换动画完成
-            yield return ChangeLoadingText(step, 0.3f);
-            
-            if (step == LanguageConfig.Instance.LoadingHotKey)
-            {
-                _ = ButtonHotkeyConfig.Instance;
-            }
-            else if (step == LanguageConfig.Instance.LoadingListeners)
-            {
+        // 加载步骤与处理逻辑映射
+        var loadingStepActions = new Dictionary<string, Action> {
+            [LanguageConfig.Instance.LoadingHotKey] = () => { _ = ButtonHotkeyConfig.Instance; },
+            [LanguageConfig.Instance.LoadingListeners] = () => {
                 ListenerManager.GetManager().RegisterListeners([
                     new CommandListener(),
                     new PlayerListener(),
@@ -215,21 +204,18 @@ public static class LoadPatch
                     new RoleAssignmentListener(),
                     new IntroListener()
                 ]);
-            }
-            else if (step == LanguageConfig.Instance.LoadingWinners)
-            {
+            },
+            [LanguageConfig.Instance.LoadingWinners] = () => {
                 CustomWinnerManager.GetManager().RegisterCustomWinnables([
                     new CrewmatesCustomWinner(),
                     new ImpostorsCustomWinner(),
                     new LastPlayerCustomWinner()
                 ]);
-            }
-            else if (step == LanguageConfig.Instance.LoadingRoles)
-            {
+            },
+            [LanguageConfig.Instance.LoadingRoles] = () => {
                 CustomRoleManager.GetManager().RegisterRoles([
                     // Unknown
                     new Unknown(),
-
                     // Crewmate
                     new Crewmate(),
                     new Bait(),
@@ -242,7 +228,6 @@ public static class LoadPatch
                     new Chief(),
                     new Enchanter(),
                     new Witch(),
-
                     // Impostor
                     new Impostor(),
                     new Cleaner(),
@@ -251,44 +236,60 @@ public static class LoadPatch
                     new Troublemaker(),
                     new Nightmare(),
                     new Spy(),
-
                     // Neutral
                     new Jester(),
                     new Reporter(),
                     new DeathBringer(),
-
                     // Sub-roles
                     new Guesser(),
                     new SpeedBooster()
                 ]);
-            }
-            else if (step == LanguageConfig.Instance.LoadingSettings)
-            {
-                _ = SettingsConfig.Instance;
-            }
-            else if (step == LanguageConfig.Instance.LoadingPlugins)
-            {
+            },
+            [LanguageConfig.Instance.LoadingSettings] = () => { _ = SettingsConfig.Instance; },
+            [LanguageConfig.Instance.LoadingPlugins] = () => {
                 if (SettingsConfig.Instance.EnablePluginSystem)
                 {
                     if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
                         Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
-
                     var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
                         .Where(name => name.ToLower().EndsWith(".cog"));
                     var enumerable = files.ToArray();
                     Main.Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
-
                     foreach (var file in enumerable)
                         IPluginManager.GetDefaultManager().LoadPlugin(file);
                 }
-            }
-            else if (step == LanguageConfig.Instance.LoadingCommand)
-            {
+            },
+            [LanguageConfig.Instance.LoadingCommand] = () => {
                 CommandManager.GetManager().RegisterCommands([
                     new RpcCommand(),
                     new OptionCommand(),
                     new DebugCommand()
                 ]);
+            }
+        };
+
+        // 执行每个加载步骤
+        for (var i = 0; i < loadingSteps.Length; i++)
+        {
+            var step = loadingSteps[i];
+
+            // 如果是最后一步（加载完成），先等待一下再显示
+            if (i == loadingSteps.Length - 1) yield return new WaitForSeconds(0.5f);
+
+            // 使用协程来确保文字切换动画完成
+            yield return ChangeLoadingText(step, 0.3f);
+
+            // 执行对应的加载逻辑
+            if (loadingStepActions.TryGetValue(step, out var action))
+            {
+                try
+                {
+                    action();
+                }
+                catch (System.Exception e)
+                {
+                    Main.Logger.LogError($"Error while loading: " + e);
+                }
             }
 
             // 如果不是最后一步，等待一下再继续

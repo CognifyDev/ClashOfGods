@@ -43,7 +43,7 @@ public class Inspector : CustomRole, IListener
                 return PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _buttonTarget);
             },
             () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.ExamineButton)!,
+            ResourceUtils.LoadSprite(ResourceConstant.ExamineButton),
             2,
             LanguageConfig.Instance.ExamineAction,
             AbilityCooldownOption.GetFloat,
