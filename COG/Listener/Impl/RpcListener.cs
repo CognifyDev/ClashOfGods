@@ -159,8 +159,8 @@ public class RpcListener : IListener
                     var eventSenderBaseType = typeof(NetworkedGameEventSender<,>);
                     var genericSenderType = eventSenderBaseType.MakeGenericType(deserializerType, eventType);
 
-                    var instance = genericSenderType.GetProperty(nameof(NetworkedGameEventSender<,>.Instance))!.GetValue(null)!;
-                    var deserializedEvent = genericSenderType.GetMethod(nameof(NetworkedGameEventSender<,>.Deserialize))!.Invoke(instance, [reader]);
+                    var instance = genericSenderType.GetProperty("Instance")!.GetValue(null)!;
+                    var deserializedEvent = genericSenderType.GetMethod("Deserialize")!.Invoke(instance, [reader]);
 
                     EventRecorder.Instance.Record(deserializedEvent as IGameEvent);
                 }
