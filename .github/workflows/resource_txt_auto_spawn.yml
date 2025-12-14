@@ -1,0 +1,31 @@
+name: Update Resources
+
+on:
+  push:
+    paths:
+      - 'Resources/*'
+      - '!Resources/resources.txt'
+      - 'Resources/*/**'
+    branches: [ main ]
+
+jobs:
+  update-resources:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run update script
+        run: |
+          cd Resources
+          bash spawn_resources.sh
+      - name: Commit if changed
+        id: commit
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: auto-update resources.txt"
+          file_pattern: 'Resources/resources.txt'
+          commit_user_name: 'github-actions[bot]'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
