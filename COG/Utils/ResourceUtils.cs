@@ -13,9 +13,9 @@ namespace COG.Utils;
 public static class ResourceUtils
 {
     private const string FileListURL =
-        "https://download.cognifydev.cn/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/resources.txt";
+        "https://download.hayashiume.top/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/resources.txt";
     private const string TargetURL =
-        "https://download.cognifydev.cn/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/";
+        "https://download.hayashiume.top/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/";
     
     private static readonly Dictionary<string, byte[]> Cache = new();
     private static readonly Dictionary<string, Sprite> CachedSprites = new();
