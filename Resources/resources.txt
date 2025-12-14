@@ -18,7 +18,6 @@ Images/RolePreviews/Sheriff.png,8726b13892995715c3e6616a909372b0a760df9b
 Images/RolePreviews/Jester.png,373dcd60277ed8b824b40a81d9a18454456e61d1
 Images/RolePreviews/Reaper.png,bdb8e2af28a2212c0bd6e7a873f2e67a79e59183
 Images/RolePreviews/Vigilante.png,fd7a3dd9b16fc49f83d84ee0632831249e10af48
-Images/test.png,2804fbb4b149ac4067917c35e529e92fa005a676
 Images/Buttons/Dispatch.png,21036812503dd33d60735185487cd7bd4c779cd4
 Images/Buttons/Examine.png,4fd44490a05b4143c0ce90342a2e3c2a559a307d
 Images/Buttons/Stare.png,43503e135bac5814e9f36186dfbd20b6b3957f73
