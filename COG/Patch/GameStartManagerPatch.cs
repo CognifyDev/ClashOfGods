@@ -49,11 +49,4 @@ internal static class GameStartManagerPatch
         size.x *= 2;
         collider.size = size;
     }
-
-    [HarmonyPatch(nameof(GameStartManager.Update))]
-    [HarmonyPrefix]
-    public static void ChangeMinNum(GameStartManager __instance)
-    {
-        if (CheckEndCriteriaPatch.NoEndGame) __instance.MinPlayers = 1;
-    }
 }
