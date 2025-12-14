@@ -183,12 +183,6 @@ option:
     name: "热键设置"
     press-key-to-set: "请在%sec%秒内按下新热键"
     button: "技能按钮"
-  no-end-game:
-    name: "开房人数缩小"
-    success: "成功启用，开始游戏最少人数缩短到1人"
-    off: "已被关闭，开始游戏最少人数以还原"
-    error: "该选项不能在对局中被修改"
-    tip: "请重新进入游戏以启用"
   enable: "<color=#5DB927>开启</color>"
   disable: "<color=#F20D0D>关闭</color>"
 main-menu:

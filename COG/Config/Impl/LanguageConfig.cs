@@ -260,11 +260,6 @@ public class LanguageConfig : ConfigBase
         UnloadModButtonName = GetString("option.main.unload-mod.name");
         UnloadModSuccessfulMessage = GetString("option.main.unload-mod.success");
         UnloadModInGameErrorMsg = GetString("option.main.unload-mod.error-in-game");
-        NoEndGameButtonName = GetString("option.no-end-game.name");
-        NoEndGameInfoMessage = GetString("option.no-end-game.success");
-        NoEndGameErrorMessage = GetString("option.no-end-game.error");
-        NoEndGameOff = GetString("option.no-end-game.off");
-        NoEndGameTipMessage = GetString("option.no-end-game.tip");
 
         UpToDate = GetString("main-menu.update.up-to-date");
         NonCheck = GetString("main-menu.update.check-failed");

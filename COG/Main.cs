@@ -198,33 +198,6 @@ public partial class Main : BasePlugin
                     GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
                     return false;
                 }),
-            new ToggleClientOption("no-end-game.name",
-                false,
-                _ =>
-                {
-                    DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
-                    if (GameStates.InRealGame)
-                    {
-                        GameUtils.Popup?.Show(LanguageConfig.Instance.NoEndGameErrorMessage);
-                        return false;
-                    }
-
-                    if (GameStates.InLobby)
-                    {
-                        GameUtils.Popup?.Show(LanguageConfig.Instance.NoEndGameTipMessage);
-                        return false;
-                    }
-
-                    if (CheckEndCriteriaPatch.NoEndGame)
-                        CheckEndCriteriaPatch.NoEndGame = false;
-                    else
-                        CheckEndCriteriaPatch.NoEndGame = true;
-
-                    GameUtils.Popup?.Show(CheckEndCriteriaPatch.NoEndGame
-                        ? LanguageConfig.Instance.NoEndGameInfoMessage
-                        : LanguageConfig.Instance.NoEndGameOff);
-                    return false;
-                }),
 #if WINDOWS
             new ToggleClientOption("main.load-custom-lang",
                 false,

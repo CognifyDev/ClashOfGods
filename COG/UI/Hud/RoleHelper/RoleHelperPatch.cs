@@ -61,7 +61,7 @@ public static class RoleHelperManager
             if (UnityEngine.Input.GetKeyDown(KeyCode.F1))
             {
                 UpdateLocalPlayerRoleInfo();
-                GameUtils.Popup.Show(localPlayerShower);
+                GameUtils.Popup?.Show(localPlayerShower);
             }
         }
     }
