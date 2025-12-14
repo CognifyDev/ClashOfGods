@@ -14,9 +14,11 @@ namespace COG.Listener.Impl;
 public class RoleAssignmentListener : IListener
 {
     private readonly RpcHandler<int, CustomPlayerData[]> _roleSelectionShareRpcHandler;
+    private readonly Random _random;
 
     public RoleAssignmentListener()
     {
+        _random = new Random();
         _roleSelectionShareRpcHandler = new RpcHandler<int, CustomPlayerData[]>(KnownRpc.ShareRoles,
             (_, playerData) =>
             {
@@ -59,8 +61,6 @@ public class RoleAssignmentListener : IListener
 
         IRpcHandler.Register(_roleSelectionShareRpcHandler);
     }
-
-
     /*
      * 职业分配逻辑：
      *
@@ -69,179 +69,257 @@ public class RoleAssignmentListener : IListener
      * 2.应当保证内鬼先被分配完全，其次是船员和中立阵营
      * 3.副职业分配要小心，为了算法的快速应当在分配上述职业的情况下一同分配副职业
      */
-    private static void SelectRoles()
+    private void SelectRoles()
     {
-        // 首先清除 防止干扰
         GameUtils.PlayerData.Clear();
 
-        // 不是房主停止分配
         if (!AmongUsClient.Instance.AmHost) return;
 
-        // 获取所有的玩家集合
-        var playerGetter = new PlayerGetter(PlayerUtils.GetAllPlayers().ToArray());
+        try
+        {
+            if (!ValidateRoleConfiguration())
+            {
+                ApplyFallbackRoles();
+                return;
+            }
 
-        // 添加到字典
-        var mainRoleData = new Dictionary<PlayerControl, CustomRole>();
-        var subRoleData = new Dictionary<PlayerControl, CustomRole[]>();
+            var players = PlayerUtils.GetAllPlayers().ToArray();
+            var playerGetter = new PlayerGetter(players);
 
-        // 获取最多可以被赋予的副职业数量
-        var maxSubRoleNumber = GlobalCustomOptionConstant.MaxSubRoleNumber.GetInt();
+            ValidateAssignmentParameters(GameUtils.GetImpostorsNumber(), GameUtils.GetNeutralNumber(), players.Length);
 
-        // 获取本局游戏要分配的内鬼数量
+            var mainRoleData = new Dictionary<PlayerControl, CustomRole>();
+            var subRoleData = new Dictionary<PlayerControl, CustomRole[]>();
+
+            AssignMainRoles(playerGetter, mainRoleData);
+            AssignSubRoles(subRoleData, GlobalCustomOptionConstant.MaxSubRoleNumber.GetInt());
+            ApplyRolesToPlayers(mainRoleData, subRoleData);
+            LogRoleAssignment();
+
+            Main.Logger.LogInfo("Successfully selected roles.");
+        }
+        catch (System.Exception ex)
+        {
+            Main.Logger.LogError($"职业分配失败: {ex.Message}");
+            ApplyFallbackRoles();
+        }
+    }
+
+    private static bool ValidateRoleConfiguration()
+    {
+        try
+        {
+            var impostorRoles = CustomRoleManager.GetManager()
+                .NewGetter(role => role.CampType == CampType.Impostor);
+            var neutralRoles = CustomRoleManager.GetManager()
+                .NewGetter(role => role.CampType == CampType.Neutral);
+
+            var impostorNumber = GameUtils.GetImpostorsNumber();
+            var neutralNumber = GameUtils.GetNeutralNumber();
+
+            if (impostorRoles.Number() < impostorNumber)
+            {
+                Main.Logger.LogWarning($"内鬼职业数量不足: 需要{impostorNumber}个，但只有{impostorRoles.Number()}个可用");
+                return false;
+            }
+
+            if (neutralRoles.Number() < neutralNumber)
+            {
+                Main.Logger.LogWarning($"中立职业数量不足: 需要{neutralNumber}个，但只有{neutralRoles.Number()}个可用");
+                return false;
+            }
+
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Main.Logger.LogError($"职业配置验证异常: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static void ValidateAssignmentParameters(int impostorNumber, int neutralNumber, int playerCount)
+    {
+        if (impostorNumber < 0 || neutralNumber < 0)
+        {
+            throw new ArgumentException($"职业数量不能为负数: 内鬼={impostorNumber}, 中立={neutralNumber}");
+        }
+
+        if (impostorNumber + neutralNumber > playerCount)
+        {
+            Main.Logger.LogWarning($"职业数量配置可能异常: 内鬼{impostorNumber} + 中立{neutralNumber} > 玩家总数{playerCount}");
+        }
+
+        if (playerCount == 0)
+        {
+            throw new InvalidOperationException("没有玩家可分配职业");
+        }
+    }
+
+    private static void AssignMainRoles(PlayerGetter playerGetter, Dictionary<PlayerControl, CustomRole> mainRoleData)
+    {
         var impostorNumber = GameUtils.GetImpostorsNumber();
-
-        // 获取本局游戏要分配的中立数量
         var neutralNumber = GameUtils.GetNeutralNumber();
 
-        // 获取一个副职业获取器
-        var subRoleGetter = CustomRoleManager.GetManager().NewGetter(role => role.IsSubRole);
-
-        // 获取一个内鬼获取器
-        var impostorGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Impostor,
+        var impostorGetter = CustomRoleManager.GetManager().NewGetter(
+            role => role.CampType == CampType.Impostor,
             CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>());
 
-        // 创建一个中立职业获取器
-        // 实际上 CustomRoleManager.GetManager().GetTypeRoleInstance<Jester>() 是多余的
-        // 因为在 GameUtils#GetNeutralNumber 中我们已经制定了场上存在的中立数量是设置里面设置的中立数量
-        var neutralGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Neutral);
+        var neutralGetter = CustomRoleManager.GetManager().NewGetter(
+            role => role.CampType == CampType.Neutral);
 
-        var crewmateGetter = CustomRoleManager.GetManager().NewGetter(role => role.CampType == CampType.Crewmate,
+        var crewmateGetter = CustomRoleManager.GetManager().NewGetter(
+            role => role.CampType == CampType.Crewmate,
             CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>());
 
-        // 首先分配内鬼职业
         for (var i = 0; i < impostorNumber; i++)
         {
             if (!playerGetter.HasNext()) break;
+            if (!impostorGetter.HasNext()) break;
 
-            // 因为Getter设置了默认值，因此无需检测是否含有下一个
             var impostorRole = impostorGetter.GetNext();
-
-            // 玩家是一定可以获取到的，因为如果玩家的数目不足以获取到，那么内鬼的数目也不会大于1，因此，除非一个玩家也没有，不然是一定可以获取到的
-            // 而玩家不可能一个也没有，因此一定可以获取到
             var target = playerGetter.GetNext();
-
-            // 添加数据
-            mainRoleData.Add(target, impostorRole);
+            mainRoleData[target] = impostorRole;
         }
 
-        // 接下来分配中立职业
         for (var i = 0; i < neutralNumber; i++)
         {
             if (!neutralGetter.HasNext()) break;
-
             if (!playerGetter.HasNext()) break;
 
-            // 同理，已经设置了默认值，无需检测
             var neutralRole = neutralGetter.GetNext();
-
-            // 获取玩家实例
             var target = playerGetter.GetNext();
-
-            // 添加数据
-            mainRoleData.Add(target, neutralRole);
+            mainRoleData[target] = neutralRole;
         }
 
-        // 紧接着分配船员职业
         while (playerGetter.HasNext())
         {
-            // 获取实例
             var cremateRole = crewmateGetter.GetNext();
-
-            // 获取玩家实例
             var target = playerGetter.GetNext();
-
-            // 没必要移除玩家在列表中，因为后面我们用不到players集合了
-            // players = players.Where(player => !player.IsSamePlayer(target)).ToList();
-
-            // 添加数据
-            mainRoleData.Add(target, cremateRole);
+            mainRoleData[target] = cremateRole;
         }
+    }
 
-        // 最后分配一下副职业
-        /*
-         * 副职业分配算法如下：
-         * 随机获取玩家蹦极式地发放副职业
-         */
-        var allPlayers = PlayerUtils.GetAllPlayers().Disarrange();
+    private void AssignSubRoles(Dictionary<PlayerControl, CustomRole[]> subRoleData, int maxSubRoleNumber)
+    {
+        var subRoleGetter = CustomRoleManager.GetManager().NewGetter(role => role.IsSubRole);
 
-        /*
-         * 副职业的分配有点特殊
-         * 副职业有最大分配数目以及副职业数目限制
-         * 因此它的分配比较麻烦
-         *
-         * 首先要明确分配玩家的判定条件，条件如下：
-         * 最大分配数目 = 最大分配数目 * 玩家数目
-         * 当且仅当 副职业已分配数目 等于 副职业应当分配数目(=副职业启用数目 > 最大分配数目 ? 最大分配数目 : 副职业启用数目)
-         * 分配完成
-         */
         var subRoleEnabledNumber = subRoleGetter.Number();
+        var allPlayers = PlayerUtils.GetAllPlayers();
         var subRoleMaxCanBeArrange = maxSubRoleNumber * allPlayers.Count;
         var subRoleShouldBeGivenNumber = subRoleEnabledNumber > subRoleMaxCanBeArrange
             ? subRoleMaxCanBeArrange
             : subRoleEnabledNumber;
 
+        if (subRoleShouldBeGivenNumber <= 0) return;
+
+        var availablePlayers = allPlayers
+            .Where(p => !subRoleData.ContainsKey(p) || subRoleData[p].Length < maxSubRoleNumber)
+            .Disarrange()
+            .ToList();
+
         var givenTimes = 0;
+        var maxAttempts = subRoleShouldBeGivenNumber * 20;
 
-        while (givenTimes < subRoleShouldBeGivenNumber)
+        while (givenTimes < subRoleShouldBeGivenNumber && availablePlayers.Count > 0 && maxAttempts-- > 0)
         {
-            var random = new Random();
-            var randomPlayer = allPlayers[random.Next(0, allPlayers.Count)];
-            subRoleData.TryGetValue(randomPlayer, out var existRoles);
-            if (existRoles != null && existRoles.Length >= maxSubRoleNumber) continue;
-            var roles = new List<CustomRole>();
-            if (existRoles != null) roles.AddRange(existRoles);
+            if (!subRoleGetter.HasNext()) break;
 
-            var customRole = subRoleGetter.GetNext();
+            var randomPlayer = availablePlayers[_random.Next(availablePlayers.Count)];
+            subRoleData.TryGetValue(randomPlayer, out var existingRoles);
 
-            if (roles.Contains(customRole))
+            if (existingRoles != null && existingRoles.Length >= maxSubRoleNumber)
             {
-                subRoleGetter.PutBack(customRole);
+                availablePlayers.Remove(randomPlayer);
                 continue;
             }
 
-            roles.Add(customRole);
+            var subRole = subRoleGetter.GetNext();
+            var rolesList = existingRoles != null ? new List<CustomRole>(existingRoles) : new List<CustomRole>();
 
-            subRoleData.Add(randomPlayer, roles.ToArray());
+            if (rolesList.Any(role => role.GetType() == subRole.GetType()))
+            {
+                subRoleGetter.PutBack(subRole);
+                continue;
+            }
+
+            rolesList.Add(subRole);
+            subRoleData[randomPlayer] = rolesList.ToArray();
             givenTimes++;
+
+            if (rolesList.Count >= maxSubRoleNumber)
+            {
+                availablePlayers.Remove(randomPlayer);
+            }
         }
+    }
 
-
-        // 全部都分配完成，接下来应用一下
+    private static void ApplyRolesToPlayers(Dictionary<PlayerControl, CustomRole> mainRoleData,
+        Dictionary<PlayerControl, CustomRole[]> subRoleData)
+    {
         for (var i = 0; i < mainRoleData.Count; i++)
         {
             var target = mainRoleData.Keys.ToArray()[i];
 
-            // 歌姬树懒并没有重写Equals方法，因此只能这样
             var subRolesList = subRoleData.Where(pair =>
                 pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList();
 
             var subRoles = subRolesList.Any() ? subRolesList[0] : [];
 
-            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles); // 先本地设置职业，后面ShareRole会把职业发出去的
+            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles);
         }
+    }
 
-        // 打印职业分配信息
+    private static void LogRoleAssignment()
+    {
         var sb = new StringBuilder();
         foreach (var playerRole in GameUtils.PlayerData)
         {
             playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType, true);
-            sb.AppendLine($"""
+            sb.AppendLine($""""
                            {playerRole.Player.name}({playerRole.PlayerId}) 
                                => {playerRole.MainRole.GetNormalName()}  with sub role(s):
                                {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).AsString()}
-                           """);
+                           """");
         }
 
         Main.Logger.LogDebug(sb.ToString());
-        Main.Logger.LogInfo("Successfully selected roles.");
     }
 
+    private static void ApplyFallbackRoles()
+    {
+        GameUtils.PlayerData.Clear();
+
+        var players = PlayerUtils.GetAllPlayers();
+        var crewmateRole = CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>();
+        var impostorRole = CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>();
+
+        var impostorNumber = Math.Min(GameUtils.GetImpostorsNumber(), players.Count);
+        var playerList = players.Disarrange().ToList();
+
+        for (var i = 0; i < impostorNumber; i++)
+        {
+            var player = playerList[i];
+            player.SetCustomRole(impostorRole, Array.Empty<CustomRole>());
+        }
+
+        for (var i = impostorNumber; i < playerList.Count; i++)
+        {
+            var player = playerList[i];
+            player.SetCustomRole(crewmateRole, Array.Empty<CustomRole>());
+        }
+    }
 
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSelectRoles(RoleManagerSelectRolesEvent _)
     {
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
+
+        if (!GameUtils.PlayerData.Any())
+        {
+            return;
+        }
 
         Main.Logger.LogInfo("Share roles for players...");
         var playerData = GameUtils.PlayerData.ToArray();
@@ -250,7 +328,8 @@ public class RoleAssignmentListener : IListener
         var roleList = GameUtils.PlayerData.Select(pr => pr.MainRole).ToList();
         roleList.AddRange(GameUtils.PlayerData.SelectMany(pr => pr.SubRoles));
 
-        foreach (var availableRole in roleList) availableRole.AfterSharingRoles();
+        foreach (var availableRole in roleList)
+            availableRole.AfterSharingRoles();
     }
 
     private class PlayerGetter : IGetter<PlayerControl>
@@ -266,13 +345,12 @@ public class RoleAssignmentListener : IListener
         {
             var target = _players[0];
             _players.RemoveAt(0);
-
             return target;
         }
 
         public bool HasNext()
         {
-            return !_players.IsEmpty();
+            return _players.Count > 0;
         }
 
         public int Number()
