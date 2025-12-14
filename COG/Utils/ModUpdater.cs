@@ -46,7 +46,7 @@ public static class ModUpdater
     {
         using var client = new WebClient();
         client.DownloadFile(
-            $"https://download.yzuu.cf/CognifyDev/ClashOfGods/releases/download/{LatestVersion}/ClashOfGods.dll",
+            $"http://download.cognifydev.cn/CognifyDev/ClashOfGods/releases/download/{LatestVersion}/ClashOfGods.dll",
             "BepInEx/plugins/ClashOfGods.dll.new"
         );
 

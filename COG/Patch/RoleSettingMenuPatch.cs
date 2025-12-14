@@ -8,6 +8,7 @@ using COG.Constant;
 using COG.Role;
 using COG.UI.CustomOption;
 using COG.Utils;
+using Reactor.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -29,7 +30,11 @@ public static class RoleOptionPatch
     [HarmonyPostfix]
     private static void OnMenuInitialization(RolesSettingsMenu __instance)
     {
-        if (CampTabs.Count != 0) return;
+        if (CampTabs.Count != 0)
+        {
+            Coroutines.Start(CoRefreshRoleOptions());
+            return;
+        }
 
         Main.Logger.LogInfo("======== Start to initialize custom role options... ========");
 
@@ -54,6 +59,24 @@ public static class RoleOptionPatch
             SetUpCustomRoleTab(__instance, chanceTab, team, i++);
 
         chanceTab.GetComponentInChildren<CategoryHeaderMasked>().gameObject.TryDestroy();
+    }
+    static IEnumerator CoRefreshRoleOptions()
+    {
+        yield return null;
+        yield return null; 
+
+        // 刷新所有角色选项的显示
+        foreach (var role in CustomRoleManager.GetManager().GetModRoles().Where(r => r.ShowInOptions))
+        {
+            var roleOption = role.RoleNumberOption;
+            if (roleOption?.OptionBehaviour != null)
+            {
+                var behaviour = roleOption.OptionBehaviour.Cast<RoleOptionSetting>();
+                behaviour.roleMaxCount = roleOption.GetInt();
+                behaviour.roleChance = role.RoleChanceOption?.GetInt() ?? 0;
+                behaviour.UpdateValuesAndText(null);
+            }
+        }
     }
 
     [HarmonyPatch(nameof(RolesSettingsMenu.Update))]
@@ -186,11 +209,16 @@ public static class RoleOptionPatch
                      .Where(r => r is { IsBaseRole: false, ShowInOptions: true }))
         {
             if ((camp == CampType.Unknown && !role.IsSubRole) || !role.ShowInOptions) continue;
-            var roleSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
-            var numberOption = role.RoleNumberOption!;
-            var chanceOption = role.RoleChanceOption!;
-            numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
-            roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions, role.VanillaRole, layer);
+           var roleSetting = Object.Instantiate(menu.roleOptionSettingOrigin, tab);
+        var numberOption = role.RoleNumberOption!;
+        var chanceOption = role.RoleChanceOption!;
+        numberOption.OptionBehaviour = chanceOption.OptionBehaviour = roleSetting;
+        roleSetting.SetRole(GameUtils.GetGameOptions().RoleOptions, role.VanillaRole, layer);
+
+            roleSetting.roleMaxCount = numberOption.GetInt();
+            roleSetting.roleChance = chanceOption.GetInt();
+            roleSetting.UpdateValuesAndText(null); // 强制更新显示
+
             roleSetting.transform.localPosition = new Vector3(initialX, initialY + offsetY * i, -2f);
             roleSetting.titleText.text = role.Name;
             var label = roleSetting.labelSprite;
