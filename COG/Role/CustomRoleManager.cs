@@ -35,7 +35,8 @@ public class CustomRoleManager
     public List<CustomRole> GetRoles()
     {
         var customRoles = new List<CustomRole>(_roles);
-        customRoles.Remove(GetTypeRoleInstance<Unknown>());
+        var unknownRole = _roles.OfType<Unknown>().FirstOrDefault();
+        if (unknownRole != null) customRoles.Remove(unknownRole);//这里有归递循环。
         return customRoles;
     }
 
