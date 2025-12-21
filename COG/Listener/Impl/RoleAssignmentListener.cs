@@ -275,7 +275,7 @@ public class RoleAssignmentListener : IListener
         var sb = new StringBuilder();
         foreach (var playerRole in GameUtils.PlayerData)
         {
-            playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType, false);
+            playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType, true);
             sb.AppendLine($""""
                            {playerRole.Player.name}({playerRole.PlayerId}) 
                                => {playerRole.MainRole.GetNormalName()}  with sub role(s):
@@ -323,6 +323,12 @@ public class RoleAssignmentListener : IListener
 
         Main.Logger.LogInfo("Share roles for players...");
         var playerData = GameUtils.PlayerData.ToArray();
+        
+        foreach (var customPlayerData in playerData)
+        {
+            customPlayerData.Player.RpcSetRole(customPlayerData.MainRole.BaseRoleType, true);
+        }
+        
         _roleSelectionShareRpcHandler.Send(playerData.Length, playerData);
 
         var roleList = GameUtils.PlayerData.Select(pr => pr.MainRole).ToList();
