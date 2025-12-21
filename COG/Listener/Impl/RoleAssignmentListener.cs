@@ -275,7 +275,7 @@ public class RoleAssignmentListener : IListener
         var sb = new StringBuilder();
         foreach (var playerRole in GameUtils.PlayerData)
         {
-            playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType, true);
+            playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType, false);
             sb.AppendLine($""""
                            {playerRole.Player.name}({playerRole.PlayerId}) 
                                => {playerRole.MainRole.GetNormalName()}  with sub role(s):
@@ -310,15 +310,15 @@ public class RoleAssignmentListener : IListener
         }
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnSelectRoles(RoleManagerSelectRolesEvent _)
+    [EventHandler(EventHandlerType.Prefix)]
+    public bool OnSelectRoles(RoleManagerSelectRolesEvent _)
     {
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
 
         if (!GameUtils.PlayerData.Any())
         {
-            return;
+            return true;
         }
 
         Main.Logger.LogInfo("Share roles for players...");
@@ -330,6 +330,8 @@ public class RoleAssignmentListener : IListener
 
         foreach (var availableRole in roleList)
             availableRole.AfterSharingRoles();
+
+        return false;
     }
 
     private class PlayerGetter : IGetter<PlayerControl>
