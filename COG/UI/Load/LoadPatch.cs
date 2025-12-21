@@ -228,6 +228,7 @@ public static class LoadPatch
                     new Chief(),
                     new Enchanter(),
                     new Witch(),
+                    new Seer(),
                     // Impostor
                     new Impostor(),
                     new Cleaner(),

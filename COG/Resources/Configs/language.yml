@@ -113,6 +113,12 @@ role:
       description: "从死神手中赎回受害者"
       long-description: "可以对尸体使用解药将其复活，被复活者进行任何交互后将会在下一轮会议召开时出局。完成所有任务后额外获得一次使用机会。"
       antidote-cooldown: "解药冷却时间"
+    seer:
+      name: "先知"
+      description: "暗中洞察，昭示一切"
+      long-description: "可以查验一名玩家，保持目标在范围内一定时间可获悉其所属的阵营。被查验的目标死亡后可以再次使用技能。"
+      check-cooldown: "查验冷却时间"
+
   neutral:
     jester:
       name: "小丑"
@@ -224,6 +230,7 @@ action:
   store-kill: "存储击杀"
   observe: "洞察"
   antidote: "解药"
+  check: "查验"
 game:
   end:
     summary-message: "玩家职业:"
