@@ -1,4 +1,6 @@
 using System.Linq;
+using COG.Game.Events;
+using COG.Listener.Event.Impl.Game.Record;
 using COG.Utils;
 using Il2CppSystem;
 using UnityEngine;
@@ -91,6 +93,7 @@ internal static class VanillaKillButtonPatch
             {
                 PlayerControl.LocalPlayer.RpcMurderPlayer(dead, true);
                 PlayerControl.LocalPlayer.ResetKillCooldown();
+                EventRecorder.Instance.Record(new PlayerKillGameEvent(PlayerControl.LocalPlayer.GetPlayerData(), dead.GetPlayerData()));
 
                 if (setting.UsesLimit > 0)
                     setting.RemainingUses--;
