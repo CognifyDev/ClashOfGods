@@ -1,7 +1,6 @@
 ﻿using COG.Rpc;
 using COG.Utils;
 using System;
-using UnityEngine.Analytics;
 
 namespace COG.Game.Events;
 

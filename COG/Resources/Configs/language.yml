@@ -118,7 +118,6 @@ role:
       description: "暗中洞察，昭示一切"
       long-description: "可以查验一名玩家，保持目标在范围内一定时间可获悉其所属的阵营。被查验的目标死亡后可以再次使用技能。"
       check-cooldown: "查验冷却时间"
-
   neutral:
     jester:
       name: "小丑"

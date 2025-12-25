@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using AmongUs.Data;
 using COG.Config.Impl;
+using COG.Listener;
+using COG.Listener.Event.Impl.Modded.Player;
 using COG.Patch;
 using COG.Role;
 using COG.Role.Impl;
@@ -192,7 +194,7 @@ public static class PlayerUtils
     public static void RemoveMark(this PlayerControl target, string tag)
     {
         var playerData = target.GetPlayerData();
-        if (playerData == null) return;
+        if (playerData == null!) return;
         if (!playerData.Tags.Contains(tag)) return;
 
         var writer = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.Mark);
@@ -438,6 +440,13 @@ public static class PlayerUtils
         }
 
         var playerRole = GameUtils.PlayerData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
+        var originalRole = playerRole?.MainRole;
+        
+        var result = ListenerManager.GetManager().ExecuteHandlers(new PlayerCustomRoleChangeEvent(pc, role, originalRole!), EventHandlerType.Prefix);
+
+        if (!result)
+            return;
+        
         if (playerRole is not null)
         {
             playerRole.MainRole.ClearRoleGameData();
@@ -451,6 +460,7 @@ public static class PlayerUtils
         VanillaKillButtonPatch.Initialize();
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");
+        ListenerManager.GetManager().ExecuteHandlers(new PlayerCustomRoleChangeEvent(pc, role, originalRole!), EventHandlerType.Postfix);
     }
 
     public static void SetCustomRole<T>(this PlayerControl pc) where T : CustomRole
@@ -467,7 +477,7 @@ public static class PlayerUtils
         writer.Write(pc.PlayerId);
         writer.WritePacked(role.Id);
         writer.Finish();
-        SetCustomRole(pc, role);
+        pc.SetCustomRole(role);
     }
 
     public static void RpcSetCustomRole<T>(this PlayerControl pc) where T : CustomRole
@@ -478,7 +488,7 @@ public static class PlayerUtils
         writer.Write(pc.PlayerId);
         writer.WritePacked(role.Id);
         writer.Finish();
-        SetCustomRole(pc, role);
+        pc.SetCustomRole(role);
     }
 
     public static CustomRole[] GetSubRoles(this PlayerControl pc)
@@ -489,14 +499,7 @@ public static class PlayerUtils
     public static CustomRole[] GetSubRoles(this NetworkedPlayerInfo pc)
     {
         var data = pc.GetPlayerData();
-        if (data == null)
-            return [];
-        return data.SubRoles;
-    }
-
-    public static bool CanKill(this PlayerControl pc)
-    {
-        return pc.GetMainRole().CanKill;
+        return data == null! ? [] : data.SubRoles;
     }
 
     public static void DisplayPlayerInfoOnName(this PlayerControl player, bool onlyDisplayNameSuffix = false)
@@ -538,7 +541,6 @@ public static class PlayerUtils
         }
         else
         {
-            var data = PlayerControl.LocalPlayer.GetPlayerData();
             foreach (var role in CustomRoleManager.GetManager().GetRoles())
                 additionalTextBuilder.Append(role.HandleAdditionalPlayerName(player));
         }
@@ -556,7 +558,7 @@ public static class PlayerUtils
     }
 
     /// <summary>
-    ///     检查 <see cref="GetClosestPlayer(PlayerControl, bool, float)" /> 返回的玩家是否在游戏设置击杀距离内
+    ///     检查 <see cref="GetClosestPlayer(PlayerControl,bool,float,bool)" /> 返回的玩家是否在游戏设置击杀距离内
     /// </summary>
     /// <param name="closestValidPlayer"></param>
     /// <param name="mustAlive"></param>

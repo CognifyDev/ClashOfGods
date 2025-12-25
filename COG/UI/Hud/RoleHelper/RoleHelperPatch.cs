@@ -1,11 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using COG.Listener;
-using COG.Listener.Attribute;
-using COG.Listener.Event.Impl.Game;
 using COG.Role;
 using COG.Utils;
-using HarmonyLib;
 using UnityEngine;
 
 namespace COG.UI.Hud.RoleHelper;
@@ -34,12 +30,12 @@ public static class RoleHelperManager
     {
         var result = "";
 
-        // 主职业
+        // 锟斤拷职业
         result += $"<color={mainRole.Color.ToColorHexString()}><size=80%>{mainRole.Name}</size>" +
               $"<b><size=50%>({mainRole.ShortDescription})</size></b></color>" +
               $"<size=40%>:{mainRole.GetLongDescription()}\n</size>";
 
-        // 副职业
+        // 锟斤拷职业
         foreach (var subRole in subRoles)
         {
             result += $"<color={subRole.Color.ToColorHexString()}><size=80%>{subRole.Name}</size>" +

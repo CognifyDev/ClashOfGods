@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Reflection;
 using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;

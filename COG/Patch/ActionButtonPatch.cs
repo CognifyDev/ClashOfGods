@@ -1,6 +1,3 @@
-using System.Linq;
-using COG.Utils;
-
 namespace COG.Patch;
 
 [HarmonyPatch]

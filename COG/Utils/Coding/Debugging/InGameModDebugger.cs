@@ -28,7 +28,7 @@ public class InGameModDebugger : MonoBehaviour
     {
         var player = PlayerUtils.GetPlayerById(playerId);
         var role = CustomRoleManager.GetManager().GetRoleByClassName(name, true);
-        player.RpcSetCustomRole(role);
+        player?.RpcSetCustomRole(role!);
     }
 
     public void ForceSetRole(string name)
