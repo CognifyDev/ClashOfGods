@@ -85,7 +85,7 @@ internal static class GameOptionMenuPatch
         foreach (var category in GameManager.Instance.GameSettingsList.AllCategories) // Calculate vanilla option
         {
             num -= headerHeight;
-            foreach (var unused in category.AllGameSettings)
+            foreach (var _ in category.AllGameSettings)
                 num -= space;
         }
 

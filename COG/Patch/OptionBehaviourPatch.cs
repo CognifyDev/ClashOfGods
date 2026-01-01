@@ -60,18 +60,18 @@ public static class OptionBehaviourPatch
 
     [HarmonyPatch(typeof(NumberOption), nameof(NumberOption.AdjustButtonsActiveState))]
     [HarmonyPrefix]
-    private static bool NumberOptionAdjectButtonsActiveStateFixer(NumberOption __instance)
+    private static bool NumberOptionAdjustButtonsActiveStateFixer(NumberOption __instance)
     {
         if (!CustomOption.TryGetOption(__instance, out _)) return true;
-        return !__instance.TitleText.text.Equals("STRMISS");
+        return __instance.TitleText.text != "STRMISS";
     }
     
     [HarmonyPatch(typeof(StringOption), nameof(StringOption.AdjustButtonsActiveState))]
     [HarmonyPrefix]
-    private static bool StringOptionAdjectButtonsActiveStateFixer(StringOption __instance)
+    private static bool StringOptionAdjustButtonsActiveStateFixer(StringOption __instance)
     {
         if (!CustomOption.TryGetOption(__instance, out _)) return true;
-        return !__instance.TitleText.text.Equals("STRMISS");
+        return __instance.TitleText.text != "STRMISS";
     }
 
     [HarmonyPatch(typeof(ToggleOption), nameof(ToggleOption.Toggle))]
