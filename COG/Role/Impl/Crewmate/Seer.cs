@@ -38,7 +38,7 @@ public class Seer : CustomRole
         
         InitialAvailableUsableTimes = CreateOption(() => 
                 GetContextFromLanguage("seer-initial-available-usable-times"),
-            new IntOptionValueRule(1, 1, 15, 1));
+            new FloatOptionValueRule(1, 1, 15, 1));
 
         var action = new LanguageConfig.TextHandler("action");
 

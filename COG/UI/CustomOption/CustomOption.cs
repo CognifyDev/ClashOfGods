@@ -255,7 +255,8 @@ public sealed class CustomOption
 
         if (ValueRule is FloatOptionValueRule floatRule)
         {
-            Main.Logger.LogWarning($"Trying to get int value from float option: {Name()}({Id})");
+            //这个日志会一直发送！
+            //Main.Logger.LogWarning($"Trying to get int value from float option: {Name()}({Id})");
             return (int)floatRule.Selections[Selection];
         }
 
