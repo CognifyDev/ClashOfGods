@@ -31,7 +31,7 @@ public class Seer : CustomRole
 
     private readonly HashSet<PlayerControl> _checkedPlayers = [];
     
-    public Seer() : base(new Color(30,144,255), CampType.Crewmate)
+    public Seer() : base(ColorUtils.FromColor32(30,144,255), CampType.Crewmate)
     {
         Cooldown = CreateOption(() => 
                 GetContextFromLanguage("role.crewmate.seer-check-cooldown"),
