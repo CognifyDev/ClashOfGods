@@ -275,12 +275,12 @@ public class RoleAssignmentListener : IListener
         var sb = new StringBuilder();
         foreach (var playerRole in GameUtils.PlayerData)
         {
-            playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType, false);
-            sb.AppendLine($""""
+            playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType);
+            sb.AppendLine($"""
                            {playerRole.Player.name}({playerRole.PlayerId}) 
                                => {playerRole.MainRole.GetNormalName()}  with sub role(s):
                                {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).AsString()}
-                           """");
+                           """);
         }
 
         Main.Logger.LogDebug(sb.ToString());
@@ -340,14 +340,9 @@ public class RoleAssignmentListener : IListener
         return false;
     }
 
-    private class PlayerGetter : IGetter<PlayerControl>
+    private class PlayerGetter(PlayerControl[] targets) : IGetter<PlayerControl>
     {
-        private readonly List<PlayerControl> _players;
-
-        public PlayerGetter(PlayerControl[] targets)
-        {
-            _players = new List<PlayerControl>(targets).Disarrange();
-        }
+        private readonly List<PlayerControl> _players = new List<PlayerControl>(targets).Disarrange();
 
         public PlayerControl GetNext()
         {
