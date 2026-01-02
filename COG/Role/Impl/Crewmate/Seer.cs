@@ -48,7 +48,7 @@ public class Seer : CustomRole
             () =>
             {
                 if (_current == null) return;
-
+    
                 _checkedPlayers.Add(_current);
                 ShowCurrentCamp(_current);
                 AvailableUsageTimes --;

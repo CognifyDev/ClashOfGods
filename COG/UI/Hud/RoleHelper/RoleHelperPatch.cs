@@ -8,8 +8,8 @@ namespace COG.UI.Hud.RoleHelper;
 
 public static class RoleHelperManager
 {
-    private static Dictionary<byte, string> playerRoleDescriptions = new();
-    private static string localPlayerShower = "";
+    private static Dictionary<byte, string> _playerRoleDescriptions = new();
+    private static string _localPlayerShower = "";
 
     public static void UpdateLocalPlayerRoleInfo()
     {
@@ -21,9 +21,9 @@ public static class RoleHelperManager
 
         if (mainRole == null) return;
 
-        localPlayerShower = BuildRoleDescription(mainRole, subRoles);
+        _localPlayerShower = BuildRoleDescription(mainRole, subRoles);
 
-        playerRoleDescriptions[player.PlayerId] = localPlayerShower;
+        _playerRoleDescriptions[player.PlayerId] = _localPlayerShower;
     }
 
     private static string BuildRoleDescription(CustomRole mainRole, List<CustomRole> subRoles)
@@ -49,15 +49,14 @@ public static class RoleHelperManager
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
     public static class HudManagerUpdatePatch
     {
-        [HarmonyPostfix]
         public static void Postfix()
         {
             if (!GameStates.InRealGame) return;
 
-            if (UnityEngine.Input.GetKeyDown(KeyCode.F1))
+            if (Input.GetKeyDown(KeyCode.F1))
             {
                 UpdateLocalPlayerRoleInfo();
-                GameUtils.Popup?.Show(localPlayerShower);
+                GameUtils.Popup?.Show(_localPlayerShower);
             }
         }
     }
