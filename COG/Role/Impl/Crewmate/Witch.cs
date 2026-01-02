@@ -1,4 +1,5 @@
-﻿using COG.Listener;
+﻿using COG.Constant;
+using COG.Listener;
 using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
 using COG.Listener.Event.Impl.Player;
@@ -56,7 +57,7 @@ public class Witch : CustomRole, IListener
             () => { },
             () => _remainingUses > 0 && (_current = PlayerUtils.GetClosestBody()),
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.AntidoteButton)!,
             2,
             ActionNameContext.GetString("antidote"),
             () => _antidoteCooldown.GetFloat(),

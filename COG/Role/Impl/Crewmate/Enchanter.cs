@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
+using COG.Constant;
 using COG.Listener;
 using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
@@ -37,7 +38,7 @@ public class Enchanter : CustomRole, IListener
             },
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) && !_usedThisRound,
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.ContractButton)!,
             2,
             ActionNameContext.GetString("contract"),
             () => 0f,

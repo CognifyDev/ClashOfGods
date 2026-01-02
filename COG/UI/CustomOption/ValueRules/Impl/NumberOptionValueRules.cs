@@ -1,8 +1,12 @@
 using System;
 using System.Linq;
+using COG.Utils.Coding;
 
 namespace COG.UI.CustomOption.ValueRules.Impl;
 
+/// <summary>
+/// 【注】请不要将其运用于职业设置，它只能用于一般的设置
+/// </summary>
 public class IntOptionValueRule : INumberValueRule<int>
 {
     public IntOptionValueRule(int min, int step, int max, int defaultValue, NumberSuffixes suffix = NumberSuffixes.None)

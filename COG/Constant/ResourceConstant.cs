@@ -16,6 +16,13 @@ public static class ResourceConstant
     public const string StareButton = "Images/Buttons/Stare.png";
     public const string ExamineButton = "Images/Buttons/Examine.png";
     public const string BlockButton = "Images/Buttons/Block.png";
+    public const string CheckButton = "Images/Buttons/Check.png";
+    public const string GiveKillButton = "Images/Buttons/GiveKill.png"; 
+    public const string ContractButton = "Images/Buttons/Contract.png";
+    public const string AntidoteButton = "Images/Buttons/Antidote.png";
+    public const string StoreKillButton = "Images/Buttons/StoreKill.png";
+    public const string ObserveButton = "Images/Buttons/Observe.png";
+    public const string DisturbButton = "Images/Buttons/Disturb.png";
 
     public const string ArrowImage = "Images/Arrow.png";
 

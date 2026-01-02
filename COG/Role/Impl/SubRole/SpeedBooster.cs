@@ -22,7 +22,7 @@ public class SpeedBooster : CustomRole, IListener
     [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnGameStart(GameStartEvent _)
     {
-        PlayerControl.LocalPlayer.MyPhysics.body.velocity *= IncreasingSpeed.GetFloat();
+        PlayerControl.LocalPlayer.MyPhysics.body.angularVelocity *= IncreasingSpeed.GetFloat();
     }
 
     public override IListener GetListener()

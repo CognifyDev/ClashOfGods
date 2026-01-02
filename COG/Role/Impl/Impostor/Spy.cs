@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using COG.Constant;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -66,7 +67,7 @@ public class Spy : CustomRole
             () => { },
             () => true,
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.ObserveButton)!,
             2,
             ActionNameContext.GetString("observe"),
             () => _observeCooldown.GetFloat(),

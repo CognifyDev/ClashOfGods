@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using COG.Constant;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -116,7 +117,7 @@ public class Nightmare : CustomRole
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) &&
                   _storedKills < MaxKillsStored && _target!.GetMainRole().CampType == CampType.Impostor,
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.StoreKillButton)!,
             2,
             ActionNameContext.GetString("store-kill"),
             () => _storeCooldown.GetFloat(),

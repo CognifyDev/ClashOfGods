@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Listener;
 using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Game;
@@ -33,11 +34,11 @@ public class Seer : CustomRole
     public Seer() : base(new Color(30,144,255), CampType.Crewmate)
     {
         Cooldown = CreateOption(() => 
-                GetContextFromLanguage("seer-check-cooldown"),
+                GetContextFromLanguage("role.crewmate.seer-check-cooldown"),
             new FloatOptionValueRule(5, 1, 60, 25, NumberSuffixes.Seconds));
         
         InitialAvailableUsableTimes = CreateOption(() => 
-                GetContextFromLanguage("seer-initial-available-usable-times"),
+                GetContextFromLanguage("role.crewmate.seer-initial-available-usable-times"),
             new FloatOptionValueRule(1, 1, 15, 1));
 
         var action = new LanguageConfig.TextHandler("action");
@@ -55,7 +56,7 @@ public class Seer : CustomRole
             () => { },
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _current) && AvailableUsageTimes > 0 && !HasChecked(_current),
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.CleanDeadBodyButton),
             2,
             action.GetString("check"),
             () => Cooldown.GetFloat(),

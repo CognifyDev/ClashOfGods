@@ -1,8 +1,10 @@
 ﻿using System.Collections;
+using COG.Constant;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
+using COG.Utils;
 using Reactor.Utilities;
 using UnityEngine;
 
@@ -71,7 +73,7 @@ public class Troublemaker : CustomRole
             () => _usedThisRound = false,
             () => !_usedThisRound,
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.DisturbButton)!,
             2,
             ActionNameContext.GetString("disturb"),
             () => _disturbCooldown.GetFloat(),

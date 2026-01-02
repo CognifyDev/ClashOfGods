@@ -1,5 +1,6 @@
 using System.Linq;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Rpc;
 using COG.UI.Hud.CustomButton;
 using COG.UI.Vanilla.KillButton;
@@ -53,7 +54,7 @@ public class Chief : CustomRole
             () => { },
             () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
             () => true,
-            null!,
+            ResourceUtils.LoadSprite(ResourceConstant.GiveKillButton)!,
             2,
             action.GetString("give-kill"),
             () => 0,
