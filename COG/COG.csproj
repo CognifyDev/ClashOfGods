@@ -54,10 +54,6 @@
         <EmbeddedResource Include="COG.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Plugin\Attributes\" />
-    </ItemGroup>
-
     <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(AmongUs)/BepInEx/plugins/" UseSymboliclinksIfPossible="true" />
     </Target>
