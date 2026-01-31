@@ -1,3 +1,5 @@
+using COG.UI.MetaContext;
+
 namespace COG.Constant;
 
 /// <summary>
@@ -7,6 +9,7 @@ namespace COG.Constant;
 /// </summary>
 public static class ResourceConstant
 {
+    static public ResourceExpandableSpriteLoader SharpWindowBackgroundSprite = new("COG.Resources.MetaContext.StatisticsBackground.png", 100f, 5, 5);
     // Buttons
     public const string CleanDeadBodyButton = "Images/Buttons/CleanDeadBody.png";
     public const string GeneralKillButton = "Images/Buttons/GeneralKill.png";

@@ -201,14 +201,10 @@ main-menu:
     fetched: "搜索到最新版：%version%\r\n%description%\r\n是否安装？"
 load:
   loading: "正在加载..."
-  load-setting-config: "正在加载预设配置文件"
-  load-hotkey-cofig: "正在加载热键配置文件"
-  load-roles: "正在初始化职业系统"
+  load-depends: "正在下载依赖文件"
+  load-datas: "正在加载必要数据"
   load-listeners: "正在初始化监听系统"
-  load-winners: "正在初始化对局必要参数"
-  load-client-options: "正在初始化客户端选项"
   load-plugins: "正在加载模组插件"
-  load-command: "正在加载模组指令"
   load-compeleted: "加载完成！"
 credits:
   developers: "开发组"

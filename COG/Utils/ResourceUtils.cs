@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using COG.Config;
+using COG.UI.MetaContext;
+using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
 
 namespace COG.Utils;
@@ -156,4 +158,13 @@ public static class ResourceUtils
         if (!isURL) Cache.Add(path, result);
         return result;
     }
+    public static T FindAsset<T>(string name) where T : Il2CppObjectBase
+    {
+        foreach (var asset in UnityEngine.Object.FindObjectsOfTypeIncludingAssets(Il2CppInterop.Runtime.Il2CppType.Of<T>()))
+        {
+            if (asset.name == name) return asset.Cast<T>();
+        }
+        return null;
+    }
+    static public ResourceExpandableSpriteLoader SharpWindowBackgroundSprite = new("COG.Resources.MetaContext.StatisticsBackground.png", 100f, 5, 5);
 }

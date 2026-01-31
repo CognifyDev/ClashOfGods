@@ -131,11 +131,6 @@ public class LanguageConfig : ConfigBase
     public string UnloadModButtonName { get; private set; } = null!;
     public string UnloadModSuccessfulMessage { get; private set; } = null!;
     public string UnloadModInGameErrorMsg { get; private set; } = null!;
-    public string NoEndGameButtonName { get; private set; } = null!;
-    public string NoEndGameErrorMessage { get; private set; } = null!;
-    public string NoEndGameTipMessage { get; private set; } = null!;
-    public string NoEndGameInfoMessage { get; private set; } = null!;
-    public string NoEndGameOff { get; private set; } = null!;
 
     // Update
     public string UpToDate { get; private set; } = null!;
@@ -155,15 +150,10 @@ public class LanguageConfig : ConfigBase
 
     //Load
     public string Loading { get; private set; } = null!;
-    public string LoadingHotKey { get; private set; } = null!;
-    public string LoadingSettings { get; private set; } = null!;
-    public string LoadingRoles { get; private set; } = null!;
-    public string LoadingWinners { get; private set; } = null!;
+    public string LoadingDependencies { get; private set; } = null!;
+    public string LoadingDatas { get; private set; } = null!;
     public string LoadingListeners { get; private set; } = null!;
-    public string LoadingClientOptions { get; private set; } = null!;
     public string LoadingPlugins { get; private set; } = null!;
-    public string LoadingCommand { get; private set; } = null!;
-
     public string LoadingCompeleted { get; private set; } = null!;
 
     //Credits
@@ -276,14 +266,10 @@ public class LanguageConfig : ConfigBase
 
         //Load
         Loading = GetString("load.loading");
-        LoadingSettings = GetString("load.load-setting-config");
-        LoadingHotKey = GetString("load.load-hotkey-cofig");
-        LoadingRoles = GetString("load.load-roles");
+        LoadingDatas = GetString("load.load-datas");
+        LoadingDependencies = GetString("load.load-depends");
         LoadingListeners = GetString("load.load-listeners");
-        LoadingWinners = GetString("load.load-winners");
-        LoadingClientOptions = GetString("load.load-client-options");
         LoadingPlugins = GetString("load.load-plugins");
-        LoadingCommand = GetString("load.load-command");
         LoadingCompeleted = GetString("load.load-compeleted");
 
         //Credits
@@ -291,7 +277,7 @@ public class LanguageConfig : ConfigBase
         Creators = GetString("credits.creators");
     }
 
-    private string GetString(string location)
+    public string GetString(string location)
     {
         var toReturn = YamlReader!.GetString(location);
         if (string.IsNullOrWhiteSpace(toReturn))
