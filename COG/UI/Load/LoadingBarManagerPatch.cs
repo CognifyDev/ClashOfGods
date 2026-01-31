@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace COG.UI.Load
+﻿namespace COG.UI.Load
 {
     [HarmonyPatch(typeof(LoadingBarManager))]
     public class LoadingBarManagerPatch

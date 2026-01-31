@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Threading.Tasks;
 using COG.Utils;
-using UnityEngine;
 
 namespace COG.Asset.Dependens
 {
@@ -49,10 +48,10 @@ namespace COG.Asset.Dependens
                 Main.Logger.LogInfo($"总的: {p:F1}%");
             });
 
-            string fileUrl = targetFile;
-            string targetDir = targetPath;
+            var fileUrl = targetFile;
+            var targetDir = targetPath;
 
-            bool success = await downloader.DownloadAndMoveAsync(
+            var success = await downloader.DownloadAndMoveAsync(
                 fileUrl,
                 targetDir,
                 progress);

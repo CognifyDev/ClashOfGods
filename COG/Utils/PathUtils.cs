@@ -8,34 +8,34 @@ namespace COG.Utils
     {
         public static string? GetAmongUsPath(string additionPath = "")
         {
-            Process[] processes = Process.GetProcessesByName("Among Us");
+            var processes = Process.GetProcessesByName("Among Us");
             if (processes.Length == 0)
             {
                 Main.Logger.LogError("Could not find the Among Us Process!”Among Us");
                 return null;
             }
 
-            string exePath = processes[0].MainModule.FileName;
-            string exeDir = Path.GetDirectoryName(exePath);
-            string storageDir = Path.Combine(exeDir, additionPath);
+            var exePath = processes[0].MainModule.FileName;
+            var exeDir = Path.GetDirectoryName(exePath);
+            var storageDir = Path.Combine(exeDir, additionPath);
             return storageDir;
         }
         public static void CopyResourcesToDisk(string targetDirectory, string embeddedDirectory, bool overwrite = true)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            string FilePatch = $"COG.Resources.{embeddedDirectory}";
+            var FilePatch = $"COG.Resources.{embeddedDirectory}";
 
-            foreach (string resourceName in assembly.GetManifestResourceNames())
+            foreach (var resourceName in assembly.GetManifestResourceNames())
             {
                 if (resourceName.StartsWith(FilePatch))
                 {
-                    string relativePath = resourceName.Substring(FilePatch.Length);
-                    string targetPath = Path.Combine(targetDirectory, relativePath);
+                    var relativePath = resourceName.Substring(FilePatch.Length);
+                    var targetPath = Path.Combine(targetDirectory, relativePath);
 
                     Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
 
-                    using (Stream resourceStream = assembly.GetManifestResourceStream(resourceName))
-                    using (FileStream fileStream = File.Create(targetPath))
+                    using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
+                    using (var fileStream = File.Create(targetPath))
                     {
                         resourceStream.CopyTo(fileStream);
                     }

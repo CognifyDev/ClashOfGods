@@ -400,7 +400,7 @@ public class CustomButton
     {
         if (GameStates.IsMeeting || PlayerStates.IsShowingMap()) return;
 
-        bool exit = false;
+        var exit = false;
         
         var vectors = GridArrange.currentChildren.ToArray().Select(b =>
         {

@@ -15,7 +15,7 @@ internal static class ActionButtonPatch
     private static void VentButtonDoClick()
     {
         Main.Logger.LogInfo($"Local Player Impostor whether :{PlayerControl.LocalPlayer.Data.Role.IsImpostor}(Vent)");
-        foreach (PlayerControl p in PlayerControl.AllPlayerControls)
+        foreach (var p in PlayerControl.AllPlayerControls)
         {
             Main.Logger.LogInfo($"Other Players Impostor whether :{p.Data.PlayerName}: {p.Data.Role.IsImpostor}(Vent)");
         }
@@ -27,7 +27,7 @@ internal static class ActionButtonPatch
     private static void SabotageButtonDoClick()
     {
         Main.Logger.LogInfo($"Local Player Impostor whether :{PlayerControl.LocalPlayer.Data.Role.IsImpostor}(Sabotage)");
-        foreach(PlayerControl p in PlayerControl.AllPlayerControls)
+        foreach(var p in PlayerControl.AllPlayerControls)
         {
             Main.Logger.LogInfo($"Other Players Impostor whether :{p.Data.PlayerName}: {p.Data.Role.IsImpostor}(Sabotage)");
         }

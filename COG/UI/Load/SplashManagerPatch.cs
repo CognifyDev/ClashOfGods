@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.IO;
-using System.Linq;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using COG.Asset.Dependens;
 using COG.Command;
 using COG.Command.Impl;
+using COG.Config;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Winnable;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Plugin;
-using COG.Plugin.JavaScript;
+using COG.Plugin.Python;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
@@ -62,13 +60,13 @@ public static class SplashManagerPatch
         logoText.fontSize = 0.6f;
         logoText.alignment = TextAlignmentOptions.Center;
 
-        float duration = 1.5f;
-        float elapsed = 0f;
+        var duration = 1.5f;
+        var elapsed = 0f;
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            var t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
 
             logo.color = Color.Lerp(Color.clear, Color.white, t);
             logoText.color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.8f), t);
@@ -82,13 +80,13 @@ public static class SplashManagerPatch
         yield return new WaitForSeconds(2.5f);
 
         elapsed = 0f;
-        Color startLogoColor = logo.color;
-        Color startTextColor = logoText.color;
+        var startLogoColor = logo.color;
+        var startTextColor = logoText.color;
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            var t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
 
             logo.color = Color.Lerp(startLogoColor, Color.clear, t);
             logoText.color = Color.Lerp(startTextColor, new Color(1, 1, 1, 0), t);
@@ -164,7 +162,7 @@ public static class SplashManagerPatch
         LoadText.text = "Loading";
         LoadText.color = new Color(1, 1, 1, 0);
 
-        float elapsed = 0f;
+        var elapsed = 0f;
         while (elapsed < 0.8f)
         {
             elapsed += Time.deltaTime;
@@ -228,6 +226,8 @@ public static class SplashManagerPatch
 
         yield return new WaitForSeconds(0.3f);
     }
+    
+    public static IPluginManager PluginManager { get; private set; } = null!;
 
     private static IEnumerator CoLoadMod_StepDatas()
     {
@@ -286,27 +286,36 @@ public static class SplashManagerPatch
 
             //胜利
             CustomWinnerManager.GetManager().RegisterCustomWinnables([
-            new CrewmatesCustomWinner(),
-            new ImpostorsCustomWinner(),
-            new LastPlayerCustomWinner()
+                new CrewmatesCustomWinner(), 
+                new ImpostorsCustomWinner(), 
+                new LastPlayerCustomWinner()
             ]);
 
             //插件
             if (SettingsConfig.Instance.EnablePluginSystem)
             {
-                if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
-                    Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
-                var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
-                    .Where(name => name.ToLower().EndsWith(".cog"));
-                var enumerable = files.ToArray();
-                Main.Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
-                foreach (var file in enumerable)
-                    IPluginManager.GetDefaultManager().LoadPlugin(file);
+                var pluginDir = Path.Combine(ConfigBase.DataDirectoryName, "plugins");
+                if (!Directory.Exists(pluginDir))
+                {
+                    Directory.CreateDirectory(pluginDir);
+                }
+                
+                Main.Logger.LogInfo("Initializing Plugin System...");
+                
+                PluginManager = new PythonPluginManager(pluginDir);
+                try
+                {
+                    PluginManager.LoadAllPlugins();
+                }
+                catch (System.Exception ex)
+                {
+                    Main.Logger.LogError($"Critical error loading plugins: {ex}");
+                }
             }
         }
         catch (System.Exception e)
         {
-            Main.Logger.LogError($"Error while loading datas: " + e);
+            Main.Logger.LogError("Error while loading data: " + e);
         }
 
         yield return new WaitForSeconds(0.3f);
@@ -321,7 +330,7 @@ public static class SplashManagerPatch
 
     private static IEnumerator CoLoadMod_CompletionAnimation(SplashManager __instance)
     {
-        float elapsed = 0f;
+        var elapsed = 0f;
         var startColor = LoadText.color;
         var targetColor = Color.green.AlphaMultiplied(0.6f);
 
@@ -347,7 +356,7 @@ public static class SplashManagerPatch
 
     private static IEnumerator CoLoadMod_Cleanup(SplashManager __instance)
     {
-        float elapsed = 0f;
+        var elapsed = 0f;
         var logo = GameObject.Find("COG-BG")?.GetComponent<SpriteRenderer>();
         var bg = GameObject.Find("COG-LOADBG")?.GetComponent<SpriteRenderer>();
 

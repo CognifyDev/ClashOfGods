@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,15 +33,15 @@ namespace COG.Utils
         {
             try
             {
-                string tempDir = Path.Combine(Path.GetTempPath(), "FileDownloader");
+                var tempDir = Path.Combine(Path.GetTempPath(), "FileDownloader");
                 Directory.CreateDirectory(tempDir);
                 Directory.CreateDirectory(targetDirectory);
 
-                string fileName = ExtractFileNameFromUrl(fileUrl) ??
-                    $"downloaded_{DateTime.Now:yyyyMMdd_HHmmss}.tmp";
+                var fileName = ExtractFileNameFromUrl(fileUrl) ??
+                               $"downloaded_{DateTime.Now:yyyyMMdd_HHmmss}.tmp";
 
-                string tempFilePath = Path.Combine(tempDir, fileName);
-                string targetFilePath = Path.Combine(targetDirectory, fileName);
+                var tempFilePath = Path.Combine(tempDir, fileName);
+                var targetFilePath = Path.Combine(targetDirectory, fileName);
 
                 if (File.Exists(targetFilePath))
                 {
@@ -111,7 +110,7 @@ namespace COG.Utils
 
                         if (_totalBytes > 0)
                         {
-                            double currentProgress = (_downloadedBytes * 100.0) / _totalBytes;
+                            var currentProgress = (_downloadedBytes * 100.0) / _totalBytes;
 
                             if (currentProgress - lastProgress >= 1.0)
                             {
@@ -133,10 +132,10 @@ namespace COG.Utils
             if (!File.Exists(filePath))
                 return filePath;
 
-            string directory = Path.GetDirectoryName(filePath);
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(filePath);
-            string extension = Path.GetExtension(filePath);
-            int counter = 1;
+            var directory = Path.GetDirectoryName(filePath);
+            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(filePath);
+            var extension = Path.GetExtension(filePath);
+            var counter = 1;
 
             string newFilePath;
             do
@@ -156,8 +155,8 @@ namespace COG.Utils
         {
             try
             {
-                Uri uri = new Uri(url);
-                string fileName = Path.GetFileName(uri.LocalPath);
+                var uri = new Uri(url);
+                var fileName = Path.GetFileName(uri.LocalPath);
 
                 if (string.IsNullOrEmpty(fileName))
                     return null;
