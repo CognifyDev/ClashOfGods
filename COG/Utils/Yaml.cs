@@ -64,6 +64,11 @@ public class Yaml
         return null;
     }
 
+    public string[]? GetStringArray(string location)
+    {
+        return GetStringList(location)?.ToArray();
+    }
+
     public List<string>? GetStringList(string location)
     {
         var locations = location.Contains('.') ? location.Split(".") : [location];

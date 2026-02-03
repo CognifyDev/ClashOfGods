@@ -16,7 +16,6 @@ using COG.Game.CustomWinner;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Patch;
-using COG.Plugin;
 using COG.Role;
 using COG.UI.ClientOption;
 using COG.UI.ClientOption.Impl;
@@ -27,6 +26,7 @@ using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using System.Reflection;
+using COG.UI.Load;
 
 #if WINDOWS
 using System.Windows.Forms;
@@ -296,8 +296,9 @@ public partial class Main : BasePlugin
     public override bool Unload()
     {
         if (SettingsConfig.Instance.EnablePluginSystem)
-            IPluginManager.GetDefaultManager().GetPlugins()
-                .ForEach(plugin => plugin.GetPluginManager().UnloadPlugin(plugin));
+        {
+            SplashManagerPatch.PluginManager.DisableAllPlugins();
+        }
 
         // 卸载插件时候，卸载一切东西
         CommandManager.GetManager().GetCommands().Clear();

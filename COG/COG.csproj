@@ -29,7 +29,9 @@
     <ItemGroup>
 <!--        <Reference Include="Assembly-CSharp-2025.11.18.dll" HintPath="..\Libs\Assembly-CSharp-2025.11.18.dll"/>-->
         <PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.11.18" />
-        <PackageReference Include="Jint" Version="4.1.0" />
+        <PackageReference Include="SharpZipLib" Version="1.4.2" />
+        <PackageReference Include="IronPython" Version="3.4.2" />
+        <PackageReference Include="IronPython.StdLib" Version="3.4.2" />
         <PackageReference Include="Reactor" Version="2.3.1" />
         <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" Private="false" ExcludeAssets="runtime;native" />
         <!--		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.10.14" PrivateAssets="all" Condition="'$(Platform)' == 'Windows'" />-->

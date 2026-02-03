@@ -1,11 +1,10 @@
 using System;
 using System.Linq;
-using COG.Utils.Coding;
 
 namespace COG.UI.CustomOption.ValueRules.Impl;
 
 /// <summary>
-/// ¡¾×¢¡¿Çë²»Òª½«ÆäÔËÓÃÓÚÖ°ÒµÉèÖÃ£¬ËüÖ»ÄÜÓÃÓÚÒ»°ãµÄÉèÖÃ
+/// ï¿½ï¿½×¢ï¿½ï¿½ï¿½ë²»Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö°Òµï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public class IntOptionValueRule : INumberValueRule<int>
 {

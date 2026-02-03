@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.IO.Compression;
 using Cpp2IL.Core.Extensions;
 using System.Collections;
 using COG.Utils;
-using HarmonyLib;
 using COG.Asset;
 
 namespace COG.UI.MetaContext
@@ -36,8 +33,8 @@ namespace COG.UI.MetaContext
         public static Texture2D LoadTextureFromResources(string path)
         {
             Texture2D texture = new(2, 2, TextureFormat.ARGB32, false);
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            Stream stream = assembly.GetManifestResourceStream(path);
+            var assembly = Assembly.GetExecutingAssembly();
+            var stream = assembly.GetManifestResourceStream(path);
             if (stream == null) return null!;
             var byteTexture = new byte[stream.Length];
             stream.Read(byteTexture, 0, (int)stream.Length);
@@ -48,8 +45,8 @@ namespace COG.UI.MetaContext
         public static System.Collections.IEnumerator LoadTextureFromResourcesAsync(string path, Action<Texture2D> onLoad)
         {
             Texture2D texture = new(2, 2, TextureFormat.ARGB32, false);
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            Stream stream = assembly.GetManifestResourceStream(path);
+            var assembly = Assembly.GetExecutingAssembly();
+            var stream = assembly.GetManifestResourceStream(path);
             if (stream == null) yield break;
             var byteTexture = new byte[stream.Length];
             yield return stream.ReadAsync(byteTexture, 0, (int)stream.Length).WaitAsCoroutine();
@@ -73,7 +70,7 @@ namespace COG.UI.MetaContext
                 if (File.Exists(path))
                 {
                     Texture2D texture = new(2, 2, TextureFormat.ARGB32, true);
-                    byte[] byteTexture = File.ReadAllBytes(path);
+                    var byteTexture = File.ReadAllBytes(path);
                     LoadImage(texture, byteTexture, !isReadable);
                     return texture;
                 }
@@ -106,8 +103,8 @@ namespace COG.UI.MetaContext
                 if (entry != null)
                 {
                     Texture2D texture = new(2, 2, TextureFormat.ARGB32, true);
-                    Stream stream = entry.Open();
-                    byte[] byteTexture = new byte[entry.Length];
+                    var stream = entry.Open();
+                    var byteTexture = new byte[entry.Length];
                     stream.Read(byteTexture, 0, byteTexture.Length);
                     stream.Close();
                     LoadImage(texture, byteTexture, true);
@@ -129,8 +126,8 @@ namespace COG.UI.MetaContext
             if (entry != null)
             {
                 Texture2D texture = new(2, 2, TextureFormat.ARGB32, true);
-                Stream stream = entry.Open();
-                byte[] byteTexture = new byte[entry.Length];
+                var stream = entry.Open();
+                var byteTexture = new byte[entry.Length];
                 yield return stream.ReadAsync(byteTexture, 0, byteTexture.Length).WaitAsCoroutine();
                 stream.Close();
                 LoadImage(texture, byteTexture, true);
@@ -641,8 +638,8 @@ namespace COG.UI.MetaContext
             if (!sprites[index])
             {
                 var texture2D = texture!.GetTexture();
-                int _x = index % division!.Item1;
-                int _y = index / division!.Item1;
+                var _x = index % division!.Item1;
+                var _y = index / division!.Item1;
                 sprites[index] = texture2D.ToSprite(new Rect(_x * size.Item1, (division.Item2 - _y - 1) * size.Item2, size.Item1, size.Item2), Pivot, pixelsPerUnit);
             }
             return sprites[index];
@@ -810,8 +807,8 @@ namespace COG.UI.MetaContext
             if (!sprites[index])
             {
                 var texture2D = texture.GetTexture();
-                int _x = index % division!.Item1;
-                int _y = index / division!.Item1;
+                var _x = index % division!.Item1;
+                var _y = index / division!.Item1;
                 sprites[index] = texture2D.ToExpandableSprite(new Rect(_x * size.Item1, (division.Item2 - _y - 1) * size.Item2, size.Item1, size.Item2), pixelsPerUnit, edgeX, edgeY);
             }
             return sprites[index];

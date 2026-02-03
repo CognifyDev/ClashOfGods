@@ -25,16 +25,16 @@ namespace COG.Utils
                 else
                 {
 
-                    IntPtr clipboardData = ClipboardHelper.GetClipboardData(type);
+                    var clipboardData = ClipboardHelper.GetClipboardData(type);
                     if (clipboardData == IntPtr.Zero)
                         result = "";
                     else
                     {
-                        IntPtr intPtr = IntPtr.Zero;
+                        var intPtr = IntPtr.Zero;
                         try
                         {
                             intPtr = ClipboardHelper.GlobalLock(clipboardData);
-                            int len = ClipboardHelper.GlobalSize(clipboardData);
+                            var len = ClipboardHelper.GlobalSize(clipboardData);
 
                             if (type == 1U)
                                 result = Marshal.PtrToStringAnsi(clipboardData, len);

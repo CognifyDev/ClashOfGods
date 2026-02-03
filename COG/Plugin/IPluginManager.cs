@@ -1,21 +1,18 @@
-﻿using COG.Plugin.JavaScript;
-
 namespace COG.Plugin;
 
 public interface IPluginManager
 {
-    void EnablePlugin(IPlugin plugin);
+    void LoadAllPlugins();
+    
+    void LoadPlugin(string path);
 
-    void DisablePlugin(IPlugin plugin);
+    void UnloadPlugin(Plugin plugin);
 
-    IPlugin LoadPlugin(string path);
+    void UnloadPlugin(string name);
 
-    void UnloadPlugin(IPlugin plugin);
+    void DisableAllPlugins();
 
-    IPlugin[] GetPlugins();
+    Plugin[] GetPlugins();
 
-    static IPluginManager GetDefaultManager()
-    {
-        return JsPluginManager.GetManager();
-    }
+    Plugin? GetPlugin(string name);
 }

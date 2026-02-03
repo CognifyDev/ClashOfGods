@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace COG.Utils
 {
@@ -11,7 +6,7 @@ namespace COG.Utils
     {
         public static byte[] ReadFully(this System.IO.Stream input)
         {
-            using System.IO.MemoryStream memoryStream = new System.IO.MemoryStream();
+            using var memoryStream = new System.IO.MemoryStream();
             input.CopyTo(memoryStream);
             return memoryStream.ToArray();
         }

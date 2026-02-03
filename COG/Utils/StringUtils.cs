@@ -19,6 +19,59 @@ public static class StringUtils
         return sb.ToString();
     }
 
+    public static string ToKebabCase(this string input)
+    {
+        // return string.IsNullOrEmpty(input) ? input : Regex.Replace(input, "(?<!^)([A-Z])", "-$1").ToLower();
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        var result = new StringBuilder();
+        var previousWasUpper = false;
+        var previousWasSeparator = false;
+    
+        for (var i = 0; i < input.Length; i++)
+        {
+            var current = input[i];
+        
+            if (char.IsUpper(current))
+            {
+                if (i > 0 && 
+                    !previousWasUpper && 
+                    !previousWasSeparator && 
+                    result[^1] != '-')
+                {
+                    result.Append('-');
+                }
+            
+                result.Append(char.ToLower(current));
+                previousWasUpper = true;
+                previousWasSeparator = false;
+            }
+            else if (char.IsLetterOrDigit(current))
+            {
+                result.Append(current);
+                previousWasUpper = false;
+                previousWasSeparator = false;
+            }
+            else
+            {
+                if (result.Length > 0 && result[^1] != '-')
+                {
+                    result.Append('-');
+                }
+                previousWasUpper = false;
+                previousWasSeparator = true;
+            }
+        }
+    
+        if (result.Length > 0 && result[^1] == '-')
+        {
+            result.Length --;
+        }
+    
+        return result.ToString();
+    }
+
     public static string RemoveLast(this string input)
     {
         return new string(input.Take(input.Length - 1).ToArray());

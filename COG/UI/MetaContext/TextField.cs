@@ -1,11 +1,8 @@
-using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Il2CppInterop.Runtime.Injection;
 using TMPro;
 using Twitch;
@@ -42,7 +39,7 @@ namespace COG.UI.MetaContext
         {
             if (validField == null) return null;
 
-            int index = allFields.IndexOf(validField);
+            var index = allFields.IndexOf(validField);
             if (index == -1)
             {
                 return null;
@@ -112,7 +109,7 @@ namespace COG.UI.MetaContext
             if (input.Length == 0) return false;
 
             {
-                int i = 0;
+                var i = 0;
                 while (true)
                 {
                     if (i == input.Length) return false;
@@ -136,7 +133,7 @@ namespace COG.UI.MetaContext
 
             if (IsSelecting)
             {
-                int minIndex = Math.Min(cursor, selectingBegin);
+                var minIndex = Math.Min(cursor, selectingBegin);
                 myInput = myInput.Remove(minIndex, Math.Abs(cursor - selectingBegin)).Insert(minIndex, input);
                 selectingBegin = -1;
                 cursor = minIndex + input.Length;
@@ -150,7 +147,7 @@ namespace COG.UI.MetaContext
             //改行文字を制限
             var strings = myInput.Split('\r');
             myInput = "";
-            for (int i = 0; i < strings.Length; i++)
+            for (var i = 0; i < strings.Length; i++)
             {
                 if (i > 0 && i < MaxLines) myInput += '\r';
                 myInput += strings[i];
@@ -195,14 +192,14 @@ namespace COG.UI.MetaContext
         {
             try
             {
-                int myLineBegining = cursor;
+                var myLineBegining = cursor;
                 while (myLineBegining > 0 && myInput[myLineBegining - 1] != '\r') myLineBegining--;
-                int targetLineBegining = moveForward ? cursor : myLineBegining - 1;
+                var targetLineBegining = moveForward ? cursor : myLineBegining - 1;
                 while (targetLineBegining > 0 && targetLineBegining < myInput.Length && myInput[targetLineBegining - 1] != '\r') targetLineBegining += moveForward ? 1 : -1;
 
-                int dis = cursor - myLineBegining;
-                int result = targetLineBegining;
-                for (int i = 0; i < dis; i++)
+                var dis = cursor - myLineBegining;
+                var result = targetLineBegining;
+                for (var i = 0; i < dis; i++)
                 {
                     if (myInput[result] != '\r' && result + 1 < myInput.Length) result++;
                 }
@@ -256,11 +253,11 @@ namespace COG.UI.MetaContext
         private void UpdateTextMesh()
         {
             lastCompoStr = Input.compositionString;
-            string compStr = lastCompoStr;
+            var compStr = lastCompoStr;
 
             if (myInput.Length > 0 || compStr.Length > 0)
             {
-                string str = myInput.Insert(cursor, compStr);
+                var str = myInput.Insert(cursor, compStr);
                 if (IsSelecting) str = str.Insert(ConsiderComposition(Math.Max(cursor, selectingBegin), compStr), "\\EMK").Insert(ConsiderComposition(Math.Min(cursor, selectingBegin), compStr), "\\BMK");
 
                 str = Regex.Replace(str, "[<>]", "<noparse>$0</noparse>").Replace("\\EMK", "</mark>").Replace("\\BMK", "<mark=#5F74A5AA>").Replace("\r", "<br>");
@@ -274,8 +271,8 @@ namespace COG.UI.MetaContext
             }
             myText.ForceMeshUpdate();
 
-            int visualCursor = ConsiderComposition(cursor, compStr);
-            int lineNum = GetCursorLineNum(visualCursor);
+            var visualCursor = ConsiderComposition(cursor, compStr);
+            var lineNum = GetCursorLineNum(visualCursor);
             myCursor.transform.localPosition = new(GetCursorX(visualCursor), myInput.Length == 0 ?
                 0f : myText.textInfo.lineInfo[lineNum].baseline - myCursor.textInfo.lineInfo[0].baseline, -1f);
 
@@ -386,7 +383,7 @@ namespace COG.UI.MetaContext
                 return;
             }
 
-            bool requireUpdate = InputText(Input.inputString);
+            var requireUpdate = InputText(Input.inputString);
             if (dirtyFlag) { requireUpdate = true; dirtyFlag = false; }
 
             if (Input.GetKeyDown(KeyCode.UpArrow))

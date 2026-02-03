@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using Il2CppInterop.Runtime.Injection;
 using UnityEngine.Rendering;
@@ -43,7 +41,7 @@ namespace COG.UI.MetaContext
         {
             get => border; private set
             {
-                bool lastShownFlag = ShowBorderLine;
+                var lastShownFlag = ShowBorderLine;
                 ShowBorderLine = false;
                 border = value;
                 ShowBorderLine = lastShownFlag;
@@ -104,7 +102,7 @@ namespace COG.UI.MetaContext
                 return 0f;
             }
 
-            Vector2 cursor = Border / 2f;
+            var cursor = Border / 2f;
             cursor.x *= -1f;
             return context.Generate(gameObject, cursor, Border, out width);
         }
@@ -477,7 +475,7 @@ namespace COG.UI.MetaContext
 
         public float Generate(GameObject screen, Vector2 cursor, Vector2 size, out (float min, float max) width)
         {
-            float sum = contents.Sum(c => c.Item2);
+            var sum = contents.Sum(c => c.Item2);
             float height = 0;
 
             if (Alignment == AlignmentOption.Right)
@@ -485,13 +483,13 @@ namespace COG.UI.MetaContext
             else if (Alignment == AlignmentOption.Center)
                 cursor.x += (size.x - sum) / 2f;
 
-            float widthMin = size.x / 2f;
-            float widthMax = cursor.x;
+            var widthMin = size.x / 2f;
+            var widthMax = cursor.x;
 
             foreach (var c in contents)
             {
-                float myX = (c.Item2 / sum) * size.x;
-                float temp = c.Item1.Generate(screen, cursor, new Vector2(myX, size.y), out var innerWidth);
+                var myX = (c.Item2 / sum) * size.x;
+                var temp = c.Item1.Generate(screen, cursor, new Vector2(myX, size.y), out var innerWidth);
 
                 widthMin = Mathf.Min(widthMin, innerWidth.min);
                 widthMax = Mathf.Min(widthMax, innerWidth.max);
@@ -526,18 +524,18 @@ namespace COG.UI.MetaContext
         public float Generate(GameObject screen, Vector2 cursor, Vector2 size, out (float min, float max) width)
         {
             var combinedScreen = GameObjectUtils.CreateObject("CombinedScreen", screen.transform, Vector3.zero);
-            float x = 0f;
-            float height = 0f;
+            var x = 0f;
+            var height = 0f;
             foreach (var c in contents)
             {
                 var alloc = GameObjectUtils.CreateObject("Allocator", combinedScreen.transform, new Vector3(x, 0f, 0f));
-                height = Mathf.Max(height, c.Generate(alloc, Vector2.zero, out float cWidth));
+                height = Mathf.Max(height, c.Generate(alloc, Vector2.zero, out var cWidth));
                 alloc.transform.localPosition += new Vector3(cWidth * 0.5f, 0f);
                 x += cWidth;
             }
             if (this.height.HasValue) height = this.height.Value;
 
-            float centerY = cursor.y - height / 2f;
+            var centerY = cursor.y - height / 2f;
 
             float leftPos;
             switch (Alignment)
@@ -563,12 +561,12 @@ namespace COG.UI.MetaContext
         public float Generate(GameObject screen, Vector2 center, out float width)
         {
             var combinedScreen = GameObjectUtils.CreateObject("CombinedScreen", screen.transform, center);
-            float x = 0f;
-            float height = 0f;
+            var x = 0f;
+            var height = 0f;
             foreach (var c in contents)
             {
                 var alloc = GameObjectUtils.CreateObject("Allocator", combinedScreen.transform, new Vector3(x, 0f, 0f));
-                height = Mathf.Max(height, c.Generate(alloc, Vector2.zero, out float cWidth));
+                height = Mathf.Max(height, c.Generate(alloc, Vector2.zero, out var cWidth));
                 alloc.transform.localPosition += new Vector3(cWidth * 0.5f, 0f);
                 x += cWidth;
             }
@@ -605,13 +603,13 @@ namespace COG.UI.MetaContext
 
             size.x = size.x > 0f ? Mathf.Min(MaxWidth ?? size.x, size.x) : (MaxWidth ?? size.x);
 
-            float widthMin = size.x / 2;
-            float widthMax = cursor.x;
+            var widthMin = size.x / 2;
+            var widthMax = cursor.x;
 
             float heightSum = 0;
             foreach (var c in contents)
             {
-                float height = c.Generate(screen, cursor, size, out var innerWidth);
+                var height = c.Generate(screen, cursor, size, out var innerWidth);
                 widthMin = Math.Min(widthMin, innerWidth.min);
                 widthMax = Math.Max(widthMax, innerWidth.max);
                 heightSum += height;
@@ -633,13 +631,13 @@ namespace COG.UI.MetaContext
 
             var subscreen = GameObjectUtils.CreateObject("MetaContext", screen.transform, new Vector3(center.x, center.y, -0.1f));
 
-            float widthMin = float.MaxValue;
-            float widthMax = float.MinValue;
+            var widthMin = float.MaxValue;
+            var widthMax = float.MinValue;
 
             float heightSum = 0;
             foreach (var c in contents)
             {
-                float height = c.Generate(subscreen, new Vector2(0, -heightSum), new Vector2(MaxWidth ?? 0f, 0), out var innerWidth);
+                var height = c.Generate(subscreen, new Vector2(0, -heightSum), new Vector2(MaxWidth ?? 0f, 0), out var innerWidth);
                 widthMin = Math.Min(widthMin, innerWidth.min);
                 widthMax = Math.Max(widthMax, innerWidth.max);
                 heightSum += height;
@@ -660,10 +658,10 @@ namespace COG.UI.MetaContext
         //linesを-1にすると全部を並べる
         public MetaContextOld Append<T>(IEnumerable<T> enumerable, Func<T, IMetaParallelPlacableOld> converter, int perLine, int lines, int page, float height, bool fixedHeight = false, AlignmentOption alignment = AlignmentOption.Center)
         {
-            int skip = lines > 0 ? page * lines : 0;
-            int leftLines = lines;
-            int index = 0;
-            IMetaParallelPlacableOld[] contextList = new IMetaParallelPlacableOld[perLine];
+            var skip = lines > 0 ? page * lines : 0;
+            var leftLines = lines;
+            var index = 0;
+            var contextList = new IMetaParallelPlacableOld[perLine];
 
             foreach (var content in enumerable)
             {
@@ -693,7 +691,7 @@ namespace COG.UI.MetaContext
                 leftLines--;
             }
 
-            if (fixedHeight && leftLines > 0) for (int i = 0; i < leftLines; i++) Append(new VerticalMargin(height));
+            if (fixedHeight && leftLines > 0) for (var i = 0; i < leftLines; i++) Append(new VerticalMargin(height));
 
             return this;
         }
@@ -937,9 +935,9 @@ namespace COG.UI.MetaContext
             {
                 MetaContextOld context = new();
 
-                for (int i = 0; i < 2; i++)
+                for (var i = 0; i < 2; i++)
                 {
-                    int copied = i;
+                    var copied = i;
                     context.Append(new Button(() => buttonAction.Invoke(copied == 0), new(TextAttribute.BoldAttr) { Size = new(0.18f, 0.08f) }) { RawText = copied == 0 ? "▲" : "▼" });
                 }
 
@@ -1167,7 +1165,7 @@ namespace COG.UI.MetaContext
                     //子を削除
                     screen.ForEachChild((Il2CppSystem.Action<GameObject>)((obj) => GameObject.Destroy(obj)));
 
-                    float height = context?.Generate(screen, new Vector2(-innerSize.x / 2f, innerSize.y / 2f), innerSize) ?? 0f;
+                    var height = context?.Generate(screen, new Vector2(-innerSize.x / 2f, innerSize.y / 2f), innerSize) ?? 0f;
                     scroller.SetBounds(new FloatRange(0, height - scrollViewSizeY), null);
                     scroller.ScrollRelative(Vector2.zero);
 
@@ -1233,7 +1231,7 @@ namespace COG.UI.MetaContext
                     mask.transform.localScale = innerSize;
                 }
 
-                float height = Inner?.Generate(inner, new Vector2(-innerSize.x / 2f, innerSize.y / 2f), innerSize) ?? 0f;
+                var height = Inner?.Generate(inner, new Vector2(-innerSize.x / 2f, innerSize.y / 2f), innerSize) ?? 0f;
                 var scroller = VanillaAsset.GenerateScroller(Size, view.transform, new Vector2(Size.x / 2 - 0.15f, 0f), inner.transform, new FloatRange(0, height - Size.y), Size.y);
 
                 if (ScrollerTag != null && distDic.TryGetValue(ScrollerTag, out var val))
@@ -1270,7 +1268,7 @@ namespace COG.UI.MetaContext
                     mask.transform.localScale = innerSize;
                 }
 
-                float height = Inner?.Generate(inner, new Vector2(-innerSize.x / 2f, innerSize.y / 2f), innerSize) ?? 0f;
+                var height = Inner?.Generate(inner, new Vector2(-innerSize.x / 2f, innerSize.y / 2f), innerSize) ?? 0f;
                 var scroller = VanillaAsset.GenerateScroller(Size, view.transform, new Vector2(Size.x / 2 - 0.1f, 0f), inner.transform, new FloatRange(0, height - Size.y), Size.y);
 
                 if (ScrollerTag != null && distDic.TryGetValue(ScrollerTag, out var val))
@@ -1322,7 +1320,7 @@ namespace COG.UI.MetaContext
             private Vector2 ActualSize => fieldSize + new Vector2(0.15f, 0.15f);
             private void Generate(Transform screen, Vector2 center)
             {
-                Vector2 actualSize = ActualSize;
+                var actualSize = ActualSize;
                 var obj = GameObjectUtils.CreateObject("TextField", screen, center);
 
                 var field = GameObjectUtils.CreateObject<TextField>("Text", obj.transform, new Vector3(0, 0, -0.5f));
@@ -1351,7 +1349,7 @@ namespace COG.UI.MetaContext
 
             public float Generate(GameObject screen, Vector2 cursor, Vector2 size, out (float min, float max) width)
             {
-                Vector2 actualSize = ActualSize;
+                var actualSize = ActualSize;
                 Generate(screen.transform, ReflectAlignment(Alignment, actualSize, cursor, size));
                 width = CalcWidth(Alignment, cursor, size, actualSize.x, -actualSize.x / 2f, actualSize.x / 2f);
 
@@ -1391,10 +1389,10 @@ namespace COG.UI.MetaContext
             {
                 var frame = GameObjectUtils.CreateObject("SizedFrame", screen.transform, new(0f, 0f, -0.5f));
 
-                IMetaContextOld mc = (context as IMetaContextOld) ?? new MetaContextOld();
+                var mc = (context as IMetaContextOld) ?? new MetaContextOld();
 
 
-                float height = mc.Generate(frame, cursor + new Vector2(extended.x, -extended.y), size - new Vector2(extended.x, extended.y) * 2f, out width);
+                var height = mc.Generate(frame, cursor + new Vector2(extended.x, -extended.y), size - new Vector2(extended.x, extended.y) * 2f, out width);
                 if (HighlightColor != null)
                 {
                     var backGround = GameObjectUtils.CreateSharpBackground(new Vector2(width.max - width.min, height) + extended * 1.8f, HighlightColor.Value, screen.transform);
@@ -1408,7 +1406,7 @@ namespace COG.UI.MetaContext
 
             public float Generate(GameObject screen, Vector2 center, out float width)
             {
-                float height = 0f;
+                var height = 0f;
                 var frame = GameObjectUtils.CreateObject("SizedFrame", screen.transform, new(center.x, center.y, -1f));
                 width = 0f;
                 if (context is IMetaParallelPlacableOld mpp)

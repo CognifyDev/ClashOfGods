@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TMPro;
-using UnityEngine;
 
 namespace COG.Utils
 {
@@ -17,8 +15,8 @@ namespace COG.Utils
 
         static public IEnumerable<T> Delimit<T>(this IEnumerable<T> enumerable, T delimiter)
         {
-            bool isFirst = true;
-            foreach (T item in enumerable)
+            var isFirst = true;
+            foreach (var item in enumerable)
             {
                 if (!isFirst) yield return delimiter;
                 yield return item;
@@ -28,13 +26,13 @@ namespace COG.Utils
 
         private static IEnumerator AnimateCoroutine(HideAndSeekDeathPopup __instance)
         {
-            HideAndSeekDeathPopup andSeekDeathPopup = __instance;
-            DateTime startTime = DateTime.UtcNow;
-            bool doNeedReduceSpeed = true;
-            bool doNeedIncrease = true;
+            var andSeekDeathPopup = __instance;
+            var startTime = DateTime.UtcNow;
+            var doNeedReduceSpeed = true;
+            var doNeedIncrease = true;
             while (true)
             {
-                AnimatorStateInfo animatorStateInfo = andSeekDeathPopup.animator.GetCurrentAnimatorStateInfo(0);
+                var animatorStateInfo = andSeekDeathPopup.animator.GetCurrentAnimatorStateInfo(0);
                 if (animatorStateInfo.IsName("Show"))
                 {
                     if (doNeedReduceSpeed && DateTime.UtcNow.Subtract(startTime).TotalSeconds >= 0.5)

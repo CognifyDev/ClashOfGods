@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using COG.Utils;
 using Il2CppInterop.Runtime.Injection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 
 namespace COG.UI.MetaContext
 {
@@ -104,10 +101,10 @@ namespace COG.UI.MetaContext
             Parameters.RelatedButton = related;
             transform.SetParent(CameraUtils.FindCamera(LayerMask.NameToLayer("UI"))!.transform);
 
-            bool isLeft = Input.mousePosition.x < Screen.width / 2f;
-            bool isLower = Input.mousePosition.y < Screen.height / 2f;
+            var isLeft = Input.mousePosition.x < Screen.width / 2f;
+            var isLower = Input.mousePosition.y < Screen.height / 2f;
 
-            float height = myScreen.SetContext(context, out var width);
+            var height = myScreen.SetContext(context, out var width);
 
             if (width.min > width.max)
             {
@@ -209,16 +206,16 @@ namespace COG.UI.MetaContext
 
         public void UpdatePosition(Vector2? screenPosition = null, bool smoothedCenter = false)
         {
-            Vector2 screenPos = screenPosition ?? Input.mousePosition;
-            bool isLeft = screenPos.x < Screen.width / 2f;
-            bool isLower = screenPos.y < Screen.height / 2f;
+            var screenPos = screenPosition ?? Input.mousePosition;
+            var isLeft = screenPos.x < Screen.width / 2f;
+            var isLower = screenPos.y < Screen.height / 2f;
 
-            float smoothX = 0f;
-            float smoothY = 0f;
+            var smoothX = 0f;
+            var smoothY = 0f;
             if (smoothedCenter)
             {
-                float xCenter = (Screen.width / 2f - screenPos.x) / 200f;
-                float yCenter = (Screen.height / 2f - screenPos.y) / 200f;
+                var xCenter = (Screen.width / 2f - screenPos.x) / 200f;
+                var yCenter = (Screen.height / 2f - screenPos.y) / 200f;
                 smoothX = Math.Max(0f, 1f - Math.Abs(xCenter));
                 smoothY = Math.Max(0f, 1f - Math.Abs(yCenter));
             }
@@ -287,8 +284,8 @@ namespace COG.UI.MetaContext
             valueViewer.gameObject.SetActive(Parameters.RelatedValue != null);
             if (Parameters.RelatedValue != null)
             {
-                float value = Math.Clamp(Parameters.RelatedValue.Invoke(), 0f, 1f);
-                Vector3 valuePos = background.transform.localPosition;
+                var value = Math.Clamp(Parameters.RelatedValue.Invoke(), 0f, 1f);
+                var valuePos = background.transform.localPosition;
                 valuePos.z = -1f;
                 valuePos.y -= (background.bounds.size.y * 0.5f);
                 valuePos.x += (background.bounds.size.x * (value - 1f) * 0.5f);
@@ -299,7 +296,7 @@ namespace COG.UI.MetaContext
             icon.gameObject.SetActive(Parameters.Icon != null);
             if (Parameters.Icon != null)
             {
-                Vector3 valuePos = background.transform.localPosition;
+                var valuePos = background.transform.localPosition;
                 valuePos.z = -1f;
                 valuePos.y += (background.bounds.size.y * 0.5f);
                 valuePos.x -= (background.bounds.size.x * 0.5f);
@@ -324,11 +321,11 @@ namespace COG.UI.MetaContext
 
             if (obj != null)
             {
-                Vector3 localPos = anchor.anchoredPosition -
-                    new Vector3(
-                        actualSize.Width * (anchor.pivot.x - 0.5f),
-                        actualSize.Height * (anchor.pivot.y - 0.5f),
-                        0f);
+                var localPos = anchor.anchoredPosition -
+                               new Vector3(
+                                   actualSize.Width * (anchor.pivot.x - 0.5f),
+                                   actualSize.Height * (anchor.pivot.y - 0.5f),
+                                   0f);
 
                 obj.transform.localPosition = localPos;
             }
@@ -482,7 +479,7 @@ namespace COG.UI.MetaContext
             InnerArtifact.Values.Add(innerScreen);
 
             innerScreen.SetContext(Inner?.Invoke(), out var innerActualSize);
-            float height = innerActualSize.Height;
+            var height = innerActualSize.Height;
 
 
             if (ScrollerTag != null && distDic.TryGetValue(ScrollerTag, out var val))
@@ -519,13 +516,13 @@ namespace COG.UI.MetaContext
         internal override GameObject Instantiate(Size size, out Size actualSize)
         {
             var results = contexts.Select(c => (c.Instantiate(size, out var acSize), acSize, c)).ToArray();
-            (float maxWidth, float sumHeight) = results.Aggregate((0f, 0f), (r, current) => (Math.Max(r.Item1, current.acSize.Width), r.Item2 + current.acSize.Height));
+            (var maxWidth, var sumHeight) = results.Aggregate((0f, 0f), (r, current) => (Math.Max(r.Item1, current.acSize.Width), r.Item2 + current.acSize.Height));
             if (FixedWidth != null) maxWidth = FixedWidth.Value;
 
-            GameObject myObj = GameObjectUtils.CreateObject("ContextsHolder", null, Vector3.zero);
+            var myObj = GameObjectUtils.CreateObject("ContextsHolder", null, Vector3.zero);
 
 
-            float height = sumHeight * 0.5f;
+            var height = sumHeight * 0.5f;
             foreach (var r in results)
             {
                 if (r.Item1 != null)
@@ -551,13 +548,13 @@ namespace COG.UI.MetaContext
         internal override GameObject Instantiate(Size size, out Size actualSize)
         {
             var results = contexts.Select(c => (c.Instantiate(size, out var acSize), acSize, c)).ToArray();
-            (float sumWidth, float maxHeight) = results.Aggregate((0f, 0f), (r, current) => (r.Item1 + current.acSize.Width, Math.Max(r.Item2, current.acSize.Height)));
+            (var sumWidth, var maxHeight) = results.Aggregate((0f, 0f), (r, current) => (r.Item1 + current.acSize.Width, Math.Max(r.Item2, current.acSize.Height)));
             if (FixedHeight != null) maxHeight = FixedHeight.Value;
 
-            GameObject myObj = GameObjectUtils.CreateObject("ContextsHolder", null, Vector3.zero);
+            var myObj = GameObjectUtils.CreateObject("ContextsHolder", null, Vector3.zero);
 
 
-            float width = -sumWidth * 0.5f;
+            var width = -sumWidth * 0.5f;
             foreach (var r in results)
             {
                 if (r.Item1 != null)
@@ -639,7 +636,7 @@ namespace COG.UI.MetaContext
         {
             allModUi.RemoveAll(tuple => !tuple.Item1);
 
-            for (int i = 0; i < allModUi.Count; i++)
+            for (var i = 0; i < allModUi.Count; i++)
             {
                 var lPos = allModUi[i].Item1.transform.localPosition;
                 allModUi[i].Item1.transform.localPosition = new Vector3(lPos.x, lPos.y, -750f - i * 30f);
@@ -743,14 +740,14 @@ namespace COG.UI.MetaContext
 
         public TextAttributes GenerateAttribute(AttributeParams attribute, Color color, FontSize fontSize, Size size)
         {
-            TextAlignment alignment =
+            var alignment =
                 ((AttributeTemplateFlag)attribute & AttributeTemplateFlag.AlignmentMask) switch
                 {
                     AttributeTemplateFlag.AlignmentLeft => TextAlignment.Left,
                     AttributeTemplateFlag.AlignmentRight => TextAlignment.Right,
                     _ => TextAlignment.Center
                 };
-            Font font = GetFont(
+            var font = GetFont(
                 ((AttributeTemplateFlag)attribute & (AttributeTemplateFlag.FontMask | AttributeTemplateFlag.MaterialMask)) switch
                 {
                     AttributeTemplateFlag.FontStandard | AttributeTemplateFlag.MaterialBared => FontAsset.Gothic,
@@ -764,7 +761,7 @@ namespace COG.UI.MetaContext
             FontStyle style = 0;
             if (((AttributeTemplateFlag)attribute & AttributeTemplateFlag.StyleBold) != 0) style |= FontStyle.Bold;
 
-            bool isFlexible = ((AttributeTemplateFlag)attribute & AttributeTemplateFlag.IsFlexible) != 0;
+            var isFlexible = ((AttributeTemplateFlag)attribute & AttributeTemplateFlag.IsFlexible) != 0;
             return new TextAttributes(alignment, font, style, fontSize, size, color, isFlexible);
         }
 
@@ -883,7 +880,7 @@ namespace COG.UI.MetaContext
             if (IsMasked) renderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
 
             var spriteSize = renderer.sprite.bounds.size;
-            float scale = Math.Min(
+            var scale = Math.Min(
                 Size.Width.HasValue ? Size.Width.Value / spriteSize.x : float.MaxValue,
                 Size.Height.HasValue ? Size.Height.Value / spriteSize.y : float.MaxValue
                 );
@@ -1044,8 +1041,8 @@ namespace COG.UI.MetaContext
 
             if (Attr.IsFlexible)
             {
-                float prefferedWidth = Math.Min(text.rectTransform.sizeDelta.x, text.preferredWidth);
-                float prefferedHeight = Math.Min(text.rectTransform.sizeDelta.y, text.preferredHeight);
+                var prefferedWidth = Math.Min(text.rectTransform.sizeDelta.x, text.preferredWidth);
+                var prefferedHeight = Math.Min(text.rectTransform.sizeDelta.y, text.preferredHeight);
                 text.rectTransform.sizeDelta = new(prefferedWidth, prefferedHeight);
 
                 text.ForceMeshUpdate();
@@ -1198,7 +1195,7 @@ namespace COG.UI.MetaContext
             InnerArtifact.Values.Add(innerScreen);
 
             innerScreen.SetContext(Inner?.Invoke(), out var innerActualSize);
-            float height = innerActualSize.Height;
+            var height = innerActualSize.Height;
 
             actualSize = new(Size.x + 0.15f, Size.y + 0.08f);
 
