@@ -96,11 +96,6 @@ public partial class Main : BasePlugin
                 ConfigBase.AutoReplace = false;
         }
 
-        #region 配置文件迁移
-        // Read configs by calling static constructors
-        //_ = SettingsConfig.Instance;
-        //_ = ButtonHotkeyConfig.Instance;
-        #endregion
 
         if (!Directory.Exists(ConfigBase.DataDirectoryName))
         {
@@ -114,71 +109,6 @@ public partial class Main : BasePlugin
         Logger.LogInfo(
             $"Latest Version => {(Equals(ModUpdater.LatestVersion, VersionInfo.Empty) ? "Unknown" : ModUpdater.LatestVersion!.ToString())}");
         */
-
-        #region 监听迁移
-        //ListenerManager.GetManager().RegisterListeners(new IListener[]
-        //{
-        //    new CommandListener(),
-        //    new PlayerListener(),
-        //    new CustomButtonListener(),
-        //    new GameListener(),
-        //    new ClientOptionListener(),
-        //    new RpcListener(),
-        //    new TaskAdderListener(),
-        //    new VersionShowerListener(),
-        //    new VanillaBugFixListener(),
-        //    new CustomWinnerListener(),
-        //    new LobbyListener(),
-        //    new RoleAssignmentListener(),
-        //    new IntroListener()
-        //});
-
-        // Register CustomWinners
-        //CustomWinnerManager.GetManager().RegisterCustomWinnables(new IWinnable[]
-        //{
-        //    new CrewmatesCustomWinner(),
-        //    new ImpostorsCustomWinner(),
-        //    new LastPlayerCustomWinner()
-        //});
-
-        // Register roles
-        //CustomRoleManager.GetManager().RegisterRoles(new CustomRole[]
-        //{
-        //    // Unknown
-        //    new Unknown(),
-
-        //    // Crewmate
-        //    new Crewmate(),
-        //    new Bait(),
-        //    new Sheriff(),
-        //    new Vigilante(),
-        //    new SoulHunter(),
-        //    new Technician(),
-        //    new Inspector(),
-        //    new Doorman(),
-        //    new Chief(),
-        //    new Enchanter(),
-        //    new Witch(),
-
-        //    // Impostor
-        //    new Impostor(),
-        //    new Cleaner(),
-        //    new Stabber(),
-        //    new Reaper(),
-        //    new Troublemaker(),
-        //    new Nightmare(),
-        //    new Spy(),
-
-        //    // Neutral
-        //    new Jester(),
-        //    new Reporter(),
-        //    new DeathBringer(),
-
-        //INetworkedGameEventSender.AllSenders.AddRange(new[]
-        //{
-        //    new UseAbilityEventSender()
-        //});
-        #endregion
 
         // Register mod options
         ClientOptionManager.GetManager().RegisterClientOptions(new IClientOption[]
@@ -259,36 +189,7 @@ public partial class Main : BasePlugin
                 (value, origin) => origin + $": {(int)value}")
         });
 
-        #region 指令迁移
-        // Register Commands
-        //CommandManager.GetManager().RegisterCommands(new CommandBase[]
-        //{
-        //    new RpcCommand(),
-        //    new OptionCommand(),
-        //    new DebugCommand()
-        //});
-
-        // CustomButtonManager.GetManager().RegisterCustomButton(ButtonConstant.KillButton);
-        #endregion
-
         Harmony.PatchAll();
-
-        #region 插件迁移
-        // Start to load plugins
-        //if (SettingsConfig.Instance.EnablePluginSystem)
-        //{
-        //    if (!Directory.Exists(JsPluginManager.PluginDirectoryPath))
-        //        Directory.CreateDirectory(JsPluginManager.PluginDirectoryPath);
-
-        //    var files = Directory.GetFiles(JsPluginManager.PluginDirectoryPath)
-        //        .Where(name => name.ToLower().EndsWith(".cog"));
-        //    var enumerable = files.ToArray();
-        //    Logger.LogInfo($"{enumerable.Length} plugin(s) to load.");
-
-        //    foreach (var file in enumerable)
-        //        IPluginManager.GetDefaultManager().LoadPlugin(file);
-        //}
-        #endregion
 
         GlobalCustomOptionConstant.Init();
     }

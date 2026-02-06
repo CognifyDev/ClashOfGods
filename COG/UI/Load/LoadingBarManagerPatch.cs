@@ -1,4 +1,4 @@
-﻿namespace COG.UI.Load
+﻿namespace COG.UI.Load //From: Town Of Next
 {
     [HarmonyPatch(typeof(LoadingBarManager))]
     public class LoadingBarManagerPatch

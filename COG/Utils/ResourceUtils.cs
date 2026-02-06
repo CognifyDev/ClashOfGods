@@ -6,7 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using COG.Config;
-using COG.UI.MetaContext;
 using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
 
@@ -166,5 +165,4 @@ public static class ResourceUtils
         }
         return null;
     }
-    static public ResourceExpandableSpriteLoader SharpWindowBackgroundSprite = new("COG.Resources.MetaContext.StatisticsBackground.png", 100f, 5, 5);
 }
