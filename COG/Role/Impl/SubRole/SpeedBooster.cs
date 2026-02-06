@@ -1,7 +1,9 @@
 ﻿using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Attribute;
+using COG.Listener.Event.Impl;
 using COG.Listener.Event.Impl.Game;
+using COG.Listener.Event.Impl.PPhysics;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using UnityEngine;
@@ -20,9 +22,9 @@ public class SpeedBooster : CustomRole, IListener
 
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnGameStart(GameStartEvent _)
+    public void OnGameStart(PlayerPhysicsEvent @event)
     {
-        PlayerControl.LocalPlayer.MyPhysics.body.angularVelocity *= IncreasingSpeed.GetFloat();
+        @event.PlayerPhysics.body.velocity *= IncreasingSpeed.GetFloat();
     }
 
     public override IListener GetListener()

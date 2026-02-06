@@ -38,23 +38,10 @@ namespace COG.Asset.Dependens
                 Main.Logger.LogInfo($"下载进度: {progress:F1}%  ");
             };
 
-            downloader.StatusChanged += (sender, status) =>
-            {
-                Main.Logger.LogInfo($"\n状态: {status}");
-            };
-
-            var progress = new Progress<double>(p =>
-            {
-                Main.Logger.LogInfo($"总的: {p:F1}%");
-            });
-
             var fileUrl = targetFile;
             var targetDir = targetPath;
 
-            var success = await downloader.DownloadAndMoveAsync(
-                fileUrl,
-                targetDir,
-                progress);
+            var success = await downloader.DownloadAndMoveAsync(fileUrl, targetDir);
 
             Main.Logger.LogInfo($"\n下载结果: {(success ? "成功" : "失败")}");
         }

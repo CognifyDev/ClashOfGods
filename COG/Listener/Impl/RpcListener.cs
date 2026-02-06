@@ -4,6 +4,7 @@ using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption;
+using COG.UI.Hud.Meeting;
 using COG.Utils;
 using InnerNet;
 
@@ -93,6 +94,15 @@ public class RpcListener : IListener
                 var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
                 if (!body) return;
                 body!.gameObject.SetActive(false);
+                break;
+            }
+            case KnownRpc.GuessPlayer:
+            {
+                if (!GameStates.InRealGame) return;
+                var guesser = reader.ReadByte();
+                var target = reader.ReadByte();
+                if (!PlayerUtils.GetPlayerById(target)) return;
+                GuesserButton.GuessPlayer(PlayerUtils.GetPlayerById(guesser), PlayerUtils.GetPlayerById(target));
                 break;
             }
 

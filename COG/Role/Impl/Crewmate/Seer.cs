@@ -28,16 +28,16 @@ public class Seer : CustomRole
 
     private PlayerControl? _current;
 
-    private readonly HashSet<PlayerControl> _checkedPlayers = [];
+    private readonly List<PlayerControl> _checkedPlayers = [];
     
     public Seer() : base(ColorUtils.FromColor32(30,144,255), CampType.Crewmate)
     {
         Cooldown = CreateOption(() => 
-                GetContextFromLanguage("role.crewmate.seer-check-cooldown"),
+                GetContextFromLanguage("check-cooldown"),
             new FloatOptionValueRule(5, 1, 60, 25, NumberSuffixes.Seconds));
         
         InitialAvailableUsableTimes = CreateOption(() => 
-                GetContextFromLanguage("role.crewmate.seer-initial-available-usable-times"),
+                GetContextFromLanguage("initial-available-usable-times"),
             new FloatOptionValueRule(1, 1, 15, 1));
 
         var action = new LanguageConfig.TextHandler("action");
@@ -53,9 +53,14 @@ public class Seer : CustomRole
                 AvailableUsageTimes --;
             }, 
             () => { },
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _current) && AvailableUsageTimes > 0 && !HasChecked(_current),
+            () =>
+            {
+                PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out var target);
+                _current = target;
+                return AvailableUsageTimes > 0 && !HasChecked(_current) && _current != null;
+            },
             () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.CleanDeadBodyButton),
+            ResourceUtils.LoadSprite(ResourceConstant.CheckButton),
             2,
             action.GetString("check"),
             () => Cooldown.GetFloat(),
@@ -78,8 +83,8 @@ public class Seer : CustomRole
             return;
         if (!HasChecked(@event.Target))
             return;
-
-        _checkedPlayers.Remove(@event.Target);
+        else _checkedPlayers.Remove(@event.Target);
+        
         AvailableUsageTimes ++;
     }
 
@@ -99,7 +104,7 @@ public class Seer : CustomRole
     [EventHandler(EventHandlerType.Postfix)]
     public void OnGameStart(GameStartEvent _)
     {
-        AvailableUsageTimes = InitialAvailableUsableTimes.GetInt();
+        AvailableUsageTimes = (int)InitialAvailableUsableTimes.GetFloat();
         PlayerUtils.GetAllPlayers().ForEach(target => _prefixes.Add(target.PlayerId, target.Data.PlayerName));
     }
 
@@ -107,7 +112,7 @@ public class Seer : CustomRole
     {
         if (_prefixes.TryGetValue(target.PlayerId, out var prefix))
         {
-            PlayerUtils.SetNamePrivately(target, PlayerControl.LocalPlayer, prefix + $"({target.GetMainRole().CampType.GetName()})");
+            target.Data.PlayerName = prefix + $"({target.GetMainRole().CampType.GetName()})";
         }
     }
     

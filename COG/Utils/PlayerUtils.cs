@@ -175,7 +175,10 @@ public static class PlayerUtils
     {
         return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.Data.IsSamePlayer(player));
     }
-
+    public static PlayerControl GetPlayerControlByNetworkedPlayerInfo(this NetworkedPlayerInfo networkedPlayerInfo)
+    {
+        return GetAllPlayers().FirstOrDefault(playerControl => playerControl.PlayerId == networkedPlayerInfo.PlayerId);
+    }
     /// <summary>
     ///     给玩家添加指定标签
     /// </summary>
@@ -246,9 +249,7 @@ public static class PlayerUtils
 
     public static void SetNamePrivately(PlayerControl target, PlayerControl seer, string name)
     {
-        var writer =
-            AmongUsClient.Instance.StartRpcImmediately(target.NetId, (byte)RpcCalls.SetName, SendOption.Reliable,
-                seer.GetClientID());
+        var writer = AmongUsClient.Instance.StartRpcImmediately(target.NetId, (byte)RpcCalls.SetName, SendOption.Reliable,  seer.GetClientID());
         writer.Write(name);
         writer.Write(false);
         AmongUsClient.Instance.FinishRpcImmediately(writer);

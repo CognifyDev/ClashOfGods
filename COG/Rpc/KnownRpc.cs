@@ -25,5 +25,6 @@ public enum KnownRpc : uint
     WitchUsesAntidote,
     DieWithoutAnimationAndBody,
     SyncGameEvent,
-    AdvancedMurder
+    AdvancedMurder,
+    GuessPlayer
 }

@@ -5,6 +5,7 @@ using COG.Config.Impl;
 using COG.Constant;
 using COG.Role;
 using COG.Role.Impl.SubRole;
+using COG.Rpc;
 using COG.Utils;
 using COG.Utils.Coding;
 using TMPro;
@@ -204,6 +205,31 @@ public class GuesserButton
     public void SetUpConfirmButton()
     {
         _confirmButton = CreateBottomButton(LanguageConfig.Instance.Confirm, new Vector3(3.6f, -2.2f, 0f), DestroyAll);
+    }
+
+    public void ConfirmRole(CustomRole role)
+    {
+        if (!_target) return;
+        if(_target.GetMainRole() == _selectedRole && !_target.IsDead)
+        {
+            
+        }
+        MeetingHud.Instance.playerStates.ForEach(x => x.gameObject.SetActive(true));
+    }
+    public static void GuessPlayer(PlayerControl guesser , PlayerControl target)
+    {
+        if (Constants.ShouldPlaySfx()) SoundManager.Instance.PlaySound(target.KillSfx, false, 0.8f);
+        if (PlayerControl.LocalPlayer.PlayerId == target.PlayerId)
+        {
+            PlayerUtils.PlayKillAnimation(guesser.Data, target.Data);
+        }
+    }
+    public static void RpcGuessPlayer(PlayerControl guesser, PlayerControl target)
+    {
+        var writer = PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.GuessPlayer);
+        writer.Write(guesser.PlayerId);
+        writer.Write(target.PlayerId);
+        writer.Finish();
     }
 
     public PassiveButton CreateBottomButton(string text, Vector3 localPosition, Action onClick)
