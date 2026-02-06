@@ -639,8 +639,13 @@ public static class PlayerUtils
         }
         else
         {
-            KillAnimationPatch.DisableNextAnim = true;
+            KillAnimationPatch.DisableNextAnim = showAnimation;
             killer.MurderPlayer(realVictim, GameUtils.DefaultFlags);
+
+            if (!showAnimation)
+            {
+                realVictim.Die(DeathReason.Kill, true);
+            }
         }
 
         var isParticipant = realVictim.AmOwner || players.Any(p => p.AmOwner);

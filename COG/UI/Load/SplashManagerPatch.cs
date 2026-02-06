@@ -9,6 +9,7 @@ using COG.Command;
 using COG.Command.Impl;
 using COG.Config;
 using COG.Config.Impl;
+using COG.Constant;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Winnable;
 using COG.Listener;
@@ -31,7 +32,7 @@ namespace COG.UI.Load;
 [HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
 public static class SplashManagerPatch
 {
-    private static readonly Sprite CognifyDevLogoSprite = LoadSprite("TeamLogo.png", 90f)!;
+    private static readonly Sprite CognifyDevLogoSprite = LoadSprite(ResourceConstant.TeamLogoSprite, 90f)!;
 
     public static TextMeshPro LoadText = null!;
     public static bool LoadedCognifyDevLogo;
