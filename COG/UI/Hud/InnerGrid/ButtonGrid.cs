@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace COG.UI.Hud.InnerGrid
+namespace COG.UI.Hud.InnerGrid;
+
+internal class ButtonGrid
 {
-    internal class ButtonGrid
-    {
-    }
 }

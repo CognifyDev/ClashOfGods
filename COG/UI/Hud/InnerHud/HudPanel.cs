@@ -1,6 +1,5 @@
-﻿namespace COG.UI.Hud.InnerHud
+﻿namespace COG.UI.Hud.InnerHud;
+
+internal class HudPanel
 {
-    internal class HudPanel
-    {
-    }
 }
