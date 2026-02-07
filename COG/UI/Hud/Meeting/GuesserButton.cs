@@ -209,10 +209,11 @@ public class GuesserButton
 
     public void ConfirmRole(CustomRole role)
     {
+        CloseGuessUI();
         if (!_target) return;
         if(_target.GetMainRole() == _selectedRole && !_target.IsDead)
         {
-            
+            RpcGuessPlayer(PlayerControl.LocalPlayer, _target.GetPlayerControlByNetworkedPlayerInfo());
         }
         MeetingHud.Instance.playerStates.ForEach(x => x.gameObject.SetActive(true));
     }

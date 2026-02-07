@@ -14,7 +14,7 @@ using COG.Utils;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Seer : CustomRole
+public class Seer : CustomRole, IListener
 {
     private CustomButton CheckButton { get; }
 
@@ -57,7 +57,7 @@ public class Seer : CustomRole
             {
                 PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out var target);
                 _current = target;
-                return AvailableUsageTimes > 0 && !HasChecked(_current) && _current != null;
+                return AvailableUsageTimes !<= 0 && !HasChecked(_current) && _current != null;
             },
             () => true,
             ResourceUtils.LoadSprite(ResourceConstant.CheckButton),
@@ -105,6 +105,7 @@ public class Seer : CustomRole
     public void OnGameStart(GameStartEvent _)
     {
         AvailableUsageTimes = (int)InitialAvailableUsableTimes.GetFloat();
+        Main.Logger.LogInfo(InitialAvailableUsableTimes.GetFloat());
         PlayerUtils.GetAllPlayers().ForEach(target => _prefixes.Add(target.PlayerId, target.Data.PlayerName));
     }
 
@@ -120,5 +121,9 @@ public class Seer : CustomRole
     {
         _checkedPlayers.Clear();
         _prefixes.Clear();
+    }
+    public override IListener GetListener()
+    {
+        return this;
     }
 }
