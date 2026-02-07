@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace COG.UI.Hud.InnerHud
 {
-    internal class HudFlider
+    internal class HudSlider
     {
     }
 }
