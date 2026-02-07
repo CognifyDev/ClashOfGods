@@ -99,7 +99,7 @@ public class Seer : CustomRole, IListener
     public void OnGameStart(GameStartEvent _)
     {
         AvailableUsageTimes = (int)InitialAvailableUsableTimes.GetFloat();
-        Main.Logger.LogInfo(InitialAvailableUsableTimes.GetFloat());
+        // Main.Logger.LogInfo(InitialAvailableUsableTimes.GetFloat());
         PlayerUtils.GetAllPlayers().ForEach(target => _prefixes.Add(target.PlayerId, target.Data.PlayerName));
     }
 
