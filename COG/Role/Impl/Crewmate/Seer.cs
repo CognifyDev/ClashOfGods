@@ -42,30 +42,24 @@ public class Seer : CustomRole, IListener
 
         var action = new LanguageConfig.TextHandler("action");
 
-        CheckButton = CustomButton.Of(
-            "seer-check",
-            () =>
+        CheckButton = CustomButton.Builder("seer-check", 
+                ResourceConstant.CheckButton, action.GetString("check"))
+            .OnClick(() =>
             {
                 if (_current == null) return;
     
                 _checkedPlayers.Add(_current);
                 ShowCurrentCamp(_current);
                 AvailableUsageTimes --;
-            }, 
-            () => { },
-            () =>
+            })
+            .CouldUse(() =>
             {
                 PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out var target);
                 _current = target;
                 return AvailableUsageTimes !<= 0 && !HasChecked(_current) && _current != null;
-            },
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.CheckButton),
-            2,
-            action.GetString("check"),
-            () => Cooldown.GetFloat(),
-            -1
-        );
+            })
+            .Cooldown(Cooldown.GetFloat)
+            .Build();
  
         AddButton(CheckButton);
     }

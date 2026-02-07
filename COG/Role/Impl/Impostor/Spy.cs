@@ -62,16 +62,12 @@ public class Spy : CustomRole
 
         RegisterRpcHandler(_revealClosestTargetHandler);
 
-        _observeButton = CustomButton.Of("spy-observe",
-            () => _revealClosestTargetHandler.PerformAndSend(false),
-            () => { },
-            () => true,
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.ObserveButton)!,
-            2,
-            ActionNameContext.GetString("observe"),
-            () => _observeCooldown.GetFloat(),
-            0);
+        _observeButton = CustomButton.Builder("spy-observe",
+                ResourceConstant.ObserveButton,
+                ActionNameContext.GetString("observe"))
+            .OnClick(() => _revealClosestTargetHandler.PerformAndSend(false))
+            .Cooldown(_observeCooldown.GetFloat)
+            .Build();
 
         AddButton(_observeButton);
 

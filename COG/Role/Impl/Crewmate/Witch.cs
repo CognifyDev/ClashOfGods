@@ -48,20 +48,16 @@ public class Witch : CustomRole, IListener
         _antidoteCooldown = CreateOption(() => GetContextFromLanguage("antidote-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
 
-        _antidoteButton = CustomButton.Of("witch-antidote",
-            () =>
+        _antidoteButton = CustomButton.Builder("witch-antidote",
+                ResourceConstant.AntidoteButton, ActionNameContext.GetString("antidote"))
+            .OnClick(() =>
             {
                 _antidoteHandler.PerformAndSend(_current!.ParentId);
                 _remainingUses--;
-            },
-            () => { },
-            () => _remainingUses > 0 && (_current = PlayerUtils.GetClosestBody()),
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.AntidoteButton)!,
-            2,
-            ActionNameContext.GetString("antidote"),
-            () => _antidoteCooldown.GetFloat(),
-            0);
+            })
+            .CouldUse(() => _remainingUses > 0 && (_current = PlayerUtils.GetClosestBody()))
+            .Cooldown(_antidoteCooldown.GetFloat)
+            .Build();
 
         AddButton(_antidoteButton);
     }

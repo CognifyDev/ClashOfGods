@@ -34,21 +34,18 @@ public class DeathBringer : CustomRole, IListener
         _neededPlayerNumber = CreateOption(() => LanguageConfig.Instance.DeathBringerNeededPlayerNumber,
             new FloatOptionValueRule(1F, 1F, 15F, 5F));
 
-        _stareButton = CustomButton.Of(
-            "death-bringer-stare",
-            () =>
+        _stareButton = CustomButton.Builder("death-bringer-stare", ResourceConstant.StareButton,
+                LanguageConfig.Instance.StareAction)
+            .OnClick(() =>
             {
                 _staredPlayers.Add(_target!);
                 PlayerControl.LocalPlayer.ResetKillCooldown();
-            },
-            () => _stareButton!.ResetCooldown(),
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.StareButton),
-            3,
-            LanguageConfig.Instance.StareAction,
-            _killCooldown.GetFloat,
-            -1);
+            })
+            .OnMeetingEnds(_stareButton!.ResetCooldown)
+            .CouldUse(() => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target))
+            .Row(3)
+            .Cooldown(_killCooldown.GetFloat)
+            .Build();
 
         DefaultKillButtonSetting.ForceShow =
             () => PlayerUtils.GetAllAlivePlayers().Count <= _neededPlayerNumber.GetFloat();

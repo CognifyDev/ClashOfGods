@@ -64,20 +64,17 @@ public class Troublemaker : CustomRole
 
         RegisterRpcHandler(_disturbRpcHandler);
 
-        _disturbButton = CustomButton.Of("troublemaker-disturb",
-            () =>
+        _disturbButton = CustomButton.Builder("troublemaker-disturb", ResourceConstant.DisturbButton,
+                ActionNameContext.GetString("disturb"))
+            .OnClick(() =>
             {
                 _disturbRpcHandler.PerformAndSend();
                 _usedThisRound = true;
-            },
-            () => _usedThisRound = false,
-            () => !_usedThisRound,
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.DisturbButton)!,
-            2,
-            ActionNameContext.GetString("disturb"),
-            () => _disturbCooldown.GetFloat(),
-            0);
+            })
+            .OnMeetingEnds(() => _usedThisRound = false)
+            .CouldUse(() => !_usedThisRound)
+            .Cooldown(_disturbCooldown.GetFloat)
+            .Build();
 
         AddButton(_disturbButton);
     }

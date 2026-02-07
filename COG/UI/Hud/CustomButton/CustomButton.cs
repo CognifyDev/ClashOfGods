@@ -17,9 +17,171 @@ namespace COG.UI.Hud.CustomButton;
 [ShitCode]
 public class CustomButton
 {
-    public const string ModdedFlag = "Modded_";
+    private const string ModdedFlag = "Modded_";
 
     private static int _availableId;
+
+    public class CustomButtonBuilder(string identifier, Sprite sprite, string text)
+    {
+        private Action _onClick = () => { }, _onMeetingEnds = () => { };
+        
+        private Action? _onEffect;
+        private float _effectTime;
+
+        private Func<bool> _couldUse = () => true, _hasButton = () => true;
+
+        private Func<float> _cooldown = () => GameUtils.GetGameOptions().KillCooldown;
+        
+        private Vector3? _position;
+
+        private int _usesLimit = -1;
+
+        private int _order = -1;
+        private int _row = 2;
+        
+        /// <summary>
+        /// 当按钮被按下时执行
+        /// </summary>
+        /// <param name="onClick">执行操作</param>
+        /// <returns></returns>
+        public CustomButtonBuilder OnClick(Action onClick)
+        {
+            _onClick = onClick;
+            return this;
+        }
+
+        /// <summary>
+        /// 会议结束的时候执行
+        /// </summary>
+        /// <param name="onMeetingEnds">执行操作</param>
+        /// <returns></returns>
+        public CustomButtonBuilder OnMeetingEnds(Action onMeetingEnds)
+        {
+            _onMeetingEnds = onMeetingEnds;
+            return this;
+        }
+
+        /// <summary>
+        /// 按钮等待时间结束后的动作（如纵火犯按下浇油按钮后要等待 <paramref name="effectTime" /> 秒,结束后便执行此动作）
+        /// </summary>
+        /// <param name="effectTime">等待时间</param>
+        /// <param name="onEffect">执行操作</param>
+        /// <returns></returns>
+        public CustomButtonBuilder OnEffect(float effectTime, Action onEffect)
+        {
+            _onEffect = onEffect;
+            _effectTime = effectTime;
+            return this;
+        }
+
+        /// <summary>
+        /// 使用按钮的条件
+        /// </summary>
+        /// <param name="couldUse">条件</param>
+        /// <returns></returns>
+        public CustomButtonBuilder CouldUse(Func<bool> couldUse)
+        {
+            _couldUse = couldUse;
+            return this;
+        }
+
+        /// <summary>
+        /// 拥有按钮的条件
+        /// </summary>
+        /// <param name="hasButton">条件</param>
+        /// <returns></returns>
+        public CustomButtonBuilder HasButton(Func<bool> hasButton)
+        {
+            _hasButton = hasButton;
+            return this;
+        }
+
+        /// <summary>
+        /// 按钮冷却
+        /// </summary>
+        /// <param name="cooldown">冷却获取器</param>
+        /// <returns></returns>
+        public CustomButtonBuilder Cooldown(Func<float> cooldown)
+        {
+            _cooldown = cooldown;
+            return this;
+        }
+        
+        /// <summary>
+        /// 使用限制
+        /// </summary>
+        /// <param name="usesLimit">限制，小于等于0则无限制</param>
+        /// <returns></returns>
+        public CustomButtonBuilder UsesLimit(int usesLimit)
+        {
+            _usesLimit = usesLimit;
+            return this;
+        }
+        
+        /// <summary>
+        /// 按钮坐标
+        /// </summary>
+        /// <param name="position">按钮坐标</param>
+        /// <returns></returns>
+        public CustomButtonBuilder Position(Vector3 position)
+        {
+            _position = position;
+            return this;
+        }
+
+        /// <summary>
+        /// 按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）
+        /// </summary>
+        /// <param name="order">顺序</param>
+        /// <returns></returns>
+        public CustomButtonBuilder Order(int order)
+        {
+            _order = order;
+            return this;
+        }
+        
+        /// <summary>
+        /// 按钮在hud中显示在第几行（1-2）
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public CustomButtonBuilder Row(int row)
+        {
+            _row = row;
+            return this;
+        }
+
+        /// <summary>
+        /// 构建 CustomButton 对象
+        /// </summary>
+        /// <returns>CustomButton 对象</returns>
+        public CustomButton Build()
+        {
+            return new CustomButton(identifier, _onClick, _onMeetingEnds, _onEffect ?? (() => { }), _couldUse,
+                    _hasButton, sprite, _position, text, _onEffect != null, _cooldown, _effectTime, _usesLimit)
+            {
+                Order = _order,
+                Row = _row
+            };
+        }
+    }
+
+    /// <summary>
+    /// 创建 CustomButton 构造器
+    /// </summary>
+    /// <param name="identifier">ID</param>
+    /// <param name="sprite">图标</param>
+    /// <param name="text">按钮文本</param>
+    /// <returns></returns>
+    public static CustomButtonBuilder Builder(string identifier, Sprite sprite, string text)
+    {
+        return new CustomButtonBuilder(identifier, sprite, text);
+    }
+    
+    public static CustomButtonBuilder Builder(string identifier, string spritePath, string text)
+    {
+        return Builder(identifier, ResourceUtils.LoadSprite(spritePath), text);
+    }
 
     private CustomButton(string identifier, Action onClick, Action onMeetingEnd, Action onEffect, Func<bool> couldUse,
         Func<bool> hasButton, Sprite sprite, Vector3? position, string text, bool hasEffect, Func<float> cooldown,
@@ -78,89 +240,6 @@ public class CustomButton
     public TextMeshPro? InfoText { get; set; }
 
     public static bool Initialized { get; internal set; }
-
-    /// <summary>
-    ///     在游戏中创建一个按钮 (Effect)
-    /// </summary>
-    /// <param name="identifier"></param>
-    /// <param name="onClick">点击后按钮的动作（自动判断是否还在冷却）</param>
-    /// <param name="onMeetingEnds">会议结束后按钮的动作</param>
-    /// <param name="onEffect">
-    ///     按钮等待时间结束后的动作（如纵火犯按下浇油按钮后要等待 <paramref name="effectTime" /> 秒,结束后便执行此动作）（此处为null或
-    ///     <paramref name="hasEffect" /> 为false则不执行）
-    /// </param>
-    /// <param name="couldUse">使用按钮的条件</param>
-    /// <param name="hasButton">玩家拥有此按钮的条件</param>
-    /// <param name="sprite">按钮的图标</param>
-    /// <param name="position">按钮的坐标</param>
-    /// <param name="text">按钮的文本</param>
-    /// <param name="cooldown">按钮的冷却</param>
-    /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
-    /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
-    /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnds, Action onEffect, Func<bool> couldUse,
-        Func<bool> hasButton, Sprite sprite, Vector3 position, string text, Func<float> cooldown,
-        float effectTime, int usesLimit, int order = -1)
-    {
-        return new CustomButton(identifier, onClick, onMeetingEnds, onEffect, couldUse, hasButton, sprite, position, text,
-                true, cooldown, effectTime, usesLimit)
-        { Order = order };
-    }
-
-    /// <summary>
-    ///     在游戏中创建一个按钮 (Non-effect)
-    /// </summary>
-    /// <param name="onClick">点击后按钮的动作（自动判断是否还在冷却）</param>
-    /// <param name="onMeetingEnds">会议结束后按钮的动作</param>
-    /// <param name="couldUse">使用按钮的条件</param>
-    /// <param name="hasButton">玩家拥有此按钮的条件</param>
-    /// <param name="sprite">按钮的图标</param>
-    /// <param name="position">按钮的坐标</param>
-    /// <param name="text">按钮的文本</param>
-    /// <param name="cooldown">按钮的冷却</param>
-    /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
-    /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnds, Func<bool> couldUse, Func<bool> hasButton,
-        Sprite sprite, Vector3 position, string text, Func<float> cooldown, int usesLimit, int order = -1)
-    {
-        return new CustomButton(identifier, onClick, onMeetingEnds, () => { }, couldUse, hasButton, sprite, position, text,
-                false, cooldown, -1f, usesLimit)
-        { Order = order };
-    }
-
-    /// <summary>
-    ///     在游戏中创建一个按钮 (Non-effect)
-    /// </summary>
-    /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
-    /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
-    /// <returns>CustomButton 的实例</returns>
-    public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnds, Func<bool> couldUse, Func<bool> hasButton,
-        Sprite sprite, int row, string text, Func<float> cooldown, int usesLimit, int order = -1)
-    {
-        return new CustomButton(identifier, onClick, onMeetingEnds, () => { }, couldUse, hasButton, sprite, null, text,
-            false, cooldown, -1f, usesLimit)
-        {
-            Row = row,
-            Order = order
-        };
-    }
-
-    /// <summary>
-    ///     在游戏中创建一个按钮 (Effect)
-    /// </summary>
-    /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
-    /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
-    public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnds, Action onEffect, Func<bool> couldUse,
-        Func<bool> hasButton, Sprite sprite, int row, string text, Func<float> cooldown,
-        float effectTime, int usesLimit, int order = -1)
-    {
-        return new CustomButton(identifier, onClick, onMeetingEnds, onEffect, couldUse, hasButton, sprite, null, text,
-            true, cooldown, effectTime, usesLimit)
-        {
-            Row = row,
-            Order = order
-        };
-    }
 
     public void SetActive(bool active)
     {

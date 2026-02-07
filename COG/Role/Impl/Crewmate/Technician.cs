@@ -22,18 +22,14 @@ public class Technician : CustomRole, IListener
         var repairRpcHandler = new RpcHandler(KnownRpc.ClearSabotages, RepairSabotages);
         RegisterRpcHandler(repairRpcHandler);
 
-        RepairButton = CustomButton.Of(
-            "technician-repair",
-            repairRpcHandler.PerformAndSend,
-            () => RepairButton?.ResetCooldown(),
-            () => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency),
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.RepairButton),
-            2,
-            LanguageConfig.Instance.RepairAction,
-            () => 0f,
-            2
-        );
+        RepairButton = CustomButton.Builder("technician-repair",
+                ResourceConstant.RepairButton, LanguageConfig.Instance.RepairAction)
+            .OnClick(repairRpcHandler.PerformAndSend)
+            .OnMeetingEnds(() => RepairButton?.ResetCooldown())
+            .CouldUse(() => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency))
+            .Cooldown(() => 0F)
+            .UsesLimit(2)
+            .Build();
 
         AddButton(RepairButton);
     }

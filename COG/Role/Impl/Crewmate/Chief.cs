@@ -49,27 +49,22 @@ public class Chief : CustomRole
 
         var action = new LanguageConfig.TextHandler("action");
 
-        _giveKillButton = CustomButton.Of("chief-give-kill",
-            () => _giveKillRpcHandler.Send(_target!), // just send
-            () => { },
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.GiveKillButton)!,
-            2,
-            action.GetString("give-kill"),
-            () => 0,
-            1);
-
-        _giveShieldButton = CustomButton.Of("chief-give-shield",
-            () => PlayerControl.LocalPlayer.CmdCheckProtect(_target),
-            () => { },
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
-            () => true,
-            null!, // allocated the sprite of guardian angel button, see CustomButton.cs
-            2,
-            action.GetString("give-shield"),
-            () => 0,
-            1);
+        _giveKillButton = CustomButton.Builder("chief-give-kill",
+                ResourceConstant.GiveKillButton, action.GetString("give-kill"))
+            .OnClick(() => _giveKillRpcHandler.Send(_target!)) // just send
+            .CouldUse(() => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target))
+            .Cooldown(() => 0)
+            .UsesLimit(1)
+            .Build();
+        
+        /* why sprite is null? */
+        /* allocated the sprite of guardian angel button, see CustomButton.cs */
+        _giveShieldButton = CustomButton.Builder("chief-give-shield", (Sprite) null!, action.GetString("give-shield"))
+            .OnClick(() => PlayerControl.LocalPlayer.CmdCheckProtect(_target))
+            .CouldUse(() => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target))
+            .Cooldown(() => 0)
+            .UsesLimit(1)
+            .Build();
 
         AddButton(_giveKillButton);
         AddButton(_giveShieldButton);
