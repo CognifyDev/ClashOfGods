@@ -27,7 +27,6 @@
     </ItemGroup>
 
     <ItemGroup>
-<!--        <Reference Include="Assembly-CSharp-2025.11.18.dll" HintPath="..\Libs\Assembly-CSharp-2025.11.18.dll"/>-->
         <PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.11.18" />
         <PackageReference Include="SharpZipLib" Version="1.4.2" />
         <PackageReference Include="IronPython" Version="3.4.2" />
