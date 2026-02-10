@@ -24,26 +24,21 @@ public class Enchanter : CustomRole, IListener
 
     public Enchanter() : base(ColorUtils.AsColor("#7030a0"), CampType.Crewmate)
     {
-        ContractButton = CustomButton.Of(
-            "enchanter-contract",
-            () =>
+        ContractButton = CustomButton.Builder("enchanter-contract",
+                ResourceConstant.ContractButton, ActionNameContext.GetString("contract"))
+            .OnClick(() =>
             {
                 _contractedPlayer = _target;
                 _usedThisRound = true;
-            },
-            () =>
+            })
+            .OnMeetingEnds(() =>
             {
                 _usedThisRound = false;
                 _contractedPlayer = null;
-            },
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) && !_usedThisRound,
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.ContractButton)!,
-            2,
-            ActionNameContext.GetString("contract"),
-            () => 0f,
-            0
-        );
+            })
+            .CouldUse(() => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) && !_usedThisRound)
+            .Cooldown(() => 0F)
+            .Build();
 
         AddButton(ContractButton);
 

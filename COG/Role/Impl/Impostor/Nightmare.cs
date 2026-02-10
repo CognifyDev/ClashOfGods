@@ -65,10 +65,12 @@ public class Nightmare : CustomRole
         _storeCooldown = CreateOption(() => GetContextFromLanguage("store-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
 
-        _storeButton = CustomButton.Of("nightmare-store",
-            () =>
+        _storeButton = CustomButton.Builder("nightmare-store", ResourceConstant.StoreKillButton,
+                ActionNameContext.GetString("store-kill"))
+            .OnClick(() =>
             {
                 Coroutines.Start(Ability());
+                return;
 
                 IEnumerator Ability()
                 {
@@ -105,6 +107,7 @@ public class Nightmare : CustomRole
 
                     _teammateCurrentCooldown = float.MaxValue;
                     _receivedCooldownSent = false;
+                    yield break;
 
                     void SyncInfoText()
                     {
@@ -112,17 +115,11 @@ public class Nightmare : CustomRole
                             .CustomFormat(("stored", _storedKills), ("max", MaxKillsStored)));
                     }
                 }
-            },
-            () => { },
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) &&
-                  _storedKills < MaxKillsStored && _target!.GetMainRole().CampType == CampType.Impostor,
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.StoreKillButton)!,
-            2,
-            ActionNameContext.GetString("store-kill"),
-            () => _storeCooldown.GetFloat(),
-            0
-        );
+            })
+            .CouldUse(() => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target) &&
+                            _storedKills < MaxKillsStored && _target!.GetMainRole().CampType == CampType.Impostor)
+            .Cooldown(_storeCooldown.GetFloat)
+            .Build();
 
         AddButton(_storeButton);
     }

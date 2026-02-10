@@ -26,24 +26,20 @@ public class Stabber : CustomRole
 
         _maxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new FloatOptionValueRule(1, 1, 15, 2));
 
-        _dispatchButton = CustomButton.Of(
-            "stabber-dispatch",
-            () =>
+        _dispatchButton = CustomButton.Builder("stabber-dispatch", ResourceConstant.DispatchButton,
+                LanguageConfig.Instance.DispatchAction)
+            .OnClick(() =>
             {
                 _target!.RpcMurderAdvanced(new AdvancedKillOptions(true,
                     new KillAnimationOptions(false, [], PlayerControl.LocalPlayer.Data,
                         _target!.Data), _target));
-                _killedTimes++;
-            },
-            () => _dispatchButton?.ResetCooldown(),
-            () => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target),
-            () => _killedTimes < _maxUseTime.GetInt(),
-            ResourceUtils.LoadSprite(ResourceConstant.DispatchButton),
-            2,
-            LanguageConfig.Instance.DispatchAction,
-            () => GameUtils.GetGameOptions().KillCooldown,
-            0
-        );
+                _killedTimes ++;
+            })
+            .OnMeetingEnds(() => _dispatchButton?.ResetCooldown())
+            .CouldUse(() => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target))
+            .HasButton(() => _killedTimes < _maxUseTime.GetInt())
+            .Cooldown(() => GameUtils.GetGameOptions().KillCooldown)
+            .Build();
 
         DefaultKillButtonSetting.AddCustomCondition(() => _killedTimes >= _maxUseTime.GetInt());
 

@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace COG.UI.Hud.InnerHud
+namespace COG.UI.Hud.InnerHud;
+
+internal class HudSlider
 {
-    internal class HudSlider
-    {
-    }
 }

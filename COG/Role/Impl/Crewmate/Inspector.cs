@@ -22,34 +22,26 @@ public class Inspector : CustomRole, IListener
 
     public Inspector() : base(ColorUtils.FromColor32(46, 84, 160), CampType.Crewmate)
     {
-        OnRoleAbilityUsed += (role, _) => NotifyInspector();
+        OnRoleAbilityUsed += (_, _) => NotifyInspector();
 
         AbilityCooldownOption = CreateOption(() => LanguageConfig.Instance.AbilityCooldown,
             new FloatOptionValueRule(10, 5, 60, 25, NumberSuffixes.Seconds));
-        ExamineButton = CustomButton.Of("inspector-examine",
-            () =>
+        
+        ExamineButton = CustomButton.Builder("inspector-examine",
+                ResourceConstant.ExamineButton, LanguageConfig.Instance.ExamineAction)
+            .OnClick(() =>
             {
                 _examinedTarget = _buttonTarget;
                 _abilityUsedThisRound = true;
-            },
-            () =>
+            })
+            .OnMeetingEnds(() =>
             {
                 _abilityUsedThisRound = false;
                 ExamineButton?.ResetCooldown();
-            },
-            () =>
-            {
-                if (_abilityUsedThisRound)
-                    return false;
-                return PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _buttonTarget);
-            },
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.ExamineButton),
-            2,
-            LanguageConfig.Instance.ExamineAction,
-            AbilityCooldownOption.GetFloat,
-            -1
-        );
+            })
+            .CouldUse(() => !_abilityUsedThisRound && PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _buttonTarget))
+            .Cooldown(AbilityCooldownOption.GetFloat)
+            .Build();
 
         AddButton(ExamineButton);
     }

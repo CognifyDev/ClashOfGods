@@ -24,27 +24,24 @@ public class Doorman : CustomRole
     {
         _instance = this;
 
-        BlockButton = CustomButton.Of("doorman-block",
-            () =>
+        BlockButton = CustomButton.Builder("doorman-block",
+                ResourceConstant.BlockButton, LanguageConfig.Instance.BlockAction)
+            .OnClick(() =>
             {
                 HudManager.Instance.ToggleMapVisible(new MapOptions
                 {
                     AllowMovementWhileMapOpen = true,
                     Mode = CustomMode
                 });
-            },
-            () =>
+            })
+            .OnMeetingEnds(() =>
             {
                 _usedThisRound = false;
                 _lastRoom = null;
-            },
-            () => !_usedThisRound,
-            () => true,
-            ResourceUtils.LoadSprite(ResourceConstant.BlockButton),
-            2,
-            LanguageConfig.Instance.BlockAction,
-            () => 0f,
-            -1);
+            })
+            .CouldUse(() => !_usedThisRound)
+            .Cooldown(() => 0F)
+            .Build();
 
         AddButton(BlockButton);
     }

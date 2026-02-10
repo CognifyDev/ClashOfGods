@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
-using COG.Asset.Dependens;
+using COG.Asset.Dependence;
 using COG.Command;
 using COG.Command.Impl;
 using COG.Config;
@@ -125,11 +125,11 @@ public static class SplashManagerPatch
 
     private static IEnumerator CoLoadMod_StepDownloadDependencies()
     {
-        yield return DependensDownloader.DownloadYaml();
+        yield return DependenceDownloader.DownloadYaml();
 
         yield return ChangeLoadingText(LanguageConfig.Instance.LoadingDependencies, 0.3f);
 
-        yield return DependensDownloader.DownloadCommonDependens();
+        yield return DependenceDownloader.DownloadCommonDependence();
 
         yield return new WaitForSeconds(0.3f);
     }
