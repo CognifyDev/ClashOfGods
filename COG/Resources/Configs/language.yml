@@ -208,6 +208,7 @@ main-menu:
 load:
   loading: "正在加载..."
   load-depends: "正在下载依赖文件"
+  load-resources: "正在加载资源文件"
   load-datas: "正在加载必要数据"
   load-listeners: "正在初始化监听系统"
   load-plugins: "正在加载模组插件"

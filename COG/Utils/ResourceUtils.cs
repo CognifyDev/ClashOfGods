@@ -21,7 +21,7 @@ public static class ResourceUtils
     private static readonly Dictionary<string, byte[]> Cache = new();
     private static readonly Dictionary<string, Sprite> CachedSprites = new();
 
-    private const string CacheDataDir = ".\\" + ConfigBase.DataDirectoryName + "\\cache";
+    public const string CacheDataDir = ".\\" + ConfigBase.DataDirectoryName + "\\cache";
 
     public static bool ContainsResource(string path)
     {
@@ -62,7 +62,12 @@ public static class ResourceUtils
         if (!succeed) Main.Logger.LogError("Failed to load texture: " + path);
         return texture;
     }
-
+    public static byte[] GetResourceBytes(string path)
+    {
+        if (Cache.TryGetValue(path, out var bytes))
+            return bytes;
+        return DownloadFromURLOrGetFromCache(path, false);
+    }
     static ResourceUtils()
     {
         if (!Directory.Exists(CacheDataDir))
