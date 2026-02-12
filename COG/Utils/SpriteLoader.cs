@@ -1,10 +1,11 @@
 using System;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 
-namespace COG.Utils;
+namespace COG.MetaContext;
 
 public class SpriteLoader : Image
 {
@@ -27,7 +28,7 @@ public class SpriteLoader : Image
 
     public static SpriteLoader FromResource(string address, float pixelsPerUnit)
     {
-        return new SpriteLoader(new CacheTextureLoader(address), pixelsPerUnit);
+        return new SpriteLoader(new ResourceTextureLoader(address), pixelsPerUnit);
     }
 }
 
@@ -68,26 +69,34 @@ public static class GraphicsHelper
 
     public static Texture2D LoadTextureFromDisk(string path)
     {
-        string fullPath = Path.Combine(ResourceUtils.CacheDataDir, path);
-
-        if (File.Exists(fullPath))
+        try
         {
-            Texture2D texture = new(2, 2, TextureFormat.ARGB32, true);
-            var byteTexture = File.ReadAllBytes(fullPath);
-            LoadImage(texture, byteTexture, false);
-            return texture;
-        }
-        else
-        {
-            var bytes = ResourceUtils.GetResourceBytes(path);
-            if (bytes != null && bytes.Length > 0)
+            if (File.Exists(path))
             {
                 Texture2D texture = new(2, 2, TextureFormat.ARGB32, true);
-                LoadImage(texture, bytes, false);
+                var byteTexture = File.ReadAllBytes(path);
+                LoadImage(texture, byteTexture, false);
                 return texture;
             }
         }
+        catch
+        {
+            Main.Logger.LogError("Error loading texture from disk: " + path);
+        }
+
         return null!;
+    }
+
+    public static Texture2D LoadTextureFromResources(string path)
+    {
+        Texture2D texture = new(2, 2, TextureFormat.ARGB32, true);
+        var assembly = Assembly.GetExecutingAssembly();
+        var stream = assembly.GetManifestResourceStream(path);
+        if (stream == null) return null!;
+        var byteTexture = new byte[stream.Length];
+        stream.Read(byteTexture, 0, (int)stream.Length);
+        LoadImage(texture, byteTexture, false);
+        return texture;
     }
 
     public static bool LoadImage(Texture2D tex, byte[] data, bool markNonReadable)
@@ -100,19 +109,20 @@ public static class GraphicsHelper
 
     internal delegate bool d_LoadImage(IntPtr tex, IntPtr data, bool markNonReadable);
 }
-public class CacheTextureLoader : ITextureLoader
+
+public class ResourceTextureLoader : ITextureLoader
 {
     private readonly string address;
     private Texture2D texture;
 
-    public CacheTextureLoader(string address)
+    public ResourceTextureLoader(string address)
     {
         this.address = address;
     }
 
     public Texture2D GetTexture()
     {
-        if (!texture) texture = GraphicsHelper.LoadTextureFromDisk(address);
+        if (!texture) texture = GraphicsHelper.LoadTextureFromResources(address);
         return texture!;
     }
 }
@@ -207,10 +217,9 @@ public class XOnlyDividedSpriteLoader : Image, IDividedSpriteLoader
     {
         return GetSprite(0);
     }
-
     public static XOnlyDividedSpriteLoader FromResource(string address, float pixelsPerUnit, int x, bool isSize = false)
     {
-        return new XOnlyDividedSpriteLoader(new CacheTextureLoader(address), pixelsPerUnit, x, isSize);
+        return new XOnlyDividedSpriteLoader(new ResourceTextureLoader(address), pixelsPerUnit, x, isSize);
     }
 }
 
@@ -288,19 +297,16 @@ public class DividedSpriteLoader : Image, IDividedSpriteLoader
     public static DividedSpriteLoader FromResource(string address, float pixelsPerUnit, int x, int y,
         bool isSize = false)
     {
-        return new DividedSpriteLoader(new CacheTextureLoader(address), pixelsPerUnit, x, y, isSize);
+        return new DividedSpriteLoader(new ResourceTextureLoader(address), pixelsPerUnit, x, y, isSize);
     }
 }
-
 public interface Image
 {
     internal Sprite GetSprite();
 }
-
 public interface ISpriteLoader : Image
 {
 }
-
 public class WrapSpriteLoader : ISpriteLoader
 {
     Func<Sprite> supplier;
