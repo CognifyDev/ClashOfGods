@@ -178,8 +178,7 @@ public sealed class CustomOption
                 var optionSelection = optionInfo[1];
 
                 var option = Options.FirstOrDefault(o => o.Id.ToString() == optionID);
-                if (option == null) continue;
-                option.UpdateSelection(int.Parse(optionSelection));
+                option?.UpdateSelection(int.Parse(optionSelection));
             }
         }
         catch (System.Exception e)
@@ -238,29 +237,26 @@ public sealed class CustomOption
 
     public float GetFloat()
     {
-        if (ValueRule is FloatOptionValueRule rule)
-            return rule.Selections[Selection];
-        if (ValueRule is IntOptionValueRule intRule)
+        switch (ValueRule)
         {
-            Main.Logger.LogWarning($"Trying to get float value from int option: {Name()}({Id})");
-            return intRule.Selections[Selection];
+            case FloatOptionValueRule rule:
+                return rule.Selections[Selection];
+            case IntOptionValueRule intRule:
+                Main.Logger.LogWarning($"Trying to get float value from int option: {Name()}({Id})");
+                return intRule.Selections[Selection];
+            default:
+                throw new NotSupportedException();
         }
-
-        throw new NotSupportedException();
     }
 
     public int GetInt()
     {
-        if (ValueRule is IntOptionValueRule rule) return rule.Selections[Selection];
-
-        if (ValueRule is FloatOptionValueRule floatRule)
+        return ValueRule switch
         {
-            //这个日志会一直发送！
-            //Main.Logger.LogWarning($"Trying to get int value from float option: {Name()}({Id})");
-            return (int)floatRule.Selections[Selection];
-        }
-
-        throw new NotSupportedException();
+            IntOptionValueRule rule => rule.Selections[Selection],
+            FloatOptionValueRule floatRule => (int)floatRule.Selections[Selection],
+            _ => throw new NotSupportedException()
+        };
     }
 
     public string GetString()
@@ -369,49 +365,48 @@ public sealed class CustomOption
 
     public BaseGameSetting? ToVanillaOptionData()
     {
-        var rule = ValueRule;
-        if (rule is BoolOptionValueRule)
+        switch (ValueRule)
         {
-            var checkboxGameSetting = ScriptableObject.CreateInstance<CheckboxGameSetting>();
-            checkboxGameSetting.Type = OptionTypes.Checkbox;
-            return VanillaData = checkboxGameSetting;
+            case BoolOptionValueRule:
+            {
+                var checkboxGameSetting = ScriptableObject.CreateInstance<CheckboxGameSetting>();
+                checkboxGameSetting.Type = OptionTypes.Checkbox;
+                return VanillaData = checkboxGameSetting;
+            }
+            case IntOptionValueRule intOptionValueRule:
+            {
+                var intGameSetting = ScriptableObject.CreateInstance<IntGameSetting>();
+                intGameSetting.Type = OptionTypes.Int;
+                intGameSetting.Value = GetInt();
+                intGameSetting.Increment = intOptionValueRule.Step;
+                intGameSetting.ValidRange = new IntRange(intOptionValueRule.Min, intOptionValueRule.Max);
+                intGameSetting.ZeroIsInfinity = false;
+                intGameSetting.SuffixType = intOptionValueRule.SuffixType;
+                intGameSetting.FormatString = "";
+                return VanillaData = intGameSetting;
+            }
+            case FloatOptionValueRule floatOptionValueRule:
+            {
+                var floatGameSetting = ScriptableObject.CreateInstance<FloatGameSetting>();
+                floatGameSetting.Type = OptionTypes.Float;
+                floatGameSetting.Value = GetFloat();
+                floatGameSetting.Increment = floatOptionValueRule.Step;
+                floatGameSetting.ValidRange = new FloatRange(floatOptionValueRule.Min, floatOptionValueRule.Max);
+                floatGameSetting.ZeroIsInfinity = false;
+                floatGameSetting.SuffixType = floatOptionValueRule.SuffixType;
+                floatGameSetting.FormatString = "";
+                return VanillaData = floatGameSetting;
+            }
+            case StringOptionValueRule stringOptionValueRule:
+            {
+                var stringGameSetting = ScriptableObject.CreateInstance<StringGameSetting>();
+                stringGameSetting.Type = OptionTypes.String;
+                stringGameSetting.Index = Selection;
+                stringGameSetting.Values = new StringNames[stringOptionValueRule.Selections.Length];
+                return VanillaData = stringGameSetting;
+            }
+            default:
+                return null;
         }
-
-        if (rule is IntOptionValueRule intOptionValueRule)
-        {
-            var intGameSetting = ScriptableObject.CreateInstance<IntGameSetting>();
-            intGameSetting.Type = OptionTypes.Int;
-            intGameSetting.Value = GetInt();
-            intGameSetting.Increment = intOptionValueRule.Step;
-            intGameSetting.ValidRange = new IntRange(intOptionValueRule.Min, intOptionValueRule.Max);
-            intGameSetting.ZeroIsInfinity = false;
-            intGameSetting.SuffixType = intOptionValueRule.SuffixType;
-            intGameSetting.FormatString = "";
-            return VanillaData = intGameSetting;
-        }
-
-        if (rule is FloatOptionValueRule floatOptionValueRule)
-        {
-            var floatGameSetting = ScriptableObject.CreateInstance<FloatGameSetting>();
-            floatGameSetting.Type = OptionTypes.Float;
-            floatGameSetting.Value = GetFloat();
-            floatGameSetting.Increment = floatOptionValueRule.Step;
-            floatGameSetting.ValidRange = new FloatRange(floatOptionValueRule.Min, floatOptionValueRule.Max);
-            floatGameSetting.ZeroIsInfinity = false;
-            floatGameSetting.SuffixType = floatOptionValueRule.SuffixType;
-            floatGameSetting.FormatString = "";
-            return VanillaData = floatGameSetting;
-        }
-
-        if (rule is StringOptionValueRule stringOptionValueRule)
-        {
-            var stringGameSetting = ScriptableObject.CreateInstance<StringGameSetting>();
-            stringGameSetting.Type = OptionTypes.String;
-            stringGameSetting.Index = Selection;
-            stringGameSetting.Values = new StringNames[stringOptionValueRule.Selections.Length];
-            return VanillaData = stringGameSetting;
-        }
-
-        return null;
     }
 }

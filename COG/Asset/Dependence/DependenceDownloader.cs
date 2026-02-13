@@ -35,11 +35,11 @@ public static class DependenceDownloader
 
         downloader.ProgressChanged += (_, progress) =>
         {
-            Main.Logger.LogInfo($"下载进度: {progress:F1}%  ");
+            Main.Logger.LogInfo($"Downloading Progress: {progress:F1}%");
         };
 
         var success = await downloader.DownloadAndMoveAsync(targetFile, targetPath);
 
-        Main.Logger.LogInfo($"\n下载结果: {(success ? "成功" : "失败")}");
+        Main.Logger.LogInfo($"\nDownload {(success ? "Succeeded" : "Failed")}");
     }
 }

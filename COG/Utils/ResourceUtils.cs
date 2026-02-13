@@ -14,7 +14,7 @@ namespace COG.Utils;
 public static class ResourceUtils
 {
     private const string FileListURL =
-        "https://download.hayashiume.top/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/resources.txt";
+        $"{TargetURL}resources.txt";
     private const string TargetURL =
         "https://download.hayashiume.top/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/";
     

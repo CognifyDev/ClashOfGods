@@ -15,6 +15,7 @@ using COG.UI.Vanilla.KillButton;
 using COG.Utils.Coding;
 using Il2CppInterop.Runtime;
 using InnerNet;
+using IronPython.Runtime.Exceptions;
 using UnityEngine;
 
 namespace COG.Utils;
@@ -237,12 +238,16 @@ public static class PlayerUtils
 
     public static CustomRole GetMainRole(this PlayerControl player)
     {
+        if (!GameStates.InRealGame)
+            throw new RuntimeException("Trying to get a player's role while the game is not started!");
         return GameUtils.PlayerData.FirstOrDefault(d => d.Player.IsSamePlayer(player))?.MainRole ??
                CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>(); // 一般来说玩家游戏职业不为空
     }
 
     public static CustomRole GetMainRole(this NetworkedPlayerInfo player)
     {
+        if (!GameStates.InRealGame)
+            throw new RuntimeException("Trying to get a player's role while the game is not started!");
         return GameUtils.PlayerData.FirstOrDefault(d => d.Data.IsSamePlayer(player))?.MainRole ??
                CustomRoleManager.GetManager().GetTypeRoleInstance<Unknown>();
     }
