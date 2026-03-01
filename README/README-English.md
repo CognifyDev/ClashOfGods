@@ -2,7 +2,7 @@
 
 **An epoch-making Among Us mod with a plugin system that allows you to make your own plugin by EASY computer language Python**
 
-> English | [简体中文](#README-SChinese.md)
+> English | [简体中文](README-SChinese.md)
 
 ### Overview
 
