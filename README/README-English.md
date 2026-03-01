@@ -157,7 +157,7 @@ def on_shutdown(self):
 
 #### Built-in Functions and Objects
 
-The plugin system provides access to various built-in functions for logging, game interaction, and more. Refer to the [Built-in Functions Guide](README/Plugin/Builtins-English.md) for comprehensive API documentation.
+The plugin system provides access to various built-in functions for logging, game interaction, and more. Refer to the [Built-in Functions Guide](Plugin/Builtins-English.md) for comprehensive API documentation.
 
 ### Dependency Management
 
@@ -175,9 +175,9 @@ The MOD is still under active development. If you're skilled in Among Us modding
 
 ### Resources
 
-- **Plugin Development Guide**: [First Plugin Guide](README/Plugin/FirstPlugin-English.md)
-- **Built-in API Reference**: [Built-in Functions](README/Plugin/Builtins-English.md)
-- **Plugin System Overview**: [About Plugin System](README/Plugin/About-English.md)
+- **Plugin Development Guide**: [First Plugin Guide](Plugin/FirstPlugin-English.md)
+- **Built-in API Reference**: [Built-in Functions](Plugin/Builtins-English.md)
+- **Plugin System Overview**: [About Plugin System](Plugin/About-English.md)
 
 ### Community
 
