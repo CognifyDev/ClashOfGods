@@ -156,7 +156,7 @@ def on_shutdown(self):
 
 #### 内置函数和对象
 
-插件系统提供了各种内置函数用于日志记录、游戏交互等。完整的 API 文档请参考 [内置函数指南](README/Plugin/Builtins.md)。
+插件系统提供了各种内置函数用于日志记录、游戏交互等。完整的 API 文档请参考 [内置函数指南](Plugin/Builtins.md)。
 
 ### 依赖管理
 
@@ -174,9 +174,9 @@ COG 支持插件之间的硬依赖和软依赖：
 
 ### 资源
 
-- **插件开发指南**: [第一个插件指南](README/Plugin/FirstPlugin.md)
-- **内置 API 参考**: [内置函数](README/Plugin/Builtins.md)
-- **插件系统概述**: [关于插件系统](README/Plugin/About.md)
+- **插件开发指南**: [第一个插件指南](Plugin/FirstPlugin.md)
+- **内置 API 参考**: [内置函数](Plugin/Builtins.md)
+- **插件系统概述**: [关于插件系统](Plugin/About.md)
 
 ### 社区
 
