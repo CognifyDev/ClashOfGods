@@ -275,11 +275,11 @@ public class CustomGameEndLogicListener : IListener
                 {
                     var related = EventRecorder.Instance.GetEvents()
                         .OfType<PlayerKillGameEvent>()
-                        .FirstOrDefault(e => e.Victim.Equals(player) && e.RelatedDeathEvent == @event);
+                        .FirstOrDefault(e => e.Victim.Equals(player));
                     if (related != null) states.Add(handler.GetString("default").Color(Palette.ImpostorRed));
                 }
 
-            if (!states.Any()) states.Add(handler.GetString("alive").Color(Palette.AcceptedGreen));
+            if (states.IsEmpty()) states.Add(handler.GetString("alive").Color(Palette.AcceptedGreen));
 
             return string.Join(" → ", states);
         }

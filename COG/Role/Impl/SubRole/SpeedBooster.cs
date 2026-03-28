@@ -22,9 +22,10 @@ public class SpeedBooster : CustomRole, IListener
 
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnGameStart(PlayerPhysicsEvent @event)
+    public void OnGameStart(GameStartEvent @event)
     {
-        @event.PlayerPhysics.body.velocity *= IncreasingSpeed.GetFloat();
+        var player = PlayerControl.LocalPlayer;
+        if (!player.Data.IsDead && GameStates.InRealGame) player.MyPhysics.Speed *= IncreasingSpeed.GetFloat();
     }
 
     public override IListener GetListener()

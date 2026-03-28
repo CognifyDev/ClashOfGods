@@ -11,6 +11,7 @@ using COG.Game.Events;
 using COG.Listener;
 using COG.Listener.Event.Impl.Game.Record;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -39,6 +40,10 @@ public class CustomRole
     private static int _order;
     private readonly Stack<KillButtonSetting> _killButtonSettings = new();
     private KillButtonSetting _currentKillButtonSetting;
+
+    // Role-scoped RPC dispatch table: localRpcId → typed handler
+    // Populated by NewRpc(); used by DispatchRoleRpc.
+    private readonly Dictionary<uint, IRoleRpc> _roleRpcHandlers = new();
 
     /// <summary>
     ///     Initializes a sub-role instance.
@@ -392,6 +397,13 @@ public class CustomRole
     {
     }
 
+    /// <summary>
+    ///     Legacy hook — receives raw <see cref="KnownRpc"/> packets routed by
+    ///     <see cref="COG.Listener.Impl.RpcListener"/>.
+    ///     <para/>
+    ///     For new role-specific RPCs, use <see cref="NewRpc(int)"/> instead.
+    ///     Prefer <see cref="OnRoleRpcReceived"/> for role-scoped manual handling.
+    /// </summary>
     public virtual void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
     {
     }
@@ -416,6 +428,135 @@ public class CustomRole
     public void RegisterRpcHandler(IRpcHandler handler)
     {
         IRpcHandler.Register(handler);
+    }
+
+    protected RoleRpc NewRpc(Enum localId) => NewRpc(Convert.ToInt32(localId));
+
+    protected RoleRpc NewRpc(int localId)
+    {
+        var rpc = new RoleRpc(this);
+        RoleRpcManager.Register(this, localId, rpc);
+        _roleRpcHandlers[rpc.AllocatedId] = rpc;
+        return rpc;
+    }
+    
+    protected RoleRpc<T> CreateRoleRpc<T>(Enum localId, Action<T> onPerform)
+        where T : notnull
+        => CreateRoleRpc<T>(Convert.ToInt32(localId), onPerform);
+
+    protected RoleRpc<T> CreateRoleRpc<T>(int localId, Action<T> onPerform)
+        where T : notnull
+    {
+        var rpc = new RoleRpc<T>(this, onPerform);
+        RoleRpcManager.Register(this, localId, rpc);
+        _roleRpcHandlers[rpc.AllocatedId] = rpc;
+        return rpc;
+    }
+    
+    protected RoleRpc<T> CreateRoleRpc<T>(
+        Enum localId,
+        Action<T> onPerform,
+        Action<RpcWriter, T> onSerialize,
+        Func<MessageReader, T> onDeserialize)
+        where T : notnull
+        => CreateRoleRpc<T>(Convert.ToInt32(localId), onPerform, onSerialize, onDeserialize);
+    
+    protected RoleRpc<T> CreateRoleRpc<T>(
+        int localId,
+        Action<T> onPerform,
+        Action<RpcWriter, T> onSerialize,
+        Func<MessageReader, T> onDeserialize)
+        where T : notnull
+    {
+        var rpc = new RoleRpc<T>(this, onPerform, onSerialize, onDeserialize);
+        RoleRpcManager.Register(this, localId, rpc);
+        _roleRpcHandlers[rpc.AllocatedId] = rpc;
+        return rpc;
+    }
+    
+    protected RoleRpc<T1, T2> CreateRoleRpc<T1, T2>(Enum localId, Action<T1, T2> onPerform)
+        where T1 : notnull where T2 : notnull
+        => CreateRoleRpc<T1, T2>(Convert.ToInt32(localId), onPerform);
+
+    protected RoleRpc<T1, T2> CreateRoleRpc<T1, T2>(int localId, Action<T1, T2> onPerform)
+        where T1 : notnull where T2 : notnull
+    {
+        var rpc = new RoleRpc<T1, T2>(this, onPerform);
+        RoleRpcManager.Register(this, localId, rpc);
+        _roleRpcHandlers[rpc.AllocatedId] = rpc;
+        return rpc;
+    }
+    
+    protected RoleRpc<T1, T2> CreateRoleRpc<T1, T2>(
+        Enum localId,
+        Action<T1, T2> onPerform,
+        Action<RpcWriter, T1, T2> onSerialize,
+        Func<MessageReader, (T1, T2)> onDeserialize)
+        where T1 : notnull where T2 : notnull
+        => CreateRoleRpc<T1, T2>(Convert.ToInt32(localId), onPerform, onSerialize, onDeserialize);
+    
+    protected RoleRpc<T1, T2> CreateRoleRpc<T1, T2>(
+        int localId,
+        Action<T1, T2> onPerform,
+        Action<RpcWriter, T1, T2> onSerialize,
+        Func<MessageReader, (T1, T2)> onDeserialize)
+        where T1 : notnull where T2 : notnull
+    {
+        var rpc = new RoleRpc<T1, T2>(this, onPerform, onSerialize, onDeserialize);
+        RoleRpcManager.Register(this, localId, rpc);
+        _roleRpcHandlers[rpc.AllocatedId] = rpc;
+        return rpc;
+    }
+
+
+    protected RoleRpc<T1, T2, T3> CreateRoleRpc<T1, T2, T3>(Enum localId, Action<T1, T2, T3> onPerform)
+        where T1 : notnull where T2 : notnull where T3 : notnull
+        => CreateRoleRpc<T1, T2, T3>(Convert.ToInt32(localId), onPerform);
+
+    protected RoleRpc<T1, T2, T3> CreateRoleRpc<T1, T2, T3>(int localId, Action<T1, T2, T3> onPerform)
+        where T1 : notnull where T2 : notnull where T3 : notnull
+    {
+        var rpc = new RoleRpc<T1, T2, T3>(this, onPerform);
+        RoleRpcManager.Register(this, localId, rpc);
+        _roleRpcHandlers[rpc.AllocatedId] = rpc;
+        return rpc;
+    }
+
+    protected RoleRpc<T1, T2, T3> CreateRoleRpc<T1, T2, T3>(
+        Enum localId,
+        Action<T1, T2, T3> onPerform,
+        Action<RpcWriter, T1, T2, T3> onSerialize,
+        Func<MessageReader, (T1, T2, T3)> onDeserialize)
+        where T1 : notnull where T2 : notnull where T3 : notnull
+        => CreateRoleRpc<T1, T2, T3>(Convert.ToInt32(localId), onPerform, onSerialize, onDeserialize);
+    
+    protected RoleRpc<T1, T2, T3> CreateRoleRpc<T1, T2, T3>(
+        int localId,
+        Action<T1, T2, T3> onPerform,
+        Action<RpcWriter, T1, T2, T3> onSerialize,
+        Func<MessageReader, (T1, T2, T3)> onDeserialize)
+        where T1 : notnull where T2 : notnull where T3 : notnull
+    {
+        var rpc = new RoleRpc<T1, T2, T3>(this, onPerform, onSerialize, onDeserialize);
+        RoleRpcManager.Register(this, localId, rpc);
+        _roleRpcHandlers[rpc.AllocatedId] = rpc;
+        return rpc;
+    }
+    
+    internal void DispatchRoleRpc(IRoleRpc handler, PlayerControl sender, MessageReader reader)
+    {
+        if (_roleRpcHandlers.TryGetValue(handler.AllocatedId, out var registeredHandler))
+        {
+            registeredHandler.InvokeReceive(reader);
+        }
+        else
+        {
+            OnRoleRpcReceived(sender, handler.AllocatedId, reader);
+        }
+    }
+    
+    protected virtual void OnRoleRpcReceived(PlayerControl sender, uint allocatedId, MessageReader reader)
+    {
     }
 
     public void ResetCurrentKillButtonSetting()

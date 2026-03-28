@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using COG.Constant;
@@ -14,13 +13,11 @@ namespace COG.Listener.Impl;
 public class RoleAssignmentListener : IListener
 {
     private readonly RpcHandler<int, CustomPlayerData[]> _roleSelectionShareRpcHandler;
-    private readonly Random _random;
 
     public RoleAssignmentListener()
     {
-        _random = new Random();
         _roleSelectionShareRpcHandler = new RpcHandler<int, CustomPlayerData[]>(KnownRpc.ShareRoles,
-            (_, playerData) =>
+            onPerform: (_, playerData) =>
             {
                 foreach (var data in playerData)
                 {
@@ -28,31 +25,28 @@ public class RoleAssignmentListener : IListener
                     data.Player.SetCustomRole(data.MainRole, data.SubRoles);
                 }
 
-                Main.Logger.LogDebug(playerData.Select(playerRole =>
-                    $"{playerRole.Player.Data.PlayerName}({playerRole.Player.Data.FriendCode})" +
-                    $" => {playerRole.MainRole.GetNormalName()}{playerRole.SubRoles.AsString()}"));
+                Main.Logger.LogDebug(playerData.Select(pr =>
+                    $"{pr.Player.Data.PlayerName}({pr.Player.Data.FriendCode})" +
+                    $" => {pr.MainRole.GetNormalName()}{pr.SubRoles.AsString()}"));
             },
-            (writer, count, data) =>
+            onSend: (writer, count, data) =>
             {
                 writer.WritePacked(count);
-
-                foreach (var playerData in data)
-                    writer.WriteBytesAndSize(SerializablePlayerData.Of(playerData).SerializeToData());
-
+                foreach (var pd in data)
+                    writer.WriteBytesAndSize(SerializablePlayerData.Of(pd).SerializeToData());
                 Main.Logger.LogInfo("Successfully sent role assignment data!");
             },
-            reader =>
+            onReceive: reader =>
             {
-                // 清除原列表，防止干扰
+                // Clear existing data before applying the authoritative assignment from host
                 GameUtils.PlayerData.Clear();
-                // 开始读入数据
                 Main.Logger.LogInfo("Received role assignment data, applying...");
 
                 var count = reader.ReadPackedInt32();
-                var list = new List<CustomPlayerData>();
-
+                var list = new List<CustomPlayerData>(count);
                 for (var i = 0; i < count; i++)
-                    list.Add(((byte[])reader.ReadBytesAndSize()).DeserializeToData<SerializablePlayerData>()
+                    list.Add(((byte[])reader.ReadBytesAndSize())
+                        .DeserializeToData<SerializablePlayerData>()
                         .ToPlayerData());
 
                 return (count, list.ToArray());
@@ -61,14 +55,7 @@ public class RoleAssignmentListener : IListener
 
         IRpcHandler.Register(_roleSelectionShareRpcHandler);
     }
-    /*
-     * 职业分配逻辑：
-     *
-     * 职业分配基本条件
-     * 1.首先要保证所有可用的职业都被分配完成，然后再去分配基职业
-     * 2.应当保证内鬼先被分配完全，其次是船员和中立阵营
-     * 3.副职业分配要小心，为了算法的快速应当在分配上述职业的情况下一同分配副职业
-     */
+    
     private void SelectRoles()
     {
         GameUtils.PlayerData.Clear();
@@ -77,21 +64,23 @@ public class RoleAssignmentListener : IListener
 
         try
         {
-            if (!ValidateRoleConfiguration())
+            var players = PlayerUtils.GetAllPlayers().ToArray();
+            var impostorNumber = GameUtils.GetImpostorsNumber();
+            var neutralNumber = GameUtils.GetNeutralNumber();
+
+            ValidateAssignmentParameters(impostorNumber, neutralNumber, players.Length);
+
+            if (!ValidateRoleConfiguration(impostorNumber, neutralNumber))
             {
                 ApplyFallbackRoles();
                 return;
             }
 
-            var players = PlayerUtils.GetAllPlayers().ToArray();
             var playerGetter = new PlayerGetter(players);
-
-            ValidateAssignmentParameters(GameUtils.GetImpostorsNumber(), GameUtils.GetNeutralNumber(), players.Length);
-
             var mainRoleData = new Dictionary<PlayerControl, CustomRole>();
             var subRoleData = new Dictionary<PlayerControl, CustomRole[]>();
 
-            AssignMainRoles(playerGetter, mainRoleData);
+            AssignMainRoles(playerGetter, mainRoleData, impostorNumber, neutralNumber);
             AssignSubRoles(subRoleData, GlobalCustomOptionConstant.MaxSubRoleNumber.GetInt());
             ApplyRolesToPlayers(mainRoleData, subRoleData);
             LogRoleAssignment();
@@ -105,184 +94,142 @@ public class RoleAssignmentListener : IListener
         }
     }
 
-    private static bool ValidateRoleConfiguration()
+    private static bool ValidateRoleConfiguration(int impostorNumber, int neutralNumber)
     {
-        try
+        var roles = CustomRoleManager.GetManager().GetRoles();
+
+        // Count total available slots (accounting for per-role quantity options)
+        var availableImpostorSlots = roles
+            .Where(r => r.CampType == CampType.Impostor && r.IsAvailable())
+            .Sum(r => r.RoleNumberOption?.GetInt() ?? 0);
+
+        var availableNeutralSlots = roles
+            .Where(r => r.CampType == CampType.Neutral && r.IsAvailable())
+            .Sum(r => r.RoleNumberOption?.GetInt() ?? 0);
+
+        if (availableImpostorSlots < impostorNumber)
+            Main.Logger.LogWarning(
+                $"内鬼自定义职业槽位不足: 需要 {impostorNumber}，可用 {availableImpostorSlots}，不足部分将以基础内鬼补全");
+
+        if (availableNeutralSlots < neutralNumber)
         {
-            var impostorRoles = CustomRoleManager.GetManager()
-                .NewGetter(role => role.CampType == CampType.Impostor);
-            var neutralRoles = CustomRoleManager.GetManager()
-                .NewGetter(role => role.CampType == CampType.Neutral);
-
-            var impostorNumber = GameUtils.GetImpostorsNumber();
-            var neutralNumber = GameUtils.GetNeutralNumber();
-
-            if (impostorRoles.Number() < impostorNumber)
-            {
-                Main.Logger.LogWarning($"内鬼职业数量不足: 需要{impostorNumber}个，但只有{impostorRoles.Number()}个可用");
-                return false;
-            }
-
-            if (neutralRoles.Number() < neutralNumber)
-            {
-                Main.Logger.LogWarning($"中立职业数量不足: 需要{neutralNumber}个，但只有{neutralRoles.Number()}个可用");
-                return false;
-            }
-
-            return true;
-        }
-        catch (System.Exception ex)
-        {
-            Main.Logger.LogError($"职业配置验证异常: {ex.Message}");
+            Main.Logger.LogWarning(
+                $"中立职业数量不足: 需要 {neutralNumber}，但只有 {availableNeutralSlots} 个可用，将回落到基础职业分配");
             return false;
         }
+
+        return true;
     }
 
     private static void ValidateAssignmentParameters(int impostorNumber, int neutralNumber, int playerCount)
     {
+        if (playerCount == 0)
+            throw new InvalidOperationException("没有玩家可分配职业");
+
         if (impostorNumber < 0 || neutralNumber < 0)
-        {
-            throw new ArgumentException($"职业数量不能为负数: 内鬼={impostorNumber}, 中立={neutralNumber}");
-        }
+            throw new ArgumentException(
+                $"职业数量不能为负数: 内鬼={impostorNumber}, 中立={neutralNumber}");
 
         if (impostorNumber + neutralNumber > playerCount)
-        {
-            Main.Logger.LogWarning($"职业数量配置可能异常: 内鬼{impostorNumber} + 中立{neutralNumber} > 玩家总数{playerCount}");
-        }
-
-        if (playerCount == 0)
-        {
-            throw new InvalidOperationException("没有玩家可分配职业");
-        }
+            Main.Logger.LogWarning(
+                $"职业数量配置可能异常: 内鬼 {impostorNumber} + 中立 {neutralNumber} > 玩家总数 {playerCount}");
     }
 
-    private static void AssignMainRoles(PlayerGetter playerGetter, Dictionary<PlayerControl, CustomRole> mainRoleData)
+    private static void AssignMainRoles(
+        PlayerGetter playerGetter,
+        Dictionary<PlayerControl, CustomRole> mainRoleData,
+        int impostorNumber,
+        int neutralNumber)
     {
-        var impostorNumber = GameUtils.GetImpostorsNumber();
-        var neutralNumber = GameUtils.GetNeutralNumber();
+        var manager = CustomRoleManager.GetManager();
 
-        var impostorGetter = CustomRoleManager.GetManager().NewGetter(
+        // Getters with base-role fallbacks: when custom roles run out, GetNext() returns the default
+        var impostorGetter = manager.NewGetter(
             role => role.CampType == CampType.Impostor,
-            CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>());
+            manager.GetTypeRoleInstance<Impostor>());
 
-        var neutralGetter = CustomRoleManager.GetManager().NewGetter(
-            role => role.CampType == CampType.Neutral);
-
-        var crewmateGetter = CustomRoleManager.GetManager().NewGetter(
+        var crewmateGetter = manager.NewGetter(
             role => role.CampType == CampType.Crewmate,
-            CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>());
+            manager.GetTypeRoleInstance<Crewmate>());
 
+        // Neutral has no fallback — only assign when HasNext() is true
+        var neutralGetter = manager.NewGetter(role => role.CampType == CampType.Neutral);
+
+        // Do NOT guard on impostorGetter.HasNext(); GetNext() already returns base Impostor as fallback
         for (var i = 0; i < impostorNumber; i++)
         {
             if (!playerGetter.HasNext()) break;
-            if (!impostorGetter.HasNext()) break;
-
-            var impostorRole = impostorGetter.GetNext();
-            var target = playerGetter.GetNext();
-            mainRoleData[target] = impostorRole;
+            mainRoleData[playerGetter.GetNext()] = impostorGetter.GetNext();
         }
 
         for (var i = 0; i < neutralNumber; i++)
         {
-            if (!neutralGetter.HasNext()) break;
-            if (!playerGetter.HasNext()) break;
-
-            var neutralRole = neutralGetter.GetNext();
-            var target = playerGetter.GetNext();
-            mainRoleData[target] = neutralRole;
+            if (!playerGetter.HasNext() || !neutralGetter.HasNext()) break;
+            mainRoleData[playerGetter.GetNext()] = neutralGetter.GetNext();
         }
 
         while (playerGetter.HasNext())
-        {
-            var cremateRole = crewmateGetter.GetNext();
-            var target = playerGetter.GetNext();
-            mainRoleData[target] = cremateRole;
-        }
+            mainRoleData[playerGetter.GetNext()] = crewmateGetter.GetNext();
     }
 
-    private void AssignSubRoles(Dictionary<PlayerControl, CustomRole[]> subRoleData, int maxSubRoleNumber)
+    private static void AssignSubRoles(Dictionary<PlayerControl, CustomRole[]> subRoleData, int maxSubRoleNumber)
     {
+        if (maxSubRoleNumber <= 0) return;
+
         var subRoleGetter = CustomRoleManager.GetManager().NewGetter(role => role.IsSubRole);
+        if (!subRoleGetter.HasNext()) return;
 
-        var subRoleEnabledNumber = subRoleGetter.Number();
         var allPlayers = PlayerUtils.GetAllPlayers();
-        var subRoleMaxCanBeArrange = maxSubRoleNumber * allPlayers.Count;
-        var subRoleShouldBeGivenNumber = subRoleEnabledNumber > subRoleMaxCanBeArrange
-            ? subRoleMaxCanBeArrange
-            : subRoleEnabledNumber;
+        if (allPlayers.Count == 0) return;
 
-        if (subRoleShouldBeGivenNumber <= 0) return;
+        var rng = new Random();
 
-        var availablePlayers = allPlayers
-            .Where(p => !subRoleData.ContainsKey(p) || subRoleData[p].Length < maxSubRoleNumber)
-            .Disarrange()
-            .ToList();
+        // Track per-player accumulated sub-roles using mutable lists for cheap appending
+        var playerSubRoles = allPlayers.ToDictionary(p => p, _ => new List<CustomRole>());
 
-        var givenTimes = 0;
-        var maxAttempts = subRoleShouldBeGivenNumber * 20;
-
-        while (givenTimes < subRoleShouldBeGivenNumber && availablePlayers.Count > 0 && maxAttempts-- > 0)
+        while (subRoleGetter.HasNext())
         {
-            if (!subRoleGetter.HasNext()) break;
-
-            var randomPlayer = availablePlayers[_random.Next(availablePlayers.Count)];
-            subRoleData.TryGetValue(randomPlayer, out var existingRoles);
-
-            if (existingRoles != null && existingRoles.Length >= maxSubRoleNumber)
-            {
-                availablePlayers.Remove(randomPlayer);
-                continue;
-            }
-
             var subRole = subRoleGetter.GetNext();
-            var rolesList = existingRoles != null ? new List<CustomRole>(existingRoles) : new List<CustomRole>();
 
-            if (rolesList.Any(role => role.GetType() == subRole.GetType()))
-            {
-                subRoleGetter.PutBack(subRole);
-                continue;
-            }
+            // Eligible: has room AND doesn't already hold this exact role type
+            var eligible = playerSubRoles
+                .Where(kvp =>
+                    kvp.Value.Count < maxSubRoleNumber &&
+                    kvp.Value.All(r => r.GetType() != subRole.GetType()))
+                .Select(kvp => kvp.Key)
+                .ToList();
 
-            rolesList.Add(subRole);
-            subRoleData[randomPlayer] = rolesList.ToArray();
-            givenTimes++;
+            // No player can accept this sub-role; stop assigning
+            if (eligible.Count == 0) break;
 
-            if (rolesList.Count >= maxSubRoleNumber)
-            {
-                availablePlayers.Remove(randomPlayer);
-            }
+            playerSubRoles[eligible[rng.Next(eligible.Count)]].Add(subRole);
         }
+
+        // Flush non-empty lists into the output dictionary
+        foreach (var (player, roles) in playerSubRoles)
+            if (roles.Count > 0)
+                subRoleData[player] = roles.ToArray();
     }
 
-    private static void ApplyRolesToPlayers(Dictionary<PlayerControl, CustomRole> mainRoleData,
+    private static void ApplyRolesToPlayers(
+        Dictionary<PlayerControl, CustomRole> mainRoleData,
         Dictionary<PlayerControl, CustomRole[]> subRoleData)
     {
-        for (var i = 0; i < mainRoleData.Count; i++)
+        foreach (var (player, mainRole) in mainRoleData)
         {
-            var target = mainRoleData.Keys.ToArray()[i];
-
-            var subRolesList = subRoleData.Where(pair =>
-                pair.Key.IsSamePlayer(target)).ToImmutableDictionary().Values.ToList();
-
-            var subRoles = subRolesList.Any() ? subRolesList[0] : [];
-
-            target.SetCustomRole(mainRoleData.Values.ToArray()[i], subRoles);
+            subRoleData.TryGetValue(player, out var subRoles);
+            player.SetCustomRole(mainRole, subRoles ?? []);
         }
     }
 
     private static void LogRoleAssignment()
     {
         var sb = new StringBuilder();
-        foreach (var playerRole in GameUtils.PlayerData)
+        foreach (var pd in GameUtils.PlayerData)
         {
-            playerRole.Player.RpcSetRole(playerRole.MainRole.BaseRoleType);
-            sb.AppendLine($"""
-                           {playerRole.Player.name}({playerRole.PlayerId}) 
-                               => {playerRole.MainRole.GetNormalName()}  with sub role(s):
-                               {playerRole.SubRoles.Select(subRole => subRole.GetNormalName()).AsString()}
-                           """);
+            var subNames = pd.SubRoles.Select(r => r.GetNormalName()).AsString();
+            sb.AppendLine($"{pd.Player.name}({pd.PlayerId}) => {pd.MainRole.GetNormalName()} | sub: {subNames}");
         }
-
         Main.Logger.LogDebug(sb.ToString());
     }
 
@@ -290,24 +237,13 @@ public class RoleAssignmentListener : IListener
     {
         GameUtils.PlayerData.Clear();
 
-        var players = PlayerUtils.GetAllPlayers();
+        var players = PlayerUtils.GetAllPlayers().Disarrange();
         var crewmateRole = CustomRoleManager.GetManager().GetTypeRoleInstance<Crewmate>();
         var impostorRole = CustomRoleManager.GetManager().GetTypeRoleInstance<Impostor>();
+        var impostorCount = Math.Min(GameUtils.GetImpostorsNumber(), players.Count);
 
-        var impostorNumber = Math.Min(GameUtils.GetImpostorsNumber(), players.Count);
-        var playerList = players.Disarrange().ToList();
-
-        for (var i = 0; i < impostorNumber; i++)
-        {
-            var player = playerList[i];
-            player.SetCustomRole(impostorRole, Array.Empty<CustomRole>());
-        }
-
-        for (var i = impostorNumber; i < playerList.Count; i++)
-        {
-            var player = playerList[i];
-            player.SetCustomRole(crewmateRole, Array.Empty<CustomRole>());
-        }
+        for (var i = 0; i < players.Count; i++)
+            players[i].SetCustomRole(i < impostorCount ? impostorRole : crewmateRole, []);
     }
 
     [EventHandler(EventHandlerType.Prefix)]
@@ -316,26 +252,24 @@ public class RoleAssignmentListener : IListener
         Main.Logger.LogInfo("Select roles for players...");
         SelectRoles();
 
-        if (!GameUtils.PlayerData.Any())
-        {
-            return true;
-        }
+        if (!GameUtils.PlayerData.Any()) return true;
 
-        Main.Logger.LogInfo("Share roles for players...");
         var playerData = GameUtils.PlayerData.ToArray();
 
-        foreach (var customPlayerData in playerData)
-        {
-            customPlayerData.Player.RpcSetRole(customPlayerData.MainRole.BaseRoleType, true);
-        }
+        // Sync vanilla role type to all clients. canBeUndone=true allows the intro animation to play.
+        foreach (var pd in playerData)
+            pd.Player.RpcSetRole(pd.MainRole.BaseRoleType, true);
 
+        Main.Logger.LogInfo("Share custom role data with all clients...");
         _roleSelectionShareRpcHandler.Send(playerData.Length, playerData);
 
-        var roleList = GameUtils.PlayerData.Select(pr => pr.MainRole).ToList();
-        roleList.AddRange(GameUtils.PlayerData.SelectMany(pr => pr.SubRoles));
+        // Notify every assigned role that the sharing phase is complete
+        var allAssignedRoles = playerData
+            .Select(pd => pd.MainRole)
+            .Concat(playerData.SelectMany(pd => pd.SubRoles));
 
-        foreach (var availableRole in roleList)
-            availableRole.AfterSharingRoles();
+        foreach (var role in allAssignedRoles)
+            role.AfterSharingRoles();
 
         return false;
     }
@@ -351,19 +285,8 @@ public class RoleAssignmentListener : IListener
             return target;
         }
 
-        public bool HasNext()
-        {
-            return _players.Count > 0;
-        }
-
-        public int Number()
-        {
-            return _players.Count;
-        }
-
-        public void PutBack(PlayerControl value)
-        {
-            _players.Add(value);
-        }
+        public bool HasNext() => _players.Count > 0;
+        public int Number() => _players.Count;
+        public void PutBack(PlayerControl value) => _players.Add(value);
     }
 }

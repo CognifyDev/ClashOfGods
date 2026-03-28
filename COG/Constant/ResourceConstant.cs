@@ -30,5 +30,5 @@ public static class ResourceConstant
     public const string DefaultRolePreview = "Images/RolePreviews/Default.png";
 
     public const string BgLogoSprite = "Images/COG-BG.png";
-    public const string TeamLogoSprite = "Images/TeamLogo.png";
+    public const string TeamLogoSprite = "COG.Resources.Images.TeamLogo.png";
 }

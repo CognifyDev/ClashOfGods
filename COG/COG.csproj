@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>12</LangVersion>
+        <LangVersion>latest</LangVersion>
         <DebugType>embedded</DebugType>
 
         <Description>An epoch-making Among Us mod with a plugin system that allows you to make your own plugin by EASY computer language JavaScript</Description>
@@ -9,7 +9,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Version>1.0.0-beta.26</Version>
+        <Version>1.0.0-beta.27</Version>
         <Title>ClashOfGods</Title>
         <Copyright>CognifyDev</Copyright>
         <PackageProjectUrl>https://github.com/CognifyDev/ClashOfGods</PackageProjectUrl>
@@ -51,6 +51,10 @@
 
     <ItemGroup>
         <EmbeddedResource Include="COG.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Rpc\Role\" />
     </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">

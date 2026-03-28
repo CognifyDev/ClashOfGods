@@ -34,10 +34,7 @@ public class CustomRoleManager
 
     public List<CustomRole> GetRoles()
     {
-        var customRoles = new List<CustomRole>(_roles);
-        var unknownRole = _roles.OfType<Unknown>().FirstOrDefault();
-        if (unknownRole != null) customRoles.Remove(unknownRole);//这里有归递循环。
-        return customRoles;
+        return _roles.Where(r => r is not Unknown).ToList();
     }
 
     public List<CustomRole> GetModRoles()

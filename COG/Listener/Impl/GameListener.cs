@@ -5,6 +5,7 @@ using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener.Event;
+using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.HManager;
 using COG.Listener.Event.Impl.Player;
@@ -95,26 +96,30 @@ public class GameListener : IListener
     public void OnHudUpdate(HudManagerUpdateEvent @event)
     {
         var manager = @event.Manager;
-        var role = GameUtils.GetLocalPlayerRole();
-
-        if (!role.CanVent)
+        //治标不治本
+        if (GameStates.InRealGame)
         {
-            manager.ImpostorVentButton.SetDisabled();
-            manager.ImpostorVentButton.ToggleVisible(false);
-        }
+            var role = GameUtils.GetLocalPlayerRole();
 
-        if (!role.CanSabotage)
-        {
-            manager.SabotageButton.SetDisabled();
-            manager.SabotageButton.ToggleVisible(false);
-        }
+            if (!role.CanVent)
+            {
+                manager.ImpostorVentButton.SetDisabled();
+                manager.ImpostorVentButton.ToggleVisible(false);
+            }
+
+            if (!role.CanSabotage)
+            {
+                manager.SabotageButton.SetDisabled();
+                manager.SabotageButton.ToggleVisible(false);
+            }
         
-        CustomRoleManager.GetManager().GetRoles().ForEach(r => r.OnUpdate());
+            CustomRoleManager.GetManager().GetRoles().ForEach(r => r.OnUpdate());
 
-        var hint = GameObject.Find("RoleHintTask");
-        if (!hint) return;
+            var hint = GameObject.Find("RoleHintTask");
+            if (!hint) return;
 
-        hint.GetComponent<ImportantTextTask>().Text = GetRoleHintText();
+            hint.GetComponent<ImportantTextTask>().Text = GetRoleHintText();
+        }
     }
 
 
@@ -199,6 +204,12 @@ public class GameListener : IListener
             DestroyableSingleton<HudManager>.Instance.ImpostorVentButton.Show();
             DestroyableSingleton<HudManager>.Instance.ImpostorVentButton.ToggleVisible(true);
         }
+    }
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnGameEnded(AmongUsClientGameEndEvent @event)
+    {
+        GameUtils.PlayerData.Clear();
+        //這裏是試圖修復幽靈玩家的問題。。。
     }
 
     private static string GetRoleHintText()

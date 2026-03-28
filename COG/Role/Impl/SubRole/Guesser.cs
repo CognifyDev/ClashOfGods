@@ -13,30 +13,65 @@ using UnityEngine;
 
 namespace COG.Role.Impl.SubRole;
 
-public class Guesser : CustomRole, IListener
-{
+public class Guesser : CustomRole, IListener, IMeetingButton
+{    
     private TextMeshPro? _remainingGuessText;
-
-    public Guesser() : base(ColorUtils.FromColor32(192, 0, 0))
-    {
-        MaxGuessTime = CreateOption(() => LanguageConfig.Instance.GuesserMaxGuessTime,
-            new FloatOptionValueRule(1, 1, 15, 3));
-        GuessContinuously = CreateOption(() => LanguageConfig.Instance.GuesserGuessContinuously,
-            new BoolOptionValueRule(true));
-        EnabledRolesOnly = CreateOption(() => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
-            new BoolOptionValueRule(true));
-    }
-
-    public CustomOption MaxGuessTime { get; }
-    public CustomOption GuessContinuously { get; }
-
-    public CustomOption EnabledRolesOnly { get; }
-    // public CustomOption CanGuessSubRoles { get; }
-
-    public int GuessedTime { get; internal set; }
 
     public NetworkedPlayerInfo? CurrentGuessing { get; set; }
 
+    public int GuessedTime { get; internal set; }
+
+    public CustomOption MaxGuessTime { get; }
+    public CustomOption GuessContinuously { get; }
+    public CustomOption EnabledRolesOnly { get; }
+
+    public Sprite MeetingButtonSprite =>
+        ResourceUtils.LoadSprite(ResourceConstant.GuessButton, 150f);
+
+    public bool ShouldShowMeetingButton() =>
+        PlayerControl.LocalPlayer.IsAlive() &&
+        GuessedTime < MaxGuessTime.GetInt();
+
+    public bool ShouldShowMeetingButtonFor(PlayerVoteArea pva)
+    {
+        if (pva.AmDead) return false;
+        if (pva.TargetPlayerId == PlayerControl.LocalPlayer.PlayerId &&
+            !GlobalCustomOptionConstant.DebugMode.GetBool())
+            return false;
+
+        var data = GameUtils.PlayerData.FirstOrDefault(pd => pd.PlayerId == pva.TargetPlayerId);
+        return data != null && !data.IsDisconnected;
+    }
+
+    public void OnMeetingButtonClick(PlayerVoteArea pva)
+    {
+        var target = GuesserButton.Buttons.FirstOrDefault(b => b.Area == pva);
+        target?.OpenGuessUI(MeetingHud.Instance);
+    }
+
+    public void OnMeetingButtonUpdate(MeetingHud meetingHud)
+    {
+        if (CurrentGuessing == null) return;
+
+        var data = GameUtils.PlayerData.FirstOrDefault(pd => CurrentGuessing.PlayerId == pd.PlayerId);
+        if (data != null && data.IsDisconnected)
+            GuesserButton.Buttons.ForEach(b => b.CloseGuessUI());
+    }
+
+    public Guesser() : base(ColorUtils.FromColor32(192, 0, 0))
+    {
+        MaxGuessTime = CreateOption(
+            () => LanguageConfig.Instance.GuesserMaxGuessTime,
+            new FloatOptionValueRule(1, 1, 15, 3));
+
+        GuessContinuously = CreateOption(
+            () => LanguageConfig.Instance.GuesserGuessContinuously,
+            new BoolOptionValueRule(true));
+
+        EnabledRolesOnly = CreateOption(
+            () => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
+            new BoolOptionValueRule(true));
+    }
 
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]
@@ -47,40 +82,30 @@ public class Guesser : CustomRole, IListener
 
         var meetingHud = @event.MeetingHud;
 
-        var infoTemplate = meetingHud.TitleText;
-        _remainingGuessText = Object.Instantiate(infoTemplate, meetingHud.transform);
+        _remainingGuessText = Object.Instantiate(meetingHud.TitleText, meetingHud.transform);
         _remainingGuessText.TryDestroyComponent<TextTranslatorTMP>();
         _remainingGuessText.transform.localPosition = new Vector3(-2.9f, 2.2f, -1f);
         _remainingGuessText.name = "RemainingGuessInfo";
-        _remainingGuessText.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
-            .GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
+        UpdateRemainingText();
 
         if (GuessedTime >= MaxGuessTime.GetInt()) return;
 
         var guessableRoles = (EnabledRolesOnly.GetBool()
             ? GetCustomRolesFromPlayers()
-            : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole)).ToList();
+            : CustomRoleManager.GetManager().GetModRoles().Where(r => !r.IsSubRole))
+            .ToList();
 
-        // WARNING: NO FOREACH
         for (var i = 0; i < meetingHud.playerStates.Count; i++)
         {
-            var playerVoteArea = meetingHud.playerStates[i];
+            var pva = meetingHud.playerStates[i];
+            if (pva == null) continue;
+            if (!ShouldShowMeetingButtonFor(pva)) continue;
 
-            // 如果断联或死了或者是当前玩家则不要布置
-            if (playerVoteArea == null || playerVoteArea.AmDead ||
-                (playerVoteArea.TargetPlayerId == player.PlayerId && !GlobalCustomOptionConstant.DebugMode.GetBool()) ||
-                GameUtils.PlayerData.First(pd => pd.PlayerId == playerVoteArea.TargetPlayerId)
-                    .IsDisconnected) continue;
-            new GuesserButton(playerVoteArea.Buttons.transform.Find("CancelButton").gameObject,
-                playerVoteArea, this, meetingHud, guessableRoles).Register();
+            new GuesserButton(
+                    pva.Buttons.transform.Find("CancelButton").gameObject,
+                    pva, this, meetingHud, guessableRoles)
+                .Register();
         }
-    }
-    
-    private CustomRole[] GetCustomRolesFromPlayers()
-    {
-        var players = PlayerUtils.GetAllPlayers();
-        var customRoles = players.Select(player => player.GetMainRole()).ToList();
-        return customRoles.ToArray();
     }
 
     [EventHandler(EventHandlerType.Postfix)]
@@ -91,20 +116,29 @@ public class Guesser : CustomRole, IListener
 
     public override void OnUpdate()
     {
-        if (_remainingGuessText)
-            _remainingGuessText!.text = LanguageConfig.Instance.GetHandler("role.sub-roles.guesser.in-game")
-                .GetString("remaining-guesses").CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
-
-        if (CurrentGuessing)
+        if (_remainingGuessText) UpdateRemainingText();
+        if (CurrentGuessing != null)
         {
-            var playerData = GameUtils.PlayerData.First(pd => CurrentGuessing!.PlayerId == pd.PlayerId);
-            if (playerData.IsDisconnected)
+            var data = GameUtils.PlayerData.FirstOrDefault(pd => CurrentGuessing.PlayerId == pd.PlayerId);
+            if (data != null && data.IsDisconnected)
                 GuesserButton.Buttons.ForEach(b => b.CloseGuessUI());
         }
     }
 
-    public override IListener GetListener()
+    public override IListener GetListener() => this;
+
+    private void UpdateRemainingText()
     {
-        return this;
+        _remainingGuessText!.text = LanguageConfig.Instance
+            .GetHandler("role.sub-roles.guesser.in-game")
+            .GetString("remaining-guesses")
+            .CustomFormat(MaxGuessTime.GetInt() - GuessedTime);
+    }
+
+    private CustomRole[] GetCustomRolesFromPlayers()
+    {
+        return PlayerUtils.GetAllPlayers()
+            .Select(p => p.GetMainRole())
+            .ToArray();
     }
 }

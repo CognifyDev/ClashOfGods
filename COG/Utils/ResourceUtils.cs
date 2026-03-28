@@ -2,20 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using COG.Config;
 using Il2CppInterop.Runtime.InteropTypes;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
 
 namespace COG.Utils;
 
 public static class ResourceUtils
 {
-    private const string FileListURL =
+    public const string FileListURL =
         "https://download.hayashiume.top/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/resources.txt";
-    private const string TargetURL =
+    public const string TargetURL =
         "https://download.hayashiume.top/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/";
     
     private static readonly Dictionary<string, byte[]> Cache = new();
@@ -54,7 +56,33 @@ public static class ResourceUtils
 
         throw new System.Exception("Failed to load sprite");
     }
-
+    public static Sprite? LoadSpriteFromResource(string path, float pixelsPerUnit = 100f)
+    {
+        try
+        {
+            if (CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
+            var texture = LoadTextureFromResource(path);
+            sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f),
+                pixelsPerUnit);
+            sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
+            return CachedSprites[path + pixelsPerUnit] = sprite;
+        }
+        catch (System.Exception e)
+        {
+            Main.Logger.LogError($"Error while loading {path} ({pixelsPerUnit}): {e}");
+            return null;
+        }
+    }
+    public static Texture2D LoadTextureFromResource(string path)
+    {
+        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
+        var texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+        using MemoryStream ms = new();
+        stream?.CopyTo(ms);
+        var succeed = texture.LoadImage(ms.ToArray(), false);
+        if (!succeed) Main.Logger.LogError("Failed to load texture: " + path);
+        return texture;
+    }
     private static Texture2D LoadTextureFromResources(string path)
     {
         var texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
@@ -116,8 +144,7 @@ public static class ResourceUtils
             Main.Logger.LogError("Please reboot the game and then try again");
         }
     }
-    
-    private static string GetFileSHA1(string filePath)
+    public static string GetFileSHA1(string filePath)
     {
         if (string.IsNullOrEmpty(filePath))
             throw new ArgumentNullException(nameof(filePath));
@@ -135,7 +162,6 @@ public static class ResourceUtils
         }
         return sb.ToString();
     }
-
     private static byte[] DownloadFromURLOrGetFromCache(string path, bool isURL = false)
     {
         if (!isURL)
@@ -161,13 +187,5 @@ public static class ResourceUtils
         
         if (!isURL) Cache.Add(path, result);
         return result;
-    }
-    public static T FindAsset<T>(string name) where T : Il2CppObjectBase
-    {
-        foreach (var asset in UnityEngine.Object.FindObjectsOfTypeIncludingAssets(Il2CppInterop.Runtime.Il2CppType.Of<T>()))
-        {
-            if (asset.name == name) return asset.Cast<T>();
-        }
-        return null;
     }
 }

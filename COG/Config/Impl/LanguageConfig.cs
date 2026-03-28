@@ -151,6 +151,9 @@ public class LanguageConfig : ConfigBase
     //Load
     public string Loading { get; private set; } = null!;
     public string LoadingDependencies { get; private set; } = null!;
+    public string LoadingResources { get; private set; } = null!;
+    public string LoadingVerify { get; private set; } = null!;
+    public string LoadingCosmetics { get; private set; } = null!;
     public string LoadingDatas { get; private set; } = null!;
     public string LoadingListeners { get; private set; } = null!;
     public string LoadingPlugins { get; private set; } = null!;
@@ -268,6 +271,9 @@ public class LanguageConfig : ConfigBase
         Loading = GetString("load.loading");
         LoadingDatas = GetString("load.load-datas");
         LoadingDependencies = GetString("load.load-depends");
+        LoadingResources = GetString("load.load-res");
+        LoadingVerify = GetString("load.load-verify");
+        LoadingCosmetics = GetString("load-cosmetics");
         LoadingListeners = GetString("load.load-listeners");
         LoadingPlugins = GetString("load.load-plugins");
         LoadingCompeleted = GetString("load.load-compeleted");

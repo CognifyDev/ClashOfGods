@@ -3,6 +3,7 @@ using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
 using COG.Role;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.CustomOption;
 using COG.UI.Hud.Meeting;
 using COG.Utils;
@@ -22,164 +23,178 @@ public class RpcListener : IListener
         switch (knownRpc)
         {
             case KnownRpc.UpdateOption:
-            {
-                var id = reader.ReadPackedInt32();
-                var selection = reader.ReadPackedInt32();
+                {
+                    var senderClientId = @event.Player.GetClientID();
+                    if (senderClientId != AmongUsClient.Instance.HostId)
+                    {
+                        Main.Logger.LogWarning(
+                            $"[CustomOption] Discarding UpdateOption from non-host client {senderClientId}.");
+                        break;
+                    }
 
-                var option = CustomOption.Options.FirstOrDefault(o => o.Id == id);
-                if (option == null) return;
+                    var id = reader.ReadPackedInt32();
+                    var selection = reader.ReadPackedInt32();
 
-                option.Selection = selection;
-                break;
-            }
+                    var option = CustomOption.Options.FirstOrDefault(o => o.Id == id);
+                    option?.ApplySelectionSilently(selection);
+                    break;
+                }
 
             case KnownRpc.ShareOptions:
-            {
-                var count = reader.ReadPackedUInt32();
-                try
                 {
-                    for (var i = 0; i < count; i++)
+                    var count = reader.ReadPackedUInt32();
+                    try
                     {
-                        var optionId = reader.ReadPackedUInt32();
-                        var selection = reader.ReadPackedUInt32();
-                        var option = CustomOption.Options.FirstOrDefault(option => option.Id == (int)optionId);
-                        option?.UpdateSelection((int)selection);
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Main.Logger.LogError("Error while deserializing options: " + e.Message);
-                }
+                        for (var i = 0; i < count; i++)
+                        {
+                            var optionId = reader.ReadPackedUInt32();
+                            var selection = reader.ReadPackedUInt32();
+                            var option = CustomOption.Options.FirstOrDefault(o => o.Id == (int)optionId);
+                            option?.ApplySelectionSilently((int)selection);
+                        }
 
-                break;
-            }
+                        Main.Logger.LogInfo($"[CustomOption] Applied {count} option(s) from ShareOptions.");
+                    }
+                    catch (System.Exception e)
+                    {
+                        Main.Logger.LogError("Error while deserializing options: " + e.Message);
+                    }
+
+                    break;
+                }
 
             case KnownRpc.SetRole:
-            {
-                var playerId = reader.ReadByte();
-                var roleId = reader.ReadPackedInt32();
-                PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
-                break;
-            }
+                {
+                    var playerId = reader.ReadByte();
+                    var roleId = reader.ReadPackedInt32();
+                    PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
+                    break;
+                }
 
             case KnownRpc.NotifySettingChange:
-            {
-                var id = reader.ReadPackedInt32();
-                var text = reader.ReadString();
-                HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)id, text, true);
-                break;
-            }
+                {
+                    var id = reader.ReadPackedInt32();
+                    var text = reader.ReadString();
+                    HudManager.Instance.Notifier.SettingsChangeMessageLogic((StringNames)id, text, true);
+                    break;
+                }
 
             case KnownRpc.KillWithoutDeadBody:
-            {
-                var killer = reader.ReadNetObject<PlayerControl>();
-                var target = reader.ReadNetObject<PlayerControl>();
-                var showAnimationToEverybody = reader.ReadBoolean();
-                var anonymousKiller = reader.ReadBoolean();
+                {
+                    var killer = reader.ReadNetObject<PlayerControl>();
+                    var target = reader.ReadNetObject<PlayerControl>();
+                    var showAnimationToEverybody = reader.ReadBoolean();
+                    var anonymousKiller = reader.ReadBoolean();
 
-                killer.KillWithoutDeadBody(target, showAnimationToEverybody, anonymousKiller);
-                break;
-            }
+                    killer.KillWithoutDeadBody(target, showAnimationToEverybody, anonymousKiller);
+                    break;
+                }
 
             case KnownRpc.Revive:
-            {
-                reader.ReadNetObject<PlayerControl>().Revive();
-                break;
-            }
+                {
+                    reader.ReadNetObject<PlayerControl>().Revive();
+                    break;
+                }
 
             case KnownRpc.HideDeadBody:
-            {
-                if (!GameStates.InRealGame) return;
-                var pid = reader.ReadByte();
-                var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
-                if (!body) return;
-                body!.gameObject.SetActive(false);
-                break;
-            }
+                {
+                    if (!GameStates.InRealGame) return;
+                    var pid = reader.ReadByte();
+                    var body = Object.FindObjectsOfType<DeadBody>().ToList().FirstOrDefault(b => b.ParentId == pid);
+                    if (!body) return;
+                    body!.gameObject.SetActive(false);
+                    break;
+                }
             case KnownRpc.GuessPlayer:
-            {
-                if (!GameStates.InRealGame) return;
-                var guesser = reader.ReadByte();
-                var target = reader.ReadByte();
-                if (!PlayerUtils.GetPlayerById(target)) return;
-                GuesserButton.GuessPlayer(PlayerUtils.GetPlayerById(guesser), PlayerUtils.GetPlayerById(target));
-                break;
-            }
+                {
+                    if (!GameStates.InRealGame) return;
+                    var guesser = reader.ReadByte();
+                    var target = reader.ReadByte();
+                    if (!PlayerUtils.GetPlayerById(target)) return;
+                    GuesserButton.GuessPlayer(PlayerUtils.GetPlayerById(guesser), PlayerUtils.GetPlayerById(target));
+                    break;
+                }
 
             case KnownRpc.Mark:
-            {
-                var target = reader.ReadNetObject<PlayerControl>();
-                var tag = reader.ReadString();
-                var playerData = target.GetPlayerData();
-
-                if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
                 {
-                    playerData.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
+                    var target = reader.ReadNetObject<PlayerControl>();
+                    var tag = reader.ReadString();
+                    var playerData = target.GetPlayerData();
+
+                    if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
+                    {
+                        playerData.Tags.Remove(tag.Replace(PlayerUtils.DeleteTagPrefix, ""));
+                        break;
+                    }
+
+                    playerData.Tags.Add(tag);
                     break;
                 }
-
-                playerData.Tags.Add(tag);
-                break;
-            }
 
             case KnownRpc.SyncRoleGameData:
-            {
-                var roleId = -1;
-                CustomRole role;
-
-                try
                 {
-                    roleId = reader.ReadPackedInt32();
-                    role = CustomRoleManager.GetManager().GetRoleById(roleId) ?? throw new System.Exception();
-                }
-                catch
-                {
-                    Main.Logger.LogError($"Got invalid {nameof(roleId)} while synchronizing role data: {roleId}");
-                    return;
-                }
+                    var roleId = -1;
+                    CustomRole role;
 
-                Main.Logger.LogMessage($"Syncing game data for {role.Name}...");
-                role.OnRoleGameDataGettingSynchronized(reader);
-                break;
-            }
+                    try
+                    {
+                        roleId = reader.ReadPackedInt32();
+                        role = CustomRoleManager.GetManager().GetRoleById(roleId) ?? throw new System.Exception();
+                    }
+                    catch
+                    {
+                        Main.Logger.LogError($"Got invalid {nameof(roleId)} while synchronizing role data: {roleId}");
+                        return;
+                    }
 
-            case KnownRpc.AdvancedMurder:
-            {
-                @event.Player.MurderAdvanced(AdvancedKillOptions.Deserialize(reader));
-                break;
-            }
-
-            case KnownRpc.SyncGameEvent:
-            {
-                var eventNameFull = reader.ReadString();
-                var typeNameFull = reader.ReadString();
-
-                var eventType = Main.Assembly.GetTypes().FirstOrDefault(t => t.FullName == eventNameFull);
-                var deserializerType = Main.Assembly.GetTypes().FirstOrDefault(t => t.FullName == typeNameFull);
-
-                if (eventType == null || deserializerType == null)
-                {
-                    Main.Logger.LogError($"Unsupported event type: {eventNameFull} ({typeNameFull})");
+                    Main.Logger.LogMessage($"Syncing game data for {role.Name}...");
+                    role.OnRoleGameDataGettingSynchronized(reader);
                     break;
                 }
 
-                try
+            case KnownRpc.AdvancedMurder:
                 {
-                    var eventSenderBaseType = typeof(NetworkedGameEventSender<,>);
-                    var genericSenderType = eventSenderBaseType.MakeGenericType(deserializerType, eventType);
-
-                    var instance = genericSenderType.GetProperty("Instance")!.GetValue(null)!;
-                    var deserializedEvent = genericSenderType.GetMethod("Deserialize")!.Invoke(instance, [reader]);
-
-                    EventRecorder.Instance.Record(deserializedEvent as IGameEvent);
-                }
-                catch (System.Exception e)
-                {
-                    Main.Logger.LogError($"Error deserializing game event {eventNameFull} ({typeNameFull}): {e}");
+                    @event.Player.MurderAdvanced(AdvancedKillOptions.Deserialize(reader));
+                    break;
                 }
 
-                break;
-            }
+            case KnownRpc.RoleRpc:
+                {
+                    RoleRpcManager.Dispatch(@event.Player, reader);
+                    break;
+                }
+
+            case KnownRpc.SyncGameEvent:
+                {
+                    var eventNameFull = reader.ReadString();
+                    var typeNameFull = reader.ReadString();
+
+                    var eventType = Main.Assembly.GetTypes().FirstOrDefault(t => t.FullName == eventNameFull);
+                    var deserializerType = Main.Assembly.GetTypes().FirstOrDefault(t => t.FullName == typeNameFull);
+
+                    if (eventType == null || deserializerType == null)
+                    {
+                        Main.Logger.LogError($"Unsupported event type: {eventNameFull} ({typeNameFull})");
+                        break;
+                    }
+
+                    try
+                    {
+                        var eventSenderBaseType = typeof(NetworkedGameEventSender<,>);
+                        var genericSenderType = eventSenderBaseType.MakeGenericType(deserializerType, eventType);
+
+                        var instance = genericSenderType.GetProperty("Instance")!.GetValue(null)!;
+                        var deserializedEvent = genericSenderType.GetMethod("Deserialize")!.Invoke(instance, [reader]);
+
+                        EventRecorder.Instance.Record(deserializedEvent as IGameEvent);
+                    }
+                    catch (System.Exception e)
+                    {
+                        Main.Logger.LogError($"Error deserializing game event {eventNameFull} ({typeNameFull}): {e}");
+                    }
+
+                    break;
+                }
         }
 
         IRpcHandler.Handlers.ForEach(h =>

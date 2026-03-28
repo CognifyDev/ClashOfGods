@@ -59,72 +59,82 @@ public sealed class CustomOption
     public OptionBehaviour? OptionBehaviour { get; set; }
     public BaseGameSetting? VanillaData { get; private set; }
 
-    public int Selection
+    public int Selection => _selection;
+
+    /// <summary>
+    ///     Applies <paramref name="newSelection"/> to the local state and refreshes
+    ///     the settings UI.  Does NOT send any RPC and does NOT fire the lobby
+    ///     change notification toast.
+    ///
+    /// <para/>
+    ///     Use this in all <b>receive</b> paths (RpcListener) so that incoming
+    ///     packets never trigger outgoing ones — which is the root cause of the
+    ///     cascade desync bug.
+    /// </summary>
+    internal void ApplySelectionSilently(int newSelection)
     {
-        get => _selection;
-        set
+        _selection = Math.Clamp(newSelection, 0, Selections.Length - 1);
+        Coroutines.Start(CoRefreshCustomOptions());
+    }
+
+    /// <summary>
+    ///     Refreshes every visible settings widget to match the current option values.
+    ///     Shared by all mutation paths so the UI stays in sync regardless of which
+    ///     path changed the underlying value.
+    /// </summary>
+    private static IEnumerator CoRefreshCustomOptions()
+    {
+        yield return null; // defer one frame so burst changes are batched
+
+        if (!GameSettingMenu.Instance)
+            yield break;
+
+        if (GameSettingMenu.Instance.RoleSettingsTab)
         {
-            _selection = value;
+            GameSettingMenu.Instance.RoleSettingsTab.RefreshChildren();
 
-            Coroutines.Start(CoRefreshCustomOptions());
-
-            static IEnumerator CoRefreshCustomOptions()
+            foreach (var role in CustomRoleManager.GetManager().GetModRoles().Where(r => r.ShowInOptions))
             {
-                yield return null;
+                var roleRoleNumberOption = role.RoleNumberOption;
+                if (roleRoleNumberOption == null) continue;
+                var roleBehaviour = roleRoleNumberOption.OptionBehaviour;
+                if (!roleBehaviour) continue;
 
-                if (!GameSettingMenu.Instance)
-                    yield break;
+                roleBehaviour!.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
 
-                if (GameSettingMenu.Instance.RoleSettingsTab)
+                Main.Logger.LogDebug("TEXT UPDATE FOR " + role.Name);
+
+                role.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
                 {
-                    GameSettingMenu.Instance.RoleSettingsTab.RefreshChildren();
-
-                    foreach (var role in CustomRoleManager.GetManager().GetModRoles().Where(r => r.ShowInOptions))
-                    {
-                        var roleRoleNumberOption = role.RoleNumberOption;
-                        if (roleRoleNumberOption == null) continue;
-                        var roleBehaviour = roleRoleNumberOption.OptionBehaviour;
-                        if (!roleBehaviour) continue;
-
-                        roleBehaviour!.Cast<RoleOptionSetting>().UpdateValuesAndText(null);
-
-                        Main.Logger.LogDebug("TEXT UPDATE FOR " + role.Name);
-
-                        role.RoleOptions.Where(o => o.OptionBehaviour).ForEach(o =>
-                        {
-                            var behaviour = o.OptionBehaviour!;
-                            if (behaviour.TryGetComponent<NumberOption>(out var numberOption))
-                                numberOption.Value = o.GetFloat();
-                            else if (behaviour.TryGetComponent<StringOption>(out var stringOption))
-                                stringOption.Value = o.Selection;
-                            else if (behaviour.TryGetComponent<ToggleOption>(out var toggleOption))
-                                toggleOption.CheckMark.enabled = o.GetBool();
-                        });
-                    }
-                }
-
-                Main.Logger.LogDebug("Trying to update setting options");
-
-                if (GameSettingMenu.Instance.GameSettingsTab)
-                {
-                    GameSettingMenu.Instance.GameSettingsTab.RefreshChildren();
-                    GameSettingMenu.Instance.GameSettingsTab.Children?.ForEach(new Action<OptionBehaviour>(o =>
-                    {
-                        if (TryGetOption(o, out _)) return;
-
-                        if (o.TryGetComponent<NumberOption>(out var numberOption))
-                            numberOption.oldValue = int.MinValue;
-                        else if (o.TryGetComponent<StringOption>(out var stringOption))
-                            stringOption.oldValue = -1;
-                        else if (o.TryGetComponent<ToggleOption>(out var toggleOption))
-                            toggleOption.oldValue = !toggleOption.CheckMark.enabled;
-                        else
-                            Main.Logger.LogDebug("Didnt update!");
-                    }));
-                }
+                    var behaviour = o.OptionBehaviour!;
+                    if (behaviour.TryGetComponent<NumberOption>(out var numberOption))
+                        numberOption.Value = o.GetFloat();
+                    else if (behaviour.TryGetComponent<StringOption>(out var stringOption))
+                        stringOption.Value = o.Selection;
+                    else if (behaviour.TryGetComponent<ToggleOption>(out var toggleOption))
+                        toggleOption.CheckMark.enabled = o.GetBool();
+                });
             }
+        }
 
-            NotifySettingChange();
+        Main.Logger.LogDebug("Trying to update setting options");
+
+        if (GameSettingMenu.Instance.GameSettingsTab)
+        {
+            GameSettingMenu.Instance.GameSettingsTab.RefreshChildren();
+            GameSettingMenu.Instance.GameSettingsTab.Children?.ForEach(new Action<OptionBehaviour>(o =>
+            {
+                if (TryGetOption(o, out _)) return;
+
+                if (o.TryGetComponent<NumberOption>(out var numberOption))
+                    numberOption.oldValue = int.MinValue;
+                else if (o.TryGetComponent<StringOption>(out var stringOption))
+                    stringOption.oldValue = -1;
+                else if (o.TryGetComponent<ToggleOption>(out var toggleOption))
+                    toggleOption.oldValue = !toggleOption.CheckMark.enabled;
+                else
+                    Main.Logger.LogDebug("Didnt update!");
+            }));
         }
     }
 
@@ -173,14 +183,17 @@ public sealed class CustomOption
 
             foreach (var line in lines)
             {
-                var optionInfo = line.Split(" ");
-                var optionID = optionInfo[0];
-                var optionSelection = optionInfo[1];
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                var parts = line.Split(' ');
+                if (parts.Length < 2) continue;
 
-                var option = Options.FirstOrDefault(o => o.Id.ToString() == optionID);
-                if (option == null) continue;
-                option.UpdateSelection(int.Parse(optionSelection));
+                var option = Options.FirstOrDefault(o => o.Id.ToString() == parts[0]);
+                if (option != null && int.TryParse(parts[1], out var sel))
+                    option.ApplySelectionSilently(sel);
             }
+
+            // ShareConfigs already checks AmHost.
+            ShareConfigs();
         }
         catch (System.Exception e)
         {
@@ -238,29 +251,26 @@ public sealed class CustomOption
 
     public float GetFloat()
     {
-        if (ValueRule is FloatOptionValueRule rule)
-            return rule.Selections[Selection];
-        if (ValueRule is IntOptionValueRule intRule)
+        switch (ValueRule)
         {
-            Main.Logger.LogWarning($"Trying to get float value from int option: {Name()}({Id})");
-            return intRule.Selections[Selection];
+            case FloatOptionValueRule rule:
+                return rule.Selections[Selection];
+            case IntOptionValueRule intRule:
+                Main.Logger.LogWarning($"Trying to get float value from int option: {Name()}({Id})");
+                return intRule.Selections[Selection];
+            default:
+                throw new NotSupportedException();
         }
-
-        throw new NotSupportedException();
     }
 
     public int GetInt()
     {
-        if (ValueRule is IntOptionValueRule rule) return rule.Selections[Selection];
-
-        if (ValueRule is FloatOptionValueRule floatRule)
+        return ValueRule switch
         {
-            //这个日志会一直发送！
-            //Main.Logger.LogWarning($"Trying to get int value from float option: {Name()}({Id})");
-            return (int)floatRule.Selections[Selection];
-        }
-
-        throw new NotSupportedException();
+            IntOptionValueRule rule => rule.Selections[Selection],
+            FloatOptionValueRule floatRule => (int)floatRule.Selections[Selection],
+            _ => throw new NotSupportedException()
+        };
     }
 
     public string GetString()
@@ -269,12 +279,10 @@ public sealed class CustomOption
             return rule.Selections[Selection];
         throw new NotSupportedException();
     }
-
-    // Option changes
     public void UpdateSelection(int newSelection)
     {
-        Selection = newSelection;
-        ShareOptionChange(newSelection);
+        ApplySelectionSilently(newSelection);
+        ScheduleDebouncedSync(newSelection);
     }
 
     public void UpdateSelection(object newValue)
@@ -282,13 +290,30 @@ public sealed class CustomOption
         var index = ValueRule.Selections.ToList().IndexOf(newValue);
         if (index != -1) UpdateSelection(index);
     }
-
-    private void ShareOptionChange(int newSelection)
+    private int _syncGeneration;
+    private void ScheduleDebouncedSync(int selection)
     {
-        PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.UpdateOption)
-            .WritePacked(Id)
-            .WritePacked(newSelection)
-            .Finish();
+        // Only the host owns the authoritative option state and may send RPCs.
+        if (!AmongUsClient.Instance.AmHost) return;
+
+        var capturedGeneration = ++_syncGeneration;
+        Coroutines.Start(CoDelayedSync(selection, capturedGeneration));
+
+        IEnumerator CoDelayedSync(int sel, int gen)
+        {
+            yield return new WaitForSeconds(0.1f);
+
+            if (_syncGeneration != gen) yield break;
+
+            PlayerControl.LocalPlayer.StartRpcImmediately(KnownRpc.UpdateOption)
+                .WritePacked(Id)
+                .WritePacked(sel)
+                .Finish();
+
+            Main.Logger.LogDebug($"[CustomOption] Synced option {Id} (selection={sel}) to all clients.");
+
+            NotifySettingChange();
+        }
     }
 
     [ShitCode]
@@ -369,49 +394,48 @@ public sealed class CustomOption
 
     public BaseGameSetting? ToVanillaOptionData()
     {
-        var rule = ValueRule;
-        if (rule is BoolOptionValueRule)
+        switch (ValueRule)
         {
-            var checkboxGameSetting = ScriptableObject.CreateInstance<CheckboxGameSetting>();
-            checkboxGameSetting.Type = OptionTypes.Checkbox;
-            return VanillaData = checkboxGameSetting;
+            case BoolOptionValueRule:
+                {
+                    var checkboxGameSetting = ScriptableObject.CreateInstance<CheckboxGameSetting>();
+                    checkboxGameSetting.Type = OptionTypes.Checkbox;
+                    return VanillaData = checkboxGameSetting;
+                }
+            case IntOptionValueRule intOptionValueRule:
+                {
+                    var intGameSetting = ScriptableObject.CreateInstance<IntGameSetting>();
+                    intGameSetting.Type = OptionTypes.Int;
+                    intGameSetting.Value = GetInt();
+                    intGameSetting.Increment = intOptionValueRule.Step;
+                    intGameSetting.ValidRange = new IntRange(intOptionValueRule.Min, intOptionValueRule.Max);
+                    intGameSetting.ZeroIsInfinity = false;
+                    intGameSetting.SuffixType = intOptionValueRule.SuffixType;
+                    intGameSetting.FormatString = "";
+                    return VanillaData = intGameSetting;
+                }
+            case FloatOptionValueRule floatOptionValueRule:
+                {
+                    var floatGameSetting = ScriptableObject.CreateInstance<FloatGameSetting>();
+                    floatGameSetting.Type = OptionTypes.Float;
+                    floatGameSetting.Value = GetFloat();
+                    floatGameSetting.Increment = floatOptionValueRule.Step;
+                    floatGameSetting.ValidRange = new FloatRange(floatOptionValueRule.Min, floatOptionValueRule.Max);
+                    floatGameSetting.ZeroIsInfinity = false;
+                    floatGameSetting.SuffixType = floatOptionValueRule.SuffixType;
+                    floatGameSetting.FormatString = "";
+                    return VanillaData = floatGameSetting;
+                }
+            case StringOptionValueRule stringOptionValueRule:
+                {
+                    var stringGameSetting = ScriptableObject.CreateInstance<StringGameSetting>();
+                    stringGameSetting.Type = OptionTypes.String;
+                    stringGameSetting.Index = Selection;
+                    stringGameSetting.Values = new StringNames[stringOptionValueRule.Selections.Length];
+                    return VanillaData = stringGameSetting;
+                }
+            default:
+                return null;
         }
-
-        if (rule is IntOptionValueRule intOptionValueRule)
-        {
-            var intGameSetting = ScriptableObject.CreateInstance<IntGameSetting>();
-            intGameSetting.Type = OptionTypes.Int;
-            intGameSetting.Value = GetInt();
-            intGameSetting.Increment = intOptionValueRule.Step;
-            intGameSetting.ValidRange = new IntRange(intOptionValueRule.Min, intOptionValueRule.Max);
-            intGameSetting.ZeroIsInfinity = false;
-            intGameSetting.SuffixType = intOptionValueRule.SuffixType;
-            intGameSetting.FormatString = "";
-            return VanillaData = intGameSetting;
-        }
-
-        if (rule is FloatOptionValueRule floatOptionValueRule)
-        {
-            var floatGameSetting = ScriptableObject.CreateInstance<FloatGameSetting>();
-            floatGameSetting.Type = OptionTypes.Float;
-            floatGameSetting.Value = GetFloat();
-            floatGameSetting.Increment = floatOptionValueRule.Step;
-            floatGameSetting.ValidRange = new FloatRange(floatOptionValueRule.Min, floatOptionValueRule.Max);
-            floatGameSetting.ZeroIsInfinity = false;
-            floatGameSetting.SuffixType = floatOptionValueRule.SuffixType;
-            floatGameSetting.FormatString = "";
-            return VanillaData = floatGameSetting;
-        }
-
-        if (rule is StringOptionValueRule stringOptionValueRule)
-        {
-            var stringGameSetting = ScriptableObject.CreateInstance<StringGameSetting>();
-            stringGameSetting.Type = OptionTypes.String;
-            stringGameSetting.Index = Selection;
-            stringGameSetting.Values = new StringNames[stringOptionValueRule.Selections.Length];
-            return VanillaData = stringGameSetting;
-        }
-
-        return null;
     }
 }

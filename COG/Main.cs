@@ -27,6 +27,8 @@ using Reactor.Networking.Attributes;
 using UnityEngine.SceneManagement;
 using System.Reflection;
 using COG.UI.Load;
+using COG.Cosmetics.Unity;
+
 
 #if WINDOWS
 using System.Windows.Forms;
@@ -192,6 +194,8 @@ public partial class Main : BasePlugin
         Harmony.PatchAll();
 
         GlobalCustomOptionConstant.Init();
+        CogHatProvider.Initialize();
+        CogHatLocator.Initialize();
     }
 
     public override bool Unload()

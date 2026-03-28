@@ -26,5 +26,6 @@ public enum KnownRpc : uint
     DieWithoutAnimationAndBody,
     SyncGameEvent,
     AdvancedMurder,
-    GuessPlayer
+    GuessPlayer,
+    RoleRpc
 }

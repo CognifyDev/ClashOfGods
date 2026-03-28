@@ -11,14 +11,21 @@ namespace COG.Utils;
 public static class CollectionUtils
 {
     /// <summary>
-    ///     打乱一个List
+    ///     打乱一个集合并返回新 List（Fisher-Yates 洗牌）
     /// </summary>
-    /// <param name="list">欲打乱List</param>
+    /// <param name="list">欲打乱的集合</param>
     /// <typeparam name="T">元素类型</typeparam>
-    /// <returns>打乱后的List</returns>
+    /// <returns>打乱后的新 List</returns>
     public static List<T> Disarrange<T>(this IEnumerable<T> list)
     {
-        return list.OrderBy(_ => new Random().Next()).ToList();
+        var result = list.ToList();
+        var rng = new Random();
+        for (var i = result.Count - 1; i > 0; i--)
+        {
+            var j = rng.Next(i + 1);
+            (result[i], result[j]) = (result[j], result[i]);
+        }
+        return result;
     }
 
     public static bool IsEmpty<T>(this List<T> list)

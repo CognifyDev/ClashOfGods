@@ -648,9 +648,9 @@ public static class PlayerUtils
                 realVictim.Die(DeathReason.Kill, true);
             }
         }
-
-        var isParticipant = realVictim.AmOwner || players.Any(p => p.AmOwner);
-        if (isParticipant) PlayKillAnimation(animKiller, animVictim);
+        //问题应该出现在这。
+        //var isParticipant = realVictim.AmOwner || players.Any(p => p.AmOwner);
+        //if (isParticipant) PlayKillAnimation(animKiller, animVictim);
     }
 
     public static void PlayKillAnimation(NetworkedPlayerInfo killer, NetworkedPlayerInfo victim)
@@ -804,5 +804,9 @@ public class CustomPlayerData
     public bool IsRole(CustomRole role)
     {
         return MainRole.Equals(role) || SubRoles.Any(r => r.Equals(role));
+    }
+
+    public void ClearPlayerData()
+    {
     }
 }
