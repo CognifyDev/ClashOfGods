@@ -116,8 +116,8 @@ public class Seer : CustomRole, IListener
         _checkedPlayers.Clear();
         _prefixes.Clear();
     }
-    public override IListener GetListener()
-    {
-        return this;
-    }
+    // public override IListener GetListener()
+    // {
+    //     return this;
+    // }
 }

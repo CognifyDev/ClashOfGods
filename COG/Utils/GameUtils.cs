@@ -8,6 +8,7 @@ using COG.Config.Impl;
 using COG.Constant;
 using COG.Role;
 using COG.Rpc;
+using IronPython.Runtime.Exceptions;
 using UnityEngine;
 
 namespace COG.Utils;
@@ -90,7 +91,7 @@ public static class GameUtils
 
     public static CustomRole GetLocalPlayerRole()
     {
-        return PlayerControl.LocalPlayer.GetMainRole();
+        return !GameStates.InRealGame ? throw new RuntimeException("Get local player's role while the game is not started") : PlayerControl.LocalPlayer.GetMainRole();
     }
 
     public static double GetKillDistance()

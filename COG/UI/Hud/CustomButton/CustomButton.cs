@@ -240,6 +240,89 @@ public class CustomButton
     public TextMeshPro? InfoText { get; set; }
 
     public static bool Initialized { get; internal set; }
+    
+    /// <summary>
+    ///     在游戏中创建一个按钮 (Effect)
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <param name="onClick">点击后按钮的动作（自动判断是否还在冷却）</param>
+    /// <param name="onMeetingEnds">会议结束后按钮的动作</param>
+    /// <param name="onEffect">
+    ///     按钮等待时间结束后的动作（如纵火犯按下浇油按钮后要等待 <paramref name="effectTime" /> 秒,结束后便执行此动作）（此处为null或
+    ///     <paramref name="hasEffect" /> 为false则不执行）
+    /// </param>
+    /// <param name="couldUse">使用按钮的条件</param>
+    /// <param name="hasButton">玩家拥有此按钮的条件</param>
+    /// <param name="sprite">按钮的图标</param>
+    /// <param name="position">按钮的坐标</param>
+    /// <param name="text">按钮的文本</param>
+    /// <param name="cooldown">按钮的冷却</param>
+    /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
+    /// <param name="hotkeyName">热键名称（留空为自动取名,如果无热键则没有名称）</param>
+    /// <returns>CustomButton 的实例</returns>
+    public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnds, Action onEffect, Func<bool> couldUse,
+        Func<bool> hasButton, Sprite sprite, Vector3 position, string text, Func<float> cooldown,
+        float effectTime, int usesLimit, int order = -1)
+    {
+        return new CustomButton(identifier, onClick, onMeetingEnds, onEffect, couldUse, hasButton, sprite, position, text,
+                true, cooldown, effectTime, usesLimit)
+        { Order = order };
+    }
+    
+    /// <summary>
+    ///     在游戏中创建一个按钮 (Non-effect)
+    /// </summary>
+    /// <param name="onClick">点击后按钮的动作（自动判断是否还在冷却）</param>
+    /// <param name="onMeetingEnds">会议结束后按钮的动作</param>
+    /// <param name="couldUse">使用按钮的条件</param>
+    /// <param name="hasButton">玩家拥有此按钮的条件</param>
+    /// <param name="sprite">按钮的图标</param>
+    /// <param name="position">按钮的坐标</param>
+    /// <param name="text">按钮的文本</param>
+    /// <param name="cooldown">按钮的冷却</param>
+    /// <param name="usesLimit">按钮使用次数限制（≤0为无限）</param>
+    /// <returns>CustomButton 的实例</returns>
+    public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnds, Func<bool> couldUse, Func<bool> hasButton,
+        Sprite sprite, Vector3 position, string text, Func<float> cooldown, int usesLimit, int order = -1)
+    {
+        return new CustomButton(identifier, onClick, onMeetingEnds, () => { }, couldUse, hasButton, sprite, position, text,
+                false, cooldown, -1f, usesLimit)
+        { Order = order };
+    }
+    
+    /// <summary>
+    ///     在游戏中创建一个按钮 (Non-effect)
+    /// </summary>
+    /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
+    /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
+    /// <returns>CustomButton 的实例</returns>
+    public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnds, Func<bool> couldUse, Func<bool> hasButton,
+        Sprite sprite, int row, string text, Func<float> cooldown, int usesLimit, int order = -1)
+    {
+        return new CustomButton(identifier, onClick, onMeetingEnds, () => { }, couldUse, hasButton, sprite, null, text,
+            false, cooldown, -1f, usesLimit)
+        {
+            Row = row,
+            Order = order
+        };
+    }
+    
+    /// <summary>
+    ///     在游戏中创建一个按钮 (Effect)
+    /// </summary>
+    /// <param name="row">按钮在hud中显示在第几行（1-2）</param>
+    /// <param name="order">按钮在hud中显示顺序（数字越小越靠右，-1为无所谓）</param>
+    public static CustomButton Of(string identifier, Action onClick, Action onMeetingEnds, Action onEffect, Func<bool> couldUse,
+        Func<bool> hasButton, Sprite sprite, int row, string text, Func<float> cooldown,
+        float effectTime, int usesLimit, int order = -1)
+    {
+        return new CustomButton(identifier, onClick, onMeetingEnds, onEffect, couldUse, hasButton, sprite, null, text,
+            true, cooldown, effectTime, usesLimit)
+        {
+            Row = row,
+            Order = order
+        };
+    }
 
     public void SetActive(bool active)
     {
