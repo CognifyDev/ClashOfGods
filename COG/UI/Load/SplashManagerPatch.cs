@@ -39,7 +39,8 @@ namespace COG.UI.Load;
 public static class SplashManagerPatch
 {
     
-    private static Sprite? _cognifyDevLogoSprite = LoadSpriteFromResource(ResourceConstant.TeamLogoSprite, 90f)!;
+    // 懒加载 —— 在资源下载完成后才加载，避免在程序集资源不可用时提前失败
+    private static Sprite? _cognifyDevLogoSprite;
 
     public static TextMeshPro LoadText = null!;
     public static bool LoadedCognifyDevLogo;
@@ -67,6 +68,8 @@ public static class SplashManagerPatch
     public static IEnumerator CoLoadCognifyDevLogo(SplashManager __instance)
     {
         CognifyDevLogoActive = true;
+        
+        _cognifyDevLogoSprite ??= LoadSpriteFromResources(ResourceConstant.TeamLogoSprite, 90f);
         
         var logo = CreateObject<SpriteRenderer>("CognifyDevLogo", null!, new Vector3(0, 0.5f, -4.9f));
         logo.sprite = _cognifyDevLogoSprite;
@@ -150,8 +153,13 @@ public static class SplashManagerPatch
     private static IEnumerator CoLoadMod_StepDownloadImages()
     {
         yield return ChangeLoadingText(LanguageConfig.Instance.LoadingVerify, 0.5f);
+        
+        byte[] fileListBytes = null!;
+        yield return Task.Run(async () =>
+        {
+            fileListBytes = await ResourceUtils.DownloadFileAsync(ResourceUtils.FileListURL);
+        }).WaitAsCoroutine();
 
-        byte[] fileListBytes = ResourceUtils.GetResourceBytes(ResourceUtils.FileListURL);
         if (fileListBytes == null || fileListBytes.Length == 0)
         {
             Main.Logger.LogError("Failed to download resource list. Skipping resource verification.");
@@ -209,30 +217,17 @@ public static class SplashManagerPatch
                 string remoteFileUrl = $"{ResourceUtils.TargetURL}{relativeFilePath}";
                 Main.Logger.LogInfo($"Downloading: {relativeFilePath}");
 
-                byte[] fileData = null;
+                byte[] fileData = null!;
 
                 yield return Task.Run(async () =>
                 {
-                    using var httpClient = new HttpClient();
-                    try
-                    {
-                        fileData = await httpClient.GetByteArrayAsync(remoteFileUrl);
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Main.Logger.LogError($"Failed to download {remoteFileUrl}: {ex}");
-                    }
+                    fileData = await ResourceUtils.DownloadFileAsync(remoteFileUrl);
                 }).WaitAsCoroutine();
 
                 if (fileData != null && fileData.Length > 0)
                 {
-                    string fileDirectory = Path.GetDirectoryName(localCachePath);
-                    if (!Directory.Exists(fileDirectory) && !string.IsNullOrEmpty(fileDirectory))
-                    {
-                        Directory.CreateDirectory(fileDirectory);
-                    }
-
-                    File.WriteAllBytes(localCachePath, fileData);
+                    // 保存文件并同步更新内存缓存
+                    ResourceUtils.SaveToCache(relativeFilePath, fileData);
                     Main.Logger.LogInfo($"Cached: {relativeFilePath} -> {localCachePath}");
 
                     try
@@ -292,12 +287,15 @@ public static class SplashManagerPatch
         yield return ChangeLoadingText(LanguageConfig.Instance.LoadingDatas, 0.3f);
         try
         {
+            //热键
             _ = ButtonHotkeyConfig.Instance;
+            //指令
             CommandManager.GetManager().RegisterCommands([
                 new RpcCommand(), new OptionCommand(), new DebugCommand()
             ]);
+            //预设配置
             _ = SettingsConfig.Instance;
-
+            //职业
             CustomRoleManager.GetManager().RegisterRoles([
                 new Unknown(),
                 new Crewmate(),
@@ -325,13 +323,13 @@ public static class SplashManagerPatch
                 new Guesser(),
                 new SpeedBooster()
             ]);
-
+            //结算
             CustomWinnerManager.GetManager().RegisterCustomWinnables([
                 new CrewmatesCustomWinner(),
                 new ImpostorsCustomWinner(),
                 new LastPlayerCustomWinner()
             ]);
-
+            //插件
             if (SettingsConfig.Instance.EnablePluginSystem)
             {
                 var pluginDir = Path.Combine(ConfigBase.DataDirectoryName, "plugins");
@@ -360,7 +358,7 @@ public static class SplashManagerPatch
         }
         catch (System.Exception e)
         {
-            Main.Logger.LogError($"[Cosmetics] Error loading cosmetics: {e}");
+            Main.Logger.LogError($"Error loading cosmetics: {e}");
         }
 
         yield return new WaitForSeconds(0.3f);

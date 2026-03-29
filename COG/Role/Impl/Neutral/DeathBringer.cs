@@ -41,8 +41,17 @@ public class DeathBringer : CustomRole, IListener
                 _staredPlayers.Add(_target!);
                 PlayerControl.LocalPlayer.ResetKillCooldown();
             })
-            .OnMeetingEnds(_stareButton!.ResetCooldown)
-            .CouldUse(() => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target))
+            .OnMeetingEnds(() => _stareButton!.ResetCooldown())
+            .CouldUse(() =>
+            {
+                if (PlayerControl.LocalPlayer == null) return false;
+                bool hasTarget = PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out PlayerControl tempTarget);
+                if (hasTarget)
+                {
+                    _target = tempTarget;
+                }
+                return hasTarget;
+            })
             .Row(3)
             .Cooldown(_killCooldown.GetFloat)
             .Build();
