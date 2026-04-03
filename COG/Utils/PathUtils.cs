@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Reflection;
 using System.Diagnostics;
 
@@ -15,10 +15,31 @@ public static class PathUtils
             return null;
         }
 
-        var exePath = processes[0].MainModule.FileName;
-        var exeDir = Path.GetDirectoryName(exePath);
-        var storageDir = Path.Combine(exeDir, additionPath);
-        return storageDir;
+        try
+        {
+            var process = processes[0];
+            if (process.MainModule == null)
+            {
+                Main.Logger.LogError("Could not get the main module of the Among Us process");
+                return null;
+            }
+            
+            var exePath = process.MainModule.FileName;
+            var exeDir = Path.GetDirectoryName(exePath);
+            if (exeDir == null)
+            {
+                Main.Logger.LogError("Could not get the directory name from the Among Us executable path");
+                return null;
+            }
+            
+            var storageDir = Path.Combine(exeDir, additionPath);
+            return storageDir;
+        }
+        catch (System.Exception e)
+        {
+            Main.Logger.LogError($"Error getting Among Us path: {e.Message}");
+            return null;
+        }
     }
     public static void CopyResourcesToDisk(string targetDirectory, string embeddedDirectory, bool overwrite = true)
     {
@@ -31,13 +52,17 @@ public static class PathUtils
             {
                 var relativePath = resourceName.Substring(FilePatch.Length);
                 var targetPath = Path.Combine(targetDirectory, relativePath);
-
-                Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+                var directoryPath = Path.GetDirectoryName(targetPath);
+                
+                if (directoryPath != null)
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
 
                 using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
                 using (var fileStream = File.Create(targetPath))
                 {
-                    resourceStream.CopyTo(fileStream);
+                    resourceStream?.CopyTo(fileStream);
                 }
 
                 Main.Logger.LogInfo($"File has Copied To : {relativePath} -> {targetPath}");

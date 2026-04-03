@@ -29,7 +29,12 @@ public sealed class CustomRpcSender
 
     private int _currentRpcTarget = -2;
 
-    private CustomRpcSender() { }
+    private CustomRpcSender() {
+        Stream = MessageWriter.Get(SendOption.Reliable);
+        Name = string.Empty;
+        SendOption = SendOption.Reliable;
+        OnSendDelegate = () => { };
+    }
 
     public CustomRpcSender(string name, SendOption sendOption = SendOption.Reliable, bool isUnsafe = false)
     {

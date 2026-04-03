@@ -28,7 +28,7 @@ public static class ResourceUtils
         return Cache.ContainsKey(path);
     }
 
-    public static Sprite LoadSpriteFromResources(string path, float pixelsPerUnit = 100f)
+    public static Sprite? LoadSpriteFromResources(string path, float pixelsPerUnit = 100f)
     {
         try
         {

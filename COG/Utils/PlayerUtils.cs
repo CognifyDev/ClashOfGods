@@ -176,7 +176,7 @@ public static class PlayerUtils
     {
         return GameUtils.PlayerData.FirstOrDefault(playerRole => playerRole.Player.Data.IsSamePlayer(player));
     }
-    public static PlayerControl GetPlayerControlByNetworkedPlayerInfo(this NetworkedPlayerInfo networkedPlayerInfo)
+    public static PlayerControl? GetPlayerControlByNetworkedPlayerInfo(this NetworkedPlayerInfo networkedPlayerInfo)
     {
         return GetAllPlayers().FirstOrDefault(playerControl => playerControl.PlayerId == networkedPlayerInfo.PlayerId);
     }
