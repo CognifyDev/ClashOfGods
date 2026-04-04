@@ -103,17 +103,18 @@ public static class GraphicsHelper
 public class CacheTextureLoader : ITextureLoader
 {
     private readonly string address;
-    private Texture2D texture;
+    private Texture2D? texture;
 
     public CacheTextureLoader(string address)
     {
         this.address = address;
+        texture = null;
     }
 
     public Texture2D GetTexture()
     {
         if (!texture) texture = GraphicsHelper.LoadTextureFromDisk(address);
-        return texture!;
+        return texture ?? throw new InvalidOperationException($"Failed to load texture for address: {address}");
     }
 }
 
@@ -152,7 +153,7 @@ public class XOnlyDividedSpriteLoader : Image, IDividedSpriteLoader
     private readonly ITextureLoader texture;
     private int? division, size;
     public Vector2 Pivot = new(0.5f, 0.5f);
-    private Sprite[] sprites;
+    private Sprite[]? sprites;
 
     public XOnlyDividedSpriteLoader(ITextureLoader textureLoader, float pixelsPerUnit, int x, bool isSize = false)
     {
@@ -177,21 +178,21 @@ public class XOnlyDividedSpriteLoader : Image, IDividedSpriteLoader
         if (!size.HasValue || !division.HasValue || sprites == null)
         {
             var texture2D = texture.GetTexture();
-            if (size == null)
-                size = texture2D.width / division;
-            else if (division == null)
-                division = texture2D.width / size!;
+            if (size == null && division.HasValue)
+                size = texture2D.width / division.Value;
+            else if (division == null && size.HasValue)
+                division = texture2D.width / size.Value;
             sprites = new Sprite[division!.Value];
         }
 
-        if (!sprites[index])
+        if (!sprites![index])
         {
             var texture2D = texture.GetTexture();
             sprites[index] = texture2D.ToSprite(new Rect(index * size!.Value, 0, size!.Value, texture2D.height), Pivot,
                 pixelsPerUnit);
         }
 
-        return sprites[index];
+        return sprites![index];
     }
 
     public int Length
@@ -218,9 +219,9 @@ public class DividedSpriteLoader : Image, IDividedSpriteLoader
 {
     private readonly float pixelsPerUnit;
     private readonly ITextureLoader texture;
-    private Tuple<int, int> division, size;
+    private Tuple<int, int>? division, size;
     public Vector2 Pivot = new(0.5f, 0.5f);
-    private Sprite[] sprites;
+    private Sprite[]? sprites;
 
     public DividedSpriteLoader(ITextureLoader textureLoader, float pixelsPerUnit, int x, int y, bool isSize = false)
     {
@@ -245,25 +246,25 @@ public class DividedSpriteLoader : Image, IDividedSpriteLoader
         if (size == null || division == null || sprites == null)
         {
             var texture2D = texture.GetTexture();
-            if (size == null)
-                size = new Tuple<int, int>(texture2D.width / division!.Item1, texture2D.height / division!.Item2);
-            else if (division == null)
-                division = new Tuple<int, int>(texture2D.width / size!.Item1, texture2D.height / size!.Item2);
+            if (size == null && division != null)
+                size = new Tuple<int, int>(texture2D.width / division.Item1, texture2D.height / division.Item2);
+            else if (division == null && size != null)
+                division = new Tuple<int, int>(texture2D.width / size.Item1, texture2D.height / size.Item2);
             sprites = new Sprite[division!.Item1 * division!.Item2];
         }
 
-        if (!sprites[index])
+        if (!sprites![index])
         {
             var texture2D = texture.GetTexture();
             var _x = index % division!.Item1;
             var _y = index / division!.Item1;
-            sprites[index] =
+            sprites[index] = 
                 texture2D.ToSprite(
-                    new Rect(_x * size.Item1, (division.Item2 - _y - 1) * size.Item2, size.Item1, size.Item2), Pivot,
+                    new Rect(_x * size!.Item1, (division.Item2 - _y - 1) * size!.Item2, size.Item1, size.Item2), Pivot,
                     pixelsPerUnit);
         }
 
-        return sprites[index];
+        return sprites![index];
     }
 
     public Image AsLoader(int index)

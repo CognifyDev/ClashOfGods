@@ -110,8 +110,10 @@ public class RpcListener : IListener
                     if (!GameStates.InRealGame) return;
                     var guesser = reader.ReadByte();
                     var target = reader.ReadByte();
-                    if (!PlayerUtils.GetPlayerById(target)) return;
-                    GuesserButton.GuessPlayer(PlayerUtils.GetPlayerById(guesser), PlayerUtils.GetPlayerById(target));
+                    var guesserPlayer = PlayerUtils.GetPlayerById(guesser);
+                    var targetPlayer = PlayerUtils.GetPlayerById(target);
+                    if (guesserPlayer == null || targetPlayer == null) return;
+                    GuesserButton.GuessPlayer(guesserPlayer, targetPlayer);
                     break;
                 }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using COG.Config.Impl;
 using COG.Constant;
@@ -45,8 +45,8 @@ public class DeathBringer : CustomRole, IListener
             .CouldUse(() =>
             {
                 if (PlayerControl.LocalPlayer == null) return false;
-                bool hasTarget = PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out PlayerControl tempTarget);
-                if (hasTarget)
+                bool hasTarget = PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out PlayerControl? tempTarget);
+                if (hasTarget && tempTarget != null)
                 {
                     _target = tempTarget;
                 }

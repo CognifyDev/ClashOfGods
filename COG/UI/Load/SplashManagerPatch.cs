@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -44,7 +44,6 @@ public static class SplashManagerPatch
 
     public static TextMeshPro LoadText = null!;
     public static bool LoadedCognifyDevLogo;
-    private static bool _loadedCOG;
     public static bool CognifyDevLogoActive;
 
     public static string LoadingText
@@ -185,7 +184,7 @@ public static class SplashManagerPatch
             localCachePath = localCachePath.Replace("/", "\\");
 
             bool needsDownload = false;
-            string currentSHA1 = null;
+            string? currentSHA1 = null;
 
             if (File.Exists(localCachePath))
             {
