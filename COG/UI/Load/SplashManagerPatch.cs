@@ -145,8 +145,9 @@ public static class SplashManagerPatch
     {
         yield return DependenceDownloader.DownloadYaml();
         yield return ChangeLoadingText(LanguageConfig.Instance.LoadingDependencies, 0.3f);
-        yield return DependenceDownloader.DownloadCommonDependence();
-        yield return new WaitForSeconds(0.3f);
+		yield return DependenceDownloader.DownloadCommonDependence();
+		yield return DependenceDownloader.DownloadPluginSystemDependence();
+		yield return new WaitForSeconds(0.3f);
     }
 
     private static IEnumerator CoLoadMod_StepDownloadImages()

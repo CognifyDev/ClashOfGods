@@ -23,7 +23,33 @@ public class PythonPluginManager : IPluginManager
         _pluginsFolder = pluginsFolder;
         _runtimeCacheFolder = Path.Combine(pluginsFolder, "runtime_cache");
         
-        _sharedEngine = IronPython.Hosting.Python.CreateEngine();
+        try
+        {
+            // 尝试使用更兼容的方法创建 IronPython 引擎
+            var setup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
+            var languageSetup = new Microsoft.Scripting.Hosting.LanguageSetup(
+                typeof(IronPython.Hosting.Python).AssemblyQualifiedName,
+                "IronPython",
+                new[] { ".py" },
+                new[] { "IronPython", "Python", "py" });
+            setup.LanguageSetups.Add(languageSetup);
+            var runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(setup);
+            _sharedEngine = runtime.GetEngine("IronPython");
+        }
+        catch (Exception ex)
+        {
+            // 如果上述方法失败，回退到传统方法
+            Main.Logger.LogWarning($"Failed to create IronPython engine with ScriptRuntime: {ex.Message}");
+            try
+            {
+                _sharedEngine = IronPython.Hosting.Python.CreateEngine();
+            }
+            catch (Exception ex2)
+            {
+                Main.Logger.LogError($"Failed to create IronPython engine: {ex2.Message}");
+                throw new InvalidOperationException("Cannot initialize IronPython engine", ex2);
+            }
+        }
         
         if (Directory.Exists(_runtimeCacheFolder))
             Directory.Delete(_runtimeCacheFolder, true);

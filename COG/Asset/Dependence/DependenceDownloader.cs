@@ -6,14 +6,23 @@ namespace COG.Asset.Dependence;
 
 public static class DependenceDownloader
 {
-    public static IEnumerator DownloadCommonDependence()
+	public static IEnumerator DownloadCommonDependence()
+	{
+		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/Acornima.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/System.Windows.Forms.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+	}
+	public static IEnumerator DownloadPluginSystemDependence()
+	{
+		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/IronPython.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/IronPython.Modules.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/IronPython.SQLite.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/IronPython.Wpf.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/Microsoft.Dynamic.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/Microsoft.Scripting.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+	}
+	public static IEnumerator DownloadYaml()
     {
-        yield return AdvancedExampleCoroutine("https://xtreme.net.cn/upload/Acornima.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
-        yield return AdvancedExampleCoroutine("https://xtreme.net.cn/upload/System.Windows.Forms.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
-    }
-    public static IEnumerator DownloadYaml()
-    {
-        yield return AdvancedExampleCoroutine("https://xtreme.net.cn/upload/YamlDotNet.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+        yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/YamlDotNet.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
     }
 
     private static IEnumerator AdvancedExampleCoroutine(string targetFile, string targetPath)
