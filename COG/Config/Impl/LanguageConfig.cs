@@ -273,7 +273,7 @@ public class LanguageConfig : ConfigBase
         LoadingDependencies = GetString("load.load-depends");
         LoadingResources = GetString("load.load-res");
         LoadingVerify = GetString("load.load-verify");
-        LoadingCosmetics = GetString("load-cosmetics");
+        LoadingCosmetics = GetString("load.load-cosmetics");
         LoadingListeners = GetString("load.load-listeners");
         LoadingPlugins = GetString("load.load-plugins");
         LoadingCompeleted = GetString("load.load-compeleted");

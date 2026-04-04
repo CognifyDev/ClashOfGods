@@ -108,7 +108,7 @@ public static class GameEventPatch // not use listener for flexibility in patchi
 
     [HarmonyPatch(typeof(GameData), nameof(GameData.HandleDisconnect),
         typeof(PlayerControl), typeof(DisconnectReasons))]
-    [HarmonyPrefix] // player might be null if we use postfix
+    [HarmonyPostfix] // player might be null if we use postfix
     private static void HandleDisconnectPatch(PlayerControl player)
     {
         EventRecorder.Instance.Record(new PlayerDisconnectGameEvent(player.GetPlayerData()));

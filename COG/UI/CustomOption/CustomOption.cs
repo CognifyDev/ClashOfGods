@@ -315,9 +315,7 @@ public sealed class CustomOption
             NotifySettingChange();
         }
     }
-
-    [ShitCode]
-    //[<!>: ]目前不会修，可能是代码对所有类型的选项都调用了数值相关的方法，但ToggleOption不支持这些方法。
+    
     private void NotifySettingChange()
     {
         if (!AmongUsClient.Instance.AmHost) return;
