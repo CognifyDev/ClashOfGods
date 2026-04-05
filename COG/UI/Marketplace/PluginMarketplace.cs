@@ -44,7 +44,7 @@ public class MarketplacePluginInfo
 public class PluginMarketplace
 {
     // ── 服务端地址 ───────────────────────────────────────
-    private static string ServerUrl => "https://cog.amongusclub.cn";
+    private static string ServerUrl => "https://cog.amongusclub.cn/index.php";
     private static readonly HttpClient HttpClient = new();
 
     // ── 协程宿主（已注册的原生 MonoBehaviour） ──────────
