@@ -23,6 +23,19 @@ public sealed class ZipPackageLoader
     
     public void LoadAllPackages(string zipDirectory, string cacheDirectory)
     {
+        // 修复：若装扮目录尚未创建，先补建，再扫描，避免 Directory.GetFiles 抛出
+        // DirectoryNotFoundException（该异常会被上层 catch 捕获，但会导致所有包都无法加载）
+        if (!Directory.Exists(zipDirectory))
+        {
+            Main.Logger.LogInfo($"[Cosmetics] Cosmetics directory not found, creating: {zipDirectory}");
+            Directory.CreateDirectory(zipDirectory);
+        }
+
+        if (!Directory.Exists(cacheDirectory))
+        {
+            Directory.CreateDirectory(cacheDirectory);
+        }
+
         var zips = Directory.GetFiles(zipDirectory, "*.zip", SearchOption.TopDirectoryOnly);
         if (zips.Length == 0)
         {

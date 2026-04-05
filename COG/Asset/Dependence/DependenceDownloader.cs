@@ -8,21 +8,22 @@ public static class DependenceDownloader
 {
 	public static IEnumerator DownloadCommonDependence()
 	{
-		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/Acornima.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
-		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/System.Windows.Forms.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/Acornima.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/System.Windows.Forms.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
 	}
 	public static IEnumerator DownloadPluginSystemDependence()
 	{
-		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/IronPython.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
-		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/IronPython.Modules.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
-		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/IronPython.SQLite.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
-		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/IronPython.Wpf.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
-		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/Microsoft.Dynamic.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
-		yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/Microsoft.Scripting.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/IronPython.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/IronPython.Modules.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/IronPython.SQLite.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/IronPython.Wpf.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/Microsoft.Dynamic.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/Microsoft.Scripting.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+		yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/System.CodeDom.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
 	}
 	public static IEnumerator DownloadYaml()
     {
-        yield return AdvancedExampleCoroutine("https://amongusclub.cn/upload/YamlDotNet.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
+        yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/YamlDotNet.dll", @$"{PathUtils.GetAmongUsPath()}\BepInEx\core");
     }
 
     private static IEnumerator AdvancedExampleCoroutine(string targetFile, string targetPath)

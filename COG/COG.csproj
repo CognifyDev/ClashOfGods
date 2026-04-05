@@ -23,8 +23,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\Configs\*.*" />
-    </ItemGroup>
+		<EmbeddedResource Include="Resources\Configs\*.*" />
+		<EmbeddedResource Include="Resources\Images\*.*" />
+	</ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.11.18" />

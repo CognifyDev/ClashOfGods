@@ -101,6 +101,7 @@ public class LanguageConfig : ConfigBase
 
     public string QQ { get; private set; } = null!;
     public string Discord { get; private set; } = null!;
+    public string PluginMarket { get; private set; } = null!;
 
     public string UnknownCamp { get; private set; } = null!;
     public string ImpostorCamp { get; private set; } = null!;
@@ -211,6 +212,7 @@ public class LanguageConfig : ConfigBase
         GitHub = GetString("main-menu.github");
         QQ = GetString("main-menu.qq");
         Discord = GetString("main-menu.discord");
+        PluginMarket = GetString("main-menu.plugin-market");
         UpdateButtonString = GetString("main-menu.update-button-string");
         HotkeySettingName = GetString("option.hotkey.name");
         PressKeyToSet = GetString("option.hotkey.press-key-to-set");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
+using COG.UI.Marketplace;
 using COG.Utils;
 using COG.Utils.Coding.Debugging;
 using TMPro;
@@ -42,6 +43,12 @@ public static class MainMenuPatch
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f),
             LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); },
             Color.gray);
+
+        // 插件市场按钮
+        CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.55f),
+            LanguageConfig.Instance.PluginMarket,
+            () => { PluginMarketplace.Open(__instance); },
+            new Color(0.28f, 0.55f, 1f));
 
         //if (!VersionInfo.Empty.Equals(ModUpdater.LatestVersion) || 
         //    (ModUpdater.LatestVersion != null && !ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo)))
