@@ -15,423 +15,407 @@ using UnityEngine.UI;
 
 namespace COG.UI.Marketplace;
 
-/// <summary>
-/// 插件市场中插件的信息
-/// </summary>
 public class MarketplacePluginInfo
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string Author { get; set; } = "";
+    public int    Id          { get; set; }
+    public string Name        { get; set; } = "";
+    public string Author      { get; set; } = "";
     public string Description { get; set; } = "";
-    public string Version { get; set; } = "";
+    public string Version     { get; set; } = "";
     public string DownloadUrl { get; set; } = "";
-    public long FileSize { get; set; }
-    public string UploadedAt { get; set; } = "";
+    public long   FileSize    { get; set; }
+    public string UploadedAt  { get; set; } = "";
 }
 
-/// <summary>
-/// COG 插件市场界面。
-///
-/// 关键设计：本类不继承 MonoBehaviour，完全避免 AddComponent 泛型方法
-/// （AddComponent&lt;T&gt; 会触发 IL2CPP MethodInfoStore 静态构造函数，
-///  在类型注入完成前调用会抛出 NullReferenceException）。
-///
-/// 所有协程均委托给已存在的 MainMenuManager 实例执行。
-/// UI 由纯 GameObject + SpriteRenderer + TextMeshPro 构成，
-/// 不需要任何自定义 MonoBehaviour 子类。
-/// </summary>
 public class PluginMarketplace
 {
-    // ── 服务端地址 ───────────────────────────────────────
-    private static string ServerUrl => "https://cog.amongusclub.cn/index.php";
-    private static readonly HttpClient HttpClient = new();
+    private const float ScreenW  = 10.4f;   // full backdrop width
+    private const float ScreenH  =  6.0f;   // full backdrop height
 
-    // ── 协程宿主（已注册的原生 MonoBehaviour） ──────────
+    private const float TitleH   =  0.55f;  // title bar height
+    private const float TitleY   =  2.65f;  // title bar centre Y
+    private const float ContentY =  0.0f;   // content area centre Y (below title)
+    private const float ContentH =  5.0f;   // content area height
+
+    // Left list panel
+    private const float ListX    = -2.8f;
+    private const float ListW    =  4.6f;
+
+    // Right detail panel
+    private const float DetailX  =  2.5f;
+    private const float DetailW  =  5.4f;
+
+    // Text sizes
+    private const float FzTitle  = 2.2f;
+    private const float FzH2     = 1.7f;
+    private const float FzBody   = 1.4f;
+    private const float FzSmall  = 1.1f;
+    private const float FzBtn    = 1.35f;
+
+    // Button dimensions
+    private const float BtnW = 2.2f;
+    private const float BtnH = 0.52f;
+
+    // ── Colours ───────────
+    private static readonly Color ColBg       = new(0.07f, 0.07f, 0.14f, 0.98f);
+    private static readonly Color ColPanel    = new(0.11f, 0.11f, 0.21f, 1f);
+    private static readonly Color ColItem     = new(0.14f, 0.14f, 0.26f, 1f);
+    private static readonly Color ColItemSel  = new(0.16f, 0.22f, 0.40f, 1f);
+    private static readonly Color ColAccent   = new(0.30f, 0.58f, 1f,   1f);
+    private static readonly Color ColGreen    = new(0.20f, 0.82f, 0.40f, 1f);
+    private static readonly Color ColRed      = new(0.88f, 0.24f, 0.24f, 1f);
+    private static readonly Color ColText     = Color.white;
+    private static readonly Color ColSub      = new(0.68f, 0.68f, 0.78f, 1f);
+    private static readonly Color ColDivider  = new(0.25f, 0.35f, 0.55f, 1f);
+
+    // ── State ───────────
+    private static readonly HttpClient Http = new();
+
     private readonly MainMenuManager _host;
+    private readonly GameObject      _root;
 
-    // ── UI 根节点 ────────────────────────────────────────
-    private readonly GameObject _root;
-    private GameObject _listPanel = null!;
-    private GameObject _detailPanel = null!;
-    private TextMeshPro _statusText = null!;
+    private GameObject   _listPanel   = null!;
+    private GameObject   _detailPanel = null!;
+    private TextMeshPro  _statusText  = null!;
 
-    // ── 列表状态 ─────────────────────────────────────────
-    private readonly List<GameObject> _listItems = new();
-    private readonly HashSet<string> _installedPlugins = new();
-    private List<MarketplacePluginInfo> _allPlugins = new();
-    private int _currentPage;
-    private const int PageSize = 6;
+    private readonly List<GameObject>          _listItems       = new();
+    private readonly HashSet<string>           _installedPlugins = new();
+    private          List<MarketplacePluginInfo> _plugins         = new();
+    private          int                       _page;
+    private const    int                       PageSize = 5;
 
-    // ── 颜色 ─────────────────────────────────────────────
-    private static readonly Color BackgroundColor = new(0.08f, 0.08f, 0.15f, 0.97f);
-    private static readonly Color PanelColor      = new(0.12f, 0.12f, 0.22f, 1f);
-    private static readonly Color AccentColor     = new(0.28f, 0.55f, 1f,    1f);
-    private static readonly Color InstalledColor  = new(0.2f,  0.85f, 0.4f,  1f);
-    private static readonly Color DangerColor     = new(0.9f,  0.25f, 0.25f, 1f);
-    private static readonly Color TextColor       = Color.white;
-    private static readonly Color SubTextColor    = new(0.7f, 0.7f, 0.8f, 1f);
+    private static string ServerUrl => "https://cog.amongusclub.cn/index.php";
 
-    // ── 单例 ─────────────────────────────────────────────
     public static PluginMarketplace? Instance { get; private set; }
 
-    // ─────────────────────────────────────────────────────
-    // 静态入口
-    // ─────────────────────────────────────────────────────
     public static void Open(MainMenuManager mainMenu)
     {
-        if (Instance != null)
-        {
-            Instance._root.SetActive(true);
-            return;
-        }
+        if (Instance != null) { Instance._root.SetActive(true); return; }
         Instance = new PluginMarketplace(mainMenu);
     }
 
-    // ─────────────────────────────────────────────────────
-    // 构造 / 初始化
-    // ─────────────────────────────────────────────────────
     private PluginMarketplace(MainMenuManager mainMenu)
     {
         _host = mainMenu;
 
-        // 根节点挂在摄像机下，位于所有内容之前
-        _root = new GameObject("COGMarketplace_Root");
+        _root = new GameObject("COGMarketplace");
         Object.DontDestroyOnLoad(_root);
-        _root.transform.SetParent(Camera.main!.transform);
-        _root.transform.localPosition = new Vector3(0f, 0f, -20f);
+        _root.transform.SetParent(Camera.main!.transform, false);
+        _root.transform.localPosition = new Vector3(0f, 0f, -30f);
         _root.transform.localScale    = Vector3.one;
 
         BuildUI();
-
         mainMenu.mainMenuUI.SetActive(false);
-
-        RefreshInstalledPlugins();
-        _host.StartCoroutine(CoLoadPluginList().WrapToIl2Cpp());
+        RefreshInstalled();
+        _host.StartCoroutine(CoLoad().WrapToIl2Cpp());
     }
 
-    // ─────────────────────────────────────────────────────
-    // UI 构建
-    // ─────────────────────────────────────────────────────
     private void BuildUI()
     {
-        // 全屏背景
-        CreateQuad(_root.transform, new Vector2(18f, 11f), BackgroundColor, "BG")
-            .transform.localPosition = Vector3.zero;
+        // Full-screen backdrop
+        Quad(_root.transform, "BG", ScreenW, ScreenH, ColBg, 0f, 0f, 0);
 
-        BuildTitleBar();
-        BuildListPanel();
-        BuildDetailPanel();
+        // ── Title bar ────
+        Quad(_root.transform, "TitleBar", ScreenW, TitleH, ColPanel, 0f, TitleY, 1);
+        Txt(_root.transform, "COG 插件市场", FzTitle, ColAccent,
+            new Vector3(-3.8f, TitleY, -2f), bold: true);
 
-        _statusText = CreateText(_root.transform, "", 0.35f, SubTextColor);
-        _statusText.transform.localPosition = new Vector3(0f, -4.7f, -1f);
-        _statusText.alignment = TextAlignmentOptions.Center;
-    }
-
-    private void BuildTitleBar()
-    {
-        var bar = CreateQuad(_root.transform, new Vector2(18f, 0.9f), PanelColor, "TitleBar");
-        bar.transform.localPosition = new Vector3(0f, 4.8f, -0.5f);
-
-        var title = CreateText(bar.transform, "COG 插件市场", 0.55f, AccentColor);
-        title.transform.localPosition = new Vector3(-3f, 0f, -0.2f);
-        title.fontStyle = FontStyles.Bold;
-
-        CreateButton(bar.transform, "↻ 刷新", new Vector3(6.2f, 0f, -0.2f), AccentColor, 0.38f, () =>
+        Btn(_root.transform, "BtnRefresh", "刷新", ColAccent,
+            new Vector3(3.4f, TitleY, -2f), BtnW * 0.8f, BtnH, FzBtn, () =>
         {
             SetStatus("正在刷新列表...");
-            _host.StartCoroutine(CoLoadPluginList().WrapToIl2Cpp());
+            _host.StartCoroutine(CoLoad().WrapToIl2Cpp());
         });
+        Btn(_root.transform, "BtnClose", "关闭", ColRed,
+            new Vector3(4.8f, TitleY, -2f), BtnW * 0.8f, BtnH, FzBtn, Close);
 
-        CreateButton(bar.transform, "✕ 关闭", new Vector3(7.8f, 0f, -0.2f), DangerColor, 0.38f, Close);
-    }
-
-    private void BuildListPanel()
-    {
+        // ── Left panel ───────
         _listPanel = new GameObject("ListPanel");
-        _listPanel.transform.SetParent(_root.transform);
-        _listPanel.transform.localPosition = new Vector3(-4.5f, 0f, -0.5f);
-        _listPanel.transform.localScale    = Vector3.one;
+        _listPanel.transform.SetParent(_root.transform, false);
+        _listPanel.transform.localPosition = new Vector3(ListX, ContentY, -1f);
 
-        CreateQuad(_listPanel.transform, new Vector2(8.5f, 9f), PanelColor, "ListBg")
-            .transform.localPosition = Vector3.zero;
+        Quad(_listPanel.transform, "Bg", ListW, ContentH, ColPanel, 0f, 0f, 0);
+        Txt(_listPanel.transform, "可用插件", FzH2, ColAccent,
+            new Vector3(-ListW / 2f + 0.2f, ContentH / 2f - 0.35f, -1f), bold: true);
+        Divider(_listPanel.transform, ListW - 0.3f, ContentH / 2f - 0.62f);
 
-        var lbl = CreateText(_listPanel.transform, "可用插件", 0.38f, AccentColor);
-        lbl.transform.localPosition = new Vector3(-3.2f, 4.1f, -0.2f);
-        lbl.fontStyle = FontStyles.Bold;
-
-        CreateButton(_listPanel.transform, "◀", new Vector3(-1.5f, -4.1f, -0.2f), AccentColor, 0.4f, () =>
+        // Pagination
+        Btn(_listPanel.transform, "BtnPrev", "◀", ColAccent,
+            new Vector3(-0.9f, -ContentH / 2f + 0.35f, -1f), 0.9f, BtnH, FzBtn, () =>
         {
-            if (_currentPage > 0) { _currentPage--; RefreshList(); }
+            if (_page > 0) { _page--; RedrawList(); }
         });
-        CreateButton(_listPanel.transform, "▶", new Vector3(1.5f, -4.1f, -0.2f), AccentColor, 0.4f, () =>
+        Btn(_listPanel.transform, "BtnNext", "▶", ColAccent,
+            new Vector3(0.9f, -ContentH / 2f + 0.35f, -1f), 0.9f, BtnH, FzBtn, () =>
         {
-            int maxPage = Mathf.Max(0, (_allPlugins.Count - 1) / PageSize);
-            if (_currentPage < maxPage) { _currentPage++; RefreshList(); }
+            int max = Mathf.Max(0, (_plugins.Count - 1) / PageSize);
+            if (_page < max) { _page++; RedrawList(); }
         });
-    }
 
-    private void BuildDetailPanel()
-    {
+        // ── Right panel ──────
         _detailPanel = new GameObject("DetailPanel");
-        _detailPanel.transform.SetParent(_root.transform);
-        _detailPanel.transform.localPosition = new Vector3(3.8f, 0f, -0.5f);
-        _detailPanel.transform.localScale    = Vector3.one;
+        _detailPanel.transform.SetParent(_root.transform, false);
+        _detailPanel.transform.localPosition = new Vector3(DetailX, ContentY, -1f);
 
-        CreateQuad(_detailPanel.transform, new Vector2(9.5f, 9f), PanelColor, "DetailBg")
-            .transform.localPosition = Vector3.zero;
+        Quad(_detailPanel.transform, "Bg", DetailW, ContentH, ColPanel, 0f, 0f, 0);
+        Txt(_detailPanel.transform, "← 从左侧选择一个插件", FzBody, ColSub,
+            Vector3.back, align: TextAlignmentOptions.Center);
 
-        var hint = CreateText(_detailPanel.transform, "← 从左侧选择一个插件", 0.38f, SubTextColor);
-        hint.transform.localPosition = new Vector3(0f, 0f, -0.2f);
-        hint.alignment = TextAlignmentOptions.Center;
+        // ── Status bar ───────
+        _statusText = Txt(_root.transform, "", FzSmall, ColSub,
+            new Vector3(0f, -ScreenH / 2f + 0.25f, -2f), align: TextAlignmentOptions.Center);
     }
 
-    // ─────────────────────────────────────────────────────
-    // 列表刷新
-    // ─────────────────────────────────────────────────────
-    private void RefreshList()
+    // ─────────────────────────
+    // List rendering
+    // ─────────────────────────
+    private void RedrawList()
     {
         foreach (var go in _listItems) Object.Destroy(go);
         _listItems.Clear();
 
-        int start = _currentPage * PageSize;
-        int end   = Mathf.Min(start + PageSize, _allPlugins.Count);
+        int start = _page * PageSize;
+        int end   = Mathf.Min(start + PageSize, _plugins.Count);
+
+        float itemH = 0.78f;
+        float topY  = ContentH / 2f - 0.82f;
+
         for (int i = start; i < end; i++)
-            CreateListItem(_allPlugins[i], i - start);
+            DrawListItem(_plugins[i], i - start, topY - i * itemH + start * itemH);
 
-        // 页码标签（懒创建）
-        var pageLabelGo = _listPanel.transform.Find("PageLabel")?.gameObject;
-        TextMeshPro pageLabel;
-        if (pageLabelGo == null)
+        // Page label
+        var pg = _listPanel.transform.Find("PageLabel")?.GetComponent<TextMeshPro>();
+        if (pg == null)
         {
-            pageLabel = CreateText(_listPanel.transform, "", 0.32f, SubTextColor);
-            pageLabel.gameObject.name = "PageLabel";
-            pageLabel.transform.localPosition = new Vector3(0f, -4.1f, -0.2f);
-            pageLabel.alignment = TextAlignmentOptions.Center;
+            pg = Txt(_listPanel.transform, "", FzSmall, ColSub,
+                new Vector3(0f, -ContentH / 2f + 0.35f, -1f), align: TextAlignmentOptions.Center);
+            pg.gameObject.name = "PageLabel";
         }
-        else
-        {
-            pageLabel = pageLabelGo.GetComponent<TextMeshPro>();
-        }
-
-        int maxPage = Mathf.Max(0, (_allPlugins.Count - 1) / PageSize);
-        pageLabel.text = $"第 {_currentPage + 1} / {maxPage + 1} 页";
+        int maxPage = Mathf.Max(0, (_plugins.Count - 1) / PageSize);
+        pg.text = $"第 {_page + 1} / {maxPage + 1} 页";
     }
 
-    private void CreateListItem(MarketplacePluginInfo plugin, int idx)
+    private void DrawListItem(MarketplacePluginInfo p, int slot, float y)
     {
-        float yPos   = 3.3f - idx * 1.3f;
-        var   item   = new GameObject($"Item_{plugin.Id}");
-        item.transform.SetParent(_listPanel.transform);
-        item.transform.localPosition = new Vector3(0f, yPos, -0.2f);
-        item.transform.localScale    = Vector3.one;
+        float itemH = 0.72f;
+        float itemW = ListW - 0.2f;
+
+        var item = new GameObject($"Item_{p.Id}");
+        item.transform.SetParent(_listPanel.transform, false);
+        item.transform.localPosition = new Vector3(0f, y, -1f);
         _listItems.Add(item);
 
-        bool installed = _installedPlugins.Contains(plugin.Name);
-        var  bgColor   = installed ? new Color(0.15f, 0.25f, 0.15f, 1f)
-                                   : new Color(0.16f, 0.16f, 0.28f, 1f);
+        bool inst = _installedPlugins.Contains(p.Name);
 
-        var bg = CreateQuad(item.transform, new Vector2(7.8f, 1.1f), bgColor, "Bg");
-        bg.transform.localPosition = Vector3.zero;
+        // Background quad – Simple mode, sized via localScale
+        var bgGo = Quad(item.transform, "Bg", itemW, itemH,
+            inst ? new Color(0.14f, 0.24f, 0.14f, 1f) : ColItem, 0f, 0f, 0);
 
-        var nameTmp = CreateText(item.transform, plugin.Name, 0.38f, TextColor);
-        nameTmp.transform.localPosition = new Vector3(-2.8f, 0.2f, -0.1f);
-        nameTmp.fontStyle = FontStyles.Bold;
+        // Name
+        Txt(item.transform, p.Name, FzBody, ColText,
+            new Vector3(-itemW / 2f + 0.18f, 0.13f, -1f), bold: true);
 
-        var infoTmp = CreateText(item.transform, $"作者: {plugin.Author}  v{plugin.Version}", 0.28f, SubTextColor);
-        infoTmp.transform.localPosition = new Vector3(-2.8f, -0.2f, -0.1f);
+        // Author / version
+        Txt(item.transform, $"by {p.Author}  v{p.Version}", FzSmall, ColSub,
+            new Vector3(-itemW / 2f + 0.18f, -0.16f, -1f));
 
-        if (installed)
-        {
-            var badge = CreateText(item.transform, "✓ 已安装", 0.28f, InstalledColor);
-            badge.transform.localPosition = new Vector3(2.8f, 0f, -0.1f);
-            badge.alignment = TextAlignmentOptions.Right;
-        }
+        if (inst)
+            Txt(item.transform, "OK", FzBody, ColGreen,
+                new Vector3(itemW / 2f - 0.22f, 0f, -1f), align: TextAlignmentOptions.Right);
 
-        // 点击事件：BoxCollider2D + PassiveButton 均为原生 AU 类型，无需注册
-        var col = bg.AddComponent<BoxCollider2D>();
-        col.size = new Vector2(7.8f, 1.1f);
-        var btn = bg.AddComponent<PassiveButton>();
+        // Click — collider on the bg quad (same GO as SpriteRenderer)
+        var col = bgGo.AddComponent<BoxCollider2D>();
+        col.size = new Vector2(itemW, itemH);
+        var btn = bgGo.AddComponent<PassiveButton>();
         btn.OnClick = new Button.ButtonClickedEvent();
-        var captured = plugin;
+        var captured = p;
         btn.OnClick.AddListener((Action)(() => ShowDetail(captured)));
+
+        // Hover tint
+        var sr = bgGo.GetComponent<SpriteRenderer>();
+        btn.OnMouseOver = new UnityEngine.Events.UnityEvent();
+        btn.OnMouseOver.AddListener((Action)(() => sr.color = ColItemSel));
+        btn.OnMouseOut  = new UnityEngine.Events.UnityEvent();
+        btn.OnMouseOut.AddListener((Action)(() => sr.color = inst
+            ? new Color(0.14f, 0.24f, 0.14f, 1f) : ColItem));
     }
 
-    // ─────────────────────────────────────────────────────
-    // 详情面板
-    // ─────────────────────────────────────────────────────
-    private void ShowDetail(MarketplacePluginInfo plugin)
+    // ─────────────────────────
+    // Detail panel
+    // ─────────────────────────
+    private void ShowDetail(MarketplacePluginInfo p)
     {
-        // 清除上次内容，保留背景
+        // Clear old children except the background
         for (int i = _detailPanel.transform.childCount - 1; i >= 0; i--)
         {
-            var child = _detailPanel.transform.GetChild(i);
-            if (child.name != "DetailBg") Object.Destroy(child.gameObject);
+            var ch = _detailPanel.transform.GetChild(i);
+            if (ch.name != "Bg") Object.Destroy(ch.gameObject);
         }
 
-        bool installed = _installedPlugins.Contains(plugin.Name);
+        bool inst = _installedPlugins.Contains(p.Name);
+        float hw  = DetailW / 2f;
 
-        var nameTmp = CreateText(_detailPanel.transform, plugin.Name, 0.5f, TextColor);
-        nameTmp.transform.localPosition = new Vector3(0f, 3.6f, -0.2f);
-        nameTmp.fontStyle  = FontStyles.Bold;
-        nameTmp.alignment  = TextAlignmentOptions.Center;
+        // Plugin name
+        Txt(_detailPanel.transform, p.Name, FzH2, ColText,
+            new Vector3(0f, ContentH / 2f - 0.42f, -1f), bold: true, align: TextAlignmentOptions.Center);
 
-        CreateQuad(_detailPanel.transform, new Vector2(8.5f, 0.02f), AccentColor, "Line")
-            .transform.localPosition = new Vector3(0f, 3.2f, -0.2f);
+        Divider(_detailPanel.transform, DetailW - 0.4f, ContentH / 2f - 0.72f);
 
-        InfoRow("作者",     plugin.Author,              2.8f);
-        InfoRow("版本",     plugin.Version,             2.3f);
-        InfoRow("大小",     FmtSize(plugin.FileSize),   1.8f);
-        InfoRow("上传时间", plugin.UploadedAt,          1.3f);
+        // Info rows
+        float ry = ContentH / 2f - 1.05f;
+        DetailRow("作者",     p.Author,           ref ry);
+        DetailRow("版本",     p.Version,          ref ry);
+        DetailRow("大小",     FmtSize(p.FileSize), ref ry);
+        DetailRow("上传",     p.UploadedAt,       ref ry);
 
-        var descLbl = CreateText(_detailPanel.transform, "描述", 0.35f, AccentColor);
-        descLbl.transform.localPosition = new Vector3(-4f, 0.7f, -0.2f);
-        descLbl.fontStyle = FontStyles.Bold;
+        // Description
+        Divider(_detailPanel.transform, DetailW - 0.4f, ry - 0.05f);
+        ry -= 0.2f;
+        var descTmp = Txt(_detailPanel.transform, p.Description.Length > 0 ? p.Description : "(无描述)",
+            FzSmall, ColSub, new Vector3(0f, ry - 0.5f, -1f), align: TextAlignmentOptions.TopJustified);
+        descTmp.enableWordWrapping  = true;
+        descTmp.overflowMode        = TextOverflowModes.Ellipsis;
+        descTmp.rectTransform.sizeDelta = new Vector2(DetailW - 0.5f, 1.6f);
 
-        var desc = CreateText(_detailPanel.transform, plugin.Description, 0.32f, SubTextColor);
-        desc.transform.localPosition     = new Vector3(0f, -0.2f, -0.2f);
-        desc.alignment                   = TextAlignmentOptions.TopLeft;
-        desc.rectTransform.sizeDelta     = new Vector2(8f, 2.5f);
-        desc.overflowMode                = TextOverflowModes.Ellipsis;
-        desc.enableWordWrapping          = true;
-
-        if (!installed)
+        // Action buttons
+        float btnY = -ContentH / 2f + 0.9f;
+        if (!inst)
         {
-            CreateButton(_detailPanel.transform, "⬇ 安装", new Vector3(0f, -3.5f, -0.2f), AccentColor, 0.4f,
-                () => _host.StartCoroutine(CoInstall(plugin).WrapToIl2Cpp()));
+            Btn(_detailPanel.transform, "BtnInstall", "安装插件", ColAccent,
+                new Vector3(0f, btnY, -1f), BtnW, BtnH, FzBtn,
+                () => _host.StartCoroutine(CoInstall(p).WrapToIl2Cpp()));
         }
         else
         {
-            CreateButton(_detailPanel.transform, "✓ 已安装", new Vector3(-2f, -3.5f, -0.2f), InstalledColor, 0.4f,
-                () => SetStatus($"插件 {plugin.Name} 已安装，重启生效。"));
-            CreateButton(_detailPanel.transform, "🗑 卸载", new Vector3(2f, -3.5f, -0.2f), DangerColor, 0.4f,
-                () => Uninstall(plugin));
+            Btn(_detailPanel.transform, "BtnInstalled", "已安装", ColGreen,
+                new Vector3(-1.3f, btnY, -1f), BtnW, BtnH, FzBtn,
+                () => SetStatus($"{p.Name} 已安装，重启游戏后生效。"));
+            Btn(_detailPanel.transform, "BtnUninstall", "卸载", ColRed,
+                new Vector3(1.3f, btnY, -1f), BtnW, BtnH, FzBtn,
+                () => DoUninstall(p));
         }
 
-        CreateButton(_detailPanel.transform, "⚠ 服务端删除", new Vector3(0f, -4.15f, -0.2f), DangerColor, 0.32f,
-            () => _host.StartCoroutine(CoServerDelete(plugin).WrapToIl2Cpp()));
+        Btn(_detailPanel.transform, "BtnDel", "从服务端删除", ColRed,
+            new Vector3(0f, btnY - 0.62f, -1f), BtnW * 1.2f, BtnH * 0.85f, FzSmall,
+            () => _host.StartCoroutine(CoServerDelete(p).WrapToIl2Cpp()));
     }
 
-    private void InfoRow(string label, string value, float y)
+    private void DetailRow(string label, string value, ref float y)
     {
-        var l = CreateText(_detailPanel.transform, label + ":", 0.33f, AccentColor);
-        l.transform.localPosition = new Vector3(-3.5f, y, -0.2f);
-        l.fontStyle = FontStyles.Bold;
-
-        var v = CreateText(_detailPanel.transform, value, 0.33f, TextColor);
-        v.transform.localPosition = new Vector3(0.5f, y, -0.2f);
+        float hw = DetailW / 2f;
+        Txt(_detailPanel.transform, label + ":", FzSmall, ColAccent,
+            new Vector3(-hw + 0.2f, y, -1f), bold: true);
+        Txt(_detailPanel.transform, value, FzSmall, ColText,
+            new Vector3(-hw + 1.5f, y, -1f));
+        y -= 0.38f;
     }
 
-    // ─────────────────────────────────────────────────────
-    // 网络协程（全部在 _host 上运行）
-    // ─────────────────────────────────────────────────────
-    private IEnumerator CoLoadPluginList()
+    // ─────────────────────────
+    // Network coroutines
+    // ─────────────────────────
+    private IEnumerator CoLoad()
     {
         SetStatus("正在获取插件列表...");
-        _allPlugins.Clear();
-
+        _plugins.Clear();
         string json = "";
+
         yield return Task.Run(async () =>
         {
-            try   { json = await HttpClient.GetStringAsync($"{ServerUrl}/api/plugins"); }
-            catch (System.Exception ex) { Main.Logger.LogError($"[Marketplace] 列表请求失败: {ex.Message}"); }
+            try   { json = await Http.GetStringAsync($"{ServerUrl}/api/plugins"); }
+            catch (System.Exception ex) { Main.Logger.LogError($"[Market] {ex.Message}"); }
         }).WaitAsCoroutine();
 
         if (string.IsNullOrEmpty(json))
         {
-            SetStatus("✗ 无法连接到服务端。");
-            RefreshList();
+            SetStatus("无法连接到服务端，请检查server-url。");
+            RedrawList();
             yield break;
         }
 
         try
         {
-            _allPlugins = ParseList(json);
-            RefreshInstalledPlugins();
-            RefreshList();
-            SetStatus($"已加载 {_allPlugins.Count} 个插件。");
+            _plugins = ParseList(json);
+            RefreshInstalled();
+            RedrawList();
+            SetStatus($"共 {_plugins.Count} 个插件。");
         }
         catch (System.Exception ex)
         {
-            Main.Logger.LogError($"[Marketplace] 解析失败: {ex.Message}");
-            SetStatus("✗ 解析插件数据失败。");
+            Main.Logger.LogError($"[Market] Parse error: {ex.Message}");
+            SetStatus("解析数据失败。");
         }
     }
 
-    private IEnumerator CoInstall(MarketplacePluginInfo plugin)
+    private IEnumerator CoInstall(MarketplacePluginInfo p)
     {
-        SetStatus($"正在下载 {plugin.Name}...");
+        SetStatus($"正在下载 {p.Name}…");
         byte[] data = Array.Empty<byte>();
 
         yield return Task.Run(async () =>
         {
-            try   { data = await HttpClient.GetByteArrayAsync($"{ServerUrl}/api/plugins/{plugin.Id}/download"); }
-            catch (System.Exception ex) { Main.Logger.LogError($"[Marketplace] 下载失败: {ex.Message}"); }
+            try   { data = await Http.GetByteArrayAsync($"{ServerUrl}/api/plugins/{p.Id}/download"); }
+            catch (System.Exception ex) { Main.Logger.LogError($"[Market] Download: {ex.Message}"); }
         }).WaitAsCoroutine();
 
-        if (data.Length == 0) { SetStatus($"✗ 下载 {plugin.Name} 失败。"); yield break; }
+        if (data.Length == 0) { SetStatus($"下载 {p.Name} 失败。"); yield break; }
 
         try
         {
             var dir = Path.Combine(ConfigBase.DataDirectoryName, "plugins");
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            File.WriteAllBytes(Path.Combine(dir, $"{plugin.Name}.ca"), data);
-            _installedPlugins.Add(plugin.Name);
-            SetStatus($"✓ {plugin.Name} 安装成功！重启游戏后生效。");
-            ShowDetail(plugin);
-            RefreshList();
+            File.WriteAllBytes(Path.Combine(dir, $"{p.Name}.ca"), data);
+            _installedPlugins.Add(p.Name);
+            SetStatus($"{p.Name} 安装成功，重启游戏后生效。");
+            ShowDetail(p);
+            RedrawList();
         }
-        catch (System.Exception ex)
-        {
-            Main.Logger.LogError($"[Marketplace] 保存失败: {ex.Message}");
-            SetStatus($"✗ 保存失败：{ex.Message}");
-        }
+        catch (System.Exception ex) { SetStatus($"保存失败：{ex.Message}"); }
     }
 
-    private void Uninstall(MarketplacePluginInfo plugin)
+    private void DoUninstall(MarketplacePluginInfo p)
     {
         try
         {
-            var path = Path.Combine(ConfigBase.DataDirectoryName, "plugins", $"{plugin.Name}.ca");
+            var path = Path.Combine(ConfigBase.DataDirectoryName, "plugins", $"{p.Name}.ca");
             if (File.Exists(path)) File.Delete(path);
-            _installedPlugins.Remove(plugin.Name);
-            SetStatus($"✓ {plugin.Name} 已卸载，重启后完全移除。");
-            ShowDetail(plugin);
-            RefreshList();
+            _installedPlugins.Remove(p.Name);
+            SetStatus($"✓ {p.Name} 已卸载，重启后完全移除。");
+            ShowDetail(p);
+            RedrawList();
         }
-        catch (System.Exception ex) { SetStatus($"✗ 卸载失败：{ex.Message}"); }
+        catch (System.Exception ex) { SetStatus($"卸载失败：{ex.Message}"); }
     }
 
-    private IEnumerator CoServerDelete(MarketplacePluginInfo plugin)
+    private IEnumerator CoServerDelete(MarketplacePluginInfo p)
     {
-        SetStatus($"正在从服务端删除 {plugin.Name}...");
+        SetStatus($"正在从服务端删除 {p.Name}…");
         int code = 0;
 
         yield return Task.Run(async () =>
         {
             try
             {
-                var resp = await HttpClient.DeleteAsync($"{ServerUrl}/api/plugins/{plugin.Id}");
-                code = (int)resp.StatusCode;
+                var r = await Http.DeleteAsync($"{ServerUrl}/api/plugins/{p.Id}");
+                code = (int)r.StatusCode;
             }
-            catch (System.Exception ex) { Main.Logger.LogError($"[Marketplace] 服务端删除失败: {ex.Message}"); }
+            catch (System.Exception ex) { Main.Logger.LogError($"[Market] Delete: {ex.Message}"); }
         }).WaitAsCoroutine();
 
         if (code is >= 200 and < 300)
         {
-            SetStatus($"✓ 已从服务端删除 {plugin.Name}。");
-            _host.StartCoroutine(CoLoadPluginList().WrapToIl2Cpp());
+            SetStatus($"已从服务端删除 {p.Name}。");
+            _host.StartCoroutine(CoLoad().WrapToIl2Cpp());
         }
         else
         {
-            SetStatus($"✗ 服务端删除失败 (HTTP {code})。");
+            SetStatus($"服务端删除失败 (HTTP {code})。");
         }
     }
 
-    // ─────────────────────────────────────────────────────
-    // 辅助
-    // ─────────────────────────────────────────────────────
-    private void RefreshInstalledPlugins()
+    // ─────────────────────────
+    // Helpers
+    // ─────────────────────────
+    private void RefreshInstalled()
     {
         _installedPlugins.Clear();
         var dir = Path.Combine(ConfigBase.DataDirectoryName, "plugins");
@@ -451,12 +435,112 @@ public class PluginMarketplace
 
     private static string FmtSize(long b)
     {
-        if (b < 1024)           return $"{b} B";
-        if (b < 1024 * 1024)    return $"{b / 1024.0:F1} KB";
-        return $"{b / 1024.0 / 1024.0:F1} MB";
+        if (b < 1024)        return $"{b} B";
+        if (b < 1048576)     return $"{b / 1024.0:F1} KB";
+        return $"{b / 1048576.0:F1} MB";
     }
 
-    // ── 轻量 JSON 解析 ────────────────────────────────────
+    // ─────────────────────────
+    // UI factory helpers
+    // ─────────────────────────
+
+    /// <summary>
+    /// Create a solid-colour rectangle using SpriteRenderer in Simple mode.
+    /// Size is applied via localScale so no border info is needed on the sprite.
+    /// </summary>
+    private static GameObject Quad(Transform parent, string name,
+        float w, float h, Color color, float lx, float ly, int order)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        go.transform.localPosition = new Vector3(lx, ly, 0f);
+        go.transform.localScale    = new Vector3(w, h, 1f);
+
+        // 1×1 white texture, pixelsPerUnit = 1 → sprite is exactly 1 world-unit
+        // after which localScale stretches it to (w × h) world units.
+        var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+        tex.SetPixel(0, 0, Color.white);
+        tex.Apply();
+
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite       = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+        sr.color        = color;
+        sr.drawMode     = SpriteDrawMode.Simple;   // ← Simple, not Sliced
+        sr.sortingOrder = order;
+        return go;
+    }
+
+    /// <summary>
+    /// Create a TextMeshPro label. fontSize is in world units (1.4–2.2 is readable).
+    /// </summary>
+    private static TextMeshPro Txt(Transform parent, string text, float fontSize, Color color,
+        Vector3 localPos, bool bold = false, TextAlignmentOptions align = TextAlignmentOptions.Left)
+    {
+        var safe = text.Length > 20 ? text[..20] : text;
+        safe = safe.Replace(" ", "_").Replace("/", "_").Replace("\\", "_");
+        var go = new GameObject($"T_{safe}");
+        go.transform.SetParent(parent, false);
+        go.transform.localPosition = localPos;
+        go.transform.localScale    = Vector3.one;
+
+        var tmp = go.AddComponent<TextMeshPro>();
+        tmp.text               = text;
+        tmp.fontSize           = fontSize;
+        tmp.color              = color;
+        tmp.alignment          = align;
+        tmp.enableWordWrapping = false;
+        tmp.fontStyle          = bold ? FontStyles.Bold : FontStyles.Normal;
+        tmp.sortingOrder       = 5;
+        return tmp;
+    }
+
+    /// <summary>
+    /// Create a clickable button: a coloured Quad with a centred text label.
+    /// The collider is placed on the Quad so its world size matches exactly.
+    /// </summary>
+    private static void Btn(Transform parent, string name, string label,
+        Color color, Vector3 localPos, float w, float h, float fontSize, Action onClick)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        go.transform.localPosition = localPos;
+        go.transform.localScale    = Vector3.one;
+
+        // Background
+        var bgGo = Quad(go.transform, "Bg", w, h, color, 0f, 0f, 3);
+
+        // Label (slightly in front)
+        var lbl = Txt(go.transform, label, fontSize, Color.white,
+            new Vector3(0f, 0f, -0.1f), align: TextAlignmentOptions.Center);
+        lbl.sortingOrder = 4;
+
+        // Collider on the bg quad (localScale = (w,h,1) so BoxCollider2D size (1,1) = w×h world)
+        var col = bgGo.AddComponent<BoxCollider2D>();
+        col.size = Vector2.one;   // bg scale is already (w, h, 1), so (1,1) collider = exact fit
+
+        var btn = bgGo.AddComponent<PassiveButton>();
+        btn.OnClick = new Button.ButtonClickedEvent();
+        btn.OnClick.AddListener(onClick);
+
+        // Hover brightness
+        var sr = bgGo.GetComponent<SpriteRenderer>();
+        btn.OnMouseOver = new UnityEngine.Events.UnityEvent();
+        btn.OnMouseOver.AddListener((Action)(() =>
+            sr.color = new Color(
+                Mathf.Min(color.r + 0.12f, 1f),
+                Mathf.Min(color.g + 0.12f, 1f),
+                Mathf.Min(color.b + 0.12f, 1f), 1f)));
+        btn.OnMouseOut = new UnityEngine.Events.UnityEvent();
+        btn.OnMouseOut.AddListener((Action)(() => sr.color = color));
+    }
+
+    /// <summary>Thin horizontal divider line.</summary>
+    private void Divider(Transform parent, float w, float y)
+        => Quad(parent, "Div", w, 0.018f, ColDivider, 0f, y, 2);
+
+    // ─────────────────────────
+    // JSON parser (no external dependencies)
+    // ─────────────────────────
     private static List<MarketplacePluginInfo> ParseList(string json)
     {
         var result = new List<MarketplacePluginInfo>();
@@ -472,8 +556,8 @@ public class PluginMarketplace
                 depth--;
                 if (depth == 0 && start >= 0)
                 {
-                    var p = ParseObj(json.Substring(start, i - start + 1));
-                    if (p != null) result.Add(p);
+                    var obj = ParseObj(json.Substring(start, i - start + 1));
+                    if (obj != null) result.Add(obj);
                     start = -1;
                 }
             }
@@ -526,67 +610,5 @@ public class PluginMarketplace
         int e = i;
         while (e < s.Length && s[e] != ',' && s[e] != '}') e++;
         return s.Substring(i, e - i).Trim();
-    }
-
-    // ── UI 工厂方法（只用原生 AU 组件，无自定义 MonoBehaviour） ──
-    private static GameObject CreateQuad(Transform parent, Vector2 size, Color color, string name)
-    {
-        var go = new GameObject(name);
-        go.transform.SetParent(parent);
-        go.transform.localScale    = Vector3.one;
-        go.transform.localPosition = Vector3.zero;
-
-        var tex = new Texture2D(1, 1);
-        tex.SetPixel(0, 0, Color.white);
-        tex.Apply();
-
-        var sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite   = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
-        sr.color    = color;
-        sr.drawMode = SpriteDrawMode.Sliced;
-        sr.size     = size;
-        return go;
-    }
-
-    private static TextMeshPro CreateText(Transform parent, string text, float size, Color color)
-    {
-        var safe = (text.Length > 16 ? text[..16] : text).Replace(" ", "_").Replace("/", "_");
-        var go   = new GameObject($"T_{safe}");
-        go.transform.SetParent(parent);
-        go.transform.localScale    = Vector3.one;
-        go.transform.localPosition = Vector3.zero;
-
-        var tmp = go.AddComponent<TextMeshPro>();
-        tmp.text               = text;
-        tmp.fontSize           = size;
-        tmp.color              = color;
-        tmp.alignment          = TextAlignmentOptions.Left;
-        tmp.enableWordWrapping = false;
-        tmp.sortingOrder       = 5;
-        return tmp;
-    }
-
-    private static void CreateButton(Transform parent, string label, Vector3 pos, Color color,
-                                     float fontSize, Action onClick)
-    {
-        var go = new GameObject($"Btn_{label.Replace(" ", "_")[..Math.Min(label.Length, 12)]}");
-        go.transform.SetParent(parent);
-        go.transform.localPosition = pos;
-        go.transform.localScale    = Vector3.one;
-
-        var bg = CreateQuad(go.transform, new Vector2(2.8f, 0.6f), color, "Bg");
-        bg.transform.localPosition = Vector3.zero;
-
-        var txt = CreateText(go.transform, label, fontSize, TextColor);
-        txt.transform.localPosition = new Vector3(0f, 0f, -0.1f);
-        txt.alignment = TextAlignmentOptions.Center;
-
-        // BoxCollider2D 和 PassiveButton 均是原生 AU 类型，不需要 RegisterInIl2Cpp
-        var col = bg.AddComponent<BoxCollider2D>();
-        col.size = new Vector2(2.8f, 0.6f);
-
-        var btn = bg.AddComponent<PassiveButton>();
-        btn.OnClick = new Button.ButtonClickedEvent();
-        btn.OnClick.AddListener(onClick);
     }
 }
