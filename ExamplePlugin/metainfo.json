@@ -1,0 +1,10 @@
+{
+    "Name": "Example Role Plugin",
+    "Author": "COG Developer",
+    "Description": "Demonstrates how to create a custom role plugin with language and resource support.",
+    "Version": "1.0.0",
+    "Type": "Plugin",
+    "Id": "com.example.customrole",
+    "Dependency": [],
+    "Hidden": false
+}

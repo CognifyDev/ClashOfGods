@@ -1,0 +1,7 @@
+LangID: en
+medic.name: Medic
+medic.short-desc: Shield a player from death
+medic.shield-button: Shield
+medic.shield-cooldown: Shield Cooldown
+medic.shield-applied: A shield has been placed on your target.
+medic.shield-saved: Your shield saved someone!
