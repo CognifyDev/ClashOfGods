@@ -1,3 +1,3 @@
 namespace COG.Plugin;
 
-public record Plugin(PluginDescription PluginDescription, IPluginHandler PluginHandler);
+public record Plugin(PluginDescription PluginDescription, IPluginHandler PluginHandler, IPluginResourceIO ResourceIO);

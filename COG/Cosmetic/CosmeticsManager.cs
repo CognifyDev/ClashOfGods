@@ -123,14 +123,50 @@ public sealed class CosmeticsManager
     public bool TryGetHat      (string id, [NotNullWhen(true)] out CustomHat?       hat)       => _hatLoader.CustomHats.TryGetValue(id, out hat);
     public bool TryGetVisor    (string id, [NotNullWhen(true)] out CustomVisor?     visor)     => _visorLoader.CustomVisors.TryGetValue(id, out visor);
     public bool TryGetNamePlate(string id, [NotNullWhen(true)] out CustomNamePlate? namePlate) => _nameplateLoader.CustomNamePlates.TryGetValue(id, out namePlate);
-    
+
+    public void MergeHatLoader(HatLoader loader)
+    {
+        foreach (var (id, hat) in loader.CustomHats)
+        {
+            if (!_hatLoader.CustomHats.ContainsKey(id))
+            {
+                _hatLoader.CustomHats[id] = hat;
+                CosmeticGroup.ids.Add(id);
+            }
+        }
+    }
+
+    public void MergeVisorLoader(VisorLoader loader)
+    {
+        foreach (var (id, visor) in loader.CustomVisors)
+        {
+            if (!_visorLoader.CustomVisors.ContainsKey(id))
+            {
+                _visorLoader.CustomVisors[id] = visor;
+                CosmeticGroup.ids.Add(id);
+            }
+        }
+    }
+
+    public void MergeNameplateLoader(NameplateLoader loader)
+    {
+        foreach (var (id, np) in loader.CustomNamePlates)
+        {
+            if (!_nameplateLoader.CustomNamePlates.ContainsKey(id))
+            {
+                _nameplateLoader.CustomNamePlates[id] = np;
+                CosmeticGroup.ids.Add(id);
+            }
+        }
+    }
+
     public (string[] Hats, string[] Visors, string[] NamePlates) GetLoadedIds() =>
     (
         [.. _hatLoader.CustomHats.Keys],
         [.. _visorLoader.CustomVisors.Keys],
         [.. _nameplateLoader.CustomNamePlates.Keys]
     );
-    
+
     public void Reset()
     {
         _hatLoader.CustomHats.Clear();
