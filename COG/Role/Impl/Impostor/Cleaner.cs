@@ -20,11 +20,11 @@ public class Cleaner : CustomRole, IListener
         CanVent = true;
         CanSabotage = true;
 
-        CleanBodyCd = CreateOption(() => LanguageConfig.Instance.CleanBodyCooldown,
+        CleanBodyCd = CreateOption(() => LanguageConfig.Instance.GetString("role.impostor.cleaner.clean-cd"),
             new FloatOptionValueRule(10F, 5F, 60F, 30F, NumberSuffixes.Seconds));
 
         CleanBodyButton = CustomButton.Builder("cleaner-clean",
-                ResourceConstant.CleanDeadBodyButton, LanguageConfig.Instance.CleanAction)
+                ResourceConstant.CleanDeadBodyButton, LanguageConfig.Instance.GetString("action.clean"))
             .OnClick(() =>
             {
                 _body!.RpcHideDeadBody();

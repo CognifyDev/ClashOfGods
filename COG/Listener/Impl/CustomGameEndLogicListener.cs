@@ -227,7 +227,7 @@ public class CustomGameEndLogicListener : IListener
         roleSummary.color = Color.white;
         roleSummary.alignment = TextAlignmentOptions.TopLeft;
 
-        var summary = new StringBuilder($"{LanguageConfig.Instance.ShowPlayersRolesMessage}\n");
+        var summary = new StringBuilder($"{LanguageConfig.Instance.GetString("game.end.summary-message")}\n");
         summary.Append(Environment.NewLine);
 
         var handler = LanguageConfig.Instance.GetHandler("game.survival-data");

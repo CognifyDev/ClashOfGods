@@ -37,8 +37,8 @@ public static class PresetsButtonsPatch
         }
 
         // Set button text
-        __instance.StandardRulesText.text = LanguageConfig.Instance.LoadPreset;
-        __instance.AlternateRulesText.text = LanguageConfig.Instance.SavePreset;
+        __instance.StandardRulesText.text = LanguageConfig.Instance.GetString("game-setting.general.load-preset");
+        __instance.AlternateRulesText.text = LanguageConfig.Instance.GetString("game-setting.general.save-preset");
 
         // Set button OnClick action
         std.OnClick = new Button.ButtonClickedEvent();

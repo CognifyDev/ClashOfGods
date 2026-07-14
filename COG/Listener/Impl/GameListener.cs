@@ -143,7 +143,7 @@ public class GameListener : IListener
         }
 
         controller.ImpostorText.text =
-            LanguageConfig.Instance.AlivePlayerInfo.CustomFormat(("crew", crewCount), ("neutral", neutralCount),
+            LanguageConfig.Instance.GetString("game.exile.alive-player-info").CustomFormat(("crew", crewCount), ("neutral", neutralCount),
                 ("imp", impCount));
         return;
 

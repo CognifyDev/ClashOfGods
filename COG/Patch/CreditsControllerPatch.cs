@@ -15,14 +15,14 @@ public class CreditsControllerPatch
             "<size=500%><color=#DD1717>Clash</color> <color=#690B0B>Of</color> <color=#12EC3D>Gods</color></color></size>",
             "By <color=#AEEEEE>CognifyDev</color>",
             "",
-            $"<size=300%><color=#fffcbe></color><color=#FF0000>{LanguageConfig.Instance.Developer}</color></size>",
+            $"<size=300%><color=#fffcbe></color><color=#FF0000>{LanguageConfig.Instance.GetString("credits.developers")}</color></size>",
             "- commandf1",
             "- JieGeLovesDengDuaLang",
             "- TianMengLucky",
             "- NikoCat233",
             "- ELinmei",
             "",
-            $"<size=300%><color=#fffcbe></color><color=#0000FF>{LanguageConfig.Instance.Creators}</color></size>",
+            $"<size=300%><color=#fffcbe></color><color=#0000FF>{LanguageConfig.Instance.GetString("credits.creators")}</color></size>",
             "" //日后统计，我不知道
         };
 

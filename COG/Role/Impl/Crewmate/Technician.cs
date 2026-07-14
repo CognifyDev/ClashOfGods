@@ -23,7 +23,7 @@ public class Technician : CustomRole, IListener
         RegisterRpcHandler(repairRpcHandler);
 
         RepairButton = CustomButton.Builder("technician-repair",
-                ResourceConstant.RepairButton, LanguageConfig.Instance.RepairAction)
+                ResourceConstant.RepairButton, LanguageConfig.Instance.GetString("action.repair"))
             .OnClick(repairRpcHandler.PerformAndSend)
             .OnMeetingEnds(() => RepairButton?.ResetCooldown())
             .CouldUse(() => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency))

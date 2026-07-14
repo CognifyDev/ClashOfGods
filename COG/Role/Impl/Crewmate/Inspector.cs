@@ -24,11 +24,11 @@ public class Inspector : CustomRole, IListener
     {
         OnRoleAbilityUsed += (_, _) => NotifyInspector();
 
-        AbilityCooldownOption = CreateOption(() => LanguageConfig.Instance.AbilityCooldown,
+        AbilityCooldownOption = CreateOption(() => LanguageConfig.Instance.GetString("role.global.ability-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 25, NumberSuffixes.Seconds));
         
         ExamineButton = CustomButton.Builder("inspector-examine",
-                ResourceConstant.ExamineButton, LanguageConfig.Instance.ExamineAction)
+                ResourceConstant.ExamineButton, LanguageConfig.Instance.GetString("action.examine"))
             .OnClick(() =>
             {
                 _examinedTarget = _buttonTarget;
@@ -74,7 +74,7 @@ public class Inspector : CustomRole, IListener
     {
         if (player.IsSamePlayer(_examinedTarget))
             return
-                $"({(_abilityUsedPlayers.Contains(player) ? LanguageConfig.Instance.Yes.Color(Palette.ImpostorRed) : LanguageConfig.Instance.No.Color(Palette.AcceptedGreen))})";
+                $"({(_abilityUsedPlayers.Contains(player) ? LanguageConfig.Instance.GetString("mod-global.yes").Color(Palette.ImpostorRed) : LanguageConfig.Instance.GetString("mod-global.no").Color(Palette.AcceptedGreen))})";
         return base.HandleAdditionalPlayerName(player);
     }
 

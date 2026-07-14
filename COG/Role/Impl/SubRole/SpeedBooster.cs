@@ -14,7 +14,7 @@ public class SpeedBooster : CustomRole, IListener
 {
     public SpeedBooster() : base(Color.cyan)
     {
-        IncreasingSpeed = CreateOption(() => LanguageConfig.Instance.SpeedBoosterIncreasingSpeed,
+        IncreasingSpeed = CreateOption(() => LanguageConfig.Instance.GetString("role.sub-roles.speed-booster.increasing-speed"),
             new FloatOptionValueRule(0.5F, 0.5F, 10F, 1F, NumberSuffixes.Multiplier));
     }
 

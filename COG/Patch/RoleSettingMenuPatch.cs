@@ -65,7 +65,7 @@ public static class RoleOptionPatch
         yield return null;
         yield return null; 
 
-        // 刷新所有角色选项的显示
+        // 脣垄脨脗脣霉脫脨陆脟脡芦脩隆脧卯碌脛脧脭脢戮
         foreach (var role in CustomRoleManager.GetManager().GetModRoles().Where(r => r.ShowInOptions))
         {
             var roleOption = role.RoleNumberOption;
@@ -171,10 +171,10 @@ public static class RoleOptionPatch
         header.SetHeader(StringNames.None, layer);
         header.Title.text = camp switch
         {
-            CampType.Crewmate => LanguageConfig.Instance.CrewmateCamp,
-            CampType.Impostor => LanguageConfig.Instance.ImpostorCamp,
-            CampType.Neutral => LanguageConfig.Instance.NeutralCamp,
-            _ => LanguageConfig.Instance.SubRoleName
+            CampType.Crewmate => LanguageConfig.Instance.GetString("camp.crewmate.name"),
+            CampType.Impostor => LanguageConfig.Instance.GetString("camp.impostor.name"),
+            CampType.Neutral => LanguageConfig.Instance.GetString("camp.neutral.name"),
+            _ => LanguageConfig.Instance.GetString("camp.sub-role")
         };
         header.Background.color = camp switch
         {
@@ -217,7 +217,7 @@ public static class RoleOptionPatch
 
             roleSetting.roleMaxCount = numberOption.GetInt();
             roleSetting.roleChance = chanceOption.GetInt();
-            roleSetting.UpdateValuesAndText(null); // 强制更新显示
+            roleSetting.UpdateValuesAndText(null); // 脟驴脰脝赂眉脨脗脧脭脢戮
 
             roleSetting.transform.localPosition = new Vector3(initialX, initialY + offsetY * i, -2f);
             roleSetting.titleText.text = role.Name;

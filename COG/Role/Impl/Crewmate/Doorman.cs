@@ -25,7 +25,7 @@ public class Doorman : CustomRole
         _instance = this;
 
         BlockButton = CustomButton.Builder("doorman-block",
-                ResourceConstant.BlockButton, LanguageConfig.Instance.BlockAction)
+                ResourceConstant.BlockButton, LanguageConfig.Instance.GetString("action.block"))
             .OnClick(() =>
             {
                 HudManager.Instance.ToggleMapVisible(new MapOptions

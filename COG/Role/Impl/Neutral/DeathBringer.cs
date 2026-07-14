@@ -29,13 +29,13 @@ public class DeathBringer : CustomRole, IListener
     {
         CanKill = true;
 
-        _killCooldown = CreateOption(() => LanguageConfig.Instance.KillCooldown,
+        _killCooldown = CreateOption(() => LanguageConfig.Instance.GetString("role.global.kill-cooldown"),
             new FloatOptionValueRule(1F, 1F, 60F, 30F, NumberSuffixes.Seconds));
-        _neededPlayerNumber = CreateOption(() => LanguageConfig.Instance.DeathBringerNeededPlayerNumber,
+        _neededPlayerNumber = CreateOption(() => LanguageConfig.Instance.GetString("role.neutral.death-bringer.neededPlayerNumber"),
             new FloatOptionValueRule(1F, 1F, 15F, 5F));
 
         _stareButton = CustomButton.Builder("death-bringer-stare", ResourceConstant.StareButton,
-                LanguageConfig.Instance.StareAction)
+                LanguageConfig.Instance.GetString("action.stare"))
             .OnClick(() =>
             {
                 _staredPlayers.Add(_target!);

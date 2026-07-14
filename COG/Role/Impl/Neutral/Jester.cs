@@ -20,9 +20,9 @@ public class Jester : CustomRole, IListener, IWinnable
 
     public Jester() : base(Color.magenta, CampType.Neutral)
     {
-        _allowStartMeeting = CreateOption(() => LanguageConfig.Instance.AllowStartMeeting,
+        _allowStartMeeting = CreateOption(() => LanguageConfig.Instance.GetString("role.global.allow-start-meeting"),
             new BoolOptionValueRule(true));
-        _allowReportDeadBody = CreateOption(() => LanguageConfig.Instance.AllowReportDeadBody,
+        _allowReportDeadBody = CreateOption(() => LanguageConfig.Instance.GetString("role.global.allow-report-body"),
             new BoolOptionValueRule(true));
     }
 
@@ -37,7 +37,7 @@ public class Jester : CustomRole, IListener, IWinnable
         var winner = matchedEvent.Player;
 
         data.WinnableCampType = CampType;
-        data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(winner!.PlayerName);
+        data.WinText = LanguageConfig.Instance.GetString("game.end.winners.neutral").CustomFormat(winner!.PlayerName);
         data.WinColor = Color;
         data.WinnablePlayers.Add(winner.Data);
         data.Winnable = true;

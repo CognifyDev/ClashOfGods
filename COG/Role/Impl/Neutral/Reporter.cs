@@ -22,7 +22,7 @@ public class Reporter : CustomRole, IListener, IWinnable
 
     public Reporter() : base(Color.gray, CampType.Neutral)
     {
-        _neededReportTimes = CreateOption(() => LanguageConfig.Instance.ReporterNeededReportTimes,
+        _neededReportTimes = CreateOption(() => LanguageConfig.Instance.GetString("role.neutral.reporter.neededReportTimes"),
             new FloatOptionValueRule(1, 1, 14, 3));
 
         _roleInstance = this;
@@ -37,7 +37,7 @@ public class Reporter : CustomRole, IListener, IWinnable
             if (times < _neededReportTimes.GetInt()) return;
 
             data.WinnableCampType = CampType;
-            data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(target);
+            data.WinText = LanguageConfig.Instance.GetString("game.end.winners.neutral").CustomFormat(target);
             data.WinColor = Color;
             data.WinnablePlayers.Add(target.Data);
             data.Winnable = true;

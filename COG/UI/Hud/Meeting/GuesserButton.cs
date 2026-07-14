@@ -178,14 +178,14 @@ public class GuesserButton
     public void SetUpPageButton(bool previousPage, bool nextPage)
     {
         if (previousPage)
-            CreateBottomButton(LanguageConfig.Instance.PreviousPage,
+            CreateBottomButton(LanguageConfig.Instance.GetString("mod-global.previous-page"),
                 new Vector3(-2.5f, -2.2f, 0f), () =>
                 {
                     _roleButtonContainer.TryDestroy();
                     SetUpRolePage(_page - 1);
                 });
         if (nextPage)
-            CreateBottomButton(LanguageConfig.Instance.NextPage,
+            CreateBottomButton(LanguageConfig.Instance.GetString("mod-global.next-page"),
                 new Vector3(2.5f, -2.2f, 0f), () =>
                 {
                     _roleButtonContainer.TryDestroy();
@@ -194,10 +194,10 @@ public class GuesserButton
     }
 
     public void SetUpCancelButton() =>
-        CreateBottomButton(LanguageConfig.Instance.Cancel, new Vector3(-3.6f, -2.2f, 0f), CloseGuessUI);
+        CreateBottomButton(LanguageConfig.Instance.GetString("mod-global.cancel"), new Vector3(-3.6f, -2.2f, 0f), CloseGuessUI);
 
     public void SetUpConfirmButton() =>
-        _confirmButton = CreateBottomButton(LanguageConfig.Instance.Confirm,
+        _confirmButton = CreateBottomButton(LanguageConfig.Instance.GetString("mod-global.confirm"),
             new Vector3(3.6f, -2.2f, 0f), DestroyAll);
 
     public static void GuessPlayer(PlayerControl guesser, PlayerControl target)

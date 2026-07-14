@@ -348,7 +348,7 @@ public static class PlayerUtils
             CustomDeathReason.Disconnected => handler.GetString("disconnected"),
             CustomDeathReason.Exiled => handler.GetString("exiled"),
             CustomDeathReason.Misfire => handler.GetString("misfire"),
-            _ => LanguageConfig.Instance.UnknownKillReason
+            _ => LanguageConfig.Instance.GetString("game.survival-data.unknown")
         };
     }
 

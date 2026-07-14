@@ -12,7 +12,7 @@ internal static class ChatPlayerInfoPatch
     [HarmonyPostfix]
     private static void SetTextPatch(ChatBubble __instance)
     {
-        if (__instance.NameText.text == LanguageConfig.Instance.SystemMessage)
+        if (__instance.NameText.text == LanguageConfig.Instance.GetString("game.chat.system-message"))
             __instance.SetLeft();
     }
 

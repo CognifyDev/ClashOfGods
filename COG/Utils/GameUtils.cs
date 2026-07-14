@@ -122,7 +122,7 @@ public static class GameUtils
             yield return new WaitForSeconds(delay);
             var host = AmongUsClient.Instance.GetHost().Character;
             var tempName = host.Data.PlayerName;
-            host.SetName(LanguageConfig.Instance.SystemMessage);
+            host.SetName(LanguageConfig.Instance.GetString("game.chat.system-message"));
             HudManager.Instance.Chat.AddChat(host, text, false);
             host.SetName(tempName);
         }

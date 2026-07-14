@@ -16,7 +16,7 @@ public class Sheriff : CustomRole, IListener
 
         BaseRoleType = RoleTypes.Crewmate;
 
-        SheriffKillCd = CreateOption(() => LanguageConfig.Instance.KillCooldown,
+        SheriffKillCd = CreateOption(() => LanguageConfig.Instance.GetString("role.global.kill-cooldown"),
             new FloatOptionValueRule(10f, 5f, 60f, 30f, NumberSuffixes.Seconds));
 
         DefaultKillButtonSetting.CustomCooldown = SheriffKillCd.GetFloat;

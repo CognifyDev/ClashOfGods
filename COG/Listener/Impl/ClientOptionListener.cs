@@ -99,7 +99,7 @@ internal class ClientOptionListener : IListener
     [EventHandler(EventHandlerType.Postfix)]
     public void OnSettingUpdate(OptionsMenuBehaviourUpdateEvent @event)
     {
-        _modTabButton!.GetComponentInChildren<TextMeshPro>().text = LanguageConfig.Instance.CogOptions;
+        _modTabButton!.GetComponentInChildren<TextMeshPro>().text = LanguageConfig.Instance.GetString("option.main.cog-options");
 
         var optionHandler = LanguageConfig.Instance.GetHandler("option");
         foreach (var option in ClientOptionManager.GetManager().GetOptions())
@@ -186,7 +186,7 @@ internal class ClientOptionListener : IListener
                 (newValue, origin) =>
                 {
                     if (_isSettingHotkey)
-                        return LanguageConfig.Instance.PressKeyToSet.CustomFormat(Mathf.CeilToInt(_timer));
+                        return LanguageConfig.Instance.GetString("option.hotkey.press-key-to-set").CustomFormat(Mathf.CeilToInt(_timer));
                     return LanguageConfig.Instance.GetHandler("option.hotkey").GetString("button") + capturedIndex +
                            (ButtonHotkeyConfig.Instance.GetHotkeys().TryGetValue(capturedIndex, out var keyCode)
                                ? $": {keyCode}"

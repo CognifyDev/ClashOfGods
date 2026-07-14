@@ -26,7 +26,7 @@ internal static class GameOptionMenuPatch
         var num = -(__instance.scrollBar.ContentYBounds.max + mapPickerHeight);
         var header = Object.Instantiate(__instance.categoryHeaderOrigin, __instance.settingsContainer);
         header.SetHeader(StringNames.None, layer);
-        header.Title.text = LanguageConfig.Instance.GeneralHeaderTitle;
+        header.Title.text = LanguageConfig.Instance.GetString("game-setting.general.title");
         var transform = header.transform;
         transform.localScale = Vector3.one * headerOffset;
         transform.localPosition = new Vector3(headerX, num, -2f);

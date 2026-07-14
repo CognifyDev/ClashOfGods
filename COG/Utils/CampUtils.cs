@@ -22,11 +22,11 @@ public static class CampUtils
     {
         return campType switch
         {
-            CampType.Crewmate => LanguageConfig.Instance.CrewmateCampDescription,
-            CampType.Unknown => LanguageConfig.Instance.UnknownCampDescription,
-            CampType.Impostor => LanguageConfig.Instance.ImpostorCampDescription,
-            CampType.Neutral => LanguageConfig.Instance.NeutralCampDescription,
-            _ => LanguageConfig.Instance.UnknownCampDescription
+            CampType.Crewmate => LanguageConfig.Instance.GetString("camp.crewmate.description"),
+            CampType.Unknown => LanguageConfig.Instance.GetString("camp.unknown.description"),
+            CampType.Impostor => LanguageConfig.Instance.GetString("camp.impostor.description"),
+            CampType.Neutral => LanguageConfig.Instance.GetString("camp.neutral.description"),
+            _ => LanguageConfig.Instance.GetString("camp.unknown.description")
         };
     }
 
@@ -34,11 +34,11 @@ public static class CampUtils
     {
         return campType switch
         {
-            CampType.Crewmate => LanguageConfig.Instance.CrewmateCamp,
-            CampType.Unknown => LanguageConfig.Instance.UnknownCamp,
-            CampType.Impostor => LanguageConfig.Instance.ImpostorCamp,
-            CampType.Neutral => LanguageConfig.Instance.NeutralCamp,
-            _ => LanguageConfig.Instance.UnknownCamp
+            CampType.Crewmate => LanguageConfig.Instance.GetString("camp.crewmate.name"),
+            CampType.Unknown => LanguageConfig.Instance.GetString("camp.unknown.name"),
+            CampType.Impostor => LanguageConfig.Instance.GetString("camp.impostor.name"),
+            CampType.Neutral => LanguageConfig.Instance.GetString("camp.neutral.name"),
+            _ => LanguageConfig.Instance.GetString("camp.unknown.name")
         };
     }
 }

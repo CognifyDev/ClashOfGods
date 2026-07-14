@@ -61,15 +61,15 @@ public class Guesser : CustomRole, IListener, IMeetingButton
     public Guesser() : base(ColorUtils.FromColor32(192, 0, 0))
     {
         MaxGuessTime = CreateOption(
-            () => LanguageConfig.Instance.GuesserMaxGuessTime,
+            () => LanguageConfig.Instance.GetString("role.sub-roles.guesser.max-guess-time"),
             new FloatOptionValueRule(1, 1, 15, 3));
 
         GuessContinuously = CreateOption(
-            () => LanguageConfig.Instance.GuesserGuessContinuously,
+            () => LanguageConfig.Instance.GetString("role.sub-roles.guesser.guess-continuously"),
             new BoolOptionValueRule(true));
 
         EnabledRolesOnly = CreateOption(
-            () => LanguageConfig.Instance.GuesserGuessEnabledRolesOnly,
+            () => LanguageConfig.Instance.GetString("role.sub-roles.guesser.guess-enabled-roles-only"),
             new BoolOptionValueRule(true));
     }
 

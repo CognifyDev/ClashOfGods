@@ -15,7 +15,7 @@ public class LastPlayerCustomWinner : IWinnable
 
         data.WinnableCampType = lastPlayer!.GetMainRole().CampType;
         data.WinnablePlayers.AddRange(PlayerUtils.GetAllAlivePlayers().Select(p => p.Data));
-        data.WinText = LanguageConfig.Instance.NeutralsWinText.CustomFormat(lastPlayer!.Data.PlayerName);
+        data.WinText = LanguageConfig.Instance.GetString("game.end.winners.neutral").CustomFormat(lastPlayer!.Data.PlayerName);
         data.WinColor = lastPlayer.GetMainRole().Color;
         data.Winnable = true;
     }

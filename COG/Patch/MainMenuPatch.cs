@@ -28,11 +28,11 @@ public static class MainMenuPatch
         if (!template) return;
 
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.2f, 0.38f),
-            LanguageConfig.Instance.GitHub,
+            LanguageConfig.Instance.GetString("main-menu.github"),
             () => { Application.OpenURL("https://github.com/CognifyDev/ClashOfGods/"); }, Color.blue);
 
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.7f, 0.38f),
-            LanguageConfig.Instance.QQ,
+            LanguageConfig.Instance.GetString("main-menu.qq"),
             () =>
             {
                 Application.OpenURL(
@@ -40,16 +40,16 @@ public static class MainMenuPatch
             }, Color.cyan);
 
         CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f),
-            LanguageConfig.Instance.Discord, () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); },
+            LanguageConfig.Instance.GetString("main-menu.discord"), () => { Application.OpenURL("https://discord.gg/uWZGh4Chde"); },
             Color.gray);
 
         //if (!VersionInfo.Empty.Equals(ModUpdater.LatestVersion) || 
         //    (ModUpdater.LatestVersion != null && !ModUpdater.LatestVersion.IsNewerThan(Main.VersionInfo)))
         //    CreateButton(__instance, template, GameObject.Find("RightPanel")?.transform, new Vector2(0.45f, 0.38f / 2),
-        //        LanguageConfig.Instance.UpdateButtonString, () =>
+        //        LanguageConfig.Instance.GetString("main-menu.update-button-string"), () =>
         //        {
         //            var result = SystemUtils.OpenMessageBox(
-        //                LanguageConfig.Instance.FetchedString.CustomFormat(ModUpdater.LatestVersion!.ToString(),
+        //                LanguageConfig.Instance.GetString("main-menu.update.fetched").CustomFormat(ModUpdater.LatestVersion!.ToString(),
         //                    ModUpdater.LatestDescription), "Update COG",
         //                MessageBoxDialogue.OpenTypes.MB_ICONQUESTION | MessageBoxDialogue.OpenTypes.MB_YESNO);
 

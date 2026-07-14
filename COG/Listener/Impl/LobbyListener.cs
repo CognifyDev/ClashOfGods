@@ -21,7 +21,7 @@ public class LobbyListener : IListener
     public bool OnMakingGamePublic(GameStartManagerMakePublicEvent _)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
-        GameUtils.SendGameMessage(LanguageConfig.Instance.MakePublicMessage);
+        GameUtils.SendGameMessage(LanguageConfig.Instance.GetString("lobby.make-public-message"));
         return false;
     }
 }

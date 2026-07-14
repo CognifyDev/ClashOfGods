@@ -24,10 +24,10 @@ public class Stabber : CustomRole
         CanVent = true;
         CanSabotage = true;
 
-        _maxUseTime = CreateOption(() => LanguageConfig.Instance.MaxUseTime, new FloatOptionValueRule(1, 1, 15, 2));
+        _maxUseTime = CreateOption(() => LanguageConfig.Instance.GetString("role.global.max-use-time"), new FloatOptionValueRule(1, 1, 15, 2));
 
         _dispatchButton = CustomButton.Builder("stabber-dispatch", ResourceConstant.DispatchButton,
-                LanguageConfig.Instance.DispatchAction)
+                LanguageConfig.Instance.GetString("action.dispatch"))
             .OnClick(() =>
             {
                 _target!.RpcMurderAdvanced(new AdvancedKillOptions(true,

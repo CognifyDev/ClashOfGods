@@ -9,14 +9,14 @@ public static class GlobalCustomOptionConstant
     static GlobalCustomOptionConstant()
     {
         DebugMode = CustomOption.Of(CustomOption.TabType.General,
-            () => LanguageConfig.Instance.DebugMode, new BoolOptionValueRule(false)).Register();
+            () => LanguageConfig.Instance.GetString("game-setting.general.debug-mode"), new BoolOptionValueRule(false)).Register();
 
         MaxSubRoleNumber = CustomOption.Of(CustomOption.TabType.General,
-            () => LanguageConfig.Instance.MaxSubRoleNumber,
+            () => LanguageConfig.Instance.GetString("game-setting.general.max-sub-role-number"),
             new IntOptionValueRule(0, 1, 10, 1)).Register();
 
         MaxNeutralNumber = CustomOption.Of(CustomOption.TabType.General,
-            () => LanguageConfig.Instance.MaxNeutralNumber,
+            () => LanguageConfig.Instance.GetString("game-setting.general.max-neutral-number"),
             new IntOptionValueRule(0, 1, 10, 1)).Register();
     }
 
