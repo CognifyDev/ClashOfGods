@@ -50,7 +50,8 @@ public class RpcHandler : IRpcHandler
 
     public void PerformAndSend()
     {
-        Delegate.Combine(Perform, Send).DynamicInvoke();
+        Send();
+        Perform();
     }
 }
 
@@ -97,7 +98,8 @@ public class RpcHandler<T> : IRpcHandler where T : notnull
 
     public void PerformAndSend(T arg)
     {
-        Delegate.Combine(Perform, Send).DynamicInvoke(arg);
+        Send(arg);
+        Perform(arg);
     }
 }
 
@@ -148,7 +150,8 @@ public class RpcHandler<T1, T2> : IRpcHandler where T1 : notnull where T2 : notn
 
     public void PerformAndSend(T1 arg1, T2 arg2)
     {
-        Delegate.Combine(Perform, Send).DynamicInvoke(arg1, arg2);
+        Send(arg1, arg2);
+        Perform(arg1, arg2);
     }
 }
 
@@ -198,7 +201,8 @@ public class RpcHandler<T1, T2, T3> : IRpcHandler where T1 : notnull where T2 : 
 
     public void PerformAndSend(T1 arg1, T2 arg2, T3 arg3)
     {
-        Delegate.Combine(Perform, Send).DynamicInvoke(arg1, arg2, arg3);
+        Send(arg1, arg2, arg3);
+        Perform(arg1, arg2, arg3);
     }
 }
 
@@ -250,7 +254,8 @@ public class RpcHandler<T1, T2, T3, T4> : IRpcHandler
 
     public void PerformAndSend(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
     {
-        Delegate.Combine(Perform, Send).DynamicInvoke(arg1, arg2, arg3, arg4);
+        Send(arg1, arg2, arg3, arg4);
+        Perform(arg1, arg2, arg3, arg4);
     }
 }
 
@@ -306,7 +311,8 @@ public class RpcHandler<T1, T2, T3, T4, T5> : IRpcHandler where T1 : notnull
 
     public void PerformAndSend(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
     {
-        Delegate.Combine(Perform, Send).DynamicInvoke(arg1, arg2, arg3, arg4, arg5);
+        Send(arg1, arg2, arg3, arg4, arg5);
+        Perform(arg1, arg2, arg3, arg4, arg5);
     }
 }
 

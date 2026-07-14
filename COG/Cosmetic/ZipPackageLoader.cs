@@ -103,7 +103,8 @@ public sealed class ZipPackageLoader
             if      (full.StartsWith("Hats/",       StringComparison.OrdinalIgnoreCase)) sub = "Hats";
             else if (full.StartsWith("Visors/",     StringComparison.OrdinalIgnoreCase) ||
                      full.StartsWith("Visions/",    StringComparison.OrdinalIgnoreCase)) sub = "Visors";
-            else if (full.StartsWith("NamePlates/", StringComparison.OrdinalIgnoreCase)) sub = "NamePlates";
+            else if (full.StartsWith("NamePlates/", StringComparison.OrdinalIgnoreCase) ||
+                     full.StartsWith("Nameplates/", StringComparison.OrdinalIgnoreCase)) sub = "NamePlates";
 
             if (sub == null) continue;
 

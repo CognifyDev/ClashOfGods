@@ -29,36 +29,17 @@ internal class CoBeginPatch
     }
 }
 
-#if WINDOWS
 [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
-#elif ANDROID
-[HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.StartSFX))]
-[HarmonyPatch(typeof(FungleShipStatus), nameof(FungleShipStatus.StartSFX))]
-#endif
 internal class IntroDestroyPatch
 {
-    public static bool Prefix(
-#if WINDOWS
-        IntroCutscene __instance
-#endif
-    )
+    public static bool Prefix(IntroCutscene __instance)
     {
-#if ANDROID
-        var __instance = DestroyableSingleton<IntroCutscene>.Instance;
-#endif
         return ListenerManager.GetManager()
             .ExecuteHandlers(new IntroCutsceneDestroyEvent(__instance), EventHandlerType.Prefix);
     }
 
-    public static void Postfix(
-#if WINDOWS
-        IntroCutscene __instance
-#endif
-    )
+    public static void Postfix(IntroCutscene __instance)
     {
-#if ANDROID
-        var __instance = DestroyableSingleton<IntroCutscene>.Instance;
-#endif
         ListenerManager.GetManager()
             .ExecuteHandlers(new IntroCutsceneDestroyEvent(__instance), EventHandlerType.Postfix);
     }
@@ -78,7 +59,7 @@ internal class EndGamePatch
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
         var @event = new AmongUsClientGameEndEvent(__instance, endGameResult);
-        var result = ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Prefix);
+        ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Postfix);
         endGameResult = @event.GetEndGameResult();
     }
 }

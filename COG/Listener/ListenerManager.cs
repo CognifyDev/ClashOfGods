@@ -51,8 +51,7 @@ public class ListenerManager
     public Handler[] AsHandlers(IListener listener)
     {
         return (from methodInfo in listener.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public |
-                                                                 BindingFlags.NonPublic | BindingFlags.Static |
-                                                                 BindingFlags.DeclaredOnly)
+                                                                 BindingFlags.NonPublic | BindingFlags.Static)
             let attributes = methodInfo.GetCustomAttributes(typeof(EventHandlerAttribute), false)
             where attributes.Length >= 1
             let attribute = attributes[0] as EventHandlerAttribute

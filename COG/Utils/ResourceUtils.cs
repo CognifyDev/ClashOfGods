@@ -21,7 +21,7 @@ public static class ResourceUtils
     private static readonly Dictionary<string, byte[]> Cache = new();
     private static readonly Dictionary<string, Sprite> CachedSprites = new();
 
-    public const string CacheDataDir = "./" + ConfigBase.DataDirectoryName + "/cache";
+    public static string CacheDataDir { get; } = Path.Combine(ConfigBase.BasePath, "cache");
 
     public static bool ContainsResource(string path)
     {
@@ -152,9 +152,9 @@ public static class ResourceUtils
         
         foreach (var filePath in Directory.GetFiles(CacheDataDir, "*.*", SearchOption.AllDirectories))
         {
-            var path = filePath.Replace(CacheDataDir + "\\", "").Replace("\\", "/");
+            var path = filePath.Replace(CacheDataDir + Path.DirectorySeparatorChar, "").Replace("\\", "/");
             var bytes = File.ReadAllBytes(filePath);
-            Cache.Add(path, bytes);
+            Cache[path] = bytes;
         }
     }
     public static string GetFileSHA1(string filePath)
@@ -180,25 +180,22 @@ public static class ResourceUtils
         if (!isURL)
             if (Cache.TryGetValue(path, out var bytes))
                 return bytes;
-        
+
         var targetURL = isURL ? path : $"{TargetURL}{path}";
-        
-        var result = Task.Run(async () =>
+
+        try
         {
-            using var httpClient = new HttpClient();
+            using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
             Main.Logger.LogInfo("Downloading needed file from: " + targetURL);
-            try
-            {
-                return await httpClient.GetByteArrayAsync(targetURL);
-            }
-            catch
-            {
-                Main.Logger.LogError("Failed to download target file.");
-                return [];
-            }
-        }).Result;
-        
-        if (!isURL) Cache.Add(path, result);
-        return result;
+            var result = httpClient.GetByteArrayAsync(targetURL).GetAwaiter().GetResult();
+
+            if (!isURL) Cache[path] = result;
+            return result;
+        }
+        catch (System.Exception ex)
+        {
+            Main.Logger.LogError($"Failed to download target file: {ex.Message}");
+            return [];
+        }
     }
 }

@@ -1,13 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using BepInEx;
 using COG.Utils;
+using UnityEngine;
 
 namespace COG.Config;
 
 public class ConfigBase
 {
     public const string DataDirectoryName = $"{Main.DisplayName}_DATA";
+
+    public static string BasePath { get; } = OperatingSystem.IsAndroid()
+        ? System.IO.Path.Combine(Application.persistentDataPath, DataDirectoryName)
+        : System.IO.Path.Combine(Paths.GameRootPath, DataDirectoryName);
 
     public ConfigBase(string name, string path, string text, bool replace = false)
     {
@@ -49,15 +56,15 @@ public class ConfigBase
 
     public void LoadConfigs(bool replace = false)
     {
-        if (!Directory.Exists(DataDirectoryName)) Directory.CreateDirectory(DataDirectoryName);
+        if (!Directory.Exists(BasePath)) Directory.CreateDirectory(BasePath);
 
         if (File.Exists(Path) && (replace || AutoReplace))
-            File.Copy(Path, Path + ".old", true); // Backup
+            File.Copy(Path, Path + $".old.{DateTime.Now:yyyyMMdd_HHmmss}", true);
 
         if (!File.Exists(Path) || replace || AutoReplace)
-            File.WriteAllText(Path, Text, Encoding.UTF8); // Auto overwrite
+            File.WriteAllText(Path, Text, Encoding.UTF8);
         else
-            Text = File.ReadAllText(Path, Encoding.UTF8); // Replace variable from disk
+            Text = File.ReadAllText(Path, Encoding.UTF8);
 
         YamlReader = Yaml.LoadFromString(Text);
         AutoReplace = false;

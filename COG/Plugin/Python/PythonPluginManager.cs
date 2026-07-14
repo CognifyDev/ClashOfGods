@@ -25,19 +25,28 @@ public class PythonPluginManager : IPluginManager
         
         _sharedEngine = IronPython.Hosting.Python.CreateEngine();
         
-        if (Directory.Exists(_runtimeCacheFolder))
-            Directory.Delete(_runtimeCacheFolder, true);
+        try
+        {
+            if (Directory.Exists(_runtimeCacheFolder))
+                Directory.Delete(_runtimeCacheFolder, true);
+        }
+        catch (Exception ex)
+        {
+            Main.Logger.LogWarning($"[PluginManager] Failed to clean runtime cache: {ex.Message}. Attempting to continue...");
+        }
         Directory.CreateDirectory(_runtimeCacheFolder);
     }
     
     public void LoadAllPlugins()
     {
-        var zipFiles = Directory.GetFiles(_pluginsFolder, "*.ca");
+        var zipFiles = Directory.GetFiles(_pluginsFolder, "*.ca")
+            .Concat(Directory.GetFiles(_pluginsFolder, "*.zip"))
+            .Distinct()
+            .ToList();
         var unsortedDescriptions = new List<PluginInfoContainer>();
-        
-        Main.Logger.LogInfo($"Found {zipFiles.Length} plugins(s) to load.");
 
-        // 1. scan & read
+        Main.Logger.LogInfo($"Found {zipFiles.Count} plugins(s) to load.");
+
         foreach (var zipPath in zipFiles)
         {
             try
@@ -70,11 +79,11 @@ public class PythonPluginManager : IPluginManager
         }
     }
 
-    private record PluginInfoContainer(PluginDescription Description, string RootPath);
+    private record PluginInfoContainer(PluginDescription Description, string RootPath, ZipArchive Archive);
 
     private PluginInfoContainer PreparePlugin(string zipPath)
     {
-        using var archive = ZipFile.OpenRead(zipPath);
+        var archive = ZipFile.OpenRead(zipPath);
         var yamlEntry = archive.GetEntry("plugin.yml") ?? throw new FileNotFoundException("plugin.yml missing in zip");
 
         PluginDescription desc;
@@ -82,28 +91,45 @@ public class PythonPluginManager : IPluginManager
         using (var reader = new StreamReader(stream))
         {
             var yamlContent = reader.ReadToEnd();
-            var yaml = Yaml.LoadFromString(yamlContent); 
+            var yaml = Yaml.LoadFromString(yamlContent);
             desc = PluginDescription.FromYaml(yaml);
         }
-        
+
         if (VersionInfo.Parse(desc.ApiVersion).IsNewerThan(Main.VersionInfo))
         {
+            archive.Dispose();
             throw new Exception($"Plugin {desc.Name} is invented for a higher version of COG, please update your COG!");
         }
 
-        // runtime path：plugins/runtime_cache/PluginName
         var pluginRuntimePath = Path.Combine(_runtimeCacheFolder, desc.Name);
 
-        // if the directory has already existed, then delete the older one
         if (Directory.Exists(pluginRuntimePath))
         {
             Directory.Delete(pluginRuntimePath, true);
         }
-    
-        // unzip all files
-        archive.ExtractToDirectory(pluginRuntimePath);
 
-        return new PluginInfoContainer(desc, pluginRuntimePath);
+        foreach (var entry in archive.Entries)
+        {
+            if (string.IsNullOrEmpty(entry.Name)) continue;
+
+            var destPath = Path.GetFullPath(Path.Combine(pluginRuntimePath, entry.FullName));
+            var pluginRuntimeFull = Path.GetFullPath(pluginRuntimePath);
+
+            if (!destPath.StartsWith(pluginRuntimeFull + Path.DirectorySeparatorChar)
+                && destPath != pluginRuntimeFull)
+            {
+                Main.Logger.LogWarning($"[PluginManager] Skipping entry with suspicious path: {entry.FullName}");
+                continue;
+            }
+
+            var destDir = Path.GetDirectoryName(destPath);
+            if (destDir != null && !Directory.Exists(destDir))
+                Directory.CreateDirectory(destDir);
+
+            entry.ExtractToFile(destPath, overwrite: true);
+        }
+
+        return new PluginInfoContainer(desc, pluginRuntimePath, archive);
     }
 
     private void LoadPluginFromContainer(PluginInfoContainer container)
@@ -111,22 +137,26 @@ public class PythonPluginManager : IPluginManager
         var desc = container.Description;
         Main.Logger.LogInfo($"Loading plugin {desc.Name} {desc.Version}...");
 
+        var resourceIO = new PluginResourceIO(desc.Name, container.Archive);
+
         var scriptsPath = Path.Combine(container.RootPath, "scripts");
         if (!Directory.Exists(scriptsPath))
         {
             Main.Logger.LogInfo($"Plugin {desc.Name} has no 'scripts' folder.");
+            var pluginNoScripts = new Plugin(desc, null!, resourceIO);
+            _loadedPlugins[desc.Name] = pluginNoScripts;
             return;
         }
-        
-        var handler = new PythonPluginHandler(_sharedEngine, scriptsPath, desc.Main);
-        
+
+        var handler = new PythonPluginHandler(_sharedEngine, scriptsPath, desc.Main, resourceIO);
+
         handler.LoadMainScript();
-        
-        var plugin = new Plugin(desc, handler);
+
+        var plugin = new Plugin(desc, handler, resourceIO);
         _loadedPlugins[desc.Name] = plugin;
-        
+
         handler.OnInitialize();
-        
+
         Main.Logger.LogInfo($"Plugin {desc.Name} loaded.");
     }
     

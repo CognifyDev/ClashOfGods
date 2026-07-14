@@ -12,6 +12,8 @@ internal class RPCHandlerPatch
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] byte callId,
         [HarmonyArgument(1)] MessageReader reader)
     {
+        if (reader == null) return;
+
         var name = "";
         if (Enum.IsDefined((RpcCalls)callId))
             name = ((RpcCalls)callId).ToString();

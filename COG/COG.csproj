@@ -4,7 +4,7 @@
         <LangVersion>latest</LangVersion>
         <DebugType>embedded</DebugType>
 
-        <Description>An epoch-making Among Us mod with a plugin system that allows you to make your own plugin by EASY computer language JavaScript</Description>
+        <Description>An epoch-making Among Us mod with a plugin system that allows you to make your own plugin by Python</Description>
         <Authors>CognifyDev</Authors>
         <Nullable>enable</Nullable>
         <AssemblyName>ClashOfGods</AssemblyName>
@@ -24,6 +24,7 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Resources\Configs\*.*" />
+    <EmbeddedResource Include="Resources\Images\*.*" />
     </ItemGroup>
 
     <ItemGroup>

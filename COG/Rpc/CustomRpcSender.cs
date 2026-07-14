@@ -152,12 +152,17 @@ public sealed class CustomRpcSender
 
         AssertState(State.Ready, nameof(SendMessage));
 
-        AmongUsClient.Instance.SendOrDisconnect(Stream);
-        OnSendDelegate?.Invoke();
-        _currentState = State.Finished;
-
-        Main.Logger.LogInfo($"[CustomRpcSender] \"{Name}\" finished.");
-        Stream.Recycle();
+        try
+        {
+            AmongUsClient.Instance.SendOrDisconnect(Stream);
+            OnSendDelegate?.Invoke();
+            _currentState = State.Finished;
+            Main.Logger.LogInfo($"[CustomRpcSender] \"{Name}\" finished.");
+        }
+        finally
+        {
+            Stream.Recycle();
+        }
     }
 
     public CustomRpcSender Write(float   val) => WriteInternal(w => w.Write(val));

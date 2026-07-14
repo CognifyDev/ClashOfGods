@@ -105,12 +105,12 @@ public class CustomRole
         if (ShowInOptions)
         {
             // Actually name here is useless for new option
-            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.MaxNumMessage,
+            RoleNumberOption = CreateOption(() => LanguageConfig.Instance.GetString("role.global.max-num"),
                 new IntOptionValueRule(0, 1, 15, 0));
             RoleChanceOption = CreateOption(() => "Chance",
                 new IntOptionValueRule(0, 10, 100, 0));
 
-            RoleCode = CreateOption(() => LanguageConfig.Instance.RoleCode,
+            RoleCode = CreateOption(() => LanguageConfig.Instance.GetString("role.global.role-code"),
                 new StringOptionValueRule(0, _ => Id.ToString().ToSingleElementArray()));
         }
     }
@@ -128,7 +128,7 @@ public class CustomRole
     /// <summary>
     ///     角色的名称
     /// </summary>
-    public string Name { get; }
+    public string Name { get; protected set; }
 
     /// <summary>
     ///     是否是基本职业
@@ -282,7 +282,7 @@ public class CustomRole
         var campName = IsSubRole ? "sub-roles" : CampType.ToString().ToLower();
         var location = $"role.{campName}.{GetNameInConfig()}.{context}";
         var toReturn = LanguageConfig.Instance.YamlReader!.GetString(location);
-        return toReturn ?? LanguageConfig.Instance.NoMoreDescription;
+        return toReturn ?? LanguageConfig.Instance.GetString("role.global.no-details");
     }
 
     /// <summary>
@@ -373,7 +373,7 @@ public class CustomRole
         foreach (var subRole in player.GetSubRoles())
             sb.Append(' ').Append(subRole.GetColorName());
 
-        return LanguageConfig.Instance.DefaultEjectText.CustomFormat(player.PlayerName, sb.ToString());
+        return LanguageConfig.Instance.GetString("game.exile.default").CustomFormat(player.PlayerName, sb.ToString());
     }
 
     public virtual string HandleAdditionalPlayerName(PlayerControl player)

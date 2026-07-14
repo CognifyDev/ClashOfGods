@@ -53,6 +53,9 @@ internal sealed class AdvancedFileDownloader
             
             if (!await ValidateFileSizeAsync(fileUrl, tempFilePath))
             {
+                Main.Logger.LogError($"Downloaded file size mismatch for '{fileName}'. File may be corrupted.");
+                try { File.Delete(tempFilePath); } catch { /* ignored */ }
+                return false;
             }
 
             MoveFile(tempFilePath, targetFilePath);

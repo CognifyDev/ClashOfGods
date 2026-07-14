@@ -39,19 +39,21 @@ internal class PlayerKillPatch
     [HarmonyPrefix]
     public static bool CheckMurderPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
-        var executeOrigin = ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerMurderEvent(__instance, target, null), EventHandlerType.Prefix);
-
         if (!target)
         {
             Main.Logger.LogError("Bad kill check with null target (target quitted game?)");
             return false;
         }
 
-        if (executeOrigin)
-            __instance.RpcMurderPlayer(target, true);
+        var executeOrigin = ListenerManager.GetManager()
+            .ExecuteHandlers(new PlayerMurderEvent(__instance, target, null), EventHandlerType.Prefix);
 
-        return false; // Always skip vanilla kill check
+        if (!executeOrigin) return false;
+
+        var canKill = __instance.GetMainRole() is { CanKill: true };
+        if (canKill) __instance.RpcMurderPlayer(target, true);
+
+        return false;
     }
 
 
