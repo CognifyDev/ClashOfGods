@@ -1,3 +1,4 @@
+#if WINDOWS
 #pragma warning disable SYSLIB0014
 using System.Diagnostics;
 using System.IO;
@@ -6,9 +7,6 @@ using COG.Utils.Version;
 
 namespace COG.Utils;
 
-/// <summary>
-///     模组更新类
-/// </summary>
 public static class ModUpdater
 {
     public static VersionInfo LatestVersion { get; private set; } = VersionInfo.Empty;
@@ -21,18 +19,9 @@ public static class ModUpdater
 
         try
         {
-            //var webText = WebUtils.GetWeb("https://api.github.com/repos/CognifyDev/ClashOfGods/releases/latest");
-            //var jsonObject =
-            //    JObject.Parse(webText);
-            //var tagNameToken = jsonObject["tag_name"];
-            //var tagBodyToken = jsonObject["body"];
-
-            //if (tagNameToken is { Type: JTokenType.String }) latestVersionString = tagNameToken.ToString();
-            //if (tagBodyToken is { Type: JTokenType.String }) description = tagBodyToken.ToString();
         }
         catch
         {
-            // ignored
         }
 
         LatestVersion = latestVersionString == null
@@ -76,3 +65,4 @@ public static class ModUpdater
         Process.Start("BepInEx/plugins/do.vbs");
     }
 }
+#endif

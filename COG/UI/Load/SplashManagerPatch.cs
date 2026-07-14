@@ -8,7 +8,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
+#if WINDOWS
 using COG.Asset.Dependence;
+#endif
 using COG.Command;
 using COG.Command.Impl;
 using COG.Config;
@@ -20,7 +22,6 @@ using COG.Game.CustomWinner.Winnable;
 using COG.Listener;
 using COG.Listener.Impl;
 using COG.Plugin;
-using COG.Plugin.Python;
 using COG.Role;
 using COG.Role.Impl;
 using COG.Role.Impl.Crewmate;
@@ -143,15 +144,19 @@ public static class SplashManagerPatch
     
     private static IEnumerator CoLoadMod_StepDownloadDependencies()
     {
+#if WINDOWS
         yield return DependenceDownloader.DownloadYaml();
-        yield return ChangeLoadingText(LanguageConfig.Instance.LoadingDependencies, 0.3f);
+        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-depends"), 0.3f);
         yield return DependenceDownloader.DownloadCommonDependence();
+#else
+        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-depends"), 0.3f);
+#endif
         yield return new WaitForSeconds(0.3f);
     }
 
     private static IEnumerator CoLoadMod_StepDownloadImages()
     {
-        yield return ChangeLoadingText(LanguageConfig.Instance.LoadingVerify, 0.5f);
+        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-verify"), 0.5f);
         
         byte[] fileListBytes = null!;
         yield return Task.Run(async () =>
@@ -211,7 +216,7 @@ public static class SplashManagerPatch
             if (needsDownload)
             {
                 processedFiles++;
-                LoadingText = $"{LanguageConfig.Instance.LoadingResources} ({processedFiles}/{totalFiles})";
+                LoadingText = $"{LanguageConfig.Instance.GetString("load.load-res")} ({processedFiles}/{totalFiles})";
 
                 string remoteFileUrl = $"{ResourceUtils.TargetURL}{relativeFilePath}";
                 Main.Logger.LogInfo($"Downloading: {relativeFilePath}");
@@ -253,7 +258,7 @@ public static class SplashManagerPatch
 
     private static IEnumerator CoLoadMod_StepListeners()
     {
-        yield return ChangeLoadingText(LanguageConfig.Instance.LoadingListeners, 0.3f);
+        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-listeners"), 0.3f);
         try
         {
             ListenerManager.GetManager().RegisterListeners([
@@ -279,11 +284,9 @@ public static class SplashManagerPatch
         yield return new WaitForSeconds(0.3f);
     }
 
-    public static IPluginManager PluginManager { get; private set; } = null!;
-
     private static IEnumerator CoLoadMod_StepDatas()
     {
-        yield return ChangeLoadingText(LanguageConfig.Instance.LoadingDatas, 0.3f);
+        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-datas"), 0.3f);
         try
         {
             //热键
@@ -328,14 +331,10 @@ public static class SplashManagerPatch
                 new ImpostorsCustomWinner(),
                 new LastPlayerCustomWinner()
             ]);
-            //插件
-            if (SettingsConfig.Instance.EnablePluginSystem)
+                if (SettingsConfig.Instance.EnablePluginSystem)
             {
-                var pluginDir = Path.Combine(ConfigBase.DataDirectoryName, "plugins");
-                if (!Directory.Exists(pluginDir)) Directory.CreateDirectory(pluginDir);
                 Main.Logger.LogInfo("Initializing Plugin System...");
-                PluginManager = new PythonPluginManager(pluginDir);
-                try { PluginManager.LoadAllPlugins(); }
+                try { ResourcesManager.CheckForResources(); }
                 catch (System.Exception ex) { Main.Logger.LogError($"Critical error loading plugins: {ex}"); }
             }
         }
@@ -348,7 +347,7 @@ public static class SplashManagerPatch
 
     private static IEnumerator CoLoadMod_StepCosmetics()
     {
-        yield return ChangeLoadingText(LanguageConfig.Instance.LoadingCosmetics, 0.3f);
+        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-cosmetics"), 0.3f);
 
         try
         {
@@ -366,7 +365,7 @@ public static class SplashManagerPatch
     private static IEnumerator CoLoadMod_StepCompleted()
     {
         yield return new WaitForSeconds(0.5f);
-        yield return ChangeLoadingText(LanguageConfig.Instance.LoadingCompeleted, 0.3f);
+        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-compeleted"), 0.3f);
         yield return new WaitForSeconds(0.5f);
     }
 
@@ -398,7 +397,7 @@ public static class SplashManagerPatch
 
     public static IEnumerator ChangeLoadingText(string newText, float duration)
     {
-        if (LoadText.text == LanguageConfig.Instance.Loading)
+        if (LoadText.text == LanguageConfig.Instance.GetString("load.loading"))
         {
             LoadText.text = newText;
             yield break;

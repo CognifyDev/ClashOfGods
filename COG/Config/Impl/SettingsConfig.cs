@@ -10,7 +10,7 @@ public class SettingsConfig : ConfigBase
     }
 
     public SettingsConfig() : base("Settings",
-        DataDirectoryName + "/settings.yml",
+        BasePath + "/settings.yml",
         new ResourceFile("COG.Resources.Configs.settings.yml"))
     {
         EnablePluginSystem = YamlReader!.GetBool("plugin.enable")!.Value;

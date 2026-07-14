@@ -21,7 +21,7 @@ public class ButtonHotkeyConfig : ConfigBase
         Instance = new ButtonHotkeyConfig();
     }
 
-    public ButtonHotkeyConfig() : base("Hotkeys", DataDirectoryName + "/hotkeys.yml")
+    public ButtonHotkeyConfig() : base("Hotkeys", BasePath + "/hotkeys.yml")
     {
         if (Text.IsNullOrEmptyOrWhiteSpace()) return;
         ApplyConfigsFromFile();

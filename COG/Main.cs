@@ -3,6 +3,7 @@ global using Hazel;
 global using GitInfo = ThisAssembly.Git;
 global using Object = UnityEngine.Object;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,6 +29,7 @@ using UnityEngine.SceneManagement;
 using System.Reflection;
 using COG.UI.Load;
 using COG.Cosmetics.Unity;
+using COG.Plugin;
 
 
 #if WINDOWS
@@ -80,7 +82,7 @@ public partial class Main : BasePlugin
 
         try
         {
-            storagedInfo = File.ReadAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat");
+            storagedInfo = File.ReadAllText(Path.Combine(ConfigBase.BasePath, "VersionInfo.dat"));
         }
         catch
         {
@@ -99,12 +101,12 @@ public partial class Main : BasePlugin
         }
 
 
-        if (!Directory.Exists(ConfigBase.DataDirectoryName))
+        if (!Directory.Exists(ConfigBase.BasePath))
         {
-            Directory.CreateDirectory(ConfigBase.DataDirectoryName);
+            Directory.CreateDirectory(ConfigBase.BasePath);
         }
-        
-        File.WriteAllText(@$".\{ConfigBase.DataDirectoryName}\VersionInfo.dat", longVersionInfo);
+
+        File.WriteAllText(Path.Combine(ConfigBase.BasePath, "VersionInfo.dat"), longVersionInfo);
 
         /*
         ModUpdater.FetchUpdate();
@@ -122,12 +124,12 @@ public partial class Main : BasePlugin
                     DestroyableSingleton<OptionsMenuBehaviour>.Instance.Close();
                     if (GameStates.InRealGame || GameStates.InLobby)
                     {
-                        GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModInGameErrorMsg);
+                        GameUtils.Popup?.Show(LanguageConfig.Instance.GetString("option.main.unload-mod.error-in-game"));
                         return false;
                     }
 
                     Unload();
-                    GameUtils.Popup?.Show(LanguageConfig.Instance.UnloadModSuccessfulMessage);
+                    GameUtils.Popup?.Show(LanguageConfig.Instance.GetString("option.main.unload-mod.success"));
                     return false;
                 }),
 #if WINDOWS
@@ -144,8 +146,7 @@ public partial class Main : BasePlugin
 
                     var openFileDialog = new OpenFileDialog();
                     openFileDialog.DefaultExt = "yml";
-                    openFileDialog.InitialDirectory =
-                        @$"{Directory.GetCurrentDirectory()}\{ConfigBase.DataDirectoryName}";
+                    openFileDialog.InitialDirectory = ConfigBase.BasePath;
                     if (openFileDialog.ShowDialog() != DialogResult.OK)
                         return false;
 
@@ -202,7 +203,11 @@ public partial class Main : BasePlugin
     {
         if (SettingsConfig.Instance.EnablePluginSystem)
         {
-            SplashManagerPatch.PluginManager.DisableAllPlugins();
+            var plugins = ResourcesManager.AllResources.Values
+                .Where(r => r.ResourceType == ResourceType.Plugin && r.Status == ResourceLoadStatus.Loaded)
+                .ToList();
+            foreach (var p in plugins)
+                ResourcesManager.UnloadResource(p.ResourceId);
         }
 
         // 卸载插件时候，卸载一切东西

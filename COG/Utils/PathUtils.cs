@@ -6,12 +6,13 @@ namespace COG.Utils;
 
 public static class PathUtils
 {
+#if WINDOWS
     public static string? GetAmongUsPath(string additionPath = "")
     {
         var processes = Process.GetProcessesByName("Among Us");
         if (processes.Length == 0)
         {
-            Main.Logger.LogError("Could not find the Among Us Process!”Among Us");
+            Main.Logger.LogError("Could not find the Among Us Process!");
             return null;
         }
 
@@ -23,7 +24,7 @@ public static class PathUtils
                 Main.Logger.LogError("Could not get the main module of the Among Us process");
                 return null;
             }
-            
+
             var exePath = process.MainModule.FileName;
             var exeDir = Path.GetDirectoryName(exePath);
             if (exeDir == null)
@@ -31,7 +32,7 @@ public static class PathUtils
                 Main.Logger.LogError("Could not get the directory name from the Among Us executable path");
                 return null;
             }
-            
+
             var storageDir = Path.Combine(exeDir, additionPath);
             return storageDir;
         }
@@ -41,6 +42,7 @@ public static class PathUtils
             return null;
         }
     }
+#endif
     public static void CopyResourcesToDisk(string targetDirectory, string embeddedDirectory, bool overwrite = true)
     {
         var assembly = Assembly.GetExecutingAssembly();
@@ -53,7 +55,7 @@ public static class PathUtils
                 var relativePath = resourceName.Substring(FilePatch.Length);
                 var targetPath = Path.Combine(targetDirectory, relativePath);
                 var directoryPath = Path.GetDirectoryName(targetPath);
-                
+
                 if (directoryPath != null)
                 {
                     Directory.CreateDirectory(directoryPath);
