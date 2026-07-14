@@ -66,6 +66,7 @@ public class RpcCommand : CommandBase
                                     """)
                         .Append("""
                                 /rpc start %callId%
+                                /rpc length %byteSize% [callId]
                                 /rpc send
                                 /rpc close
                                 """);
@@ -170,6 +171,36 @@ public class RpcCommand : CommandBase
                     }
 
                     GameUtils.SendSystemMessage("写入成功！");
+                    break;
+                }
+                case "length":
+                {
+                    if (!int.TryParse(args[1], out var byteSize) || byteSize <= 0)
+                    {
+                        GameUtils.SendSystemMessage("请输入有效的字节大小（正整数）。\n用法：/rpc length <byte大小> [callId]");
+                        break;
+                    }
+
+                    byte callId = 0;
+                    if (args.Length > 2)
+                    {
+                        if (int.TryParse(args[2], out var parsedId))
+                            callId = (byte)parsedId;
+                        else if (Enum.TryParse<RpcCalls>(args[2], true, out var vanillaRpc))
+                            callId = (byte)vanillaRpc;
+                        else if (Enum.TryParse<KnownRpc>(args[2], false, out var modRpc))
+                            callId = (byte)modRpc;
+                        else
+                            GameUtils.SendSystemMessage("无法解析callId，将使用默认值。");
+                    }
+
+                    var lengthWriter = player.StartRpcImmediately(callId);
+                    var payload = new byte[byteSize];
+                    new System.Random().NextBytes(payload);
+                    lengthWriter.WriteBytesAndSize(payload);
+                    lengthWriter.Finish();
+
+                    GameUtils.SendSystemMessage($"已发送 {byteSize} 字节的RPC消息（callId: {(byte)callId}）。");
                     break;
                 }
                 case "send":
