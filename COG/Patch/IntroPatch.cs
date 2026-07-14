@@ -13,11 +13,11 @@ internal class SetUpRoleTextPatch
 {
     public static void Postfix(
 #if WINDOWS
-        IntroCutscene._ShowRole_d__41
+        IntroCutscene._ShowRole_d__41 __instance
 #elif ANDROID
-        IntroCutscene._ShowRole_d__40
+        IntroCutscene._ShowRole_d__40 __instance
 #endif
-            __instance)
+    )
     {
         var @event = new IntroCutsceneShowRoleEvent(__instance.__4__this);
         ListenerManager.GetManager().ExecuteHandlers(@event, EventHandlerType.Postfix);

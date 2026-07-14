@@ -3,3 +3,5 @@
   time-zone: "default"
   culture: "default"
   strict: true
+marketplace:
+  server-url: "http://localhost:8080"

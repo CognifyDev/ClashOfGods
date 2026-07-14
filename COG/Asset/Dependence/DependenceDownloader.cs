@@ -20,12 +20,12 @@ public static class DependenceDownloader
 
     public static IEnumerator DownloadCommonDependence()
     {
-        yield return AdvancedExampleCoroutine("https://github.com/CognifyDev/ClashOfGods/raw/refs/heads/main/Dependencies/Acornima.dll", Path.Combine(Paths.GameRootPath, "BepInEx", "core"));
+        yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/Acornima.dll", Path.Combine(Paths.GameRootPath, "BepInEx", "core"));
     }
 
     public static IEnumerator DownloadYaml()
     {
-        yield return AdvancedExampleCoroutine("https://github.com/CognifyDev/ClashOfGods/raw/refs/heads/main/Dependencies/YamlDotNet.dll", Path.Combine(Paths.GameRootPath, "BepInEx", "core"));
+        yield return AdvancedExampleCoroutine("https://cog.amongusclub.cn/Dependence/YamlDotNet.dll", Path.Combine(Paths.GameRootPath, "BepInEx", "core"));
     }
 
     private static IEnumerator AdvancedExampleCoroutine(string targetFile, string targetPath)
