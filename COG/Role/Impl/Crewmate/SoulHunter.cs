@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Linq;
 using COG.Config.Impl;
+using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -16,7 +18,7 @@ public class SoulHunter : COG.Role.Camp.CrewmateRole
 
     private Vector2? _position;
 
-    public SoulHunter()
+    public SoulHunter() : base(Color.green)
     {
         ReviveAfter = CreateOption(() => LanguageConfig.Instance.GetString("role.crewmate.soul-hunter.revive-after"),
             new FloatOptionValueRule(1F, 1F, 60F, 5F, NumberSuffixes.Seconds));
@@ -40,6 +42,7 @@ public class SoulHunter : COG.Role.Camp.CrewmateRole
         _position = null;
     }
 
+    [LocalOnly]
     private void OnPlayerMurder(PlayerMurderEvent @event)
     {
         var target = @event.Target;

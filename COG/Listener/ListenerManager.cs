@@ -147,8 +147,9 @@ public class ListenerManager
         }
 
         // Dispatch to roles that subscribed via On<T>() delegates
-        if (type != EventHandlerType.Prefix)
-            DispatchToRoleDelegates(@event);
+        // For Prefix events: On<T>() handlers receive the event but cannot cancel (void return).
+        // For prefix cancellation, use IListener with [EventHandler(EventHandlerType.Prefix)].
+        DispatchToRoleDelegates(@event);
 
         return toReturn;
     }

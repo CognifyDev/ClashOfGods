@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using COG.Constant;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
 using COG.UI.CustomOption;
@@ -21,7 +22,7 @@ public class Enchanter : COG.Role.Camp.CrewmateRole
     private PlayerControl? _target;
     private bool _usedThisRound;
 
-    public Enchanter()
+    public Enchanter() : base(ColorUtils.AsColor("#7030a0"))
     {
         ContractButton = CustomButton.Builder("enchanter-contract",
                 ResourceConstant.ContractButton, ActionNameContext.GetString("contract"))
@@ -93,6 +94,7 @@ public class Enchanter : COG.Role.Camp.CrewmateRole
     public CustomOption CooldownIncreament { get; }
     public RpcHandler<PlayerControl> KillerPunishmentHandler { get; }
 
+    [LocalOnly]
     private void OnPlayerMurder(PlayerMurderEvent @event)
     {
         if (!_contractedPlayer) return;

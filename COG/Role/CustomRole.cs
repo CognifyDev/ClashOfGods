@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.Events;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Game.Record;
 using COG.Rpc;
 using COG.Rpc.Role;
@@ -478,15 +480,18 @@ public class CustomRole
 
     /// <summary>
     /// Raise an event to all subscribed handlers. Called by ListenerManager.
-    /// Only fires for the local player's roles.
+    /// Handlers decorated with [LocalOnly] only fire for the local player's role.
     /// </summary>
     internal void RaiseEvent<T>(T @event) where T : COG.Listener.Event.Event
     {
-        if (!IsLocalPlayerRole()) return;
         if (_eventHandlers.TryGetValue(typeof(T), out var handlers))
         {
             foreach (var handler in handlers.ToArray())
+            {
+                if (handler.Method.GetCustomAttribute<LocalOnlyAttribute>() != null && !IsLocalPlayerRole())
+                    continue;
                 ((Action<T>)handler)(@event);
+            }
         }
     }
 

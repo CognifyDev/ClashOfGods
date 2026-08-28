@@ -1,4 +1,6 @@
 using COG.Config.Impl;
+using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl;
 using COG.Listener.Event.Impl.Game;
 using COG.UI.CustomOption;
@@ -19,6 +21,7 @@ public class SpeedBooster : CustomRole
 
     private CustomOption IncreasingSpeed { get; }
 
+    [LocalOnly]
     private void OnGameStart(GameStartEvent @event)
     {
         var player = PlayerControl.LocalPlayer;

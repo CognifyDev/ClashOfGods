@@ -22,7 +22,7 @@ public class Witch : COG.Role.Camp.CrewmateRole
     private DeadBody? _current;
     private int _remainingUses = 1;
 
-    public Witch()
+    public Witch() : base(ColorUtils.AsColor("#773ba4"))
     {
         _antidoteHandler = new RpcHandler<byte>(KnownRpc.WitchUsesAntidote,
             playerId =>

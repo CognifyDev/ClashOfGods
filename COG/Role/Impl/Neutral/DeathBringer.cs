@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -62,6 +63,7 @@ public class DeathBringer : COG.Role.Camp.NeutralRole
         On<PlayerReportDeadBodyEvent>(OnHostCheckPlayerReport);
     }
 
+    [LocalOnly]
     private void OnHostCheckPlayerReport(PlayerReportDeadBodyEvent _)
     {
         foreach (var target in _staredPlayers)

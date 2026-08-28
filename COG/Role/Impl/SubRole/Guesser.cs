@@ -1,6 +1,8 @@
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
+using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -74,6 +76,7 @@ public class Guesser : CustomRole, IMeetingButton
         On<MeetingVotingCompleteEvent>(OnVotingComplete);
     }
 
+    [LocalOnly]
     private void OnMeetingStart(MeetingStartEvent @event)
     {
         var player = PlayerControl.LocalPlayer;

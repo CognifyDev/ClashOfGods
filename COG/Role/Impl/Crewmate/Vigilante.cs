@@ -14,7 +14,7 @@ public class Vigilante : COG.Role.Camp.CrewmateRole
     private readonly CustomOption _minCrewmateNumber;
     private bool _hasGiven;
 
-    public Vigilante()
+    public Vigilante() : base(ColorUtils.AsColor("#ffcc00"))
     {
         CanKill = true;
 
@@ -33,6 +33,7 @@ public class Vigilante : COG.Role.Camp.CrewmateRole
         _hasGiven = false;
     }
 
+    [LocalOnly]
     private void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
         if (!GameStates.InRealGame) return;

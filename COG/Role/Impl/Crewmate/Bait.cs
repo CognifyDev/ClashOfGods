@@ -12,7 +12,7 @@ namespace COG.Role.Impl.Crewmate;
 
 public class Bait : COG.Role.Camp.CrewmateRole
 {
-    public Bait()
+    public Bait() : base(ColorUtils.AsColor("#00F7FF"))
     {
         KillerSelfReportDelay = CreateOption(() => GetContextFromLanguage("killer-report-delay"),
             new FloatOptionValueRule(0, 1, 5, 1, NumberSuffixes.Seconds));

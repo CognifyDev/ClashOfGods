@@ -19,7 +19,7 @@ public class Inspector : COG.Role.Camp.CrewmateRole
     private PlayerControl? _buttonTarget;
     private PlayerControl? _examinedTarget;
 
-    public Inspector()
+    public Inspector() : base(ColorUtils.FromColor32(46, 84, 160))
     {
         OnRoleAbilityUsed += (_, _) => NotifyInspector();
 

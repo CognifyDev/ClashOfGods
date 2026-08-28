@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
+using COG.Listener;
+using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Modded.Player;
 using COG.Listener.Event.Impl.Player;
@@ -28,7 +30,7 @@ public class Seer : COG.Role.Camp.CrewmateRole
 
     private readonly List<PlayerControl> _checkedPlayers = [];
 
-    public Seer()
+    public Seer() : base(ColorUtils.FromColor32(30,144,255))
     {
         Cooldown = CreateOption(() =>
                 GetContextFromLanguage("check-cooldown"),
@@ -71,6 +73,7 @@ public class Seer : COG.Role.Camp.CrewmateRole
         return target != null && _checkedPlayers.Any(current => current.PlayerId == target.PlayerId);
     }
 
+    [LocalOnly]
     private void OnPlayerMurder(PlayerMurderEvent @event)
     {
         if (MurderResultFlags.Succeeded != @event.MurderResult!.Value)
@@ -82,6 +85,7 @@ public class Seer : COG.Role.Camp.CrewmateRole
         AvailableUsageTimes ++;
     }
 
+    [LocalOnly]
     private void OnPlayerRoleChange(PlayerCustomRoleChangeEvent @event)
     {
         if (@event.OriginRole.Equals(@event.TargetRole))
@@ -92,6 +96,7 @@ public class Seer : COG.Role.Camp.CrewmateRole
         ShowCurrentCamp(@event.Player);
     }
 
+    [LocalOnly]
     private void OnGameStart(GameStartEvent _)
     {
         AvailableUsageTimes = (int)InitialAvailableUsableTimes.GetFloat();
