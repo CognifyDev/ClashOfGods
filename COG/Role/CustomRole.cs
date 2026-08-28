@@ -12,6 +12,7 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Game.Record;
 using COG.Rpc;
 using COG.Rpc.Role;
+using COG.Role.Components;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -32,14 +33,18 @@ namespace COG.Role;
   so you probably gotta use RPC to synchronize them.
  */
 /// <summary>
-///     用来表示一个职业
+///     Represents a custom role with identity, capabilities, buttons, and options.
 /// </summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class CustomRole
 {
     private static int _order;
-    private readonly Stack<KillButtonSetting> _killButtonSettings = new();
-    private KillButtonSetting _currentKillButtonSetting;
+
+    // Component instances
+    private readonly RoleMetadata _metadata;
+    private readonly RoleCapabilities _capabilities;
+    private readonly RoleButtons _buttons;
+    private readonly RoleOptions _options;
 
     // Role-scoped RPC dispatch table: localRpcId → typed handler
     // Populated by NewRpc(); used by DispatchRoleRpc.
@@ -48,8 +53,6 @@ public class CustomRole
     /// <summary>
     ///     Initializes a sub-role instance.
     /// </summary>
-    /// <param name="color"></param>
-    /// <param name="showInOptions"></param>
     public CustomRole(Color color, bool showInOptions = true) : this(color, CampType.Unknown, true, showInOptions)
     {
     }
@@ -57,9 +60,6 @@ public class CustomRole
     /// <summary>
     ///     Initializes a main role instance.
     /// </summary>
-    /// <param name="color"></param>
-    /// <param name="campType"></param>
-    /// <param name="showInOptions"></param>
     public CustomRole(Color color, CampType campType, bool showInOptions = true) : this(color, campType, false,
         showInOptions)
     {
@@ -68,33 +68,32 @@ public class CustomRole
     /// <summary>
     ///     Initializes an impostor role instance.
     /// </summary>
-    /// <param name="showInOptions"></param>
     public CustomRole(bool showInOptions = true) : this(Palette.ImpostorRed, CampType.Impostor, showInOptions)
     {
     }
 
     private CustomRole(Color color, CampType campType, bool isSubRole, bool showInOptions)
     {
-        IsBaseRole = false;
-        Color = color;
-        CampType = campType;
-        BaseRoleType = campType == CampType.Impostor ? RoleTypes.Impostor : RoleTypes.Crewmate;
-        IsSubRole = isSubRole;
-        CanVent = campType == CampType.Impostor;
-        CanKill = campType == CampType.Impostor;
-        CanSabotage = campType == CampType.Impostor;
-        Id = _order++;
-        ShowInOptions = showInOptions;
-        AllOptions = [];
+        var id = _order++;
 
-        _currentKillButtonSetting = DefaultKillButtonSetting = new KillButtonSetting
+        _metadata = new RoleMetadata(id, "", color, campType, isSubRole, showInOptions)
         {
-            ForceShow = () => CanKill,
-            TargetOutlineColor = Color
+            IsBaseRole = false
         };
-        DefaultKillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this, null!));
 
-        ResetCurrentKillButtonSetting();
+        _capabilities = new RoleCapabilities(
+            canVent: campType == CampType.Impostor,
+            canKill: campType == CampType.Impostor,
+            canSabotage: campType == CampType.Impostor
+        );
+
+        _buttons = new RoleButtons();
+        _buttons.DefaultKillButtonSetting.ForceShow = () => CanKill;
+        _buttons.DefaultKillButtonSetting.TargetOutlineColor = Color;
+        _buttons.DefaultKillButtonSetting.AddAfterClick(() => OnRoleAbilityUsed(this, null!));
+        _buttons.ResetCurrentKillButtonSetting();
+
+        _options = new RoleOptions();
 
         Name = GetContextFromLanguage("name");
         ShortDescription = GetContextFromLanguage("description");
@@ -115,90 +114,131 @@ public class CustomRole
         }
     }
 
-    /// <summary>
-    ///     角色特征码
-    /// </summary>
-    public int Id { get; }
+    // ==================== Metadata Delegates ====================
 
     /// <summary>
-    ///     角色颜色
+    ///     Role identifier (characteristic code).
     /// </summary>
-    public Color Color { get; }
+    public int Id => _metadata.Id;
 
     /// <summary>
-    ///     角色的名称
+    ///     Role color.
     /// </summary>
-    public string Name { get; protected set; }
+    public Color Color => _metadata.Color;
 
     /// <summary>
-    ///     是否是基本职业
+    ///     Role name.
     /// </summary>
-    public bool IsBaseRole { get; protected init; }
-
-    /// <summary>
-    ///     显示在职业分配后职业介绍界面的简短介绍文本
-    /// </summary>
-    public string ShortDescription { get; protected set; }
-
-    /// <summary>
-    ///     角色阵营
-    /// </summary>
-    public CampType CampType { get; }
-
-    /// <summary>
-    ///     原版角色蓝本
-    /// </summary>
-    public RoleTypes BaseRoleType { get; protected init; }
-
-    /// <summary>
-    ///     是否为副职业
-    /// </summary>
-    public bool IsSubRole { get; }
-
-    /// <summary>
-    ///     在选项中显示
-    /// </summary>
-    public bool ShowInOptions { get; }
-
-    /// <summary>
-    ///     是否可以跳管
-    /// </summary>
-    public bool CanVent { get; protected init; }
-
-    /// <summary>
-    ///     是否可以击杀
-    /// </summary>
-    public bool CanKill { get; protected init; }
-
-    /// <summary>
-    ///     是否可以破坏
-    /// </summary>
-    public bool CanSabotage { get; protected init; }
-
-    /// <summary>
-    ///     选择角色数量的option
-    /// </summary>
-    public CustomOption? RoleNumberOption { get; internal set; }
-
-    /// <summary>
-    ///     职业几率的选项
-    /// </summary>
-    public CustomOption? RoleChanceOption { get; internal set; }
-
-    public CustomOption? RoleCode { get; internal set; }
-
-    /// <summary>
-    ///     职业是否已启用
-    /// </summary>
-    public bool Enabled
+    public string Name
     {
-        get
-        {
-            if (RoleNumberOption != null)
-                return RoleNumberOption!.GetInt() > 0;
-            return false;
-        }
+        get => _metadata.Name;
+        protected set => _metadata.Name = value;
     }
+
+    /// <summary>
+    ///     Whether this is a base role.
+    /// </summary>
+    public bool IsBaseRole
+    {
+        get => _metadata.IsBaseRole;
+        protected init => _metadata.IsBaseRole = value;
+    }
+
+    /// <summary>
+    ///     Short description displayed in the role introduction screen after role assignment.
+    /// </summary>
+    public string ShortDescription
+    {
+        get => _metadata.ShortDescription;
+        protected set => _metadata.ShortDescription = value;
+    }
+
+    /// <summary>
+    ///     Role camp type.
+    /// </summary>
+    public CampType CampType => _metadata.CampType;
+
+    /// <summary>
+    ///     Vanilla role type template.
+    /// </summary>
+    public RoleTypes BaseRoleType
+    {
+        get => _metadata.BaseRoleType;
+        protected set => _metadata.BaseRoleType = value;
+    }
+
+    /// <summary>
+    ///     Whether this is a sub-role.
+    /// </summary>
+    public bool IsSubRole => _metadata.IsSubRole;
+
+    /// <summary>
+    ///     Whether to show this role in options.
+    /// </summary>
+    public bool ShowInOptions => _metadata.ShowInOptions;
+
+    // ==================== Capabilities Delegates ====================
+
+    /// <summary>
+    ///     Whether the role can use vents.
+    /// </summary>
+    public bool CanVent
+    {
+        get => _capabilities.CanVent;
+        protected init => _capabilities.CanVent = value;
+    }
+
+    /// <summary>
+    ///     Whether the role can kill.
+    /// </summary>
+    public bool CanKill
+    {
+        get => _capabilities.CanKill;
+        protected init => _capabilities.CanKill = value;
+    }
+
+    /// <summary>
+    ///     Whether the role can use sabotage.
+    /// </summary>
+    public bool CanSabotage
+    {
+        get => _capabilities.CanSabotage;
+        protected init => _capabilities.CanSabotage = value;
+    }
+
+    // ==================== Options Delegates ====================
+
+    /// <summary>
+    ///     Option for role count configuration.
+    /// </summary>
+    public CustomOption? RoleNumberOption
+    {
+        get => _options.RoleNumberOption;
+        internal set => _options.RoleNumberOption = value;
+    }
+
+    /// <summary>
+    ///     Option for role chance configuration.
+    /// </summary>
+    public CustomOption? RoleChanceOption
+    {
+        get => _options.RoleChanceOption;
+        internal set => _options.RoleChanceOption = value;
+    }
+
+    /// <summary>
+    ///     Option for role code configuration.
+    /// </summary>
+    public CustomOption? RoleCode
+    {
+        get => _options.RoleCode;
+        internal set => _options.RoleCode = value;
+    }
+
+    /// <summary>
+    ///     Whether this role is enabled (has count > 0).
+    /// </summary>
+    public bool Enabled => _options.Enabled;
 
     public LanguageConfig.TextHandler ActionNameContext { get; }
 
@@ -215,13 +255,19 @@ public class CustomRole
         new(GameUtils.PlayerData.Where(pr => !pr.IsDisconnected && pr.Player.IsRole(this)).Select(pr => pr.Player)
             .ToList());
 
-    public List<CustomOption> AllOptions { get; internal set; }
+    /// <summary>
+    ///     All options associated with this role.
+    /// </summary>
+    public List<CustomOption> AllOptions
+    {
+        get => _options.AllOptions;
+        internal set => throw new NotSupportedException("AllOptions is managed by RoleOptions component.");
+    }
 
     /// <summary>
-    ///     除了概率与人数之外的所有职业选项
+    ///     Role options excluding count and chance options.
     /// </summary>
-    public ReadOnlyCollection<CustomOption> RoleOptions =>
-        new(AllOptions.Where(o => o != RoleNumberOption && o != RoleChanceOption).ToList());
+    public ReadOnlyCollection<CustomOption> RoleOptions => _options.RoleOptionsList;
 
     public RoleBehaviour VanillaRole => new()
     {
@@ -237,39 +283,29 @@ public class CustomRole
         AllGameSettings = RoleOptions.Select(o => o.ToVanillaOptionData()).ToIl2CppList()
     };
 
-    public KillButtonSetting DefaultKillButtonSetting { get; }
+    // ==================== Buttons Delegates ====================
 
     /// <summary>
-    ///     NOTE: Set to null to use previous setting.
-    ///     <para />
-    ///     PLEASE CAREFULLY CONSIDER WHETHER TO CLONE ONE OR TO JUST OVERRIDE!
+    ///     The default kill button setting for this role.
+    /// </summary>
+    public KillButtonSetting DefaultKillButtonSetting => _buttons.DefaultKillButtonSetting;
+
+    /// <summary>
+    ///     The current active kill button setting.
+    ///     Set to null to pop the previous setting from the stack.
     /// </summary>
     public KillButtonSetting CurrentKillButtonSetting
     {
-        get => _currentKillButtonSetting;
-        set
-        {
-            if (value == null!)
-            {
-                if (_killButtonSettings.Count > 0)
-                {
-                    _currentKillButtonSetting = _killButtonSettings.Pop();
-                }
-                else
-                {
-                    _currentKillButtonSetting = DefaultKillButtonSetting;
-                    _killButtonSettings.Push(DefaultKillButtonSetting);
-                }
-            }
-            else
-            {
-                _killButtonSettings.Push(_currentKillButtonSetting);
-                _currentKillButtonSetting = value;
-            }
-        }
+        get => _buttons.CurrentKillButtonSetting;
+        set => _buttons.CurrentKillButtonSetting = value;
     }
 
-    public List<CustomButton> AllButtons { get; } = [];
+    /// <summary>
+    ///     All custom buttons registered to this role.
+    /// </summary>
+    public List<CustomButton> AllButtons => _buttons.AllButtons;
+
+    // ==================== Core Methods ====================
 
     public override bool Equals(object? obj)
     {
@@ -286,9 +322,8 @@ public class CustomRole
     }
 
     /// <summary>
-    ///     显示在职业设置的职业详细介绍文本
+    ///     Detailed description displayed in the role settings.
     /// </summary>
-    /// <returns>详细介绍</returns>
     public string GetLongDescription()
     {
         return GetContextFromLanguage("long-description");
@@ -319,14 +354,14 @@ public class CustomRole
         if (!ShowInOptions) return null!;
 
         var option = CustomOption.Of(GetTabType(this), nameGetter, rule).Register();
-        AllOptions.Add(option);
+        _options.AllOptions.Add(option);
 
         return option;
     }
 
     protected void RegisterCustomOption(CustomOption option)
     {
-        AllOptions.Add(option.Register());
+        _options.AllOptions.Add(option.Register());
     }
 
     public bool IsLocalPlayerRole(PlayerControl target)
@@ -345,10 +380,10 @@ public class CustomRole
     }
 
     /// <summary>
-    ///     添加一个按钮
+    ///     Adds a custom button to this role.
     /// </summary>
-    /// <param name="button">要添加的按钮</param>
-    /// <param name="hasButton"></param>
+    /// <param name="button">The button to add.</param>
+    /// <param name="hasButton">Optional condition to show the button.</param>
     public void AddButton(CustomButton button, Func<bool>? hasButton = null)
     {
         hasButton ??= () => PlayerControl.LocalPlayer.IsRole(this);
@@ -365,6 +400,8 @@ public class CustomRole
         AllButtons.Add(button);
     }
 
+    // ==================== Eject & Name Handling ====================
+
     public virtual string HandleEjectText(NetworkedPlayerInfo player)
     {
         var role = player.GetMainRole();
@@ -380,6 +417,8 @@ public class CustomRole
     {
         return "";
     }
+
+    // ==================== Lifecycle Methods ====================
 
     public virtual void AfterSharingRoles()
     {
@@ -412,6 +451,7 @@ public class CustomRole
     {
     }
 
+    // ==================== RPC Handling ====================
 
     public void SyncRoleGameData()
     {
@@ -422,7 +462,7 @@ public class CustomRole
 
     public string GetColorName()
     {
-        return Name.Color(Color);
+        return _metadata.GetColorName();
     }
 
     public void RegisterRpcHandler(IRpcHandler handler)
@@ -439,7 +479,7 @@ public class CustomRole
         _roleRpcHandlers[rpc.AllocatedId] = rpc;
         return rpc;
     }
-    
+
     protected RoleRpc<T> CreateRoleRpc<T>(Enum localId, Action<T> onPerform)
         where T : notnull
         => CreateRoleRpc<T>(Convert.ToInt32(localId), onPerform);
@@ -452,7 +492,7 @@ public class CustomRole
         _roleRpcHandlers[rpc.AllocatedId] = rpc;
         return rpc;
     }
-    
+
     protected RoleRpc<T> CreateRoleRpc<T>(
         Enum localId,
         Action<T> onPerform,
@@ -460,7 +500,7 @@ public class CustomRole
         Func<MessageReader, T> onDeserialize)
         where T : notnull
         => CreateRoleRpc<T>(Convert.ToInt32(localId), onPerform, onSerialize, onDeserialize);
-    
+
     protected RoleRpc<T> CreateRoleRpc<T>(
         int localId,
         Action<T> onPerform,
@@ -473,7 +513,7 @@ public class CustomRole
         _roleRpcHandlers[rpc.AllocatedId] = rpc;
         return rpc;
     }
-    
+
     protected RoleRpc<T1, T2> CreateRoleRpc<T1, T2>(Enum localId, Action<T1, T2> onPerform)
         where T1 : notnull where T2 : notnull
         => CreateRoleRpc<T1, T2>(Convert.ToInt32(localId), onPerform);
@@ -486,7 +526,7 @@ public class CustomRole
         _roleRpcHandlers[rpc.AllocatedId] = rpc;
         return rpc;
     }
-    
+
     protected RoleRpc<T1, T2> CreateRoleRpc<T1, T2>(
         Enum localId,
         Action<T1, T2> onPerform,
@@ -494,7 +534,7 @@ public class CustomRole
         Func<MessageReader, (T1, T2)> onDeserialize)
         where T1 : notnull where T2 : notnull
         => CreateRoleRpc<T1, T2>(Convert.ToInt32(localId), onPerform, onSerialize, onDeserialize);
-    
+
     protected RoleRpc<T1, T2> CreateRoleRpc<T1, T2>(
         int localId,
         Action<T1, T2> onPerform,
@@ -507,7 +547,6 @@ public class CustomRole
         _roleRpcHandlers[rpc.AllocatedId] = rpc;
         return rpc;
     }
-
 
     protected RoleRpc<T1, T2, T3> CreateRoleRpc<T1, T2, T3>(Enum localId, Action<T1, T2, T3> onPerform)
         where T1 : notnull where T2 : notnull where T3 : notnull
@@ -529,7 +568,7 @@ public class CustomRole
         Func<MessageReader, (T1, T2, T3)> onDeserialize)
         where T1 : notnull where T2 : notnull where T3 : notnull
         => CreateRoleRpc<T1, T2, T3>(Convert.ToInt32(localId), onPerform, onSerialize, onDeserialize);
-    
+
     protected RoleRpc<T1, T2, T3> CreateRoleRpc<T1, T2, T3>(
         int localId,
         Action<T1, T2, T3> onPerform,
@@ -542,7 +581,7 @@ public class CustomRole
         _roleRpcHandlers[rpc.AllocatedId] = rpc;
         return rpc;
     }
-    
+
     internal void DispatchRoleRpc(IRoleRpc handler, PlayerControl sender, MessageReader reader)
     {
         if (_roleRpcHandlers.TryGetValue(handler.AllocatedId, out var registeredHandler))
@@ -554,23 +593,23 @@ public class CustomRole
             OnRoleRpcReceived(sender, handler.AllocatedId, reader);
         }
     }
-    
+
     protected virtual void OnRoleRpcReceived(PlayerControl sender, uint allocatedId, MessageReader reader)
     {
     }
+
+    // ==================== Kill Button Management ====================
 
     public void ResetCurrentKillButtonSetting()
     {
         CurrentKillButtonSetting = null!;
     }
 
-
     public static void ClearKillButtonSettings()
     {
         CustomRoleManager.GetManager().GetRoles().ForEach(r =>
         {
-            r._killButtonSettings.Clear();
-            r.ResetCurrentKillButtonSetting();
+            r._buttons.ClearSettings();
         });
     }
 

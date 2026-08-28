@@ -30,6 +30,7 @@ using System.Reflection;
 using COG.UI.Load;
 using COG.Cosmetics.Unity;
 using COG.Plugin;
+using COG.Infrastructure;
 
 
 #if WINDOWS
@@ -53,6 +54,7 @@ public partial class Main : BasePlugin
     public static string PluginVersion { get; private set; } = null!;
     public static DateTime CommitTime => DateTime.Parse(GitInfo.CommitDate);
     public static Assembly Assembly { get; } = typeof(Main).Assembly;
+    public static ServiceContainer Container { get; private set; } = null!;
 
     private Harmony Harmony { get; } = new(PluginGuid);
 
@@ -64,6 +66,14 @@ public partial class Main : BasePlugin
     public override void Load()
     {
         Instance = this;
+
+        // Initialize DI Container
+        var container = new ServiceContainer();
+        container.RegisterSingleton(container);
+        container.RegisterSingleton(Logger);
+        container.RegisterSingleton(new EventBus());
+        container.RegisterSingleton(ConfigManager.Instance);
+        Container = container;
 
         PluginVersion = ProjectUtils.GetProjectVersion() ?? "Unknown";
         VersionInfo = PluginVersion.Equals("Unknown")
