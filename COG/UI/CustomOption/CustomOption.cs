@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using COG.Config;
 using COG.Role;
 using COG.Rpc;
 using COG.UI.CustomOption.ValueRules;
@@ -237,6 +238,30 @@ public sealed class CustomOption
         LoadOptionFromPreset(openFileDialog.FileName);
     }
 
+    /// <summary>
+    /// Default path for auto-saving/loading game options.
+    /// </summary>
+    private static string DefaultSavePath => Path.Combine(ConfigBase.BasePath, "last_options.cfg");
+
+    /// <summary>
+    /// Auto-save current options to the default path.
+    /// Called whenever an option changes.
+    /// </summary>
+    public static void AutoSave()
+    {
+        SaveCurrentOption(DefaultSavePath);
+    }
+
+    /// <summary>
+    /// Auto-load options from the default path.
+    /// Called during mod initialization.
+    /// </summary>
+    public static void AutoLoad()
+    {
+        if (File.Exists(DefaultSavePath))
+            LoadOptionFromPreset(DefaultSavePath);
+    }
+
     public dynamic GetDynamicValue()
     {
         return ValueRule.Selections[Selection];
@@ -283,6 +308,7 @@ public sealed class CustomOption
     {
         ApplySelectionSilently(newSelection);
         ScheduleDebouncedSync(newSelection);
+        AutoSave();
     }
 
     public void UpdateSelection(object newValue)

@@ -370,6 +370,7 @@ public static class SplashManagerPatch
     {
         yield return new WaitForSeconds(0.5f);
         yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-compeleted"), 0.3f);
+        COG.UI.CustomOption.CustomOption.AutoLoad();
         yield return new WaitForSeconds(0.5f);
     }
 
