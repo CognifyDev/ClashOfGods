@@ -1,4 +1,4 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Attribute;
@@ -38,7 +38,7 @@ public class Reaper : CustomRole, IListener
 
     public override void ClearRoleGameData()
     {
-        _cooldown = GameUtils.GetGameOptions().KillCooldown;
+        _cooldown = GameUtils.GetGameOptions()?.KillCooldown ?? 30f;
     }
 
     public override IListener GetListener()

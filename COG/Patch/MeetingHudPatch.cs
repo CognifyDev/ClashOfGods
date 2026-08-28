@@ -53,7 +53,7 @@ internal class MeetingHudCastVotePatch
                 EventHandlerType.Prefix);
 
         if (!result)
-            __instance.RpcClearVote(voterPlayer.GetClientID());
+            __instance.ClearVote(voterPlayer.PlayerId, true);
 
         // 在listener中return false以取消玩家的投票事件，此后需要通过rpcClearVote清除玩家的投票操作，以允许玩家重新投票。
         return result;
@@ -102,9 +102,10 @@ internal class MeetingHudUpdatePatch
 internal class MeetingHudVotingCompletePatch
 {
     private static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] MeetingHud.VoterState[] states,
-        [HarmonyArgument(1)] NetworkedPlayerInfo exiled, [HarmonyArgument(2)] bool tie)
+        [HarmonyArgument(1)] NetworkedPlayerInfo exiled, [HarmonyArgument(2)] bool tie,
+        [HarmonyArgument(3)] bool isOverruled, [HarmonyArgument(4)] ushort nonce)
     {
-        if (__instance.state == MeetingHud.VoteStates.Results) return;
+        if (__instance.state == MeetingHud.MeetingStates.Results) return;
 
         ListenerManager.GetManager()
             .ExecuteHandlers(new MeetingVotingCompleteEvent(__instance, states, exiled, tie), EventHandlerType.Postfix);

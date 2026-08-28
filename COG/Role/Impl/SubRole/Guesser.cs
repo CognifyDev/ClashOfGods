@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
@@ -35,11 +35,11 @@ public class Guesser : CustomRole, IListener, IMeetingButton
     public bool ShouldShowMeetingButtonFor(PlayerVoteArea pva)
     {
         if (pva.AmDead) return false;
-        if (pva.TargetPlayerId == PlayerControl.LocalPlayer.PlayerId &&
+        if (pva.PlayerId == PlayerControl.LocalPlayer.PlayerId &&
             !GlobalCustomOptionConstant.DebugMode.GetBool())
             return false;
 
-        var data = GameUtils.PlayerData.FirstOrDefault(pd => pd.PlayerId == pva.TargetPlayerId);
+        var data = GameUtils.PlayerData.FirstOrDefault(pd => pd.PlayerId == pva.PlayerId);
         return data != null && !data.IsDisconnected;
     }
 

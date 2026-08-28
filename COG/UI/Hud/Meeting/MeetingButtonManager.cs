@@ -33,7 +33,7 @@ public static class MeetingButtonManager
         _tickCounter = (_tickCounter + 1) % 20;
         if (_tickCounter != 0) goto UpdateOnly;
 
-        if (__instance.state == MeetingHud.VoteStates.Results)
+        if (__instance.state == MeetingHud.MeetingStates.Results)
         {
             ClearAllButtons(__instance);
             return;
@@ -54,7 +54,7 @@ public static class MeetingButtonManager
         foreach (var pva in __instance.playerStates)
         {
             if (pva == null) continue;
-            var data = PlayerUtils.GetPlayerById(pva.TargetPlayerId)?.Data;
+            var data = PlayerUtils.GetPlayerById(pva.PlayerId)?.Data;
             if (data != null) continue;
 
             RemoveButtonsFromArea(pva.transform);

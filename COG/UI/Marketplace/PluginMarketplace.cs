@@ -253,7 +253,6 @@ public class PluginMarketplace
         }
 
         bool inst = _installedPlugins.Contains(p.Name);
-        float hw  = DetailW / 2f;
 
         // Plugin name
         Txt(_detailPanel.transform, p.Name, FzH2, ColText,

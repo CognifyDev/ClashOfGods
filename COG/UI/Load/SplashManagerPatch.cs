@@ -145,10 +145,14 @@ public static class SplashManagerPatch
     private static IEnumerator CoLoadMod_StepDownloadDependencies()
     {
 #if WINDOWS
+        // 先下载依赖，不使用 LanguageConfig（避免 YamlDotNet 未加载时崩溃）
         yield return DependenceDownloader.DownloadYaml();
-        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-depends"), 0.3f);
         yield return DependenceDownloader.DownloadCommonDependence();
+        // 依赖下载完成后，初始化 LanguageConfig
+        LanguageConfig.EnsureInitialized();
+        yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-depends"), 0.3f);
 #else
+        LanguageConfig.EnsureInitialized();
         yield return ChangeLoadingText(LanguageConfig.Instance.GetString("load.load-depends"), 0.3f);
 #endif
         yield return new WaitForSeconds(0.3f);

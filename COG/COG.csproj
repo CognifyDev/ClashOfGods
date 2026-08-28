@@ -2,6 +2,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latest</LangVersion>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <DebugType>embedded</DebugType>
 
         <Description>An epoch-making Among Us mod with a plugin system that allows you to make your own plugin by EASY computer language JavaScript</Description>
@@ -28,11 +29,11 @@
 	</ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.11.18" />
+        <PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.8.18" />
         <PackageReference Include="SharpZipLib" Version="1.4.2" />
         <PackageReference Include="IronPython" Version="3.4.2" />
         <PackageReference Include="IronPython.StdLib" Version="3.4.2" />
-        <PackageReference Include="Reactor" Version="2.3.1" />
+        <PackageReference Include="Reactor" Version="2.5.1-ci.384" />
         <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" Private="false" ExcludeAssets="runtime;native" />
         <!--		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.10.14" PrivateAssets="all" Condition="'$(Platform)' == 'Windows'" />-->
         <PackageReference Include="System.Windows.Forms" Version="4.0.0" />
@@ -40,11 +41,11 @@
         <PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" PrivateAssets="all" ExcludeAssets="runtime">
             <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="YamlDotNet" Version="15.1.2" />
+        <PackageReference Include="YamlDotNet" Version="18.1.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="GitInfo" Version="3.3.4">
+        <PackageReference Include="GitInfo" Version="3.6.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -60,5 +61,6 @@
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(AmongUs)/BepInEx/plugins/" UseSymboliclinksIfPossible="true" />
+        <Copy SourceFiles="@(ReferenceCopyLocalPaths)" DestinationFolder="$(AmongUs)/BepInEx/plugins/" SkipUnchangedFiles="true" />
     </Target>
 </Project>

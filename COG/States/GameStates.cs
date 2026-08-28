@@ -68,6 +68,6 @@ public static class GameStates
     ///     是否处于投票阶段
     /// </summary>
     public static bool IsVoting => IsMeeting &&
-                                   MeetingHud.Instance.state is MeetingHud.VoteStates.Voted
-                                       or MeetingHud.VoteStates.NotVoted;
+                                   MeetingHud.Instance.state is MeetingHud.MeetingStates.Voted
+                                       or MeetingHud.MeetingStates.NotVoted;
 }

@@ -35,11 +35,18 @@ public static class HudActivePatch
     [HarmonyPostfix]
     static void Postfix(HudManager __instance, [HarmonyArgument(0)] PlayerControl localPlayer, [HarmonyArgument(1)] RoleBehaviour role, [HarmonyArgument(2)] bool isActive)
     {
-        var roles = PlayerControl.LocalPlayer.GetRoles();
-        var sabotageFlag = roles.Any(r => r.CanSabotage);
-        var ventable = roles.Any(r => r.CanVent);
-        __instance.SabotageButton.ToggleVisible(isActive && sabotageFlag);
-        __instance.AdminButton.ToggleVisible(isActive && sabotageFlag);
-        __instance.ImpostorVentButton.ToggleVisible(isActive && localPlayer.IsAlive() && ventable && GameOptionsManager.Instance.CurrentGameOptions.GameMode != GameModes.HideNSeek);
+        try
+        {
+            var roles = PlayerControl.LocalPlayer.GetRoles();
+            var sabotageFlag = roles.Any(r => r.CanSabotage);
+            var ventable = roles.Any(r => r.CanVent);
+            __instance.SabotageButton.ToggleVisible(isActive && sabotageFlag);
+            __instance.AdminButton.ToggleVisible(isActive && sabotageFlag);
+            __instance.ImpostorVentButton.ToggleVisible(isActive && localPlayer.IsAlive() && ventable && GameOptionsManager.Instance.CurrentGameOptions.GameMode != GameModes.HideNSeek);
+        }
+        catch
+        {
+            // Game state not ready yet, silently ignore
+        }
     }
 }

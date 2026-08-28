@@ -218,7 +218,8 @@ public class RoleAssignmentListener : IListener
         foreach (var (player, mainRole) in mainRoleData)
         {
             subRoleData.TryGetValue(player, out var subRoles);
-            player.SetCustomRole(mainRole, subRoles ?? []);
+            // vanillaSync=false: vanilla SelectRoles has already run, skip redundant SetRole
+            player.SetCustomRole(mainRole, subRoles ?? [], false);
         }
     }
 
@@ -243,16 +244,28 @@ public class RoleAssignmentListener : IListener
         var impostorCount = Math.Min(GameUtils.GetImpostorsNumber(), players.Count);
 
         for (var i = 0; i < players.Count; i++)
-            players[i].SetCustomRole(i < impostorCount ? impostorRole : crewmateRole, []);
+            // vanillaSync=false: vanilla SelectRoles has already run
+            players[i].SetCustomRole(i < impostorCount ? impostorRole : crewmateRole, [], false);
     }
 
     [EventHandler(EventHandlerType.Prefix)]
     public bool OnSelectRoles(RoleManagerSelectRolesEvent _)
     {
-        Main.Logger.LogInfo("Select roles for players...");
+        Main.Logger.LogInfo("Let vanilla SelectRoles run first for internal state initialization...");
+        // Among Us 2026.8.18: SelectRoles is now empty but the vanilla flow through
+        // LogicRoleSelection is still needed for proper game state setup.
+        // We let vanilla run, then override roles in Postfix.
+        return true;
+    }
+
+    [EventHandler(EventHandlerType.Postfix)]
+    public void OnSelectRolesPostfix(RoleManagerSelectRolesEvent _)
+    {
+        Main.Logger.LogInfo("Overriding vanilla roles with custom roles...");
+        GameStates.InRealGame = true;
         SelectRoles();
 
-        if (!GameUtils.PlayerData.Any()) return true;
+        if (!GameUtils.PlayerData.Any()) return;
 
         var playerData = GameUtils.PlayerData.ToArray();
 
@@ -270,8 +283,6 @@ public class RoleAssignmentListener : IListener
 
         foreach (var role in allAssignedRoles)
             role.AfterSharingRoles();
-
-        return false;
     }
 
     private class PlayerGetter(PlayerControl[] targets) : IGetter<PlayerControl>

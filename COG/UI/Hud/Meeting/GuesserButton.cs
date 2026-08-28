@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
@@ -42,7 +42,7 @@ public class GuesserButton
         IEnumerable<CustomRole> roles)
     {
         _guesser = guesser;
-        _target = PlayerUtils.GetPlayerById(playerVoteArea.TargetPlayerId)?.Data;
+        _target = PlayerUtils.GetPlayerById(playerVoteArea.PlayerId)?.Data;
         _area = playerVoteArea;
         _roles = roles;
     }
@@ -51,7 +51,7 @@ public class GuesserButton
 
     public void OpenGuessUI(MeetingHud meetingHud)
     {
-        if (meetingHud.state != MeetingHud.VoteStates.NotVoted) return;
+        if (meetingHud.state != MeetingHud.MeetingStates.NotVoted) return;
         _guesser.CurrentGuessing = _target;
 
         ResetState();

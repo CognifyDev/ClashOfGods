@@ -112,16 +112,14 @@ public static class PlayerUtils
         {
             foreach (var pva in MeetingHud.Instance.playerStates)
             {
-                if (pva.TargetPlayerId == target.PlayerId)
+                if (pva.PlayerId == target.PlayerId)
                 {
-                    pva.SetDead(pva.DidReport, true);
+                    pva.SetDead(true);
                     pva.Overlay.gameObject.SetActive(true);
                 }
 
-                if (pva.VotedFor != target.PlayerId) continue;
-                pva.UnsetVote();
-                if (!target.AmOwner) continue;
-                MeetingHud.Instance.ClearVote();
+                if (pva.VotedForId != target.PlayerId) continue;
+                MeetingHud.Instance.ClearVote(pva.PlayerId, true);
             }
 
             if (AmongUsClient.Instance.AmHost)
@@ -435,7 +433,8 @@ public static class PlayerUtils
         return null;
     }
 
-    public static void SetCustomRole(this PlayerControl pc, CustomRole? role, CustomRole[]? subRoles = null)
+    public static void SetCustomRole(this PlayerControl pc, CustomRole? role, CustomRole[]? subRoles = null,
+        bool vanillaSync = true)
     {
         if (!pc) return;
         if (role == null)
@@ -447,12 +446,12 @@ public static class PlayerUtils
 
         var playerRole = GameUtils.PlayerData.FirstOrDefault(pr => pr.Player.IsSamePlayer(pc));
         var originalRole = playerRole?.MainRole;
-        
+
         var result = ListenerManager.GetManager().ExecuteHandlers(new PlayerCustomRoleChangeEvent(pc, role, originalRole!), EventHandlerType.Prefix);
 
         if (!result)
             return;
-        
+
         if (playerRole is not null)
         {
             playerRole.MainRole.ClearRoleGameData();
@@ -462,7 +461,12 @@ public static class PlayerUtils
 
         CustomRole.ClearKillButtonSettings();
         GameUtils.PlayerData.Add(new CustomPlayerData(pc.Data, role, subRoles));
-        RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+
+        // Among Us 2026.8.18: vanilla SelectRoles now delegates to LogicRoleSelection.
+        // When vanilla has already assigned roles, skip redundant SetRole to avoid conflicts.
+        if (vanillaSync)
+            RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+
         VanillaKillButtonPatch.Initialize();
 
         Main.Logger.LogInfo($"The role of player {pc.Data.PlayerName} has been set to {role.GetNormalName()}");

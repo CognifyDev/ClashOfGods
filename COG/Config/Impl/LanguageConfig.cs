@@ -8,12 +8,7 @@ public class LanguageConfig : ConfigBase
 {
     private static readonly Dictionary<string, string> CustomTranslations = new();
 
-#nullable disable
-    static LanguageConfig()
-    {
-        LoadLanguageConfig();
-    }
-#nullable restore
+    private static bool _initialized;
 
     private LanguageConfig() : base(
         "Language",
@@ -36,7 +31,19 @@ public class LanguageConfig : ConfigBase
         }
     }
 
-    public static LanguageConfig Instance { get; private set; }
+    public static LanguageConfig Instance { get; private set; } = null!;
+
+    /// <summary>
+    ///     确保 LanguageConfig 已初始化。依赖下载完成后调用。
+    /// </summary>
+    public static void EnsureInitialized()
+    {
+        if (!_initialized)
+        {
+            _initialized = true;
+            LoadLanguageConfig();
+        }
+    }
 
     public string GetString(string location)
     {

@@ -96,10 +96,10 @@ public static class GameUtils
 
     public static double GetKillDistance()
     {
-        return NormalGameOptionsV10.KillDistances[Mathf.Clamp(GetGameOptions().KillDistance, 0, 2)];
+        return NormalGameOptionsV11.KillDistances[Mathf.Clamp(GetGameOptions().KillDistance, 0, 2)];
     }
 
-    public static NormalGameOptionsV10 GetGameOptions()
+    public static NormalGameOptionsV11 GetGameOptions()
     {
         return GameOptionsManager.Instance.currentNormalGameOptions;
     }

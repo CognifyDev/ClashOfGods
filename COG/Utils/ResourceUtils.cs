@@ -16,7 +16,7 @@ public static class ResourceUtils
     public const string FileListURL =
         $"{TargetURL}resources.txt";
     public const string TargetURL =
-        "https://download.hayashiume.top/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/";
+        "https://gh-proxy.com/https://raw.githubusercontent.com/CognifyDev/ClashOfGods/refs/heads/main/Resources/";
     
     private static readonly Dictionary<string, byte[]> Cache = new();
     private static readonly Dictionary<string, Sprite> CachedSprites = new();
