@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
@@ -113,6 +113,13 @@ public class Seer : CustomRole, IListener
     
     public override void ClearRoleGameData()
     {
+        // Restore modified player names before clearing
+        foreach (var (playerId, originalName) in _prefixes)
+        {
+            var player = PlayerUtils.GetPlayerById(playerId);
+            if (player?.Data != null)
+                player.Data.PlayerName = originalName;
+        }
         _checkedPlayers.Clear();
         _prefixes.Clear();
     }

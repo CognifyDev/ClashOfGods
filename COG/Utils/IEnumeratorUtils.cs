@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +10,8 @@ public static class IEnumeratorUtils
     static public IEnumerator WaitAsCoroutine(this Task task)
     {
         while (!task.IsCompleted) yield return null;
-        yield break;
+        if (task.IsFaulted)
+            Main.Logger.LogError($"Task failed: {task.Exception?.InnerException?.Message}");
     }
 
     static public IEnumerable<T> Delimit<T>(this IEnumerable<T> enumerable, T delimiter)

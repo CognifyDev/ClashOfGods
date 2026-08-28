@@ -26,4 +26,9 @@ public class CustomButtonManager
     {
         return _buttons;
     }
+
+    public void Clear()
+    {
+        _buttons.Clear();
+    }
 }

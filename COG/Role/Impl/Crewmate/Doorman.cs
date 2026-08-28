@@ -52,15 +52,14 @@ public class Doorman : CustomRole
     {
         _isShowing = false;
         _lastRoom = null;
-        MapBehaviour.Instance
-            .TryDestroy(); // destroy modified map, HudManager will auto instantiate when u open map next time
+        MapBehaviour.Instance?.TryDestroy();
     }
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Show))]
     [HarmonyPrefix]
     private static bool ShowMapPatch(MapBehaviour __instance, MapOptions opts)
     {
-        if (opts.Mode != CustomMode || !_instance.IsLocalPlayerRole()) return true;
+        if (opts.Mode != CustomMode || _instance == null || !_instance.IsLocalPlayerRole()) return true;
 
         _isShowing = true;
 

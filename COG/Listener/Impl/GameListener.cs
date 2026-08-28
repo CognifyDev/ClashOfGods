@@ -183,6 +183,8 @@ public class GameListener : IListener
         impText.name = "RoleHintTask";
         impText.Text = GetRoleHintText();
 
+        if (CustomHudMessage.Instance != null)
+            Object.Destroy(CustomHudMessage.Instance.gameObject);
         new GameObject("HudMessageManager").AddComponent<CustomHudMessage>();
 
         if (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)

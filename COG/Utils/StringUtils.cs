@@ -74,6 +74,7 @@ public static class StringUtils
 
     public static string RemoveLast(this string input)
     {
+        if (string.IsNullOrEmpty(input)) return input;
         return new string(input.Take(input.Length - 1).ToArray());
     }
 
@@ -146,6 +147,7 @@ public static class StringUtils
 
     public static string DecodeAsBase64(string encoded)
     {
-        return Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
+        try { return Encoding.UTF8.GetString(Convert.FromBase64String(encoded)); }
+        catch { return encoded; }
     }
 }

@@ -17,7 +17,8 @@ public class ResourceFile
 
     public string GetResourcesText()
     {
-        Stream!.Position = 0;
+        if (Stream == null) return "";
+        Stream.Position = 0;
         using StreamReader reader = new(Stream, Encoding.UTF8);
         return reader.ReadToEnd();
     }

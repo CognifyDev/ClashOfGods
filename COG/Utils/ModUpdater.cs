@@ -19,9 +19,12 @@ public static class ModUpdater
 
         try
         {
+            Main.Logger.LogInfo("Checking for updates...");
+            // TODO: Implement actual version check logic
         }
-        catch
+        catch (System.Exception e)
         {
+            Main.Logger.LogWarning($"Failed to check for updates: {e.Message}");
         }
 
         LatestVersion = latestVersionString == null

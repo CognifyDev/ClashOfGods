@@ -25,7 +25,8 @@ public static class GameUtils
         get
         {
             if (!PopupPrefab) return null;
-            var popup = Object.Instantiate(PopupPrefab, Camera.main!.transform, true)!;
+            if (Camera.main == null) return null;
+            var popup = Object.Instantiate(PopupPrefab, Camera.main.transform, true)!;
             popup.transform.localPosition = new Vector3(0, 0, 0);
             return popup;
         }
@@ -120,7 +121,8 @@ public static class GameUtils
         IEnumerator CoSendChatMessage()
         {
             yield return new WaitForSeconds(delay);
-            var host = AmongUsClient.Instance.GetHost().Character;
+            var host = AmongUsClient.Instance.GetHost()?.Character;
+            if (host == null) yield break;
             var tempName = host.Data.PlayerName;
             host.SetName(LanguageConfig.Instance.GetString("game.chat.system-message"));
             HudManager.Instance.Chat.AddChat(host, text, false);

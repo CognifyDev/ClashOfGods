@@ -21,4 +21,12 @@ public class PlayerHandleRpcEvent : PlayerEvent
     ///     Rpc读取操作器
     /// </summary>
     public MessageReader Reader { get; }
+
+    /// <summary>
+    ///     回收 MessageReader 以避免内存泄漏
+    /// </summary>
+    public void Recycle()
+    {
+        Reader?.Recycle();
+    }
 }

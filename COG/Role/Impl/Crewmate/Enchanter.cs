@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Linq;
 using COG.Constant;
 using COG.Listener;
@@ -74,10 +74,10 @@ public class Enchanter : CustomRole, IListener
                     var role = p.GetRoles().FirstOrDefault(r => r.CanKill);
                     if (role == null) yield break;
 
-                    var originCooldown = role.CurrentKillButtonSetting.CustomCooldown();
+                    var baseCooldown = role.CurrentKillButtonSetting.CustomCooldown();
                     role.CurrentKillButtonSetting /* this wont be synced, so it is just the setting of local player */
                             .CustomCooldown =
-                        () => originCooldown + CooldownIncreament.GetFloat();
+                        () => baseCooldown + CooldownIncreament.GetFloat();
                     PlayerControl.LocalPlayer.ResetKillCooldown();
                 }
             },

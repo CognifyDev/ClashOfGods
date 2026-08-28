@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using COG.Constant;
 using COG.Rpc;
 using COG.UI.CustomOption;
@@ -19,6 +19,16 @@ public class Troublemaker : CustomRole
     private GameObject? _commsDown;
 
     private bool _usedThisRound;
+
+    public override void ClearRoleGameData()
+    {
+        if (_commsDown != null)
+        {
+            Object.Destroy(_commsDown);
+            _commsDown = null;
+        }
+        _usedThisRound = false;
+    }
 
     public Troublemaker()
     {

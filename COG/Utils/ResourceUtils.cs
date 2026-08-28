@@ -70,7 +70,7 @@ public static class ResourceUtils
 
     private static Texture2D LoadTextureFromResources(string path)
     {
-        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
         var texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
         using MemoryStream ms = new();
         stream?.CopyTo(ms);
@@ -138,10 +138,7 @@ public static class ResourceUtils
         if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
         File.WriteAllBytes(localPath, data);
-        if (Cache.ContainsKey(relativePath))
-            Cache[relativePath] = data;
-        else
-            Cache.Add(relativePath, data);
+        Cache[relativePath] = data;
     }
     static ResourceUtils()
     {

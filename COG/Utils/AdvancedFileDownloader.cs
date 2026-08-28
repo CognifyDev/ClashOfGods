@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -72,8 +72,9 @@ internal sealed class AdvancedFileDownloader
 
             return true;
         }
-        catch (System.Exception)
+        catch (System.Exception e)
         {
+            Main.Logger.LogError($"File download failed: {e.Message}");
             return false;
         }
     }

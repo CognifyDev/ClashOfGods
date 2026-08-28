@@ -274,7 +274,8 @@ public static class PlayerUtils
 
     public static int GetClientID(this PlayerControl player)
     {
-        return player.GetClient() == null ? -1 : player.GetClient()!.Id;
+        var client = player.GetClient();
+        return client?.Id ?? -1;
     }
 
     /// <summary>

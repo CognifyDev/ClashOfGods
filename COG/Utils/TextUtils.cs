@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using System.Runtime.InteropServices;
 
@@ -6,8 +6,10 @@ namespace COG.Utils;
 
 public static class TextUtils
 {
-    public static string HeadLower(this string text) => char.ToLower(text[0]) + text[1..];
-    public static string HeadUpper(this string text) => char.ToUpper(text[0]) + text[1..];
+    public static string HeadLower(this string text) =>
+        string.IsNullOrEmpty(text) ? text : char.ToLower(text[0]) + text[1..];
+    public static string HeadUpper(this string text) =>
+        string.IsNullOrEmpty(text) ? text : char.ToUpper(text[0]) + text[1..];
     public static string GetClipboardString()
     {
         uint type = 0;
@@ -37,10 +39,10 @@ public static class TextUtils
                         var len = ClipboardHelper.GlobalSize(clipboardData);
 
                         if (type == 1U)
-                            result = Marshal.PtrToStringAnsi(clipboardData, len);
+                            result = Marshal.PtrToStringAnsi(intPtr, len);
                         else
                         {
-                            result = Marshal.PtrToStringUni(clipboardData) ?? "";
+                            result = Marshal.PtrToStringUni(intPtr) ?? "";
                         }
                     }
                     finally

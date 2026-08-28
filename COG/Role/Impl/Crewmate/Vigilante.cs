@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using COG.Config.Impl;
 using COG.Listener;
 using COG.Listener.Attribute;
@@ -36,6 +36,7 @@ public class Vigilante : CustomRole, IListener
     [OnlyLocalPlayerWithThisRoleInvokable]
     public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
+        if (!GameStates.InRealGame) return;
         if (PlayerUtils.AllCrewmates.Count() > _minCrewmateNumber.GetInt() || _hasGiven) return;
 
         DefaultKillButtonSetting.RemainingUses++;

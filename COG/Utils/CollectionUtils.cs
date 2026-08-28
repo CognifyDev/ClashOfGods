@@ -35,6 +35,7 @@ public static class CollectionUtils
 
     public static T Pop<T>(this List<T> list)
     {
+        if (list.Count == 0) throw new InvalidOperationException("Cannot pop from empty list");
         var obj = list[0];
         list.RemoveAt(0);
         return obj;

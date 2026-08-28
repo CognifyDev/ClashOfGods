@@ -24,6 +24,7 @@ public class Reaper : CustomRole, IListener
         TimeToReduce = CreateOption(() => LanguageConfig.Instance.GetString("role.impostor.reaper.time-to-reduce"),
             new FloatOptionValueRule(1F, 0.5F, 5F, 1.5F, NumberSuffixes.Seconds));
 
+        _cooldown = GameUtils.GetGameOptions()?.KillCooldown ?? 30f;
         DefaultKillButtonSetting.CustomCooldown = () => _cooldown;
     }
 

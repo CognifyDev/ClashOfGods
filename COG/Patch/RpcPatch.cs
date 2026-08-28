@@ -23,25 +23,30 @@ internal class RPCHandlerPatch
             name = callId.ToString();
         Main.Logger.LogDebug($"Rpc {name}({callId}) received, rpc length => {reader.Length}");
 
-        ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader), EventHandlerType.Postfix);
+        var rpcEvent = new PlayerHandleRpcEvent(__instance, callId, reader);
+        try
+        {
+            ListenerManager.GetManager()
+                .ExecuteHandlers(rpcEvent, EventHandlerType.Postfix);
+        }
+        finally
+        {
+            rpcEvent.Recycle();
+        }
     }
 
     [HarmonyPrefix]
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId,
         [HarmonyArgument(1)] MessageReader reader)
     {
-        var result = ListenerManager.GetManager().ExecuteHandlers(new PlayerHandleRpcEvent(__instance, callId, reader),
-            EventHandlerType.Prefix);
-        //var rpcType = (RpcCalls)callId;
-        //var subReader = MessageReader.Get(reader);
-        //if (RpcCalls.SendChat.Equals(rpcType))
-        //{
-        //    var text = subReader.ReadString();
-        //    ListenerManager.GetManager()
-        //        .ExecuteHandlers(new PlayerChatEvent(__instance, text!), EventHandlerType.Prefix);
-        //}
-
-        return result;
+        var rpcEvent = new PlayerHandleRpcEvent(__instance, callId, reader);
+        try
+        {
+            return ListenerManager.GetManager().ExecuteHandlers(rpcEvent, EventHandlerType.Prefix);
+        }
+        finally
+        {
+            rpcEvent.Recycle();
+        }
     }
 }

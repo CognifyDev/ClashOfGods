@@ -45,6 +45,8 @@ public static class ColorUtils
     /// <returns></returns>
     public static Color AsColor(string color)
     {
+        if (string.IsNullOrEmpty(color) || color.Length < 7 || !color.StartsWith('#'))
+            return Color.white;
         var red = Convert.ToByte(color.Substring(1, 2), 16);
         var green = Convert.ToByte(color.Substring(3, 2), 16);
         var blue = Convert.ToByte(color.Substring(5, 2), 16);

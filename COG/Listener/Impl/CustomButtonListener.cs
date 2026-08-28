@@ -1,4 +1,4 @@
-﻿using COG.Listener.Event.Impl.HManager;
+using COG.Listener.Event.Impl.HManager;
 using COG.UI.Hud.CustomButton;
 using COG.Utils;
 
@@ -25,5 +25,6 @@ internal class CustomButtonListener : IListener
     public void OnHudDestroy(HudManagerDestroyEvent @event)
     {
         CustomButton.Initialized = false;
+        CustomButtonManager.GetManager().Clear();
     }
 }

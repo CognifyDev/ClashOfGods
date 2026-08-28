@@ -21,14 +21,6 @@ public class LanguageConfig : ConfigBase
 
     private LanguageConfig(string path) : base("Language", path)
     {
-        try
-        {
-        }
-        catch
-        {
-            GameUtils.Popup?.Show("An error occurred when loading language from the disk.");
-            Instance = new LanguageConfig();
-        }
     }
 
     public static LanguageConfig Instance { get; private set; } = null!;

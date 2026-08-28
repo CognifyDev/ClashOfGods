@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Listener;
@@ -33,6 +33,11 @@ public class SoulHunter : CustomRole, IListener
 
     private CustomOption ReviveAfter { get; }
     private CustomOption SoulHunterKillCd { get; }
+
+    public override void ClearRoleGameData()
+    {
+        _position = null;
+    }
 
     [EventHandler(EventHandlerType.Postfix)]
     [OnlyLocalPlayerWithThisRoleInvokable]

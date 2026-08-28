@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using COG.Game.Events;
 using COG.Listener.Event.Impl.Player;
@@ -42,7 +43,7 @@ public class RpcListener : IListener
 
             case KnownRpc.ShareOptions:
                 {
-                    var count = reader.ReadPackedUInt32();
+                    var count = Math.Min(reader.ReadPackedUInt32(), 1000u);
                     try
                     {
                         for (var i = 0; i < count; i++)
@@ -67,7 +68,10 @@ public class RpcListener : IListener
                 {
                     var playerId = reader.ReadByte();
                     var roleId = reader.ReadPackedInt32();
-                    PlayerUtils.GetPlayerById(playerId)!.SetCustomRole(CustomRoleManager.GetManager().GetRoleById(roleId)!);
+                    var player = PlayerUtils.GetPlayerById(playerId);
+                    var role = CustomRoleManager.GetManager().GetRoleById(roleId);
+                    if (player != null && role != null)
+                        player.SetCustomRole(role);
                     break;
                 }
 
@@ -86,13 +90,15 @@ public class RpcListener : IListener
                     var showAnimationToEverybody = reader.ReadBoolean();
                     var anonymousKiller = reader.ReadBoolean();
 
-                    killer.KillWithoutDeadBody(target, showAnimationToEverybody, anonymousKiller);
+                    if (killer != null && target != null)
+                        killer.KillWithoutDeadBody(target, showAnimationToEverybody, anonymousKiller);
                     break;
                 }
 
             case KnownRpc.Revive:
                 {
-                    reader.ReadNetObject<PlayerControl>().Revive();
+                    var player = reader.ReadNetObject<PlayerControl>();
+                    player?.Revive();
                     break;
                 }
 
@@ -121,7 +127,8 @@ public class RpcListener : IListener
                 {
                     var target = reader.ReadNetObject<PlayerControl>();
                     var tag = reader.ReadString();
-                    var playerData = target.GetPlayerData();
+                    var playerData = target?.GetPlayerData();
+                    if (playerData == null) break;
 
                     if (tag.StartsWith(PlayerUtils.DeleteTagPrefix))
                     {
@@ -199,7 +206,7 @@ public class RpcListener : IListener
                 }
         }
 
-        IRpcHandler.Handlers.ForEach(h =>
+        IRpcHandler.Handlers.ToArray().ForEach(h =>
         {
             dynamic handler = h;
             if (handler.CallId != callId) return;
