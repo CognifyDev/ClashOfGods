@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
-using COG.Listener;
-using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Game;
 using COG.Listener.Event.Impl.Modded.Player;
 using COG.Listener.Event.Impl.Player;
@@ -14,7 +12,7 @@ using COG.Utils;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Seer : CustomRole, IListener
+public class Seer : COG.Role.Camp.CrewmateRole
 {
     private CustomButton CheckButton { get; }
 
@@ -29,25 +27,25 @@ public class Seer : CustomRole, IListener
     private PlayerControl? _current;
 
     private readonly List<PlayerControl> _checkedPlayers = [];
-    
-    public Seer() : base(ColorUtils.FromColor32(30,144,255), CampType.Crewmate)
+
+    public Seer()
     {
-        Cooldown = CreateOption(() => 
+        Cooldown = CreateOption(() =>
                 GetContextFromLanguage("check-cooldown"),
             new FloatOptionValueRule(5, 1, 60, 25, NumberSuffixes.Seconds));
-        
-        InitialAvailableUsableTimes = CreateOption(() => 
+
+        InitialAvailableUsableTimes = CreateOption(() =>
                 GetContextFromLanguage("initial-available-usable-times"),
             new FloatOptionValueRule(1, 1, 15, 1));
 
         var action = new LanguageConfig.TextHandler("action");
 
-        CheckButton = CustomButton.Builder("seer-check", 
+        CheckButton = CustomButton.Builder("seer-check",
                 ResourceConstant.CheckButton, action.GetString("check"))
             .OnClick(() =>
             {
                 if (_current == null) return;
-    
+
                 _checkedPlayers.Add(_current);
                 ShowCurrentCamp(_current);
                 AvailableUsageTimes --;
@@ -60,46 +58,43 @@ public class Seer : CustomRole, IListener
             })
             .Cooldown(Cooldown.GetFloat)
             .Build();
- 
+
         AddButton(CheckButton);
+
+        On<PlayerMurderEvent>(OnPlayerMurder);
+        On<PlayerCustomRoleChangeEvent>(OnPlayerRoleChange);
+        On<GameStartEvent>(OnGameStart);
     }
 
     private bool HasChecked(PlayerControl? target)
     {
         return target != null && _checkedPlayers.Any(current => current.PlayerId == target.PlayerId);
     }
-    
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerMurder(PlayerMurderEvent @event)
+
+    private void OnPlayerMurder(PlayerMurderEvent @event)
     {
         if (MurderResultFlags.Succeeded != @event.MurderResult!.Value)
             return;
         if (!HasChecked(@event.Target))
             return;
         else _checkedPlayers.Remove(@event.Target);
-        
+
         AvailableUsageTimes ++;
     }
 
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnPlayerRoleChange(PlayerCustomRoleChangeEvent @event)
+    private void OnPlayerRoleChange(PlayerCustomRoleChangeEvent @event)
     {
         if (@event.OriginRole.Equals(@event.TargetRole))
             return;
         if (!HasChecked(@event.Player))
             return;
-        
+
         ShowCurrentCamp(@event.Player);
     }
 
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnGameStart(GameStartEvent _)
+    private void OnGameStart(GameStartEvent _)
     {
         AvailableUsageTimes = (int)InitialAvailableUsableTimes.GetFloat();
-        // Main.Logger.LogInfo(InitialAvailableUsableTimes.GetFloat());
         PlayerUtils.GetAllPlayers().ForEach(target => _prefixes.Add(target.PlayerId, target.Data.PlayerName));
     }
 
@@ -110,7 +105,7 @@ public class Seer : CustomRole, IListener
             target.Data.PlayerName = prefix + $"({target.GetMainRole().CampType.GetName()})";
         }
     }
-    
+
     public override void ClearRoleGameData()
     {
         // Restore modified player names before clearing
@@ -123,8 +118,4 @@ public class Seer : CustomRole, IListener
         _checkedPlayers.Clear();
         _prefixes.Clear();
     }
-    // public override IListener GetListener()
-    // {
-    //     return this;
-    // }
 }

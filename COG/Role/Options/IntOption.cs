@@ -15,7 +15,7 @@ public class IntOption
         _option = CustomOption.Of(
             CustomRole.GetTabType(role),
             () => role.GetContextFromLanguage(key),
-            new IntOptionValueRule(defaultValue, min, max, step));
+            new IntOptionValueRule(min, step, max, defaultValue));
         _option.Register();
         role.AllOptions.Add(_option);
     }

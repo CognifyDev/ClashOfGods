@@ -1,7 +1,5 @@
-using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
-using COG.Listener;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
@@ -9,17 +7,12 @@ using COG.Utils;
 
 namespace COG.Role.Impl.Impostor;
 
-public class Cleaner : CustomRole, IListener
+public class Cleaner : COG.Role.Camp.ImpostorRole
 {
     private DeadBody? _body;
 
     public Cleaner()
     {
-        BaseRoleType = RoleTypes.Impostor;
-        CanKill = true;
-        CanVent = true;
-        CanSabotage = true;
-
         CleanBodyCd = CreateOption(() => LanguageConfig.Instance.GetString("role.impostor.cleaner.clean-cd"),
             new FloatOptionValueRule(10F, 5F, 60F, 30F, NumberSuffixes.Seconds));
 
@@ -46,9 +39,4 @@ public class Cleaner : CustomRole, IListener
 
     private CustomOption CleanBodyCd { get; }
     private CustomButton CleanBodyButton { get; }
-
-    public override IListener GetListener()
-    {
-        return this;
-    }
 }

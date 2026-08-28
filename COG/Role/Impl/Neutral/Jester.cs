@@ -13,12 +13,12 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Neutral;
 
-public class Jester : CustomRole, IListener, IWinnable
+public class Jester : COG.Role.Camp.NeutralRole, IListener, IWinnable
 {
     private readonly CustomOption _allowReportDeadBody;
     private readonly CustomOption _allowStartMeeting;
 
-    public Jester() : base(Color.magenta, CampType.Neutral)
+    public Jester() : base(Color.magenta)
     {
         _allowStartMeeting = CreateOption(() => LanguageConfig.Instance.GetString("role.global.allow-start-meeting"),
             new BoolOptionValueRule(true));

@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Linq;
 using COG.Config.Impl;
-using COG.Listener;
-using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -12,13 +10,13 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class SoulHunter : CustomRole, IListener
+public class SoulHunter : COG.Role.Camp.CrewmateRole
 {
     private const string HasRevivedTag = "hasRevived_SoulHunter";
 
     private Vector2? _position;
 
-    public SoulHunter() : base(Color.green, CampType.Crewmate)
+    public SoulHunter()
     {
         ReviveAfter = CreateOption(() => LanguageConfig.Instance.GetString("role.crewmate.soul-hunter.revive-after"),
             new FloatOptionValueRule(1F, 1F, 60F, 5F, NumberSuffixes.Seconds));
@@ -29,6 +27,9 @@ public class SoulHunter : CustomRole, IListener
 
         DefaultKillButtonSetting.UsesLimit = 1;
         DefaultKillButtonSetting.CustomCooldown = SoulHunterKillCd.GetFloat;
+
+        On<PlayerMurderEvent>(OnPlayerMurder);
+        On<PlayerReportDeadBodyEvent>(OnReportBody);
     }
 
     private CustomOption ReviveAfter { get; }
@@ -39,10 +40,7 @@ public class SoulHunter : CustomRole, IListener
         _position = null;
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    [OnlyInRealGame]
-    public void OnPlayerMurder(PlayerMurderEvent @event)
+    private void OnPlayerMurder(PlayerMurderEvent @event)
     {
         var target = @event.Target;
 
@@ -78,8 +76,7 @@ public class SoulHunter : CustomRole, IListener
         }
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnReportBody(PlayerReportDeadBodyEvent @event)
+    private void OnReportBody(PlayerReportDeadBodyEvent @event)
     {
         var targets = Players.Where(player => player.HasMarkAs(HasRevivedTag));
         targets.ForEach(target => target.RpcSuicide());
@@ -88,10 +85,5 @@ public class SoulHunter : CustomRole, IListener
     public override string GetNameInConfig()
     {
         return "soul-hunter";
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
     }
 }

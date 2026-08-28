@@ -1,5 +1,6 @@
 using System.Collections;
-using COG.Listener;
+using COG.Config.Impl;
+using COG.Constant;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -9,20 +10,21 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Bait : CustomRole, IListener
+public class Bait : COG.Role.Camp.CrewmateRole
 {
-    public Bait() : base(ColorUtils.AsColor("#00F7FF"), CampType.Crewmate)
+    public Bait()
     {
         KillerSelfReportDelay = CreateOption(() => GetContextFromLanguage("killer-report-delay"),
             new FloatOptionValueRule(0, 1, 5, 1, NumberSuffixes.Seconds));
         WarnKiller = CreateOption(() => GetContextFromLanguage("warn-killer"), new BoolOptionValueRule(true));
+
+        On<PlayerMurderEvent>(OnMurderPlayer);
     }
 
     public CustomOption KillerSelfReportDelay { get; }
     public CustomOption WarnKiller { get; }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnMurderPlayer(PlayerMurderEvent @event)
+    private void OnMurderPlayer(PlayerMurderEvent @event)
     {
         var killer = @event.Player;
         var target = @event.Target;
@@ -41,10 +43,5 @@ public class Bait : CustomRole, IListener
             if (delay != 0) yield return new WaitForSeconds(delay);
             killer.CmdReportDeadBody(victim);
         }
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
     }
 }

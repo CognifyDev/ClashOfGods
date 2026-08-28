@@ -10,7 +10,7 @@ using UnityEngine.Events;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Doorman : CustomRole
+public class Doorman : COG.Role.Camp.CrewmateRole
 {
     public const MapOptions.Modes CustomMode = (MapOptions.Modes)int.MaxValue;
 
@@ -20,7 +20,7 @@ public class Doorman : CustomRole
 
     private bool _usedThisRound;
 
-    public Doorman() : base(Color.blue, CampType.Crewmate)
+    public Doorman() : base(Color.blue)
     {
         _instance = this;
 

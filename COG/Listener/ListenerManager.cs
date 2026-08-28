@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -145,6 +146,31 @@ public class ListenerManager
             if (type == EventHandlerType.Prefix && returnType == typeof(bool) && !(bool)result!) toReturn = false;
         }
 
+        // Dispatch to roles that subscribed via On<T>() delegates
+        if (type != EventHandlerType.Prefix)
+            DispatchToRoleDelegates(@event);
+
         return toReturn;
     }
+
+    /// <summary>
+    ///     Dispatch an event to all roles' delegate handlers (subscribed via On&lt;T&gt;()).
+    ///     Uses cached generic RaiseEvent invocation per event type.
+    /// </summary>
+    private void DispatchToRoleDelegates(Event.Event @event)
+    {
+        var eventType = @event.GetType();
+        if (!_roleRaiseMethods.TryGetValue(eventType, out var raise))
+        {
+            raise = typeof(CustomRole)
+                .GetMethod("RaiseEvent", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .MakeGenericMethod(eventType);
+            _roleRaiseMethods[eventType] = raise;
+        }
+
+        foreach (var role in CustomRoleManager.GetManager().GetRoles())
+            raise!.Invoke(role, [@event]);
+    }
+
+    private static readonly Dictionary<Type, MethodInfo?> _roleRaiseMethods = new();
 }

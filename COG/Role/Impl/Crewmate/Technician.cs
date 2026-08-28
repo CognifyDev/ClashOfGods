@@ -2,7 +2,6 @@ using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
-using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Rpc;
 using COG.UI.Hud.CustomButton;
@@ -11,13 +10,11 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Technician : CustomRole, IListener
+public class Technician : COG.Role.Camp.CrewmateRole
 {
-    public Technician() : base(Palette.Orange, CampType.Crewmate)
+    public Technician() : base(Palette.Orange)
     {
         CanVent = true;
-        CanKill = false;
-        CanSabotage = false;
 
         var repairRpcHandler = new RpcHandler(KnownRpc.ClearSabotages, RepairSabotages);
         RegisterRpcHandler(repairRpcHandler);
@@ -32,13 +29,13 @@ public class Technician : CustomRole, IListener
             .Build();
 
         AddButton(RepairButton);
+
+        On<VentCheckEvent>(OnVentCheck);
     }
 
     private CustomButton RepairButton { get; }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnVentCheck(VentCheckEvent @event)
+    private void OnVentCheck(VentCheckEvent @event)
     {
         var data = @event.PlayerInfo;
         var player = data.Object;
@@ -108,10 +105,5 @@ public class Technician : CustomRole, IListener
             if (mixup.IsActive)
                 mixup.currentSecondsUntilHeal = 0.1f;
         }
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
     }
 }

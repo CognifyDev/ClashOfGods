@@ -1,6 +1,5 @@
-﻿using COG.Constant;
+using COG.Constant;
 using COG.Listener;
-using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
@@ -12,7 +11,7 @@ using COG.Utils;
 namespace COG.Role.Impl.Crewmate;
 
 [HarmonyPatch]
-public class Witch : CustomRole, IListener
+public class Witch : COG.Role.Camp.CrewmateRole
 {
     private static bool _shouldDetectInteraction;
     private static bool _shouldDieWhenMeetingStarts;
@@ -23,7 +22,7 @@ public class Witch : CustomRole, IListener
     private DeadBody? _current;
     private int _remainingUses = 1;
 
-    public Witch() : base(ColorUtils.AsColor("#773ba4"), CampType.Crewmate)
+    public Witch()
     {
         _antidoteHandler = new RpcHandler<byte>(KnownRpc.WitchUsesAntidote,
             playerId =>
@@ -60,19 +59,19 @@ public class Witch : CustomRole, IListener
             .Build();
 
         AddButton(_antidoteButton);
+
+        On<MeetingStartEvent>(OnMeetingStarts);
+        On<PlayerTaskFinishEvent>(OnPlayerFinishesTask);
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnMeetingStarts(MeetingStartEvent @event)
+    private void OnMeetingStarts(MeetingStartEvent @event)
     {
         if (_shouldDieWhenMeetingStarts) // Other players should always have this being false
         {
         } // TODO
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnPlayerFinishesTask(PlayerTaskFinishEvent @event)
+    private void OnPlayerFinishesTask(PlayerTaskFinishEvent @event)
     {
         if (@event.Player.AllTasksCompleted())
             _remainingUses++;
@@ -83,11 +82,6 @@ public class Witch : CustomRole, IListener
         _remainingUses = 1;
         _shouldDetectInteraction = false;
         _shouldDieWhenMeetingStarts = false;
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
     }
 
 

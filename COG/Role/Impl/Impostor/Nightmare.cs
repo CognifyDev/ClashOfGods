@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using COG.Constant;
 using COG.Rpc;
 using COG.UI.CustomOption;
@@ -14,7 +14,7 @@ using UnityEngine;
 namespace COG.Role.Impl.Impostor;
 
 [NotTested("rpc")]
-public class Nightmare : CustomRole
+public class Nightmare : COG.Role.Camp.ImpostorRole
 {
     private const int MaxKillsStored = 2;
     private const float ResponseTimeout = 5f;

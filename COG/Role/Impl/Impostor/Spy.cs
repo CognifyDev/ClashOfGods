@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using COG.Constant;
 using COG.Rpc;
 using COG.UI.CustomOption;
@@ -14,7 +14,7 @@ using UnityEngine;
 namespace COG.Role.Impl.Impostor;
 
 [NotTested("队友的HudMessage")]
-public class Spy : CustomRole
+public class Spy : COG.Role.Camp.ImpostorRole
 {
     private readonly CustomButton _observeButton;
     private readonly CustomOption _observeCooldown;

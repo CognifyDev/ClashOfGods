@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
-using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -13,10 +12,8 @@ using COG.Utils;
 namespace COG.Role.Impl.Neutral;
 
 [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]
-public class DeathBringer : CustomRole, IListener
+public class DeathBringer : COG.Role.Camp.NeutralRole
 {
-    // private const string PlayerStaredAtTag = "staredAt_DeathBringer";
-
     private readonly CustomOption _killCooldown, _neededPlayerNumber;
 
     private readonly CustomButton _stareButton;
@@ -25,7 +22,7 @@ public class DeathBringer : CustomRole, IListener
 
     private PlayerControl? _target;
 
-    public DeathBringer() : base(ColorUtils.FromColor32(112, 48, 160), CampType.Neutral)
+    public DeathBringer() : base(ColorUtils.FromColor32(112, 48, 160))
     {
         CanKill = true;
 
@@ -61,16 +58,11 @@ public class DeathBringer : CustomRole, IListener
         DefaultKillButtonSetting.CustomCooldown = _killCooldown.GetFloat;
 
         AddButton(_stareButton);
+
+        On<PlayerReportDeadBodyEvent>(OnHostCheckPlayerReport);
     }
 
-    public override IListener GetListener()
-    {
-        return this;
-    }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnHostCheckPlayerReport(PlayerReportDeadBodyEvent _)
+    private void OnHostCheckPlayerReport(PlayerReportDeadBodyEvent _)
     {
         foreach (var target in _staredPlayers)
             target.CmdCheckMurder(target);

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.CustomWinner.Data;
@@ -12,7 +12,7 @@ using UnityEngine;
 namespace COG.Role.Impl.Neutral;
 
 [HarmonyPatch]
-public class Reporter : CustomRole, IListener, IWinnable
+public class Reporter : COG.Role.Camp.NeutralRole, IListener, IWinnable
 {
     private static bool _isReporterReported;
     private static Reporter _roleInstance = null!;
@@ -20,7 +20,7 @@ public class Reporter : CustomRole, IListener, IWinnable
     private readonly CustomOption _neededReportTimes;
     private readonly Dictionary<PlayerControl, uint> _reportersWhoReported = new();
 
-    public Reporter() : base(Color.gray, CampType.Neutral)
+    public Reporter() : base(Color.gray)
     {
         _neededReportTimes = CreateOption(() => LanguageConfig.Instance.GetString("role.neutral.reporter.neededReportTimes"),
             new FloatOptionValueRule(1, 1, 14, 3));

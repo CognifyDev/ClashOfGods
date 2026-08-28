@@ -15,7 +15,7 @@ public class FloatOption
         _option = CustomOption.Of(
             CustomRole.GetTabType(role),
             () => role.GetContextFromLanguage(key),
-            new FloatOptionValueRule(defaultValue, min, max, step));
+            new FloatOptionValueRule(min, step, max, defaultValue));
         _option.Register();
         role.AllOptions.Add(_option);
     }

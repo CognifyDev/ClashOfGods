@@ -2,7 +2,6 @@ using System.Collections;
 using System.Linq;
 using COG.Constant;
 using COG.Listener;
-using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
 using COG.UI.CustomOption;
@@ -15,14 +14,14 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Enchanter : CustomRole, IListener
+public class Enchanter : COG.Role.Camp.CrewmateRole
 {
     private PlayerControl? _contractedPlayer;
     private PlayerControl? _lastKiller;
     private PlayerControl? _target;
     private bool _usedThisRound;
 
-    public Enchanter() : base(ColorUtils.AsColor("#7030a0"), CampType.Crewmate)
+    public Enchanter()
     {
         ContractButton = CustomButton.Builder("enchanter-contract",
                 ResourceConstant.ContractButton, ActionNameContext.GetString("contract"))
@@ -85,6 +84,8 @@ public class Enchanter : CustomRole, IListener
             reader => reader.ReadNetObject<PlayerControl>());
 
         RegisterRpcHandler(KillerPunishmentHandler);
+
+        On<PlayerMurderEvent>(OnPlayerMurder);
     }
 
     public CustomButton ContractButton { get; }
@@ -92,9 +93,7 @@ public class Enchanter : CustomRole, IListener
     public CustomOption CooldownIncreament { get; }
     public RpcHandler<PlayerControl> KillerPunishmentHandler { get; }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnPlayerMurder(PlayerMurderEvent @event)
+    private void OnPlayerMurder(PlayerMurderEvent @event)
     {
         if (!_contractedPlayer) return;
         if (@event.Target.IsSamePlayer(_contractedPlayer))
@@ -112,10 +111,5 @@ public class Enchanter : CustomRole, IListener
         _target = null;
         _usedThisRound = false;
         _lastKiller = null;
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
     }
 }

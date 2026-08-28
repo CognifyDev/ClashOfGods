@@ -1,49 +1,33 @@
-using AmongUs.GameOptions;
-using COG.Config.Impl;
-using COG.Listener;
-using COG.Listener.Attribute;
-using COG.Listener.Event.Impl.Player;
-using COG.UI.CustomOption;
+using COG.Role.Camp;
+using COG.Role.Options;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.Utils;
 using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
-public class Reaper : CustomRole, IListener
+public class Reaper : COG.Role.Camp.ImpostorRole
 {
     private float _cooldown;
+    private FloatOption TimeToReduce { get; }
 
     public Reaper()
     {
-        BaseRoleType = RoleTypes.Impostor;
-        CanKill = true;
-        CanVent = true;
-        CanSabotage = true;
-
-        TimeToReduce = CreateOption(() => LanguageConfig.Instance.GetString("role.impostor.reaper.time-to-reduce"),
-            new FloatOptionValueRule(1F, 0.5F, 5F, 1.5F, NumberSuffixes.Seconds));
+        TimeToReduce = Float("time-to-reduce", 0.5f, 5f, 1.5f, 0.5f);
 
         _cooldown = GameUtils.GetGameOptions()?.KillCooldown ?? 30f;
         DefaultKillButtonSetting.CustomCooldown = () => _cooldown;
+
+        On<Listener.Event.Impl.Player.PlayerMurderEvent>(OnPlayerMurder);
     }
 
-    private CustomOption TimeToReduce { get; }
-
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnPlayerMurder(PlayerMurderEvent @event)
+    private void OnPlayerMurder(Listener.Event.Impl.Player.PlayerMurderEvent @event)
     {
-        _cooldown = Mathf.Clamp(_cooldown -= TimeToReduce.GetFloat(), 1f, float.MaxValue);
+        _cooldown = Mathf.Clamp(_cooldown - TimeToReduce.Value, 1f, float.MaxValue);
     }
 
     public override void ClearRoleGameData()
     {
         _cooldown = GameUtils.GetGameOptions()?.KillCooldown ?? 30f;
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
     }
 }

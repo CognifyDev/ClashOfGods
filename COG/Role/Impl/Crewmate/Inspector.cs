@@ -3,7 +3,6 @@ using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.Listener;
-using COG.Listener.Attribute;
 using COG.Rpc;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -13,14 +12,14 @@ using COG.Utils.Coding;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Inspector : CustomRole, IListener
+public class Inspector : COG.Role.Camp.CrewmateRole
 {
     private readonly List<PlayerControl> _abilityUsedPlayers = [];
     private bool _abilityUsedThisRound;
     private PlayerControl? _buttonTarget;
     private PlayerControl? _examinedTarget;
 
-    public Inspector() : base(ColorUtils.FromColor32(46, 84, 160), CampType.Crewmate)
+    public Inspector()
     {
         OnRoleAbilityUsed += (_, _) => NotifyInspector();
 
@@ -49,7 +48,6 @@ public class Inspector : CustomRole, IListener
     public CustomOption AbilityCooldownOption { get; }
     public CustomButton ExamineButton { get; }
 
-    [OnlyLocalPlayerWithThisRoleInvokable]
     public override void OnRpcReceived(PlayerControl sender, byte callId, MessageReader reader)
     {
         if (callId is (byte)KnownRpc.ShareAbilityOrVentUseForInspector or (byte)RpcCalls.EnterVent)
@@ -76,10 +74,5 @@ public class Inspector : CustomRole, IListener
             return
                 $"({(_abilityUsedPlayers.Contains(player) ? LanguageConfig.Instance.GetString("mod-global.yes").Color(Palette.ImpostorRed) : LanguageConfig.Instance.GetString("mod-global.no").Color(Palette.AcceptedGreen))})";
         return base.HandleAdditionalPlayerName(player);
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
     }
 }

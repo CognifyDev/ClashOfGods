@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Impostor;
 
-public class Troublemaker : CustomRole
+public class Troublemaker : COG.Role.Camp.ImpostorRole
 {
     private readonly CustomButton _disturbButton;
     private readonly CustomOption _disturbCooldown;

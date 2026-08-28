@@ -9,21 +9,22 @@ using COG.Utils;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Vigilante : CustomRole, IListener
+public class Vigilante : COG.Role.Camp.CrewmateRole
 {
     private readonly CustomOption _minCrewmateNumber;
     private bool _hasGiven;
 
-    public Vigilante() : base(ColorUtils.AsColor("#ffcc00"), CampType.Crewmate)
+    public Vigilante()
     {
         CanKill = true;
-        CanVent = false;
 
         DefaultKillButtonSetting.UsesLimit = int.MaxValue;
         DefaultKillButtonSetting.RemainingUses = 1;
 
         _minCrewmateNumber = CreateOption(() => LanguageConfig.Instance.GetString("role.crewmate.vigilante.min-crewmate-number"),
             new FloatOptionValueRule(1, 1, 15, 3));
+
+        On<PlayerFixedUpdateEvent>(OnPlayerFixedUpdate);
     }
 
     public override void ClearRoleGameData()
@@ -32,19 +33,12 @@ public class Vigilante : CustomRole, IListener
         _hasGiven = false;
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
+    private void OnPlayerFixedUpdate(PlayerFixedUpdateEvent @event)
     {
         if (!GameStates.InRealGame) return;
         if (PlayerUtils.AllCrewmates.Count() > _minCrewmateNumber.GetInt() || _hasGiven) return;
 
         DefaultKillButtonSetting.RemainingUses++;
         _hasGiven = true;
-    }
-
-    public override IListener GetListener()
-    {
-        return this;
     }
 }

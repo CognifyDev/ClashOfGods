@@ -1,4 +1,4 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Constant;
 using COG.UI.CustomOption;
@@ -8,7 +8,7 @@ using COG.Utils;
 
 namespace COG.Role.Impl.Impostor;
 
-public class Stabber : CustomRole
+public class Stabber : COG.Role.Camp.ImpostorRole
 {
     private readonly CustomButton _dispatchButton;
     private readonly CustomOption _maxUseTime;
@@ -19,11 +19,6 @@ public class Stabber : CustomRole
 
     public Stabber()
     {
-        BaseRoleType = RoleTypes.Impostor;
-        CanKill = true;
-        CanVent = true;
-        CanSabotage = true;
-
         _maxUseTime = CreateOption(() => LanguageConfig.Instance.GetString("role.global.max-use-time"), new FloatOptionValueRule(1, 1, 15, 2));
 
         _dispatchButton = CustomButton.Builder("stabber-dispatch", ResourceConstant.DispatchButton,

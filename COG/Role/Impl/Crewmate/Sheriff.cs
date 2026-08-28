@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Sheriff : CustomRole, IListener
+public class Sheriff : COG.Role.Camp.CrewmateRole
 {
-    public Sheriff() : base(Color.yellow, CampType.Crewmate)
+    public Sheriff() : base(Color.yellow)
     {
         CanKill = true;
 

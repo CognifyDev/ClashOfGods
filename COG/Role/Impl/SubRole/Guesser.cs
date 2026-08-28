@@ -1,8 +1,6 @@
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
-using COG.Listener;
-using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -13,8 +11,8 @@ using UnityEngine;
 
 namespace COG.Role.Impl.SubRole;
 
-public class Guesser : CustomRole, IListener, IMeetingButton
-{    
+public class Guesser : CustomRole, IMeetingButton
+{
     private TextMeshPro? _remainingGuessText;
 
     public NetworkedPlayerInfo? CurrentGuessing { get; set; }
@@ -71,11 +69,12 @@ public class Guesser : CustomRole, IListener, IMeetingButton
         EnabledRolesOnly = CreateOption(
             () => LanguageConfig.Instance.GetString("role.sub-roles.guesser.guess-enabled-roles-only"),
             new BoolOptionValueRule(true));
+
+        On<MeetingStartEvent>(OnMeetingStart);
+        On<MeetingVotingCompleteEvent>(OnVotingComplete);
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    [OnlyLocalPlayerWithThisRoleInvokable]
-    public void OnMeetingStart(MeetingStartEvent @event)
+    private void OnMeetingStart(MeetingStartEvent @event)
     {
         var player = PlayerControl.LocalPlayer;
         if (!player.IsAlive()) return;
@@ -108,8 +107,7 @@ public class Guesser : CustomRole, IListener, IMeetingButton
         }
     }
 
-    [EventHandler(EventHandlerType.Postfix)]
-    public void OnVotingComplete(MeetingVotingCompleteEvent @event)
+    private void OnVotingComplete(MeetingVotingCompleteEvent @event)
     {
         GuesserButton.DestroyAll();
     }
@@ -124,8 +122,6 @@ public class Guesser : CustomRole, IListener, IMeetingButton
                 GuesserButton.Buttons.ForEach(b => b.CloseGuessUI());
         }
     }
-
-    public override IListener GetListener() => this;
 
     private void UpdateRemainingText()
     {

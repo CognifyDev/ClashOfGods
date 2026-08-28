@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace COG.Role.Impl.Crewmate;
 
-public class Chief : CustomRole
+public class Chief : COG.Role.Camp.CrewmateRole
 {
     private readonly CustomButton _giveKillButton;
 
@@ -19,7 +19,7 @@ public class Chief : CustomRole
 
     private PlayerControl? _target;
 
-    public Chief() : base(Color.gray, CampType.Crewmate)
+    public Chief() : base(Color.gray)
     {
         _giveKillRpcHandler = new RpcHandler<PlayerControl>(KnownRpc.GiveOneKill,
             player =>

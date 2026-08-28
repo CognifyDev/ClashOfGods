@@ -10,6 +10,11 @@ public abstract class ImpostorRole : CustomRole
     protected ImpostorRole(Color? color = null) 
         : base(color ?? Palette.ImpostorRed, CampType.Impostor)
     {
+        SetImpostorCapabilities();
+    }
+
+    private void SetImpostorCapabilities()
+    {
         CanKill = true;
         CanVent = true;
         CanSabotage = true;

@@ -8,7 +8,6 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.Events;
-using COG.Infrastructure;
 using COG.Listener;
 using COG.Listener.Event.Impl.Game.Record;
 using COG.Rpc;
@@ -146,7 +145,7 @@ public class CustomRole
     public bool IsBaseRole
     {
         get => _metadata.IsBaseRole;
-        protected init => _metadata.IsBaseRole = value;
+        protected set => _metadata.IsBaseRole = value;
     }
 
     /// <summary>
@@ -190,7 +189,7 @@ public class CustomRole
     public bool CanVent
     {
         get => _capabilities.CanVent;
-        protected init => _capabilities.CanVent = value;
+        protected set => _capabilities.CanVent = value;
     }
 
     /// <summary>
@@ -199,7 +198,7 @@ public class CustomRole
     public bool CanKill
     {
         get => _capabilities.CanKill;
-        protected init => _capabilities.CanKill = value;
+        protected set => _capabilities.CanKill = value;
     }
 
     /// <summary>
@@ -208,7 +207,7 @@ public class CustomRole
     public bool CanSabotage
     {
         get => _capabilities.CanSabotage;
-        protected init => _capabilities.CanSabotage = value;
+        protected set => _capabilities.CanSabotage = value;
     }
 
     // ==================== Options Delegates ====================
@@ -461,7 +460,7 @@ public class CustomRole
     /// <summary>
     /// Subscribe to an event using delegate. Replaces IListener pattern.
     /// </summary>
-    protected void On<T>(Action<T> handler) where T : IEvent
+    protected void On<T>(Action<T> handler) where T : COG.Listener.Event.Event
     {
         if (!_eventHandlers.ContainsKey(typeof(T)))
             _eventHandlers[typeof(T)] = new List<Delegate>();
@@ -471,7 +470,7 @@ public class CustomRole
     /// <summary>
     /// Unsubscribe from an event.
     /// </summary>
-    protected void Off<T>(Action<T> handler) where T : IEvent
+    protected void Off<T>(Action<T> handler) where T : COG.Listener.Event.Event
     {
         if (_eventHandlers.ContainsKey(typeof(T)))
             _eventHandlers[typeof(T)].Remove(handler);
@@ -479,9 +478,11 @@ public class CustomRole
 
     /// <summary>
     /// Raise an event to all subscribed handlers. Called by ListenerManager.
+    /// Only fires for the local player's roles.
     /// </summary>
-    internal void RaiseEvent<T>(T @event) where T : IEvent
+    internal void RaiseEvent<T>(T @event) where T : COG.Listener.Event.Event
     {
+        if (!IsLocalPlayerRole()) return;
         if (_eventHandlers.TryGetValue(typeof(T), out var handlers))
         {
             foreach (var handler in handlers.ToArray())
@@ -492,7 +493,7 @@ public class CustomRole
     /// <summary>
     /// Check if this role has any handlers for a specific event type.
     /// </summary>
-    internal bool HasHandlers<T>() where T : IEvent
+    internal bool HasHandlers<T>() where T : COG.Listener.Event.Event
     {
         return _eventHandlers.ContainsKey(typeof(T)) && _eventHandlers[typeof(T)].Count > 0;
     }
