@@ -1,6 +1,7 @@
 using System.Collections;
 using COG.Constant;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
@@ -15,7 +16,7 @@ public class Troublemaker : COG.Role.Camp.ImpostorRole
     private readonly CustomButton _disturbButton;
     private readonly CustomOption _disturbCooldown;
     private readonly CustomOption _disturbDuration;
-    private readonly RpcHandler _disturbRpcHandler;
+    private readonly RoleRpc _disturbRpc;
     private GameObject? _commsDown;
 
     private bool _usedThisRound;
@@ -39,7 +40,7 @@ public class Troublemaker : COG.Role.Camp.ImpostorRole
             5f, 60f,
             30f, NumberSuffixes.Seconds));
 
-        _disturbRpcHandler = new RpcHandler(KnownRpc.TroubleMakerDisturb, () =>
+        _disturbRpc = NewRpc(KnownRpc.TroubleMakerDisturb).Receive(_ =>
         {
             var useButton = HudManager.Instance.UseButton;
 
@@ -72,13 +73,11 @@ public class Troublemaker : COG.Role.Camp.ImpostorRole
             }
         });
 
-        RegisterRpcHandler(_disturbRpcHandler);
-
         _disturbButton = CustomButton.Builder("troublemaker-disturb", ResourceConstant.DisturbButton,
                 ActionNameContext.GetString("disturb"))
             .OnClick(() =>
             {
-                _disturbRpcHandler.PerformAndSend();
+                _disturbRpc.Create().Perform();
                 _usedThisRound = true;
             })
             .OnMeetingEnds(() => _usedThisRound = false)

@@ -5,6 +5,7 @@ using COG.Listener;
 using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
@@ -49,7 +50,7 @@ public class Enchanter : COG.Role.Camp.CrewmateRole
             new FloatOptionValueRule(3, 1, 10,
                 5, NumberSuffixes.Seconds));
 
-        KillerPunishmentHandler = new RpcHandler<PlayerControl>(KnownRpc.EnchanterPunishesKiller,
+        KillerPunishmentRpc = CreateRoleRpc<PlayerControl>(KnownRpc.EnchanterPunishesKiller,
             p => // p must be local player
             {
                 if (!p.AmOwner) return;
@@ -80,11 +81,7 @@ public class Enchanter : COG.Role.Camp.CrewmateRole
                         () => baseCooldown + CooldownIncreament.GetFloat();
                     PlayerControl.LocalPlayer.ResetKillCooldown();
                 }
-            },
-            (writer, player) => writer.WriteNetObject(player),
-            reader => reader.ReadNetObject<PlayerControl>());
-
-        RegisterRpcHandler(KillerPunishmentHandler);
+            });
 
         On<PlayerMurderEvent>(OnPlayerMurder);
     }
@@ -92,7 +89,7 @@ public class Enchanter : COG.Role.Camp.CrewmateRole
     public CustomButton ContractButton { get; }
     public CustomOption ImmobilizationDuration { get; }
     public CustomOption CooldownIncreament { get; }
-    public RpcHandler<PlayerControl> KillerPunishmentHandler { get; }
+    public RoleRpc<PlayerControl> KillerPunishmentRpc { get; }
 
     [LocalOnly]
     private void OnPlayerMurder(PlayerMurderEvent @event)
@@ -101,7 +98,7 @@ public class Enchanter : COG.Role.Camp.CrewmateRole
         if (@event.Target.IsSamePlayer(_contractedPlayer))
         {
             _lastKiller = @event.Player;
-            KillerPunishmentHandler.Send(_lastKiller);
+            KillerPunishmentRpc.Send(_lastKiller);
             _lastKiller = null;
             _contractedPlayer = null;
         }

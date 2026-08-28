@@ -1,6 +1,7 @@
 using System.Collections;
 using COG.Constant;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.Arrow;
@@ -18,14 +19,14 @@ public class Spy : COG.Role.Camp.ImpostorRole
 {
     private readonly CustomButton _observeButton;
     private readonly CustomOption _observeCooldown;
-    private readonly RpcHandler<bool> _revealClosestTargetHandler;
+    private readonly RoleRpc<bool> _revealClosestTargetRpc;
 
     public Spy()
     {
         _observeCooldown = CreateOption(() => GetContextFromLanguage("observe-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
 
-        _revealClosestTargetHandler = new RpcHandler<bool>(KnownRpc.SpyRevealClosestTarget,
+        _revealClosestTargetRpc = CreateRoleRpc<bool>(KnownRpc.SpyRevealClosestTarget,
             isByKill =>
             {
                 if (PlayerControl.LocalPlayer.GetMainRole().CampType != CampType.Impostor) return;
@@ -56,21 +57,17 @@ public class Spy : COG.Role.Camp.ImpostorRole
 
                     arrow.gameObject.TryDestroy();
                 }
-            },
-            (writer, isByKill) => writer.Write(isByKill),
-            reader => reader.ReadBoolean());
-
-        RegisterRpcHandler(_revealClosestTargetHandler);
+            });
 
         _observeButton = CustomButton.Builder("spy-observe",
                 ResourceConstant.ObserveButton,
                 ActionNameContext.GetString("observe"))
-            .OnClick(() => _revealClosestTargetHandler.PerformAndSend(false))
+            .OnClick(() => _revealClosestTargetRpc.PerformAndSend(false))
             .Cooldown(_observeCooldown.GetFloat)
             .Build();
 
         AddButton(_observeButton);
 
-        CurrentKillButtonSetting.AddAfterClick(() => _revealClosestTargetHandler.PerformAndSend(true));
+        CurrentKillButtonSetting.AddAfterClick(() => _revealClosestTargetRpc.PerformAndSend(true));
     }
 }

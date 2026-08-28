@@ -1,7 +1,9 @@
 using System.Linq;
 using COG.Config.Impl;
 using COG.Constant;
+using COG.Listener;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.Hud.CustomButton;
 using COG.UI.Vanilla.KillButton;
 using COG.Utils;
@@ -14,14 +16,14 @@ public class Chief : COG.Role.Camp.CrewmateRole
 {
     private readonly CustomButton _giveKillButton;
 
-    private readonly RpcHandler<PlayerControl> _giveKillRpcHandler;
+    private readonly RoleRpc<PlayerControl> _giveKillRpc;
     private readonly CustomButton _giveShieldButton;
 
     private PlayerControl? _target;
 
     public Chief() : base(Color.gray)
     {
-        _giveKillRpcHandler = new RpcHandler<PlayerControl>(KnownRpc.GiveOneKill,
+        _giveKillRpc = CreateRoleRpc<PlayerControl>(KnownRpc.GiveOneKill,
             player =>
             {
                 if (!player.AmOwner) return; // local player only
@@ -41,17 +43,13 @@ public class Chief : COG.Role.Camp.CrewmateRole
                     role.CurrentKillButtonSetting.AddAfterClick(() =>
                         role.ResetCurrentKillButtonSetting()); // restore setting after use
                 }
-            },
-            (writer, player) => writer.WriteNetObject(player),
-            reader => reader.ReadNetObject<PlayerControl>());
-
-        RegisterRpcHandler(_giveKillRpcHandler);
+            });
 
         var action = new LanguageConfig.TextHandler("action");
 
         _giveKillButton = CustomButton.Builder("chief-give-kill",
                 ResourceConstant.GiveKillButton, action.GetString("give-kill"))
-            .OnClick(() => _giveKillRpcHandler.Send(_target!)) // just send
+            .OnClick(() => _giveKillRpc.Send(_target!)) // just send
             .CouldUse(() => PlayerControl.LocalPlayer.CheckClosestTargetInKillDistance(out _target))
             .Cooldown(() => 0)
             .UsesLimit(1)

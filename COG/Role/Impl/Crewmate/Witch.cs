@@ -3,6 +3,7 @@ using COG.Listener;
 using COG.Listener.Event.Impl.Meeting;
 using COG.Listener.Event.Impl.Player;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
@@ -17,14 +18,14 @@ public class Witch : COG.Role.Camp.CrewmateRole
     private static bool _shouldDieWhenMeetingStarts;
     private readonly CustomButton _antidoteButton;
     private readonly CustomOption _antidoteCooldown;
-    private readonly RpcHandler<byte> _antidoteHandler;
+    private readonly RoleRpc<byte> _antidoteRpc;
 
     private DeadBody? _current;
     private int _remainingUses = 1;
 
     public Witch() : base(ColorUtils.AsColor("#773ba4"))
     {
-        _antidoteHandler = new RpcHandler<byte>(KnownRpc.WitchUsesAntidote,
+        _antidoteRpc = CreateRoleRpc<byte>(KnownRpc.WitchUsesAntidote,
             playerId =>
             {
                 var player = PlayerUtils.GetPlayerById(playerId);
@@ -40,9 +41,7 @@ public class Witch : COG.Role.Camp.CrewmateRole
                     _shouldDetectInteraction = true;
                     OnRoleAbilityUsed += (role, _) => _shouldDieWhenMeetingStarts = true;
                 }
-            },
-            (writer, playerId) => writer.Write(playerId),
-            reader => reader.ReadByte());
+            });
 
         _antidoteCooldown = CreateOption(() => GetContextFromLanguage("antidote-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
@@ -51,7 +50,7 @@ public class Witch : COG.Role.Camp.CrewmateRole
                 ResourceConstant.AntidoteButton, ActionNameContext.GetString("antidote"))
             .OnClick(() =>
             {
-                _antidoteHandler.PerformAndSend(_current!.ParentId);
+                _antidoteRpc.PerformAndSend(_current!.ParentId);
                 _remainingUses--;
             })
             .CouldUse(() => _remainingUses > 0 && (_current = PlayerUtils.GetClosestBody()))

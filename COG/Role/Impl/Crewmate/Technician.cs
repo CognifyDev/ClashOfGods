@@ -5,6 +5,7 @@ using COG.Listener;
 using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.VentImpl;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.Hud.CustomButton;
 using COG.Utils;
 using UnityEngine;
@@ -17,12 +18,11 @@ public class Technician : COG.Role.Camp.CrewmateRole
     {
         CanVent = true;
 
-        var repairRpcHandler = new RpcHandler(KnownRpc.ClearSabotages, RepairSabotages);
-        RegisterRpcHandler(repairRpcHandler);
+        var repairRpc = NewRpc(KnownRpc.ClearSabotages).Receive(_ => RepairSabotages());
 
         RepairButton = CustomButton.Builder("technician-repair",
                 ResourceConstant.RepairButton, LanguageConfig.Instance.GetString("action.repair"))
-            .OnClick(repairRpcHandler.PerformAndSend)
+            .OnClick(() => repairRpc.Create().Perform())
             .OnMeetingEnds(() => RepairButton?.ResetCooldown())
             .CouldUse(() => PlayerControl.LocalPlayer.myTasks.ToArray().Any(PlayerTask.TaskIsEmergency))
             .Cooldown(() => 0F)

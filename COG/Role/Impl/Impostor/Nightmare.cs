@@ -1,6 +1,7 @@
 using System.Collections;
 using COG.Constant;
 using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.CustomButton;
@@ -18,10 +19,10 @@ public class Nightmare : COG.Role.Camp.ImpostorRole
 {
     private const int MaxKillsStored = 2;
     private const float ResponseTimeout = 5f;
-    private readonly RpcHandler<PlayerControl, PlayerControl, float> _cooldownCheckHandler;
+    private readonly RoleRpc<PlayerControl, PlayerControl, float> _cooldownCheckRpc;
     private readonly CustomButton _storeButton;
     private readonly CustomOption _storeCooldown;
-    private readonly RpcHandler<PlayerControl> _storeHandler;
+    private readonly RoleRpc<PlayerControl> _storeRpc;
     private bool _receivedCooldownSent;
 
     // GAMEPLAY VARIABLES
@@ -31,22 +32,20 @@ public class Nightmare : COG.Role.Camp.ImpostorRole
 
     public Nightmare()
     {
-        _storeHandler = new RpcHandler<PlayerControl>(KnownRpc.NightmareStore,
+        _storeRpc = CreateRoleRpc<PlayerControl>(KnownRpc.NightmareStore,
             player =>
             {
                 if (player.AmOwner) // local player only
                     player.ResetKillCooldown();
-            },
-            (writer, player) => writer.WriteNetObject(player),
-            reader => reader.ReadNetObject<PlayerControl>());
-        _cooldownCheckHandler = new RpcHandler<PlayerControl, PlayerControl, float>(KnownRpc.NightmareCooldownCheck,
+            });
+        _cooldownCheckRpc = CreateRoleRpc<PlayerControl, PlayerControl, float>(KnownRpc.NightmareCooldownCheck,
             (sender, receiver, cooldown) =>
             {
                 if (!receiver.AmOwner) return;
 
                 if (cooldown == float.MaxValue)
                 {
-                    _cooldownCheckHandler!.Send(receiver, sender,
+                    _cooldownCheckRpc!.Send(receiver, sender,
                         PlayerControl.LocalPlayer.killTimer); // Sending current cooldown
                 }
                 else
@@ -54,13 +53,7 @@ public class Nightmare : COG.Role.Camp.ImpostorRole
                     _teammateCurrentCooldown = cooldown;
                     _receivedCooldownSent = true;
                 }
-            },
-            (writer, player, receiver, cooldown) => writer.WriteNetObject(player).Write(cooldown),
-            reader => (reader.ReadNetObject<PlayerControl>(), reader.ReadNetObject<PlayerControl>(),
-                reader.ReadSingle()));
-
-        RegisterRpcHandler(_storeHandler);
-        RegisterRpcHandler(_cooldownCheckHandler);
+            });
 
         _storeCooldown = CreateOption(() => GetContextFromLanguage("store-cooldown"),
             new FloatOptionValueRule(10, 5, 60, 20, NumberSuffixes.Seconds));
@@ -74,8 +67,8 @@ public class Nightmare : COG.Role.Camp.ImpostorRole
 
                 IEnumerator Ability()
                 {
-                    _storeHandler.Send(_target!);
-                    _cooldownCheckHandler.Send(PlayerControl.LocalPlayer, _target!, float.MaxValue);
+                    _storeRpc.Send(_target!);
+                    _cooldownCheckRpc.Send(PlayerControl.LocalPlayer, _target!, float.MaxValue);
 
                     Main.Logger.LogInfo("Begun checking teammate cooldown, waiting for response...");
 
