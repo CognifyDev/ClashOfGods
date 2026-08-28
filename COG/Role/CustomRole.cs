@@ -8,11 +8,13 @@ using AmongUs.GameOptions;
 using COG.Config.Impl;
 using COG.Game.CustomWinner;
 using COG.Game.Events;
+using COG.Infrastructure;
 using COG.Listener;
 using COG.Listener.Event.Impl.Game.Record;
 using COG.Rpc;
 using COG.Rpc.Role;
 using COG.Role.Components;
+using COG.Role.Options;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules;
 using COG.UI.CustomOption.ValueRules.Impl;
@@ -49,6 +51,9 @@ public class CustomRole
     // Role-scoped RPC dispatch table: localRpcId → typed handler
     // Populated by NewRpc(); used by DispatchRoleRpc.
     private readonly Dictionary<uint, IRoleRpc> _roleRpcHandlers = new();
+
+    // Event handlers for delegate-based event subscription
+    private readonly Dictionary<Type, List<Delegate>> _eventHandlers = new();
 
     /// <summary>
     ///     Initializes a sub-role instance.
@@ -313,7 +318,7 @@ public class CustomRole
         return role.Id == Id;
     }
 
-    protected string GetContextFromLanguage(string context)
+    internal string GetContextFromLanguage(string context)
     {
         var campName = IsSubRole ? "sub-roles" : CampType.ToString().ToLower();
         var location = $"role.{campName}.{GetNameInConfig()}.{context}";
@@ -450,6 +455,100 @@ public class CustomRole
     public virtual void OnUpdate()
     {
     }
+
+    // ==================== Event Delegates ====================
+
+    /// <summary>
+    /// Subscribe to an event using delegate. Replaces IListener pattern.
+    /// </summary>
+    protected void On<T>(Action<T> handler) where T : IEvent
+    {
+        if (!_eventHandlers.ContainsKey(typeof(T)))
+            _eventHandlers[typeof(T)] = new List<Delegate>();
+        _eventHandlers[typeof(T)].Add(handler);
+    }
+
+    /// <summary>
+    /// Unsubscribe from an event.
+    /// </summary>
+    protected void Off<T>(Action<T> handler) where T : IEvent
+    {
+        if (_eventHandlers.ContainsKey(typeof(T)))
+            _eventHandlers[typeof(T)].Remove(handler);
+    }
+
+    /// <summary>
+    /// Raise an event to all subscribed handlers. Called by ListenerManager.
+    /// </summary>
+    internal void RaiseEvent<T>(T @event) where T : IEvent
+    {
+        if (_eventHandlers.TryGetValue(typeof(T), out var handlers))
+        {
+            foreach (var handler in handlers.ToArray())
+                ((Action<T>)handler)(@event);
+        }
+    }
+
+    /// <summary>
+    /// Check if this role has any handlers for a specific event type.
+    /// </summary>
+    internal bool HasHandlers<T>() where T : IEvent
+    {
+        return _eventHandlers.ContainsKey(typeof(T)) && _eventHandlers[typeof(T)].Count > 0;
+    }
+
+    // ==================== Lifecycle Hooks ====================
+
+    /// <summary>
+    /// Called when a game starts.
+    /// </summary>
+    public virtual void OnGameStart() { }
+
+    /// <summary>
+    /// Called when a game ends.
+    /// </summary>
+    public virtual void OnGameEnd() { }
+
+    /// <summary>
+    /// Called when a meeting starts.
+    /// </summary>
+    public virtual void OnMeetingStart() { }
+
+    /// <summary>
+    /// Called when a meeting ends.
+    /// </summary>
+    public virtual void OnMeetingEnd() { }
+
+    /// <summary>
+    /// Called when this role is assigned to a player.
+    /// </summary>
+    public virtual void OnRoleAssigned(PlayerControl player) { }
+
+    // ==================== Convenience Methods ====================
+
+    /// <summary>
+    /// Create a boolean option for this role.
+    /// </summary>
+    protected BoolOption Bool(string key, bool defaultValue = false)
+        => new(this, key, defaultValue);
+
+    /// <summary>
+    /// Create a float option for this role.
+    /// </summary>
+    protected FloatOption Float(string key, float min, float max, float defaultValue, float step = 1f)
+        => new(this, key, min, max, defaultValue, step);
+
+    /// <summary>
+    /// Create an integer option for this role.
+    /// </summary>
+    protected IntOption Int(string key, int min, int max, int defaultValue, int step = 1)
+        => new(this, key, min, max, defaultValue, step);
+
+    /// <summary>
+    /// Create a button for this role. Automatically registers with the role.
+    /// </summary>
+    protected RoleButtonBuilder Button(string key, Sprite icon, string text)
+        => new(this, key, icon, text);
 
     // ==================== RPC Handling ====================
 
