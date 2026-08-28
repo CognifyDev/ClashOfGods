@@ -16,7 +16,6 @@ using UnityEngine.UI;
 namespace COG.UI.Hud.Meeting;
 
 
-[ShitCode]
 public class GuesserButton
 {
     private const string GuessButtonName = "GuessButton";
@@ -198,22 +197,49 @@ public class GuesserButton
 
     public void SetUpConfirmButton() =>
         _confirmButton = CreateBottomButton(LanguageConfig.Instance.GetString("mod-global.confirm"),
-            new Vector3(3.6f, -2.2f, 0f), DestroyAll);
+            new Vector3(3.6f, -2.2f, 0f), () =>
+            {
+                if (_selectedRole == null || _target == null) return;
+                var targetPlayer = PlayerUtils.GetPlayerById(_target.PlayerId);
+                if (targetPlayer == null) return;
 
-    public static void GuessPlayer(PlayerControl guesser, PlayerControl target)
+                var killOnWrong = _guesser.GuessContinuously.GetBool();
+                RpcGuessPlayer(PlayerControl.LocalPlayer, targetPlayer, _selectedRole.Id, killOnWrong);
+                _guesser.GuessedTime++;
+                DestroyAll();
+            });
+
+    public static void GuessPlayer(PlayerControl guesser, PlayerControl target, int guessedRoleId, bool killOnWrongGuess)
     {
-        if (Constants.ShouldPlaySfx())
-            SoundManager.Instance.PlaySound(target.KillSfx, false, 0.8f);
-        if (PlayerControl.LocalPlayer.PlayerId == target.PlayerId)
-            PlayerUtils.PlayKillAnimation(guesser.Data, target.Data);
-        target.Exiled();
+        var guessedRole = CustomRoleManager.GetManager().GetRoleById(guessedRoleId);
+        var targetRole = target.GetMainRole();
+        var isCorrect = guessedRole != null && targetRole.Id == guessedRoleId;
+
+        if (isCorrect)
+        {
+            if (Constants.ShouldPlaySfx())
+                SoundManager.Instance.PlaySound(target.KillSfx, false, 0.8f);
+            if (PlayerControl.LocalPlayer.PlayerId == target.PlayerId)
+                PlayerUtils.PlayKillAnimation(guesser.Data, target.Data);
+            target.Exiled();
+        }
+        else if (killOnWrongGuess)
+        {
+            if (Constants.ShouldPlaySfx())
+                SoundManager.Instance.PlaySound(guesser.KillSfx, false, 0.8f);
+            if (PlayerControl.LocalPlayer.PlayerId == guesser.PlayerId)
+                PlayerUtils.PlayKillAnimation(guesser.Data, guesser.Data);
+            guesser.Exiled();
+        }
     }
 
-    public static void RpcGuessPlayer(PlayerControl guesser, PlayerControl target)
+    public static void RpcGuessPlayer(PlayerControl guesser, PlayerControl target, int roleId, bool killOnWrong)
     {
         var writer = RpcWriter.Start(KnownRpc.GuessPlayer);
         writer.Write(guesser.PlayerId);
         writer.Write(target.PlayerId);
+        writer.WritePacked(roleId);
+        writer.Write(killOnWrong);
         writer.Finish();
     }
 

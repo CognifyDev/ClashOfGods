@@ -116,10 +116,12 @@ public class RpcListener : IListener
                     if (!GameStates.InRealGame) return;
                     var guesser = reader.ReadByte();
                     var target = reader.ReadByte();
+                    var roleId = reader.ReadPackedInt32();
+                    var killOnWrong = reader.ReadBoolean();
                     var guesserPlayer = PlayerUtils.GetPlayerById(guesser);
                     var targetPlayer = PlayerUtils.GetPlayerById(target);
                     if (guesserPlayer == null || targetPlayer == null) return;
-                    GuesserButton.GuessPlayer(guesserPlayer, targetPlayer);
+                    GuesserButton.GuessPlayer(guesserPlayer, targetPlayer, roleId, killOnWrong);
                     break;
                 }
 
