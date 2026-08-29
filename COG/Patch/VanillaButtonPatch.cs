@@ -10,10 +10,6 @@ namespace COG.Patch;
 [HarmonyPatch]
 internal static class VanillaButtonPatch
 {
-    /// <summary>
-    ///     Fully replace SabotageButton.Refresh to use our custom role CanSabotage check.
-    ///     Based on ExtremeRoles SabotageButtonRefreshPatch.
-    /// </summary>
     [HarmonyPatch(typeof(SabotageButton), nameof(SabotageButton.Refresh))]
     [HarmonyPrefix]
     private static bool VanillaSabotageButtonRefreshPatch(SabotageButton __instance)
@@ -45,10 +41,6 @@ internal static class VanillaButtonPatch
         return false;
     }
 
-    /// <summary>
-    ///     Prefix SabotageButton.DoClick to open sabotage map for custom impostor roles.
-    ///     Based on ExtremeRoles SabotageButtonDoClickPatch.
-    /// </summary>
     [HarmonyPatch(typeof(SabotageButton), nameof(SabotageButton.DoClick))]
     [HarmonyPrefix]
     private static bool SabotageButtonDoClickPatch()
@@ -67,11 +59,6 @@ internal static class VanillaButtonPatch
         return false;
     }
 
-    /// <summary>
-    ///     Intercept HudManager.ToggleMapVisible to redirect TAB key from Normal→Sabotage
-    ///     for custom impostor roles. The TAB key calls ToggleMapVisible with Mode=Normal,
-    ///     while only the sabotage button calls it with Mode=Sabotage.
-    /// </summary>
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.ToggleMapVisible), typeof(MapOptions))]
     [HarmonyPrefix]
     private static bool OnToggleMapVisible(ref MapOptions options)
@@ -111,24 +98,24 @@ public static class HudActivePatch
             // Game state not ready yet, silently ignore
         }
     }
+}
 
-    /// <summary>
-    ///     Fix for impostor roles: when the player is an impostor, the vanilla
-    ///     `CalculateLightRadius` method only checks `Role.IsImpostor` and ignores
-    ///     our custom role's `AffectedByLightAffectors` setting. This patch ensures
-    ///     impostor roles correctly have `AffectedByLightAffectors = false` so they
-    ///     are not affected by mushroom lights.
-    /// </summary>
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
+/// <summary>
+///     Sync vanilla RoleBehaviour fields every frame for the local player.
+///     Ensures AffectedByLightAffectors and TasksCountTowardProgress are
+///     always correct based on the custom role's camp type.
+/// </summary>
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
+public static class VanillaRoleFieldSyncPatch
+{
     [HarmonyPostfix]
-    private static void FixedUpdatePatch()
+    private static void Postfix()
     {
         try
         {
             var player = PlayerControl.LocalPlayer;
             if (!player || !player.Data || player.Data.Role == null) return;
 
-            var roles = player.GetRoles();
             var mainRole = player.GetMainRole();
             var vanillaRole = player.Data.Role;
 
@@ -140,15 +127,16 @@ public static class HudActivePatch
         }
         catch { }
     }
+}
 
-    /// <summary>
-    ///     Fix for VentButton.DoClick: the vanilla method calls `currentTarget.Use()`.
-    ///     We need to log the current target to ensure it's correctly set when
-    ///     the player presses V (or the vent button).
-    /// </summary>
-    [HarmonyPatch(typeof(VentButton), nameof(VentButton.DoClick))]
+/// <summary>
+///     Log VentButton.DoClick to diagnose hotkey issues.
+/// </summary>
+[HarmonyPatch(typeof(VentButton), nameof(VentButton.DoClick))]
+public static class VentButtonDoClickPatch
+{
     [HarmonyPostfix]
-    private static void VentButtonDoClick()
+    private static void Postfix()
     {
         var button = HudManager.Instance.ImpostorVentButton;
         if (button != null && button.currentTarget != null)
