@@ -1,5 +1,6 @@
 using System.Linq;
 using AmongUs.GameOptions;
+using COG.Role;
 using COG.States;
 using COG.Utils;
 using COG.Utils.Coding;
@@ -108,6 +109,55 @@ public static class HudActivePatch
         catch
         {
             // Game state not ready yet, silently ignore
+        }
+    }
+
+    /// <summary>
+    ///     Fix for impostor roles: when the player is an impostor, the vanilla
+    ///     `CalculateLightRadius` method only checks `Role.IsImpostor` and ignores
+    ///     our custom role's `AffectedByLightAffectors` setting. This patch ensures
+    ///     impostor roles correctly have `AffectedByLightAffectors = false` so they
+    ///     are not affected by mushroom lights.
+    /// </summary>
+    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
+    [HarmonyPostfix]
+    private static void FixedUpdatePatch()
+    {
+        try
+        {
+            var player = PlayerControl.LocalPlayer;
+            if (!player || !player.Data || player.Data.Role == null) return;
+
+            var roles = player.GetRoles();
+            var mainRole = player.GetMainRole();
+            var vanillaRole = player.Data.Role;
+
+            if (vanillaRole != null)
+            {
+                vanillaRole.AffectedByLightAffectors = mainRole.CampType != CampType.Impostor;
+                vanillaRole.TasksCountTowardProgress = mainRole.CampType != CampType.Impostor;
+            }
+        }
+        catch { }
+    }
+
+    /// <summary>
+    ///     Fix for VentButton.DoClick: the vanilla method calls `currentTarget.Use()`.
+    ///     We need to log the current target to ensure it's correctly set when
+    ///     the player presses V (or the vent button).
+    /// </summary>
+    [HarmonyPatch(typeof(VentButton), nameof(VentButton.DoClick))]
+    [HarmonyPostfix]
+    private static void VentButtonDoClick()
+    {
+        var button = HudManager.Instance.ImpostorVentButton;
+        if (button != null && button.currentTarget != null)
+        {
+            Main.Logger.LogInfo($"VentButton.DoClick - currentTarget: {button.currentTarget.name}");
+        }
+        else
+        {
+            Main.Logger.LogInfo("VentButton.DoClick - currentTarget is null!");
         }
     }
 }
