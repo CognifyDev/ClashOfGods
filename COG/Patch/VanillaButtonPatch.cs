@@ -5,10 +5,13 @@ using COG.Utils.Coding;
 
 namespace COG.Patch;
 
-[WorkInProgress]
 [HarmonyPatch]
 internal static class VanillaButtonPatch
 {
+    /// <summary>
+    ///     Fully replace SabotageButton.Refresh to use our custom role CanSabotage check.
+    ///     Based on ExtremeRoles SabotageButtonRefreshPatch.
+    /// </summary>
     [HarmonyPatch(typeof(SabotageButton), nameof(SabotageButton.Refresh))]
     [HarmonyPrefix]
     private static bool VanillaSabotageButtonRefreshPatch(SabotageButton __instance)
@@ -17,14 +20,46 @@ internal static class VanillaButtonPatch
         {
             __instance.ToggleVisible(false);
             __instance.SetDisabled();
+            return false;
         }
-        else if (PlayerControl.LocalPlayer.inVent || !GameManager.Instance.SabotagesEnabled() || PlayerControl.LocalPlayer.petting)
+
+        var canSabotage = PlayerControl.LocalPlayer.GetRoles().Any(role => role.CanSabotage);
+
+        if (!canSabotage || !GameManager.Instance.SabotagesEnabled() ||
+            PlayerControl.LocalPlayer.Data.IsDead)
         {
-            __instance.ToggleVisible(PlayerControl.LocalPlayer.GetRoles().Any(role => role.CanSabotage) && GameManager.Instance.SabotagesEnabled());
+            __instance.ToggleVisible(false);
             __instance.SetDisabled();
         }
         else
-            __instance.SetEnabled();
+        {
+            __instance.ToggleVisible(true);
+            if (PlayerControl.LocalPlayer.inVent || PlayerControl.LocalPlayer.petting)
+                __instance.SetDisabled();
+            else
+                __instance.SetEnabled();
+        }
+        return false;
+    }
+
+    /// <summary>
+    ///     Prefix SabotageButton.DoClick to open sabotage map for custom impostor roles.
+    ///     Based on ExtremeRoles SabotageButtonDoClickPatch.
+    /// </summary>
+    [HarmonyPatch(typeof(SabotageButton), nameof(SabotageButton.DoClick))]
+    [HarmonyPrefix]
+    private static bool SabotageButtonDoClickPatch()
+    {
+        if (!GameManager.Instance && GameManager.Instance.SabotagesEnabled()) return true;
+
+        var canSabotage = PlayerControl.LocalPlayer.GetRoles().Any(role => role.CanSabotage);
+        if (!canSabotage) return true;
+
+        HudManager.Instance.ToggleMapVisible(new MapOptions
+        {
+            Mode = MapOptions.Modes.Sabotage,
+            AllowMovementWhileMapOpen = true,
+        });
         return false;
     }
 }

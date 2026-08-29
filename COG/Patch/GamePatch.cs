@@ -262,12 +262,16 @@ internal class SabotageMapOpen
     }
 }
 
-[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CoSetTasks))]
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.SetTasks))]
 internal class TaskPatch
 {
-    public static bool Prefix(PlayerControl __instance, ref List<NetworkedPlayerInfo> tasks)
+    /// <summary>
+    ///     Intercept task assignment. Impostor roles get empty task list (fake tasks
+    ///     are handled by ImpostorRole.SpawnTaskHeader in the vanilla role system).
+    /// </summary>
+    public static bool Prefix(PlayerControl __instance,
+        List<NetworkedPlayerInfo.TaskInfo> tasks)
     {
-        // Impostor roles should not get real tasks
         try
         {
             if (GameStates.InRealGame && __instance.AmOwner)
@@ -275,26 +279,14 @@ internal class TaskPatch
                 var role = __instance.GetMainRole();
                 if (role != null && role.CampType == CampType.Impostor)
                 {
-                    tasks = new List<NetworkedPlayerInfo>();
+                    __instance.Data.Tasks.Clear();
                     return false;
                 }
             }
         }
         catch { }
 
-        var typeTasks = tasks;
-        var result = ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, typeTasks), EventHandlerType.Prefix);
-        tasks = typeTasks;
-        return result;
-    }
-
-    public static void Postfix(PlayerControl __instance, ref List<NetworkedPlayerInfo> tasks)
-    {
-        var typeTasks = tasks;
-        ListenerManager.GetManager()
-            .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, typeTasks), EventHandlerType.Postfix);
-        tasks = typeTasks;
+        return true;
     }
 }
 
