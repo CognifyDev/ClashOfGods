@@ -5,7 +5,7 @@ using COG.Config.Impl;
 using COG.Constant;
 using COG.Role;
 using COG.Role.Impl.SubRole;
-using COG.Rpc;
+using COG.Rpc.Role;
 using COG.Utils;
 using COG.Utils.Coding;
 using TMPro;
@@ -204,7 +204,7 @@ public class GuesserButton
                 if (targetPlayer == null) return;
 
                 var killOnWrong = _guesser.GuessContinuously.GetBool();
-                RpcGuessPlayer(PlayerControl.LocalPlayer, targetPlayer, _selectedRole.Id, killOnWrong);
+                _guesser.GuessRpc.Send(_target.PlayerId, _selectedRole.Id, killOnWrong);
                 _guesser.GuessedTime++;
                 DestroyAll();
             });
@@ -231,16 +231,6 @@ public class GuesserButton
                 PlayerUtils.PlayKillAnimation(guesser.Data, guesser.Data);
             guesser.Exiled();
         }
-    }
-
-    public static void RpcGuessPlayer(PlayerControl guesser, PlayerControl target, int roleId, bool killOnWrong)
-    {
-        var writer = RpcWriter.Start(KnownRpc.GuessPlayer);
-        writer.Write(guesser.PlayerId);
-        writer.Write(target.PlayerId);
-        writer.WritePacked(roleId);
-        writer.Write(killOnWrong);
-        writer.Finish();
     }
 
     public PassiveButton CreateBottomButton(string text, Vector3 localPosition, Action onClick)

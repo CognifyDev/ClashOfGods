@@ -4,6 +4,8 @@ using COG.Constant;
 using COG.Listener;
 using COG.Listener.Attribute;
 using COG.Listener.Event.Impl.Meeting;
+using COG.Rpc;
+using COG.Rpc.Role;
 using COG.UI.CustomOption;
 using COG.UI.CustomOption.ValueRules.Impl;
 using COG.UI.Hud.Meeting;
@@ -24,6 +26,7 @@ public class Guesser : CustomRole, IMeetingButton
     public CustomOption MaxGuessTime { get; }
     public CustomOption GuessContinuously { get; }
     public CustomOption EnabledRolesOnly { get; }
+    public RoleRpc<byte, int, bool> GuessRpc { get; }
 
     public Sprite MeetingButtonSprite =>
         ResourceUtils.LoadSprite(ResourceConstant.GuessButton, 150f);
@@ -60,6 +63,15 @@ public class Guesser : CustomRole, IMeetingButton
 
     public Guesser() : base(ColorUtils.FromColor32(192, 0, 0))
     {
+        GuessRpc = CreateRoleRpc<byte, int, bool>(KnownRpc.GuessPlayer,
+            (targetPlayerId, roleId, killOnWrong) =>
+            {
+                var guesser = PlayerControl.LocalPlayer;
+                var target = PlayerUtils.GetPlayerById(targetPlayerId);
+                if (target == null) return;
+                GuesserButton.GuessPlayer(guesser, target, roleId, killOnWrong);
+            });
+
         MaxGuessTime = CreateOption(
             () => LanguageConfig.Instance.GetString("role.sub-roles.guesser.max-guess-time"),
             new FloatOptionValueRule(1, 1, 15, 3));

@@ -31,38 +31,44 @@ public static class MeetingButtonManager
         if (__instance == null) return;
 
         _tickCounter = (_tickCounter + 1) % 20;
-        if (_tickCounter != 0) goto UpdateOnly;
 
-        if (__instance.state == MeetingHud.MeetingStates.Results)
+        if (_tickCounter == 0)
         {
-            ClearAllButtons(__instance);
-            return;
+            if (__instance.state == MeetingHud.MeetingStates.Results)
+            {
+                ClearAllButtons(__instance);
+                return;
+            }
+
+            var handlers = GetLocalPlayerMeetingButtonHandlers();
+
+            if (_buttonsCreated && handlers.Count == 0)
+            {
+                ClearAllButtons(__instance);
+            }
+
+            if (handlers.Count > 0)
+            {
+                TryCreateButtons(__instance);
+            }
+
+            foreach (var pva in __instance.playerStates)
+            {
+                if (pva == null) continue;
+                var data = PlayerUtils.GetPlayerById(pva.PlayerId)?.Data;
+                if (data != null) continue;
+
+                RemoveButtonsFromArea(pva.transform);
+            }
         }
 
-        var handlers = GetLocalPlayerMeetingButtonHandlers();
+        UpdateMeetingButtons(__instance);
+    }
 
-        if (_buttonsCreated && handlers.Count == 0)
-        {
-            ClearAllButtons(__instance);
-        }
-
-        if (handlers.Count > 0)
-        {
-            TryCreateButtons(__instance);
-        }
-
-        foreach (var pva in __instance.playerStates)
-        {
-            if (pva == null) continue;
-            var data = PlayerUtils.GetPlayerById(pva.PlayerId)?.Data;
-            if (data != null) continue;
-
-            RemoveButtonsFromArea(pva.transform);
-        }
-
-        UpdateOnly:
+    private static void UpdateMeetingButtons(MeetingHud meetingHud)
+    {
         foreach (var handler in GetLocalPlayerMeetingButtonHandlers())
-            handler.OnMeetingButtonUpdate(__instance);
+            handler.OnMeetingButtonUpdate(meetingHud);
     }
 
     public static void RefreshButtons(MeetingHud meetingHud)

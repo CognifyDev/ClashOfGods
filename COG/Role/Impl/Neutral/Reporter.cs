@@ -53,6 +53,7 @@ public class Reporter : COG.Role.Camp.NeutralRole, IListener, IWinnable
     {
         _reportersWhoReported.Clear();
         _isReporterReported = false;
+        _roleInstance = null!;
     }
 
     [EventHandler(EventHandlerType.Prefix)]

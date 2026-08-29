@@ -2,6 +2,7 @@ global using GameStates = COG.States.GameStates;
 using COG.Game.Events;
 using COG.Patch;
 using COG.Role;
+using COG.UI.Hud.Meeting;
 using COG.Utils;
 
 namespace COG.States;
@@ -44,6 +45,7 @@ public static class GameStates
 
                 GameUtils.PlayerData.Clear();
                 CustomRole.ClearKillButtonSettings();
+                GuesserButton.DestroyAll();
             }
 
             IsLeavingGame = false;
