@@ -455,9 +455,12 @@ public static class VentUsePatch
         bool couldUse;
         __instance.CanUse(localPlayer.Data, out canUse, out couldUse);
 
-        if (!canUse || localPlayer.walkingToVent) return false;
+        if (!canUse) return false;
 
         bool isEnter = !localPlayer.inVent;
+
+        // Vanilla: entering requires !walkingToVent; exiting does not
+        if (isEnter && localPlayer.walkingToVent) return false;
 
         if (isEnter)
         {

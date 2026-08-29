@@ -19,7 +19,11 @@ internal static class VanillaKillButtonPatch
     {
         var playerControl = PlayerControl.LocalPlayer;
         if (!GameStates.InRealGame) return;
-        playerControl.Data.Role.CanUseKillButton = true;
+
+        // Only set CanUseKillButton for roles that can actually kill
+        var canKill = false;
+        try { canKill = playerControl.GetRoles().Any(r => r.CanKill); } catch { }
+        playerControl.Data.Role.CanUseKillButton = canKill;
 
         var setting = playerControl.GetKillButtonSetting();
         var killButton = HudManager.Instance.KillButton;
