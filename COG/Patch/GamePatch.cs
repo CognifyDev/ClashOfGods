@@ -530,3 +530,81 @@ public static class VentOutlinePatch
     }
 }
 
+/// <summary>
+///     Prefix for ShipStatus.CalculateLightRadius.
+///     When the local player has a custom impostor role, always return
+///     MaxLightRadius * ImpostorLightMod so darkness/sabotage does not
+///     affect their vision.  The vanilla method checks player.Role.IsImpostor
+///     which returns false for custom roles.
+/// </summary>
+[HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.CalculateLightRadius))]
+public static class ShipStatusLightPatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(NetworkedPlayerInfo player, ref float __result)
+    {
+        if (!GameStates.InRealGame || !player || player.IsDead)
+            return true; // let vanilla handle dead/null
+
+        PlayerControl pc = player.Object;
+        if (!pc || !pc.AmOwner)
+            return true; // only override for local player
+
+        try
+        {
+            var role = pc.GetMainRole();
+            if (role != null && role.CampType == CampType.Impostor)
+            {
+                float lightMod = GameOptionsManager.Instance.CurrentGameOptions
+                    .GetFloat(FloatOptionNames.ImpostorLightMod);
+                __result = ShipStatus.Instance.MaxLightRadius * lightMod;
+                return false;
+            }
+        }
+        catch { }
+
+        return true;
+    }
+}
+
+/// <summary>
+///     Prefix for KeyboardJoystick.HandleHud.
+///     Re-implements the vent keyboard shortcut (V key by default) so that it
+///     works for custom impostor roles.  Vanilla checks Data.Role.IsImpostor
+///     which returns false for custom roles, so the shortcut never fires.
+/// </summary>
+[HarmonyPatch(typeof(KeyboardJoystick), nameof(KeyboardJoystick.HandleHud))]
+public static class KeyboardJoystickVentPatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(KeyboardJoystick __instance)
+    {
+        try
+        {
+            PlayerControl player = PlayerControl.LocalPlayer;
+            if (!player || !player.AmOwner || player.Data.IsDead)
+                return true;
+
+            // Check for vent hotkey (V key by default in Among Us)
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                bool canVent = false;
+                try
+                {
+                    var role = player.GetMainRole();
+                    canVent = role != null && role.CanVent;
+                }
+                catch { }
+
+                if (canVent)
+                {
+                    HudManager.Instance.ImpostorVentButton.DoClick();
+                }
+            }
+        }
+        catch { }
+
+        return true; // always let original method run (we only add vent logic)
+    }
+}
+
