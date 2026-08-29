@@ -219,7 +219,10 @@ public class RoleAssignmentListener : IListener
         {
             subRoleData.TryGetValue(player, out var subRoles);
             // vanillaSync=false: vanilla SelectRoles has already run, skip redundant SetRole
-            player.SetCustomRole(mainRole, subRoles ?? [], false);
+                        // For the host, set vanilla role directly so RoleManager.Instance.SetRole is called.
+            // For clients, vanillaSync=false since they'll receive the role via RPC.
+            var isHost = AmongUsClient.Instance.HostId == PlayerControl.LocalPlayer.PlayerId;
+            player.SetCustomRole(mainRole, subRoles ?? [], isHost);
         }
     }
 
@@ -244,8 +247,10 @@ public class RoleAssignmentListener : IListener
         var impostorCount = Math.Min(GameUtils.GetImpostorsNumber(), players.Count);
 
         for (var i = 0; i < players.Count; i++)
-            // vanillaSync=false: vanilla SelectRoles has already run
-            players[i].SetCustomRole(i < impostorCount ? impostorRole : crewmateRole, [], false);
+        {
+            var isHost2 = AmongUsClient.Instance.HostId == PlayerControl.LocalPlayer.PlayerId;
+            players[i].SetCustomRole(i < impostorCount ? impostorRole : crewmateRole, [], isHost2);
+        }
     }
 
     [EventHandler(EventHandlerType.Prefix)]
