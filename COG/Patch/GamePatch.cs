@@ -427,10 +427,10 @@ public static class VentOutlinePatch
 
         if (!myRole.CanVent) return true;
 
-        var roleColor = myRole.Color;
+        var ventColor = myRole.VentOutlineColor ?? myRole.Color;
         __instance.myRend.material.SetFloat(Outline, on ? 1 : 0);
-        __instance.myRend.material.SetColor(OutlineColor, roleColor);
-        __instance.myRend.material.SetColor(AddColor, mainTarget ? roleColor : Color.clear);
+        __instance.myRend.material.SetColor(OutlineColor, ventColor);
+        __instance.myRend.material.SetColor(AddColor, mainTarget ? ventColor : Color.clear);
 
         return false;
     }

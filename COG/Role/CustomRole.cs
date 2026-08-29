@@ -93,6 +93,14 @@ public class CustomRole
             canSabotage: campType == CampType.Impostor
         );
 
+        // Set default vent outline color based on camp type
+        _capabilities.VentOutlineColor = campType switch
+        {
+            CampType.Impostor => Palette.ImpostorRed,
+            CampType.Neutral => UnityEngine.Color.green,
+            _ => color // Crewmate/Unknown: use role color
+        };
+
         _buttons = new RoleButtons();
         _buttons.DefaultKillButtonSetting.ForceShow = () => CanKill;
         _buttons.DefaultKillButtonSetting.TargetOutlineColor = Color;
@@ -210,6 +218,16 @@ public class CustomRole
     {
         get => _capabilities.CanSabotage;
         protected set => _capabilities.CanSabotage = value;
+    }
+
+    /// <summary>
+    ///     Color used for vent outline. Null means use camp default.
+    ///     Only effective when CanVent is true.
+    /// </summary>
+    public UnityEngine.Color? VentOutlineColor
+    {
+        get => _capabilities.VentOutlineColor;
+        protected set => _capabilities.VentOutlineColor = value;
     }
 
     // ==================== Options Delegates ====================

@@ -20,6 +20,11 @@ public class RoleCapabilities
     /// </summary>
     public bool CanSabotage { get; set; }
 
+    /// <summary>
+    ///     Color used for vent outline. Null means use camp default.
+    /// </summary>
+    public UnityEngine.Color? VentOutlineColor { get; set; }
+
     public RoleCapabilities(bool canVent = false, bool canKill = false, bool canSabotage = false)
     {
         CanVent = canVent;
