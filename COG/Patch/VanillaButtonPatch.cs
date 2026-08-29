@@ -128,24 +128,3 @@ public static class VanillaRoleFieldSyncPatch
         catch { }
     }
 }
-
-/// <summary>
-///     Log VentButton.DoClick to diagnose hotkey issues.
-/// </summary>
-[HarmonyPatch(typeof(VentButton), nameof(VentButton.DoClick))]
-public static class VentButtonDoClickPatch
-{
-    [HarmonyPostfix]
-    private static void Postfix()
-    {
-        var button = HudManager.Instance.ImpostorVentButton;
-        if (button != null && button.currentTarget != null)
-        {
-            Main.Logger.LogInfo($"VentButton.DoClick - currentTarget: {button.currentTarget.name}");
-        }
-        else
-        {
-            Main.Logger.LogInfo("VentButton.DoClick - currentTarget is null!");
-        }
-    }
-}

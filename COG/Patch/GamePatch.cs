@@ -598,13 +598,50 @@ public static class KeyboardJoystickVentPatch
 
                 if (canVent)
                 {
-                    HudManager.Instance.ImpostorVentButton.DoClick();
+                    // Find nearest vent and call Vent.Use directly,
+                    // bypassing VentButton.DoClick which may have stale internal state
+                    // after a kill action.
+                    var vent = FindNearestVent(player);
+                    if (vent != null)
+                    {
+                        vent.Use();
+                    }
                 }
             }
         }
         catch { }
 
         return true; // always let original method run (we only add vent logic)
+    }
+
+    private static Vent? FindNearestVent(PlayerControl player)
+    {
+        if (!player || player.Data == null || player.Data.IsDead)
+            return null;
+
+        Vent? nearest = null;
+        float nearestDist = float.MaxValue;
+
+        foreach (var vent in UnityEngine.Object.FindObjectsOfType<Vent>())
+        {
+            if (!vent || !vent.gameObject.activeInHierarchy) continue;
+
+            bool canUse;
+            bool couldUse;
+            vent.CanUse(player.Data, out canUse, out couldUse);
+            if (!canUse) continue;
+
+            float dist = Vector2.Distance(
+                player.Collider.bounds.center,
+                vent.transform.position);
+            if (dist < nearestDist)
+            {
+                nearestDist = dist;
+                nearest = vent;
+            }
+        }
+
+        return nearest;
     }
 }
 
