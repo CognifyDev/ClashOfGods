@@ -1,4 +1,5 @@
 using COG.Listener;
+using COG.Role;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Controller;
 using COG.Listener.Event.Impl.Game;
@@ -369,5 +370,36 @@ public static class VentOutlinePatch
         __instance.myRend.material.SetColor(AddColor, mainTarget ? color : Color.clear);
 
         return false;
+    }
+}
+/// <summary>
+///     Override RoleBehaviour.IsImpostor to respect custom impostor roles.
+///     This fixes sabotage, venting, and other vanilla checks that rely on IsImpostor.
+/// </summary>
+[HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.IsImpostor), MethodType.Getter)]
+internal static class RoleBehaviourIsImpostorPatch
+{
+    private static bool Prefix(RoleBehaviour __instance, ref bool __result)
+    {
+        if (!GameStates.InRealGame) return true;
+
+        var pc = __instance.Player;
+        if (pc == null) return true;
+
+        try
+        {
+            var customRole = pc.GetMainRole();
+            if (customRole != null && customRole.CampType == CampType.Impostor)
+            {
+                __result = true;
+                return false; // skip original
+            }
+        }
+        catch
+        {
+            // Role data not ready yet
+        }
+
+        return true; // fall through to original
     }
 }

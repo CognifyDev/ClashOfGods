@@ -377,7 +377,7 @@ public class CustomRole
 
     public bool IsLocalPlayerRole()
     {
-        return PlayerControl.LocalPlayer.IsRole(this);
+        return PlayerControl.LocalPlayer && PlayerControl.LocalPlayer.IsRole(this);
     }
 
     protected CustomOption CreateOptionWithoutRegisteration(Func<string> nameGetter, IValueRule rule)
