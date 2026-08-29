@@ -1,6 +1,7 @@
 using System.Linq;
 using COG.Game.Events;
 using COG.Listener.Event.Impl.Game.Record;
+using COG.Role;
 using COG.Utils;
 using Il2CppSystem;
 using UnityEngine;
@@ -20,10 +21,22 @@ internal static class VanillaKillButtonPatch
         var playerControl = PlayerControl.LocalPlayer;
         if (!GameStates.InRealGame) return;
 
-        // Only set CanUseKillButton for roles that can actually kill
-        var canKill = false;
-        try { canKill = playerControl.GetRoles().Any(r => r.CanKill); } catch { }
-        playerControl.Data.Role.CanUseKillButton = canKill;
+        // Sync vanilla RoleBehaviour fields every frame as a safety net.
+        // This ensures AffectedByLightAffectors, TasksCountTowardProgress, etc.
+        // are always correct even if RoleManager.SetRole postfix didn't run.
+        try
+        {
+            var roles = playerControl.GetRoles();
+            var mainRole = playerControl.GetMainRole();
+            var vanillaRole = playerControl.Data.Role;
+            if (vanillaRole != null)
+            {
+                vanillaRole.CanUseKillButton = roles.Any(r => r.CanKill);
+                vanillaRole.AffectedByLightAffectors = mainRole.CampType != CampType.Impostor;
+                vanillaRole.TasksCountTowardProgress = mainRole.CampType != CampType.Impostor;
+            }
+        }
+        catch { }
 
         var setting = playerControl.GetKillButtonSetting();
         var killButton = HudManager.Instance.KillButton;

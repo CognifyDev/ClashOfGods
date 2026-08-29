@@ -133,17 +133,27 @@ internal class RoleManagerSetRolePatch
 
         try
         {
-            var playerData = GameUtils.PlayerData.FirstOrDefault(
-                d => d.Player.IsSamePlayer(targetPlayer));
-            if (playerData == null) return;
-
-            var customRole = playerData.MainRole;
             var vanillaRole = targetPlayer.Data.Role;
 
-            vanillaRole.CanVent = customRole.CanVent;
-            vanillaRole.CanUseKillButton = customRole.CanKill;
-            vanillaRole.AffectedByLightAffectors = customRole.CampType != CampType.Impostor;
-            vanillaRole.TasksCountTowardProgress = customRole.CampType != CampType.Impostor;
+            // First try to find the custom role for precise field mapping
+            var playerData = GameUtils.PlayerData.FirstOrDefault(
+                d => d.Player.IsSamePlayer(targetPlayer));
+
+            if (playerData != null)
+            {
+                var customRole = playerData.MainRole;
+                vanillaRole.CanVent = customRole.CanVent;
+                vanillaRole.CanUseKillButton = customRole.CanKill;
+                vanillaRole.AffectedByLightAffectors = customRole.CampType != CampType.Impostor;
+                vanillaRole.TasksCountTowardProgress = customRole.CampType != CampType.Impostor;
+            }
+            else if (vanillaRole.IsImpostor)
+            {
+                // Fallback: if custom role data not available yet but vanilla says Impostor,
+                // still set the fields correctly based on vanilla role type
+                vanillaRole.AffectedByLightAffectors = false;
+                vanillaRole.TasksCountTowardProgress = false;
+            }
         }
         catch
         {
