@@ -1,4 +1,5 @@
 using COG.Listener;
+using COG.Role;
 using COG.Listener.Event.Impl.AuClient;
 using COG.Listener.Event.Impl.Controller;
 using COG.Listener.Event.Impl.Game;
@@ -151,6 +152,10 @@ internal class ControllerManagerPatch
 [HarmonyPatch(typeof(Vent), nameof(Vent.CanUse))]
 public static class PlayerVentPatch
 {
+    /// <summary>
+    ///     Fully replace Vent.CanUse. Never let the vanilla method run,
+    ///     because vanilla checks Role.IsImpostor which doesn't work for custom roles.
+    /// </summary>
     [HarmonyPrefix]
     public static bool Prefix(Vent __instance,
         [HarmonyArgument(0)] NetworkedPlayerInfo playerInfo,
@@ -158,28 +163,49 @@ public static class PlayerVentPatch
         [HarmonyArgument(2)] ref bool couldUse,
         ref float __result)
     {
-        var @event = new VentCheckEvent(__instance, playerInfo, canUse, couldUse, __result);
-        var result = ListenerManager.GetManager()
-            .ExecuteHandlers(@event, EventHandlerType.Prefix);
-        canUse = @event.GetCanUse();
-        couldUse = @event.GetCouldUse();
-        __result = @event.GetResult();
-        return result;
-    }
+        if (!GameStates.InRealGame || !playerInfo || !playerInfo.Object)
+        {
+            canUse = false;
+            couldUse = false;
+            __result = float.MaxValue;
+            return false;
+        }
 
-    [HarmonyPostfix]
-    public static void Postfix(Vent __instance,
-        [HarmonyArgument(0)] NetworkedPlayerInfo playerInfo,
-        [HarmonyArgument(1)] ref bool canUse,
-        [HarmonyArgument(2)] ref bool couldUse,
-        ref float __result)
-    {
-        var @event = new VentCheckEvent(__instance, playerInfo, canUse, couldUse, __result);
-        ListenerManager.GetManager()
-            .ExecuteHandlers(@event, EventHandlerType.Postfix);
-        canUse = @event.GetCanUse();
-        couldUse = @event.GetCouldUse();
-        __result = @event.GetResult();
+        var pc = playerInfo.Object;
+        if (!pc.AmOwner)
+        {
+            canUse = false;
+            couldUse = false;
+            __result = float.MaxValue;
+            return false;
+        }
+
+        if (pc.Data.IsDead)
+        {
+            canUse = false;
+            couldUse = false;
+            __result = float.MaxValue;
+            return false;
+        }
+
+        try
+        {
+            var role = pc.GetMainRole();
+            if (role != null && role.CanVent)
+            {
+                // Player can vent — calculate distance result
+                canUse = true;
+                couldUse = true;
+                __result = Vector2.Distance(pc.GetTruePosition(), __instance.transform.position);
+                return false;
+            }
+        }
+        catch { }
+
+        canUse = false;
+        couldUse = false;
+        __result = float.MaxValue;
+        return false;
     }
 }
 
@@ -241,6 +267,21 @@ internal class TaskPatch
 {
     public static bool Prefix(PlayerControl __instance, ref List<NetworkedPlayerInfo> tasks)
     {
+        // Impostor roles should not get real tasks
+        try
+        {
+            if (GameStates.InRealGame && __instance.AmOwner)
+            {
+                var role = __instance.GetMainRole();
+                if (role != null && role.CampType == CampType.Impostor)
+                {
+                    tasks = new List<NetworkedPlayerInfo>();
+                    return false;
+                }
+            }
+        }
+        catch { }
+
         var typeTasks = tasks;
         var result = ListenerManager.GetManager()
             .ExecuteHandlers(new PlayerCoSetTasksEvent(__instance, typeTasks), EventHandlerType.Prefix);
