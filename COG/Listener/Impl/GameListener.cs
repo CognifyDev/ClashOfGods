@@ -191,7 +191,9 @@ public class GameListener : IListener
             foreach (var player in PlayerControl.AllPlayerControls)
                 player.RpcSetCustomRole<Crewmate>();
 
-        var localPlayerRoles = PlayerControl.LocalPlayer.GetRoles();
+        var localPlayerRoles = Array.Empty<CustomRole>();
+        try { localPlayerRoles = PlayerControl.LocalPlayer.GetRoles(); } catch { }
+
         if (localPlayerRoles.Any(role => role.CanSabotage))
         {
             DestroyableSingleton<HudManager>.Instance.SabotageButton.Show();

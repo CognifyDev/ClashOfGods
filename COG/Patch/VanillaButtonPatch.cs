@@ -23,7 +23,8 @@ internal static class VanillaButtonPatch
             return false;
         }
 
-        var canSabotage = PlayerControl.LocalPlayer.GetRoles().Any(role => role.CanSabotage);
+        var canSabotage = false;
+        try { canSabotage = PlayerControl.LocalPlayer.GetRoles().Any(role => role.CanSabotage); } catch { }
 
         if (!canSabotage || !GameManager.Instance.SabotagesEnabled() ||
             PlayerControl.LocalPlayer.Data.IsDead)
@@ -50,9 +51,10 @@ internal static class VanillaButtonPatch
     [HarmonyPrefix]
     private static bool SabotageButtonDoClickPatch()
     {
-        if (!GameManager.Instance && GameManager.Instance.SabotagesEnabled()) return true;
+        if (!GameManager.Instance || !GameManager.Instance.SabotagesEnabled()) return true;
 
-        var canSabotage = PlayerControl.LocalPlayer.GetRoles().Any(role => role.CanSabotage);
+        var canSabotage = false;
+        try { canSabotage = PlayerControl.LocalPlayer.GetRoles().Any(role => role.CanSabotage); } catch { }
         if (!canSabotage) return true;
 
         HudManager.Instance.ToggleMapVisible(new MapOptions
@@ -72,7 +74,9 @@ public static class HudActivePatch
     {
         try
         {
-            var roles = PlayerControl.LocalPlayer.GetRoles();
+            if (!localPlayer || !localPlayer.Data || localPlayer.Data.IsDead) return;
+
+            var roles = localPlayer.GetRoles();
             var sabotageFlag = roles.Any(r => r.CanSabotage);
             var ventable = roles.Any(r => r.CanVent);
             __instance.SabotageButton.ToggleVisible(isActive && sabotageFlag);

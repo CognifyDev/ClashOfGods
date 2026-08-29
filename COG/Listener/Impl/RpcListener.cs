@@ -99,7 +99,7 @@ public class RpcListener : IListener
         var player = PlayerUtils.GetPlayerById(playerId);
         var role = CustomRoleManager.GetManager().GetRoleById(roleId);
         if (player != null && role != null)
-            player.SetCustomRole(role);
+            player.SetCustomRole(role, vanillaSync: false);
     }
 
     private static void HandleNotifySettingChange(PlayerControl sender, MessageReader reader)

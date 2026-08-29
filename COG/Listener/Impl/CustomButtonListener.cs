@@ -25,6 +25,19 @@ internal class CustomButtonListener : IListener
     public void OnHudDestroy(HudManagerDestroyEvent @event)
     {
         CustomButton.Initialized = false;
-        CustomButtonManager.GetManager().Clear();
+        // Only invalidate Unity-side references; keep button registrations alive
+        // so they survive across game rounds (roles re-add via constructor).
+        foreach (var btn in CustomButtonManager.GetManager().GetButtons())
+        {
+            btn.ButtonObject = null;
+            btn.GameObject = null;
+            btn.SpriteRenderer = null;
+            btn.Material = null;
+            btn.PassiveButton = null;
+            btn.TextMesh = null;
+            btn.HotkeyRenderer = null;
+            btn.HotkeyText = null;
+            btn.InfoText = null;
+        }
     }
 }

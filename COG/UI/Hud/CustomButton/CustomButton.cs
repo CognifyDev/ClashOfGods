@@ -506,10 +506,15 @@ public class CustomButton
     }
     internal static void Init(HudManager hud)
     {
-        //var moddedParent = new GameObject("ModdedBottomRight");
-        //var vanillaParent = hud.AbilityButton.transform.parent;
-        //moddedParent.transform.SetParent(vanillaParent.parent);
-        //moddedParent.transform.localPosition = vanillaParent.localPosition;
+        // Destroy stale ButtonObjects from previous HUD (e.g. between game rounds)
+        foreach (var button in CustomButtonManager.GetManager().GetButtons())
+        {
+            if (button.ButtonObject != null)
+            {
+                UnityEngine.Object.Destroy(button.ButtonObject.gameObject);
+                button.ButtonObject = null;
+            }
+        }
 
         foreach (var button in CustomButtonManager.GetManager().GetButtons())
         {
