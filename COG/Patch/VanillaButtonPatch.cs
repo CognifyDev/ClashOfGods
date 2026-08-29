@@ -73,14 +73,14 @@ internal static class VanillaButtonPatch
     /// </summary>
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.ToggleMapVisible), typeof(MapOptions))]
     [HarmonyPrefix]
-    private static bool OnToggleMapVisible(ref MapOptions opts)
+    private static bool OnToggleMapVisible(ref MapOptions options)
     {
-        if (opts.Mode == MapOptions.Modes.Normal && GameStates.InRealGame)
+        if (options.Mode == MapOptions.Modes.Normal && GameStates.InRealGame)
         {
             try
             {
                 if (PlayerControl.LocalPlayer.GetRoles().Any(r => r.CanSabotage))
-                    opts.Mode = MapOptions.Modes.Sabotage;
+                    options.Mode = MapOptions.Modes.Sabotage;
             }
             catch { }
         }
