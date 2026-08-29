@@ -468,18 +468,18 @@ public static class PlayerUtils
         if (vanillaSync)
         {
             RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+        }
 
-            // Sync custom role capabilities to vanilla RoleBehaviour fields
-            // This ensures game systems (sabotage effects, task progress, etc.)
-            // respect our custom role's capabilities.
-            var vanillaRole = pc.Data.Role;
-            if (vanillaRole != null)
-            {
-                vanillaRole.CanVent = role.CanVent;
-                vanillaRole.CanUseKillButton = role.CanKill;
-                vanillaRole.AffectedByLightAffectors = role.CampType != CampType.Impostor;
-                vanillaRole.TasksCountTowardProgress = role.CampType != CampType.Impostor;
-            }
+        // Sync custom role capabilities to vanilla RoleBehaviour fields.
+        // This MUST run regardless of vanillaSync so that clients (which receive
+        // vanilla RpcSetRole first) also get the correct field values.
+        var vanillaRole = pc.Data.Role;
+        if (vanillaRole != null)
+        {
+            vanillaRole.CanVent = role.CanVent;
+            vanillaRole.CanUseKillButton = role.CanKill;
+            vanillaRole.AffectedByLightAffectors = role.CampType != CampType.Impostor;
+            vanillaRole.TasksCountTowardProgress = role.CampType != CampType.Impostor;
         }
 
         VanillaKillButtonPatch.Initialize();

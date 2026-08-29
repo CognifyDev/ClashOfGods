@@ -1,5 +1,6 @@
 using System.Linq;
 using AmongUs.GameOptions;
+using COG.States;
 using COG.Utils;
 using COG.Utils.Coding;
 
@@ -63,6 +64,27 @@ internal static class VanillaButtonPatch
             AllowMovementWhileMapOpen = true,
         });
         return false;
+    }
+
+    /// <summary>
+    ///     Intercept HudManager.ToggleMapVisible to redirect TAB key from Normal→Sabotage
+    ///     for custom impostor roles. The TAB key calls ToggleMapVisible with Mode=Normal,
+    ///     while only the sabotage button calls it with Mode=Sabotage.
+    /// </summary>
+    [HarmonyPatch(typeof(HudManager), nameof(HudManager.ToggleMapVisible), typeof(MapOptions))]
+    [HarmonyPrefix]
+    private static bool OnToggleMapVisible(ref MapOptions opts)
+    {
+        if (opts.Mode == MapOptions.Modes.Normal && GameStates.InRealGame)
+        {
+            try
+            {
+                if (PlayerControl.LocalPlayer.GetRoles().Any(r => r.CanSabotage))
+                    opts.Mode = MapOptions.Modes.Sabotage;
+            }
+            catch { }
+        }
+        return true;
     }
 }
 
