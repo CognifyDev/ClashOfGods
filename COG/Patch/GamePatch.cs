@@ -1,3 +1,5 @@
+using System.Linq;
+using AmongUs.GameOptions;
 using COG.Listener;
 using COG.Role;
 using COG.Listener.Event.Impl.AuClient;
@@ -8,6 +10,7 @@ using COG.Listener.Event.Impl.ICutscene;
 using COG.Listener.Event.Impl.Player;
 using COG.Listener.Event.Impl.RManager;
 using COG.Listener.Event.Impl.VentImpl;
+using COG.States;
 using COG.Utils;
 using Il2CppSystem.Collections.Generic;
 using UnityEngine;
@@ -110,6 +113,42 @@ internal class SelectRolesPatch
     {
         ListenerManager.GetManager()
             .ExecuteHandlers(new RoleManagerSelectRolesEvent(__instance), EventHandlerType.Postfix);
+    }
+}
+
+/// <summary>
+///     Postfix on RoleManager.SetRole to ensure vanilla RoleBehaviour fields are always
+///     synced with our custom role capabilities, regardless of when SetRole is called.
+///     This eliminates timing issues where vanilla RpcSetRole might arrive after our
+///     ShareRoles RPC and create an unpatched RoleBehaviour.
+/// </summary>
+[HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SetRole))]
+internal class RoleManagerSetRolePatch
+{
+    [HarmonyPostfix]
+    public static void Postfix(PlayerControl targetPlayer, RoleTypes roleType)
+    {
+        if (!GameStates.InRealGame) return;
+        if (!targetPlayer || !targetPlayer.Data || targetPlayer.Data.Role == null) return;
+
+        try
+        {
+            var playerData = GameUtils.PlayerData.FirstOrDefault(
+                d => d.Player.IsSamePlayer(targetPlayer));
+            if (playerData == null) return;
+
+            var customRole = playerData.MainRole;
+            var vanillaRole = targetPlayer.Data.Role;
+
+            vanillaRole.CanVent = customRole.CanVent;
+            vanillaRole.CanUseKillButton = customRole.CanKill;
+            vanillaRole.AffectedByLightAffectors = customRole.CampType != CampType.Impostor;
+            vanillaRole.TasksCountTowardProgress = customRole.CampType != CampType.Impostor;
+        }
+        catch
+        {
+            // Role data not ready yet
+        }
     }
 }
 
