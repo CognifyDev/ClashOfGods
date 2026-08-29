@@ -401,13 +401,36 @@ public static class VentOutlinePatch
 
     public static bool Prefix(Vent __instance, bool on, bool mainTarget)
     {
-        var myRole = PlayerControl.LocalPlayer.GetMainRole();
-        if (myRole is { CanVent: false }) return true;
+        if (!GameStates.InRealGame || !PlayerControl.LocalPlayer) return true;
 
-        var color = myRole.Color;
+        CustomRole? myRole = null;
+        try { myRole = PlayerControl.LocalPlayer.GetMainRole(); } catch { }
+
+        // Fallback: check raw player data if role system not ready
+        if (myRole == null || myRole.CampType == CampType.Unknown)
+        {
+            try
+            {
+                var pd = PlayerControl.LocalPlayer.Data;
+                if (pd != null && pd.Role != null && pd.Role.CanVent)
+                {
+                    var color = Palette.ImpostorRed;
+                    __instance.myRend.material.SetFloat(Outline, on ? 1 : 0);
+                    __instance.myRend.material.SetColor(OutlineColor, color);
+                    __instance.myRend.material.SetColor(AddColor, mainTarget ? color : Color.clear);
+                    return false;
+                }
+            }
+            catch { }
+            return true;
+        }
+
+        if (!myRole.CanVent) return true;
+
+        var roleColor = myRole.Color;
         __instance.myRend.material.SetFloat(Outline, on ? 1 : 0);
-        __instance.myRend.material.SetColor(OutlineColor, color);
-        __instance.myRend.material.SetColor(AddColor, mainTarget ? color : Color.clear);
+        __instance.myRend.material.SetColor(OutlineColor, roleColor);
+        __instance.myRend.material.SetColor(AddColor, mainTarget ? roleColor : Color.clear);
 
         return false;
     }
