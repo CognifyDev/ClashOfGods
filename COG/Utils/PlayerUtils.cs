@@ -466,7 +466,21 @@ public static class PlayerUtils
         // Among Us 2026.8.18: vanilla SelectRoles now delegates to LogicRoleSelection.
         // When vanilla has already assigned roles, skip redundant SetRole to avoid conflicts.
         if (vanillaSync)
+        {
             RoleManager.Instance.SetRole(pc, role.BaseRoleType);
+
+            // Sync custom role capabilities to vanilla RoleBehaviour fields
+            // This ensures game systems (sabotage effects, task progress, etc.)
+            // respect our custom role's capabilities.
+            var vanillaRole = pc.Data.Role;
+            if (vanillaRole != null)
+            {
+                vanillaRole.CanVent = role.CanVent;
+                vanillaRole.CanUseKillButton = role.CanKill;
+                vanillaRole.AffectedByLightAffectors = role.CampType != CampType.Impostor;
+                vanillaRole.TasksCountTowardProgress = role.CampType != CampType.Impostor;
+            }
+        }
 
         VanillaKillButtonPatch.Initialize();
 

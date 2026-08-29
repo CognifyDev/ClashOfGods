@@ -163,48 +163,60 @@ public static class PlayerVentPatch
         [HarmonyArgument(2)] ref bool couldUse,
         ref float __result)
     {
+        float num = float.MaxValue;
+        canUse = couldUse = false;
+
         if (!GameStates.InRealGame || !playerInfo || !playerInfo.Object)
         {
-            canUse = false;
-            couldUse = false;
-            __result = float.MaxValue;
+            __result = num;
             return false;
         }
 
-        var pc = playerInfo.Object;
-        if (!pc.AmOwner)
-        {
-            canUse = false;
-            couldUse = false;
-            __result = float.MaxValue;
-            return false;
-        }
+        PlayerControl player = playerInfo.Object;
 
-        if (pc.Data.IsDead)
+        if (!player.AmOwner || playerInfo.IsDead)
         {
-            canUse = false;
-            couldUse = false;
-            __result = float.MaxValue;
+            __result = num;
             return false;
         }
 
         try
         {
-            var role = pc.GetMainRole();
-            if (role != null && role.CanVent)
+            var role = player.GetMainRole();
+            bool roleCouldUse = role != null && role.CanVent;
+
+            if (!roleCouldUse)
             {
-                // Player can vent — calculate distance result
-                canUse = true;
-                couldUse = true;
-                __result = Vector2.Distance(pc.GetTruePosition(), __instance.transform.position);
+                __result = num;
                 return false;
             }
-        }
-        catch { }
 
-        canUse = false;
-        couldUse = false;
-        __result = float.MaxValue;
+            bool inVent = player.inVent;
+
+            couldUse = roleCouldUse && !playerInfo.IsDead && (player.CanMove || inVent);
+
+            // Vent cleaning check omitted for now
+
+            canUse = couldUse;
+            if (canUse)
+            {
+                Vector2 playerPos = player.Collider.bounds.center;
+                Vector3 position = __instance.transform.position;
+                num = Vector2.Distance(playerPos, position);
+
+                canUse &= num <= __instance.UsableDistance &&
+                    !PhysicsHelpers.AnythingBetween(
+                        player.Collider, playerPos, position,
+                        Constants.ShipOnlyMask, false);
+            }
+
+            __result = num;
+        }
+        catch
+        {
+            __result = float.MaxValue;
+        }
+
         return false;
     }
 }
@@ -381,6 +393,44 @@ public static class LocalPlayerExitPatch
     public static void Postfix()
     {
         GameStates.InRealGame = false;
+    }
+}
+
+
+/// <summary>
+///     Fully replace Vent.Use to handle vent entry/exit properly.
+///     Based on ExtremeRoles VentUsePatch.
+/// </summary>
+[HarmonyPatch(typeof(Vent), nameof(Vent.Use))]
+public static class VentUsePatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(Vent __instance)
+    {
+        if (!GameStates.InRealGame) return true;
+
+        PlayerControl localPlayer = PlayerControl.LocalPlayer;
+        if (!localPlayer || localPlayer.Data.IsDead) return true;
+
+        bool canUse;
+        bool couldUse;
+        __instance.CanUse(localPlayer.Data, out canUse, out couldUse);
+
+        if (!canUse || localPlayer.walkingToVent) return false;
+
+        bool isEnter = !localPlayer.inVent;
+
+        if (isEnter)
+        {
+            localPlayer.MyPhysics.RpcEnterVent(__instance.Id);
+        }
+        else
+        {
+            localPlayer.MyPhysics.RpcExitVent(__instance.Id);
+        }
+
+        __instance.SetButtons(isEnter);
+        return false;
     }
 }
 
