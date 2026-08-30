@@ -486,6 +486,62 @@ public static class VentUsePatch
     }
 }
 
+/// <summary>
+///     Fully replace VentButton.DoClick.
+///     Vanilla DoClick has internal state checks (button enable, cooldown, etc.) that
+///     can become stale after a kill action, breaking the V-key vent shortcut.
+///     Since Among Us hardcodes V→DoClick in KeyboardJoystick.HandleHud, patching
+///     DoClick directly fixes both the button click and the hotkey.
+/// </summary>
+[HarmonyPatch(typeof(VentButton), nameof(VentButton.DoClick))]
+public static class VentButtonDoClickPatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix()
+    {
+        if (!GameStates.InRealGame) return false;
+
+        PlayerControl player = PlayerControl.LocalPlayer;
+        if (!player || player.Data == null || player.Data.IsDead)
+            return false;
+
+        try
+        {
+            var role = player.GetMainRole();
+            if (role == null || !role.CanVent) return false;
+
+            // Find nearest vent using our custom CanUse (role-aware)
+            Vent? nearest = null;
+            float nearestDist = float.MaxValue;
+
+            foreach (var vent in UnityEngine.Object.FindObjectsOfType<Vent>())
+            {
+                if (!vent || !vent.gameObject.activeInHierarchy) continue;
+
+                bool canUse;
+                bool couldUse;
+                vent.CanUse(player.Data, out canUse, out couldUse);
+                if (!canUse) continue;
+
+                float dist = Vector2.Distance(
+                    player.Collider.bounds.center,
+                    vent.transform.position);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearest = vent;
+                }
+            }
+
+            if (nearest != null)
+                nearest.Use();
+        }
+        catch { }
+
+        return false; // skip vanilla DoClick entirely
+    }
+}
+
 [HarmonyPatch(typeof(Vent), nameof(Vent.SetOutline))]
 public static class VentOutlinePatch
 {
@@ -567,81 +623,5 @@ public static class ShipStatusLightPatch
     }
 }
 
-/// <summary>
-///     Prefix for KeyboardJoystick.HandleHud.
-///     Re-implements the vent keyboard shortcut (V key by default) so that it
-///     works for custom impostor roles.  Vanilla checks Data.Role.IsImpostor
-///     which returns false for custom roles, so the shortcut never fires.
-/// </summary>
-[HarmonyPatch(typeof(KeyboardJoystick), nameof(KeyboardJoystick.HandleHud))]
-public static class KeyboardJoystickVentPatch
-{
-    [HarmonyPrefix]
-    public static bool Prefix(KeyboardJoystick __instance)
-    {
-        try
-        {
-            PlayerControl player = PlayerControl.LocalPlayer;
-            if (!player || !player.AmOwner || player.Data.IsDead)
-                return true;
 
-            // Check for vent hotkey (V key by default in Among Us)
-            if (Input.GetKeyDown(KeyCode.V))
-            {
-                bool canVent = false;
-                try
-                {
-                    var role = player.GetMainRole();
-                    canVent = role != null && role.CanVent;
-                }
-                catch { }
-
-                if (canVent)
-                {
-                    // Find nearest vent and call Vent.Use directly,
-                    // bypassing VentButton.DoClick which may have stale internal state
-                    // after a kill action.
-                    var vent = FindNearestVent(player);
-                    if (vent != null)
-                    {
-                        vent.Use();
-                    }
-                }
-            }
-        }
-        catch { }
-
-        return true; // always let original method run (we only add vent logic)
-    }
-
-    private static Vent? FindNearestVent(PlayerControl player)
-    {
-        if (!player || player.Data == null || player.Data.IsDead)
-            return null;
-
-        Vent? nearest = null;
-        float nearestDist = float.MaxValue;
-
-        foreach (var vent in UnityEngine.Object.FindObjectsOfType<Vent>())
-        {
-            if (!vent || !vent.gameObject.activeInHierarchy) continue;
-
-            bool canUse;
-            bool couldUse;
-            vent.CanUse(player.Data, out canUse, out couldUse);
-            if (!canUse) continue;
-
-            float dist = Vector2.Distance(
-                player.Collider.bounds.center,
-                vent.transform.position);
-            if (dist < nearestDist)
-            {
-                nearestDist = dist;
-                nearest = vent;
-            }
-        }
-
-        return nearest;
-    }
-}
 
